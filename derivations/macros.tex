@@ -1,6 +1,8 @@
-% Macros do WAFC. Implementa docs/notacao.md (esboço; congela em E1.1).
+% Macros do WAFC. Implementa docs/notacao.md (congelada em E1.1, 2026-09-18).
 % Único lugar onde uma macro é definida; os derivations/*.tex fazem \input{macros}.
 \usepackage{amsmath,amssymb,amsthm}
+
+% --- básicas -------------------------------------------------------------
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\E}{\mathbb{E}}
 \newcommand{\Prob}{\mathbb{P}}
@@ -8,16 +10,57 @@
 \newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
 \newcommand{\normn}[1]{\left\lVert #1 \right\rVert_{n}}
 \newcommand{\normL}[1]{\left\lVert #1 \right\rVert_{L_2(P)}}
-\newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
+\newcommand{\inner}[2]{\langle #1, #2 \rangle}
+
+% --- índices (notacao.md, §1) --------------------------------------------
+% A covariável linear é X_\ell, \ell = 1..p; a moduladora é U_m, m = 1..q;
+% a wavelet é \psi_{jk}, com nível j e translação k. O par (\ell,m) é o bloco.
+\newcommand{\cv}{\ell}          % índice da covariável linear
+\newcommand{\md}{m}             % índice da covariável moduladora
+\newcommand{\lev}{j}            % nível de resolução
+\newcommand{\tsl}{k}            % translação
+\newcommand{\jzero}{j_{0}}
+\newcommand{\NJ}{N_{J}}
+
+% --- modelo (notacao.md, §2) ---------------------------------------------
 \newcommand{\bX}{\mathbf{X}}
 \newcommand{\bU}{\mathbf{U}}
 \newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\fcoef}[1]{\beta_{#1}}          % \fcoef{\cv}: coeficiente funcional
+\newcommand{\lvl}[1]{c_{#1}}                % \lvl{\cv}: nível não penalizado
+\newcommand{\gcomp}[2]{g_{#1#2}}            % \gcomp{\cv}{\md}: componente aditiva
+
+% --- base e sieve (notacao.md, §3) ---------------------------------------
+\newcommand{\wav}[2]{\psi_{#1#2}}           % \wav{\lev}{\tsl}
+\newcommand{\VJ}{V_{J}}
+\newcommand{\WJ}{W_{J}}
+\newcommand{\PiJ}{\Pi_{J}}
+\newcommand{\coef}[4]{\theta_{#1#2,#3#4}}   % \coef{\cv}{\md}{\lev}{\tsl}
+\newcommand{\coefs}[4]{\theta^{*}_{#1#2,#3#4}}
+\newcommand{\blk}[2]{\theta_{#1#2,\cdot}}   % subvetor do bloco (grupo em E2.2)
 \newcommand{\btheta}{\boldsymbol{\theta}}
 \newcommand{\thetastar}{\btheta^{*}}
+\newcommand{\thetahat}{\widehat{\btheta}}
 \newcommand{\bc}{\mathbf{c}}
-\newcommand{\PiJ}{\Pi_{J}}
-\newcommand{\VJ}{V_{J}}
-\newcommand{\NJ}{N_{J}}
+\newcommand{\chat}{\widehat{\mathbf{c}}}
+\newcommand{\Gram}{\Sigma}
+\newcommand{\Gramhat}{\widehat{\Sigma}}
+
+% --- estimador (notacao.md, §4) ------------------------------------------
+\newcommand{\pen}{\lambda}
+\newcommand{\penn}{\lambda_{n}}
+\newcommand{\wgt}[4]{w_{#1#2,#3#4}}
+\newcommand{\compat}{\phi_{0}}
+\newcommand{\Szero}{S_{0}}
+% A penalidade é escrita \norm{\btheta}_{1}; nunca "\ell_1", que colidiria
+% com o índice \cv (notacao.md, §1).
+
+% --- espaços de funções (notacao.md, §5) ---------------------------------
+\newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
+\newcommand{\seff}{s'}
+\newcommand{\weakl}[1]{\mathrm{w}\ell_{#1}}
+
+% --- ambientes -----------------------------------------------------------
 \newtheorem{proposition}{Proposition}
 \newtheorem{lemma}{Lemma}
 \newtheorem{theorem}{Theorem}

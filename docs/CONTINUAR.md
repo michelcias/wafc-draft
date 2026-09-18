@@ -83,10 +83,11 @@ Quando existirem: `Rscript derivations/check/01-identificabilidade.R` (imprime
   *Statistica Sinica* em `docs/ss-instrucoes-autores.md`, templates em
   `manuscript/ss-template/`, teto corrigido para 40 páginas em espaço duplo).
   O tipo de revisão da revista não consta da página oficial.
-- **Nada de teoria, protótipo ou manuscrito ainda.** `notacao.md` é esboço;
-  E1.1 o congela.
-- **Tarefas que podem abrir agora em chats de tarefa:** L1 e L2 (catálogo em
-  `TAREFA.md`). E1.2, E1.3, E1.4 e E2.1 depois de E1.1.
+- **Notação congelada** (E1.1, D9 a D12): `ψ_{jk}`, `X_ℓ`, `U_m`,
+  `θ_{ℓm,jk}`, `U ∈ [0,1]^q`; `derivations/macros.tex` implementa e compila.
+  Fora isso, nada de teoria, protótipo ou manuscrito ainda.
+- **Tarefas que podem abrir agora em chats de tarefa:** L1, L2, E1.2, E1.3 e
+  E1.4 (catálogo em `TAREFA.md`); E2.1 depois do enunciado de E1.2.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
   `instrucoes.md`.
