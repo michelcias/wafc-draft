@@ -1,7 +1,8 @@
 # wafc
 
 O código do método WAFC (decisão D4: pasta dedicada dentro do `wafc-draft`,
-não o `WaveBased`). Organizado como pacote sem ser pacote, para que
+não o `WaveBased`; **privado por enquanto**, sem pacote público nem cópia
+para outro repositório até E3.3). Organizado como pacote sem ser pacote, para que
 empacotar (E3.3) seja mover arquivos:
 
 ```

@@ -40,21 +40,10 @@ git clone https://github.com/michelcias/wall-manuscript.git
 O `wall` (compêndio) não tem remoto registrado nesta máquina; se precisar
 dele em outra, copiar ou publicar. Só E4.1 depende dele, como molde.
 
-**Publicação deste repositório no GitHub (pendente em 2026-09-18):** o
-`gh` não está instalado nesta máquina. Criar `michelcias/wafc-draft`
-(privado) pela página do GitHub, sem README, e então:
-
-```bash
-cd ~/Documents/repo/wafc-draft
-git remote add origin https://github.com/michelcias/wafc-draft.git
-git push -u origin main
-```
-
-Ou, com o `gh` instalado e autenticado:
-
-```bash
-cd ~/Documents/repo/wafc-draft && gh repo create michelcias/wafc-draft --private --source=. --remote=origin --push
-```
+O repositório `michelcias/wafc-draft` é **privado** (publicado em
+2026-09-18), e o código em `wafc/` fica privado por enquanto (D4): nada de
+`install_github`, pacote público ou cópia para outro repositório sem
+decisão em E3.3.
 
 ## 2. Ferramentas
 

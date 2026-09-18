@@ -1,9 +1,10 @@
 # Estado do trabalho, handoff de continuidade
 
 **Última atualização:** 2026-09-18.
-**Etapa corrente:** E0 aberta (falta E0.3 pelo autor e a publicação no
-GitHub); E1.1 é o próximo do chat principal. Nenhum chat de tarefa em curso.
-Duas decisões do autor adiadas (D5, D8) e cinco perguntas na §4.
+**Etapa corrente:** E0 aberta (falta E0.3 pelo autor); repositório publicado
+em `michelcias/wafc-draft` (privado). E1.1 é o próximo do chat principal.
+Nenhum chat de tarefa em curso. Duas decisões do autor adiadas (D5, D8) e
+cinco perguntas na §4.
 **Versão viva do manuscrito:** nenhuma (nasce em E5a como `k = 1`).
 **Cor da rodada corrente:** `colR1` (entra em uso quando existir `k = 2`).
 
@@ -94,7 +95,7 @@ fez buscas de literatura. O que saiu:
 | D1 | 09-18 | O modelo é `Y = Σ_j β_j(U) X_j + ε`, `β_j(u) = c_j + Σ_k g_{jk}(u_k)`, com `X_1 ≡ 1` permitido (o aditivo puro e o parcialmente linear aditivo são casos particulares) | pedido do autor |
 | D2 | 09-18 | Base: wavelets ortonormais de suporte compacto do `WaveBased`; padrão periódico com `j0 = 0` e a função de escala constante descartada (identificabilidade no nível da base, como no `wall()`); `boundary = "interval"` como opção | herda o `wall()`; é o que faz a restrição `∫ g_{jk} = 0` sair de graça |
 | D3 | 09-18 | Estimador base: LASSO sobre todos os coeficientes de wavelet, `c_j` não penalizados; sparse group LASSO por par `(j,k)` é a variante a medir em E2 | pedido do autor (LASSO); a variante em grupos é a candidata natural à seleção de estrutura |
-| D4 | 09-18 | **O código do método vive na pasta `wafc/` deste repositório** (`R/`, `tests/`, `scripts/`); o `WaveBased` não recebe código por enquanto e é usado só como dependência para as bases (`wbasis()`, `wtable()`); empacotar (pacote próprio, `WaveBased`, ou ficar na pasta) decide-se em E3.3, com o código testado | decisão do autor, contra a proposta de implementar dentro do `WaveBased` |
+| D4 | 09-18 | **O código do método vive na pasta `wafc/` deste repositório** (`R/`, `tests/`, `scripts/`); o `WaveBased` não recebe código por enquanto e é usado só como dependência para as bases (`wbasis()`, `wtable()`), confirmado pelo autor; **as funções criadas ficam privadas por enquanto** (neste repositório privado, sem pacote público, sem `install_github`); empacotar e publicar decide-se em E3.3, com o código testado | decisão do autor, contra a proposta de implementar dentro do `WaveBased` |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
 | D7 | 09-18 | Compêndio de simulação e aplicação em repositório próprio, `wafc-studies`, nos moldes do `wall` | o `wall` já resolveu cache, `renv` por commit e proveniência |
 
@@ -124,26 +125,18 @@ fez buscas de literatura. O que saiu:
 
 Ordenadas pelo que bloqueia mais.
 
-1. **Uso do `WaveBased` instalado como dependência.** D4 diz "não use o
-   `WaveBased` por enquanto"; o assistente entendeu "não coloque código lá" e
-   manteve o pacote instalado como dependência de `wafc/` para avaliar as
-   bases (`wbasis()`, `wtable()`), porque reimplementar Daubechies–Lagarias
-   seria trabalho sem ganho. Se a intenção era não depender dele de forma
-   alguma, a alternativa é o `wavethresh` (bases só em grade diádica, o que
-   exige interpolação) ou copiar o C do `WaveBased` para `wafc/src/`.
-   **Confirmar.**
-2. **D5 e D8** (tabela acima), adiadas. D5 destrava E0.3 e a estrutura de
+1. **D5 e D8** (tabela acima), adiadas. D5 destrava E0.3 e a estrutura de
    E5a; D8 é nome e pode esperar E5a. Cobrar quando E1.1 fechar.
-3. **Índice de nível das wavelets:** `l` (proposta, para deixar `j` à
+2. **Índice de nível das wavelets:** `l` (proposta, para deixar `j` à
    covariável linear) ou `j` como no WALL, mudando a covariável para outro
    índice. Decide-se em E1.1 (`notacao.md`, §6).
-4. **Aplicação (E6.1):** o autor tem uma base em mente? Os candidatos de
+3. **Aplicação (E6.1):** o autor tem uma base em mente? Os candidatos de
    `plano-projeto.md` E6.1 são genéricos. Decidir cedo evita desenhar a
    simulação longe do caso real.
-5. **Sparse group LASSO:** a variante em grupos entra em `wafc()` como
+4. **Sparse group LASSO:** a variante em grupos entra em `wafc()` como
    opção (`penalty = "sglasso"`, dependência `sparsegl`) ou fica só no
    piloto e no artigo como comparação? Decide-se em E2.5 com número.
-6. **`X` dependente de `U`:** a teoria de E1.4 tenta o caso geral ou o
+5. **`X` dependente de `U`:** a teoria de E1.4 tenta o caso geral ou o
    artigo assume `X ⊥ U` e discute o geral? Decide-se quando E1.4 mostrar o
    que fecha.
 
@@ -153,10 +146,8 @@ Ordenadas pelo que bloqueia mais.
 
 Em ordem; (a) e (b) são independentes de (c) a (e).
 
-- (a) **Autor:** confirmar a pergunta 1 (dependência do `WaveBased`); criar
-  `michelcias/wafc-draft` no GitHub e fazer o push (`CONTINUAR.md`, §1);
-  E0.3 (instruções e template da SS); responder a pergunta 4 se já tiver a
-  base. D5 e D8 ficam para depois de E1.1.
+- (a) **Autor:** E0.3 (instruções e template da SS); responder a pergunta 3
+  se já tiver a base. D5 e D8 ficam para depois de E1.1.
 - (b) **Chat principal:** E1.1 (congelar a notação; `macros.tex`); depois
   catalogar E1.3, E1.4 e E2.1 com os arquivos permitidos definitivos.
 - (c) **Chats de tarefa, em paralelo desde já:** L1 (verificação
@@ -170,4 +161,4 @@ Em ordem; (a) e (b) são independentes de (c) a (e).
 | Data | O que aconteceu |
 |---|---|
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
-| 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos |
+| 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
