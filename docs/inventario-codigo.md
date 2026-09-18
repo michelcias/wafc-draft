@@ -82,9 +82,13 @@ R 4.6.1; `glmnet`, `grpreg`, `gglasso` (group LASSO), `Matrix`, `bench`,
 `foreach`, `doParallel`, `future`, `ggplot2`, `xtable`, `knitr`,
 `rmarkdown`, `mgcv` (competidor: `gam(y ~ x1 + s(u1, by = x1) + ...)` ajusta
 o modelo de coeficientes aditivos por splines penalizadas), `splines2`,
-`posterior`; `latexmk`, `pdflatex`. **Não instalados:** `sparsegl` e `SGL`
-(sparse group LASSO), `targets`, `gh`. O `WaveBased` 2.6-0 foi instalado de
-`../../WaveBased` (`R CMD INSTALL .`) em 2026-09-18.
+`posterior`; `latexmk`, `pdflatex`. **Não instalados:** `SGL` (sparse group
+LASSO, a referência original) e `targets`. O `WaveBased` 2.6-0 foi instalado
+de `../../WaveBased` (`R CMD INSTALL .`) em 2026-09-18.
+
+Na máquina de trabalho do autor (conferida em 2026-09-18), `grpreg`,
+`gglasso` e `sparsegl` vieram do repositório do Ubuntu (`r-cran-*`, em
+`/usr/lib/R/site-library`) e o `gh` está autenticado como `michelcias`.
 
 Para a variante em grupos (E2.2): `sparsegl` (Liang, Cohen, Sólon Heinsfeld,
 Pestilli & McDonald, 2024, *JSS*) é a opção com interface tipo `glmnet` e
