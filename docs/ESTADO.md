@@ -1,10 +1,10 @@
 # Estado do trabalho, handoff de continuidade
 
 **Última atualização:** 2026-09-18.
-**Etapa corrente:** E0 fechada, menos a ratificação de D5; E1.1 e L1
-fechadas. Liberadas para chats de tarefa: L2, E1.2, E1.3 e E1.4 (E2.1 espera
-o enunciado de E1.2). Nenhum chat de tarefa em curso. Duas decisões do autor
-adiadas (D5, D8) e cinco perguntas na §4.
+**Etapa corrente:** E0 fechada, menos a ratificação de D5; E1.1, L1 e L2
+fechadas. Liberadas para chats de tarefa: E1.2, E1.3 e E1.4 (E2.1 espera o
+enunciado de E1.2). Nenhum chat de tarefa em curso. Duas decisões do autor
+adiadas (D5, D8), seis propostas de L2 a ratificar e sete perguntas na §4.
 **Versão viva do manuscrito:** nenhuma (nasce em E5a como `k = 1`).
 **Cor da rodada corrente:** `colR1` (entra em uso quando existir `k = 2`).
 
@@ -182,6 +182,50 @@ respondem desta máquina sem chave; o Semantic Scholar limita a ~1
 consulta/s; o Project Euclid bloqueia `curl`; a *Statistica Sinica* serve os
 PDFs antigos em `statistica/oldpdf/A{vol}n{iss}{art}.pdf`.
 
+### 2026-09-18: L2 fechada (busca de novidade), e o vizinho é outro
+
+Chat de tarefa, integrado neste. `docs/busca-novidade.md` traz as quatro
+buscas, a varredura da *Statistica Sinica* e da EJS desde 2015 e o veredito
+por contribuição; as linhas novas de `literatura.md` foram coladas aqui,
+porque L1 tinha o arquivo na mão quando L2 rodou.
+
+- **A novidade central se sustenta:** nenhum trabalho combina coeficientes
+  aditivos em várias moduladoras, wavelets e LASSO. Na varredura por título,
+  a interseção "coeficientes variáveis × wavelet" é **zero** na SS e **zero**
+  na EJS desde 2015 (SS: 28 `varying coefficient`, 1 `additive coefficient`,
+  2 `wavelet`; EJS: 7, 0, 6).
+- **Mas o vizinho perigoso não é Sardy & Ma: é Klopp & Pensky (2015,
+  *Ann. Statist.* 43(3) 1273-1299).** Para `q = 1` e `X ⊥ U`, eles já têm o
+  desenho de produtos com Gram `Ω ⊗ Φ` (eq. 1.8), a concentração da Gram
+  empírica restrita (Lema 1), o LASSO em blocos com desigualdade oráculo não
+  assintótica, a taxa adaptativa em Besov com `ν < 2` e a cota inferior
+  minimax. Ou seja: E1.4 (i), E1.5 e E1.6 estão publicados no caso de uma
+  moduladora com desenho independente.
+- **O que sobra para o WAFC**, e que passa a ser o eixo do artigo:
+  aditividade em `q ≥ 2` moduladoras, com o termo cruzado
+  `E[X_ℓ X_{ℓ'} ψ_{jk}(U_m) ψ_{j'k'}(U_{m'})]`, `m ≠ m'`, que não é produto
+  de Kronecker; `X` dependente de `U`; LASSO puro com o corolário de
+  compressibilidade; identificabilidade no nível da base com constantes não
+  penalizadas; e o software, a simulação e a aplicação, que K&P não têm.
+- **Sardy & Ma (2024) não é ameaça teórica:** os quatro teoremas deles são
+  de otimização (degenerescência do group square-root LASSO em bloco
+  ortonormal, limiarização suave em forma fechada, relaxação por blocos,
+  SURE), sem teoria estatística e sem sieve.
+- **Precursor do próprio grupo, obrigatório citar:** Montoril, Morettin &
+  Chiann (2018, *IJWMIP* 16(1) 1850004), wavelets em coeficientes funcionais
+  sem penalização.
+- **Concorrentes que o referee vai cobrar em E4:** o spline adaptativo de
+  Wang, Jiang & Liu (2024, *JCGS*), o block LASSO de K&P no mesmo desenho
+  (sai com `grpreg`/`gglasso`) e um não aditivo em várias moduladoras
+  (VCBART).
+- **Lição de ferramenta:** o Crossref por ISSN com `from-pub-date` varre uma
+  revista por título; o OpenAlex dá grafo de citações e resumos; a Wiley
+  bloqueia leitura automatizada.
+
+As linhas que L2 acrescentou ao `literatura.md` estão com status `resumo` ou
+`[VERIFICAR]` e **não podem entrar no `.bib`** antes de uma verificação como
+a de L1.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -196,6 +240,18 @@ PDFs antigos em `statistica/oldpdf/A{vol}n{iss}{art}.pdf`.
 | D12 | 09-18 | Ordem das colunas de `Z`: não penalizados, depois blocos `(ℓ, m)` lexicográficos, dentro do bloco `j` e `k` crescentes | fixa a interface de `wafc_design()` em E2.1 |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
 | D7 | 09-18 | Compêndio de simulação e aplicação em repositório próprio, `wafc-studies`, nos moldes do `wall` | o `wall` já resolveu cache, `renv` por commit e proveniência |
+
+**Propostas de L2, a ratificar (2026-09-18).** Nenhuma bloqueia E1.2, E1.3 ou
+E1.4; todas mudam documento, não resultado.
+
+| # | Proposta | Onde |
+|---|---|---|
+| L2a | Frase-tese e contribuição 1 reescritas como extensão de Klopp & Pensky a coeficientes aditivos em várias moduladoras e desenho dependente; "Why not block LASSO?" entra nas perguntas do referee | `alvo-revista.md` §4 |
+| L2b | E1.4 (i) vira "recordar K&P (eq. 1.8, Lema 1) e estender ao desenho aditivo"; o entregável central passa a ser o termo cruzado entre moduladoras e a parte (ii) | `plano-projeto.md` E1.4 |
+| L2c | O QUT (Giacobino et al. 2017), que Sardy & Ma usam, entra em E2.3 como regra de `λ` sem `σ`, ao lado de BIC/EBIC | `plano-projeto.md` E2.3 |
+| L2d | Concorrentes mínimos de E2.4/E4: `mgcv`, spline adaptativo (Wang, Jiang & Liu 2024), block LASSO de K&P no mesmo desenho, VCBART; cenário não homogêneo com as funções de Donoho-Johnstone | `plano-projeto.md` E2.4, E4 |
+| L2e | "O mais próximo na teoria é Klopp & Pensky; no método, Sardy & Ma e Amato et al."; citar Montoril, Morettin & Chiann (2018) | `proposta-metodo.md` §5 |
+| L2f | E1.7 fica opcional ou vira variante sem teorema de seleção: a ideia já existe em splines (Antoniadis et al. 2014; Ma et al. 2015) e em wavelets sem `X_ℓ` (Amato et al. 2022) | `plano-projeto.md` E1.7 |
 
 **Adiadas pelo autor ("cobre-me depois", 2026-09-18); propostas do assistente:**
 
@@ -234,7 +290,15 @@ Ordenadas pelo que bloqueia mais.
 4. **`X` dependente de `U`:** a teoria de E1.4 tenta o caso geral ou o
    artigo assume `X ⊥ U` e discute o geral? Decide-se quando E1.4 mostrar o
    que fecha.
-5. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+5. **Como o artigo se posiciona diante de Klopp & Pensky** (a mais
+   importante desta rodada): o WAFC se apresenta como extensão deles
+   (honesto, e o referee da SS reconhece) ou como modelo diferente, com K&P
+   citado como caso particular? A primeira muda a frase-tese de
+   `alvo-revista.md` §4; a segunda obriga a Seção 2 a mostrar que o desenho
+   aditivo não é o deles. Decide-se antes de E5a; E1.4 não depende.
+6. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
+   lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
+7. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
@@ -258,8 +322,14 @@ Ordenadas pelo que bloqueia mais.
 
 - (a) **Autor:** ratificar D5 e D8 (a notação já não depende disso);
   responder a pergunta 2 se já tiver a base da aplicação.
-- (b) **Chats de tarefa, em paralelo desde já:** L2 (L1 fechou e liberou o
-  `literatura.md`); E1.2, E1.3 e E1.4, que tocam arquivos distintos.
+- (b) **Chats de tarefa, em paralelo desde já:** E1.2, E1.3 e E1.4, que
+  tocam arquivos distintos. E1.4 abre com o achado de L2: a parte (i) é
+  citação de K&P, e o entregável é o termo cruzado entre moduladoras e a
+  parte (ii).
+- (b') **A catalogar quando o autor ratificar as propostas de L2:** a
+  verificação bibliográfica das linhas novas de `literatura.md` (uma L1 de
+  segunda rodada) e as edições de `alvo-revista.md` e `plano-projeto.md`
+  listadas na §6 de `busca-novidade.md`.
 - (c) **Chat de tarefa, depois do enunciado de E1.2:** E2.1, que precisa
   saber o que a identificabilidade descarta do desenho.
 - (d) **Chat principal:** integrar os handoffs e catalogar E1.5, E1.6 e
@@ -272,6 +342,7 @@ Ordenadas pelo que bloqueia mais.
 |---|---|
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
+| 2026-09-18 | L2 fechada em chat de tarefa e integrada: novidade central confirmada (interseção zero na SS e na EJS), mas Klopp & Pensky (2015) cobre E1.4 (i), E1.5 e E1.6 para `q = 1` e `X ⊥ U`; seis propostas de mudança de rumo a ratificar |
 | 2026-09-18 | L1 fechada em chat de tarefa e integrada: 35 referências verificadas, quatro correções de atribuição, dois trabalhos novos para L2 olhar |
 | 2026-09-18 | E1.1 fechada: notação congelada (`ψ_{jk}`, `X_ℓ`, `U_m`, `θ_{ℓm,jk}`, `U ∈ [0,1]^q`), D9 a D12, `macros.tex` reescrito e compilando |
 | 2026-09-18 | Máquina nova conferida (R 4.6.1, `WaveBased` 2.6-0, `grpreg`, `gglasso`, `sparsegl` por `apt`); E0.3 fechada: instruções da SS transcritas, templates versionados e compilando, teto corrigido de 30 para 40 páginas |
