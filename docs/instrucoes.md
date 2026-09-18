@@ -87,8 +87,8 @@ resolvidas de uma vez, no início; no decorrer, só o pontual é perguntado.
   `push --force`, `reset --hard`, apagar branch. Se parecer necessário, dizer o
   comando e o porquê, e esperar.
 - Apagar arquivo rastreado se avisa antes: o que sai e o que deixa de funcionar.
-- O mesmo vale no `WaveBased` quando E3 abrir: commit lá segue as mesmas
-  regras, e o `NEWS.md` do pacote é atualizado no mesmo commit da função.
+- O `WaveBased` não é tocado por este projeto (D4); se E3.3 mudar isso,
+  commit lá segue as mesmas regras.
 
 O que continua esperado é o **lembrete**, uma linha no fecho da resposta, nos
 momentos úteis: fim de uma rodada que compila, criação de versão `{k+1}`,
@@ -211,34 +211,40 @@ a EJS, cai o teto de páginas e sobe a expectativa de teoria.
 
 ## 6. Código
 
-O código de produção vive fora deste repositório (decisão D4 em
-`ESTADO.md`; detalhe em `plano-projeto.md`, E0.2):
+O código do método vive **na pasta `wafc/` deste repositório** (decisão D4
+em `ESTADO.md`; detalhe em `plano-projeto.md`, E0.2). O `WaveBased` não
+recebe código por enquanto: o pacote instalado é uma dependência, como o
+`glmnet`, usada só para avaliar as bases (`wbasis()`, `wtable()`).
 
 | Código | Onde |
 |---|---|
-| `wafc()`, `cv.wafc()`, métodos S3 | `michelcias/WaveBased`, pasta `../../WaveBased`, ao lado de `wall()` |
-| estudo de simulação e aplicações | `michelcias/wafc-studies`, compêndio nos moldes do `wall` |
+| funções do método: desenho, ajuste, sintonia, reconstrução, predição, gráficos | `wafc/R/`, um arquivo por tema, carregados por `source()` via `wafc/R/load.R` |
+| testes | `wafc/tests/`, `testthat` rodado com `testthat::test_dir("wafc/tests")` |
+| scripts de fumaça, piloto e comparação | `wafc/scripts/`, numerados |
+| estudo de simulação e aplicações | `michelcias/wafc-studies`, compêndio nos moldes do `wall`, que fixa o código de `wafc/` por commit deste repositório |
 
-Neste repositório ficam:
+Neste repositório ficam também:
 
 - scripts curtos de conferência numérica de um resultado (`derivations/check/`);
-- o protótipo em R (`prototype/`), que chama o `WaveBased` para as bases e o
-  `glmnet` (ou o pacote de sparse group LASSO escolhido em E2) para o ajuste;
-  existe para escolher a variante do estimador (E2) e depois serve de oráculo
-  de teste da função do pacote; nada dele entra no pacote por cópia;
 - a cópia de referência de figuras e tabelas (`results/`), copiadas do
   compêndio, nunca geradas aqui;
 - a documentação de reprodutibilidade que o artigo cita.
 
-Quando o `results/` e o compêndio divergirem, o compêndio é a verdade. Quando
-o protótipo e o pacote divergirem, investiga-se antes de decidir quem está
-certo.
+Regras do código em `wafc/`:
 
-No `WaveBased`, `wafc()` **reaproveita as internas de `wall()`** (`.wall_x`,
-`.wall_rescale_pars`, `.wall_table`, `.wall_design`, `.wall_penalty`,
-`.wall_wbasis_sparse`): o que for compartilhado é renomeado para um prefixo
-neutro (`.wb_add_*`) num commit próprio de refatoração, com os testes de
-`wall()` passando antes e depois, e só então `wafc()` é escrito por cima.
+- **Toda função exportável tem teste** em `wafc/tests/`; o teste de
+  recuperação exata (`θ*` na base, sem ruído, `λ → 0`) é o primeiro.
+- **O `wall()` é referência de leitura, não de cópia.** O desenho por blocos,
+  o reescalonamento para `[ε, 1 − ε]` e o descarte da função de escala são
+  reimplementados aqui com nomes próprios (`wafc_design()`, `wafc_rescale()`),
+  citando no comentário a função do `wall.R` que inspirou.
+- **Dependências declaradas** em `wafc/R/load.R` e em `CONTINUAR.md` na
+  mesma rodada em que entram.
+- **Se um dia virar pacote** (próprio ou dentro do `WaveBased`), a decisão é
+  tomada depois de E2.5, com o código já testado; a pasta é organizada desde
+  já como `R/` + `tests/` para que a migração seja mover arquivos.
+
+Quando o `results/` e o compêndio divergirem, o compêndio é a verdade.
 
 ---
 
@@ -295,6 +301,5 @@ As regras que vêm disso:
   editar, conferir que o trecho novo está lá.
 - **Produto de compilação não é documentação.** PDF compilado viaja quando
   for a entrega; `.aux`, `.bbl` e afins ficam de fora até haver razão.
-- **Antes de trocar de máquina**, `git status` limpo em `wafc-draft` e, quando
-  E3 abrir, no `WaveBased`; `HEAD` igual a `origin/main`; nenhum
-  `docs/handoff-*.md` pendente.
+- **Antes de trocar de máquina**, `git status` limpo em `wafc-draft`; `HEAD`
+  igual a `origin/main`; nenhum `docs/handoff-*.md` pendente.

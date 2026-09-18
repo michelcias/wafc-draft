@@ -95,7 +95,8 @@ afetam quais coeficientes.
 3. Evidência numérica de que a adaptatividade se materializa: contra
    splines (Xue & Yang; `mgcv`) em funções não homogêneas, sem perder muito
    nas suaves (E4).
-4. Software: `wafc()` no `WaveBased`, com a mesma interface do `wall()`.
+4. Software: o código de `wafc/`, com a mesma interface do `wall()`, na
+   forma de distribuição decidida em E3.3.
 
 **O que o referee vai perguntar:**
 

@@ -22,9 +22,9 @@ relativos não dependem disso):
 ```
 ~/Documents/
 ├── repo/
-│   ├── wafc-draft/       # este repositório (docs, derivations, prototype, manuscript)
+│   ├── wafc-draft/       # este repositório (docs, derivations, wafc/ com o código, manuscript)
 │   └── bdm-draft/        # projeto irmão, só consulta (origem das convenções)
-├── WaveBased/            # o pacote (michelcias/WaveBased); recebe wafc() em E3
+├── WaveBased/            # o pacote (michelcias/WaveBased); só dependência para as bases (D4)
 ├── wall-manuscript/      # artigos do WALL (michelcias/wall-manuscript), só leitura; molde da prova
 └── wall/                 # compêndio do WALL, só leitura; molde do wafc-studies
 ```
@@ -65,7 +65,7 @@ cd ~/Documents/repo/wafc-draft && gh repo create michelcias/wafc-draft --private
 | `gh` autenticado como `michelcias` (opcional) | criar repositórios, CI | `gh auth status` |
 | pacotes R: `glmnet`, `Matrix`, `mgcv`, `grpreg`, `gglasso`, `bench`, `testthat`, `devtools`, `roxygen2`, `remotes`, `renv` | protótipo, competidores, pacote | comando abaixo |
 | `sparsegl` | sparse group LASSO (E2.2), se a variante for adotada | `install.packages("sparsegl")` |
-| o próprio `WaveBased`, instalado de `../../WaveBased` | bases de wavelets em tudo | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
+| o próprio `WaveBased`, instalado de `../../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
 
 ```r
 pk <- c("glmnet", "Matrix", "mgcv", "grpreg", "gglasso", "bench", "testthat", "devtools", "roxygen2", "remotes", "renv")
@@ -80,12 +80,13 @@ cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd - 
 ```
 
 Quando existirem: `Rscript derivations/check/01-identificabilidade.R` (imprime
-`OK`); `Rscript prototype/05-smoke.R`.
+`OK`); `Rscript -e 'testthat::test_dir("wafc/tests")'`; `Rscript wafc/scripts/01-smoke.R`.
 
 ## 3. Onde o trabalho está (resumo de 2026-09-18; o `ESTADO.md` manda)
 
-- **E0 quase fechada:** falta o autor ratificar D4, D5 e D8, publicar o
-  repositório e fazer E0.3 (instruções e template da *Statistica Sinica*).
+- **E0 quase fechada:** D4 decidida (código em `wafc/`); D5 e D8 adiadas;
+  falta publicar o repositório e fazer E0.3 (instruções e template da
+  *Statistica Sinica*).
 - **Nada de teoria, protótipo ou manuscrito ainda.** `notacao.md` é esboço;
   E1.1 o congela.
 - **Tarefas que podem abrir agora em chats de tarefa:** L1 e L2 (catálogo em
@@ -98,10 +99,10 @@ Quando existirem: `Rscript derivations/check/01-identificabilidade.R` (imprime
 
 - A memória local do assistente (`~/.claude/...`) e o scratchpad: nada do
   projeto depende deles; tudo que importa está nos repositórios.
-- Resultados de piloto (`.rds`) e `prototype/cache/`: não versionados; só o
+- Resultados de piloto (`.rds`) e `wafc/cache/`: não versionados; só o
   handoff e o `ESTADO.md` registram os números.
-- Objetos compilados do `WaveBased` (`src/*.o`, `*.so`): recompilar com
-  `R CMD INSTALL .`.
+- A instalação do `WaveBased`: reinstalar com `R CMD INSTALL .` na pasta
+  clonada.
 
 ## 5. Regras que valem lá como aqui
 

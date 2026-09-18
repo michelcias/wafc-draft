@@ -11,7 +11,8 @@ Y = Σ_j β_j(U) X_j + ε,      β_j(u) = c_j + Σ_k g_{jk}(u_k),
 cada `g_{jk}` expandida numa base ortonormal de wavelets de suporte compacto
 e o vetor de coeficientes estimado por LASSO. É a generalização, para
 regressão com coeficientes funcionais, do que o WALL (`wall()` no pacote
-`WaveBased`) faz para o modelo aditivo logístico.
+`WaveBased`) faz para o modelo aditivo logístico. O código do método vive
+na pasta [`wafc/`](wafc/) deste repositório.
 
 Alvo de publicação: periódico Q1 em Statistics and Probability (SCImago);
 proposta **Statistica Sinica**, reserva *Electronic Journal of Statistics*
@@ -46,7 +47,7 @@ wafc-draft/
 │   └── ejs-template/            #   template da EJS (imsart.cls, opção ejsv2), compila
 ├── derivations/                 # rascunhos matemáticos, um resultado por arquivo
 │   └── check/                   #   conferência numérica em R (n pequeno, forma densa)
-├── prototype/                   # protótipo do estimador em R sobre o WaveBased (E2)
+├── wafc/                        # o código do método em R (E2): R/, tests/, scripts/
 └── results/                     # cópia de referência de figuras e tabelas (origem: wafc-studies)
 ```
 
@@ -80,7 +81,7 @@ Regra completa em [`docs/instrucoes.md`](docs/instrucoes.md).
 
 | Repositório | Papel |
 |---|---|
-| [`WaveBased`](https://github.com/michelcias/WaveBased) | pacote R/C do autor: bases de wavelets (Daubechies–Lagarias, tabelas, CDV), `wall()`; recebe `wafc()` em E3 |
+| [`WaveBased`](https://github.com/michelcias/WaveBased) | pacote R/C do autor: bases de wavelets (Daubechies–Lagarias, tabelas, CDV); dependência do código em `wafc/`; `wall()` é referência de leitura |
 | [`wall-manuscript`](https://github.com/michelcias/wall-manuscript) | artigos do WALL; o teórico é o molde da prova |
 | `wall` (local) | compêndio de benchmark do WALL; molde do `wafc-studies` |
 | [`bdm-draft`](https://github.com/michelcias/bdm-draft) | projeto irmão, origem destas convenções |

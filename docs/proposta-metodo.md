@@ -46,7 +46,8 @@ Coiflets, avaliadas por Daubechies–Lagarias no `WaveBased`):
 g_{jk}(u) ≈ Σ_{m} α_{jk,m} φ_{j0,m}(u) + Σ_{l=j0}^{J-1} Σ_{m} θ_{jk,lm} ψ_{lm}(u)
 ```
 
-Duas escolhas herdadas do `wall()` do `WaveBased`:
+Duas escolhas herdadas do desenho do `wall()` do `WaveBased` (reimplementadas
+em `wafc/`, D4):
 
 - **Periodização com `j0 = 0`**: a única função de escala é a constante, e
   ela é **descartada**, absorvida em `c_j`. Isso impõe a restrição de

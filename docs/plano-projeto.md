@@ -5,7 +5,8 @@ funcionais aditivos, `Y = Σ_j β_j(U) X_j + ε` com `β_j(u) = c_j + Σ_k
 g_{jk}(u_k)`, em que cada `g_{jk}` é expandida numa base ortonormal de
 wavelets e todos os coeficientes são estimados por LASSO num único problema
 convexo. Três produtos: a teoria (desigualdade oráculo no desenho de
-produtos, taxas em Besov, adaptação), a função `wafc()` no pacote `WaveBased`,
+produtos, taxas em Besov, adaptação), o código do método na pasta `wafc/`
+deste repositório (com testes; empacotamento decidido depois de E2.5),
 e um artigo num periódico Q1 de Statistics and Probability (alvo proposto:
 *Statistica Sinica*; reserva: EJS).
 
@@ -31,8 +32,8 @@ L2 busca de novidade ──────────┼──► E5a manuscrito: 
                                │         ▲                                 │
 E1 teoria ─────────────────────┘─────────┘                                 ├──► E7 fechamento
    (E1.1 notação primeiro)                                                 │
-E2 protótipo R (go/no-go) ──► E3 wafc() no WaveBased ──┬──► E4 simulação ──┤
-                                                       └──► E6 aplicação ──┘
+E2 código em wafc/ (go/no-go) ──► E3 consolidação ──┬──► E4 simulação ──┤
+                                                    └──► E6 aplicação ──┘
 ```
 
 | Etapa | Depende de | Pode andar junto com |
@@ -41,9 +42,9 @@ E2 protótipo R (go/no-go) ──► E3 wafc() no WaveBased ──┬──► E
 | L1 verificação bibliográfica | nada | tudo |
 | L2 busca de novidade | nada | tudo; deve fechar antes de E5a |
 | E1 teoria | E1.1 (notação) | E0, E2, L1, L2 |
-| E2 protótipo | E1.1 (notação) e o enunciado de E1.2 (identificabilidade) | E1.3 a E1.7 |
-| E3 `wafc()` | E2.5 (variante e sintonia decididas) | E1 provas, E5a |
-| E4 simulação | E3.1 (função ajustando) | E6, E5a |
+| E2 código em `wafc/` | E1.1 (notação) e o enunciado de E1.2 (identificabilidade) | E1.3 a E1.7 |
+| E3 consolidação do código | E2.5 (variante e sintonia decididas) | E1 provas, E5a |
+| E4 simulação | E3.1 (interface congelada) | E6, E5a |
 | E5a manuscrito, seções 1 a 4 | enunciados de E1.2 a E1.6, L2 | E2, E3, E4, E6 |
 | E5b manuscrito, resultados | E4 e E6 | |
 | E6 aplicação | E3.1 e E6.1 | E4 |
@@ -61,7 +62,7 @@ decisões para a hora errada.
 | O quê | Nome | Estado (2026-09-18) |
 |---|---|---|
 | método | WAFC, *wavelet additive functional coefficients* (provisório) | a ratificar (D8) |
-| função no pacote | `wafc()`, `cv.wafc()`, classe `"wafc"` | livre no `WaveBased`; a ratificar (D4) |
+| funções | `wafc()`, `cv.wafc()`, classe `"wafc"`, na pasta `wafc/` | D4 fechada: pasta dedicada, não o `WaveBased` |
 | repositório de rascunho | `michelcias/wafc-draft` (este) | criado localmente em 2026-09-18; a publicar no GitHub |
 | compêndio | `michelcias/wafc-studies` | a criar em E4.1; conferir que está livre |
 
@@ -70,9 +71,8 @@ decisões para a hora errada.
 | Código | Onde | Por quê |
 |---|---|---|
 | conferência numérica de um resultado (`n ≤ 200`, denso) | `derivations/check/` aqui | é parte da prova, viaja com ela |
-| protótipo do estimador (R sobre `WaveBased` + `glmnet`) | `prototype/` aqui | é descartável; serve para decidir a variante e depois vira oráculo de teste |
-| `wafc()`, `cv.wafc()`, métodos | `michelcias/WaveBased`, ao lado de `wall()` | o motor (bases, tabelas, desenho por blocos, `glmnet`) já está lá; um pacote novo duplicaria 90 % do código; o `wall` já é citado pelo `WaveBased` |
-| estudo de simulação e aplicação | `michelcias/wafc-studies`, repositório próprio | pipeline pesado com cache; o `wall` é o molde |
+| o método: `wafc()`, `cv.wafc()`, métodos, testes, scripts | `wafc/` aqui (`R/`, `tests/`, `scripts/`) | decisão do autor (D4): pasta dedicada dentro do `wafc-draft`; o `WaveBased` instalado é só dependência para as bases; empacotar (pacote próprio ou `WaveBased`) decide-se depois de E2.5 |
+| estudo de simulação e aplicação | `michelcias/wafc-studies`, repositório próprio | pipeline pesado com cache; o `wall` é o molde; fixa `wafc/` por commit deste repositório |
 
 ### E0.3 Template e instruções da revista
 
@@ -94,22 +94,25 @@ página do GitHub).
 
 ### E0.5 Inventário
 
-Feito em `inventario-codigo.md`: o motor inteiro está no `wall()`; a
-refatoração das internas para prefixo neutro é o primeiro commit de E3.
+Feito em `inventario-codigo.md`: o desenho por blocos do `wall()` é a
+referência de leitura para `wafc_design()`; o `WaveBased` instalado fornece
+`wbasis()` e `wtable()`.
 
-### E0.6 Convenções do pacote, fixadas agora
+### E0.6 Convenções do código em `wafc/`, fixadas agora
 
 - `wafc()` tem a mesma assinatura de `wall()` até onde fizer sentido (`J`,
   `j0`, `family`, `filter.size`, `boundary`, `rescale`, `eps`, `use.table`,
   `sparse`, `lambda`, `standardize`, `weights`), mais `x` (lineares) e `u`
   (moduladoras) separados, e `penalty = c("lasso", "sglasso")` se E2 mantiver
   a variante.
-- Versão do `WaveBased`: `2.7-0` quando `wafc()` entrar; `NEWS.md` no mesmo
-  commit. Etiqueta git na versão citada pelo artigo; o compêndio fixa por
-  commit.
-- Testes lentos com `skip_on_cran()`.
+- Organização de pacote sem ser pacote: `wafc/R/` (um arquivo por tema,
+  roxygen nos cabeçalhos desde já), `wafc/tests/` (`testthat`),
+  `wafc/scripts/` (numerados), `wafc/R/load.R` que carrega tudo e declara as
+  dependências. O compêndio fixa o código por commit deste repositório.
+- Estilo do `WaveBased`: `snake_case` nas funções internas, `.` só nos
+  métodos S3; erro informativo em argumento desconhecido.
 
-**Critério de saída de E0:** nomes ratificados (D4, D5, D8); instruções da SS
+**Critério de saída de E0:** D5 e D8 ratificados; instruções da SS
 transcritas e template compilando; `WaveBased` instalado; repositório
 publicado no GitHub.
 
@@ -211,33 +214,35 @@ enunciado na forma que vai ao manuscrito.
 
 ---
 
-## E2. Protótipo em R e go/no-go
+## E2. O código em `wafc/` e o go/no-go
 
-Vive em `prototype/`. R sobre `WaveBased` e `glmnet`. `n ≤ 2000`.
+Vive em `wafc/` (`R/`, `tests/`, `scripts/`; ver `wafc/README.md`). R sobre
+`WaveBased` (bases) e `glmnet`. `n ≤ 2000`.
 
 ### E2.1 Cenários e desenho
 
-`00-dgp.R` e `01-design.R` do `prototype/README.md`. O desenho é construído
-com `wbasis()` do `WaveBased` bloco a bloco e multiplicado por `X_j`;
-colunas nomeadas; `penalty.factor` zero nos `c_j`. Conferência: com
-`g_{jk}` na base (`θ*` conhecido) e sem ruído, o LASSO com `λ → 0` recupera
-`θ*`.
+`R/dgp.R`, `R/design.R`, `tests/test-design.R`, `scripts/01-smoke.R`. O
+desenho é construído com `wbasis()` do `WaveBased` bloco a bloco e
+multiplicado por `X_j`; colunas nomeadas; `penalty.factor` zero nos `c_j`.
+Conferência (e primeiro teste): com `g_{jk}` na base (`θ*` conhecido) e sem
+ruído, o LASSO com `λ → 0` recupera `θ*`.
 
 ### E2.2 Variantes do estimador
 
-`02-fit.R`: LASSO (`glmnet`, gaussiano) e sparse group LASSO (`sparsegl`;
-grupo por `(j, k)`). Reconstrução de `ĝ_{jk}` e `β̂_j`. Registrar em
+`R/fit.R`, `R/reconstruct.R`, `tests/test-fit.R`: `wafc()` com LASSO
+(`glmnet`, gaussiano) e sparse group LASSO (`sparsegl`; grupo por `(j, k)`);
+`predict`, `coef`; reconstrução de `ĝ_{jk}` e `β̂_j`. Registrar em
 `CONTINUAR.md` o pacote escolhido.
 
 ### E2.3 Sintonia
 
-`03-tune.R`: CV sobre `(J, λ)` como o `cv.wall()`; BIC e EBIC com graus de
-liberdade = número de não nulos. Comparar as três regras nos cenários de
-E2.1 em `n ∈ {250, 1000}`.
+`R/tune.R`, `tests/test-tune.R`: `cv.wafc()` sobre `(J, λ)` como o
+`cv.wall()`; BIC e EBIC com graus de liberdade = número de não nulos.
+Comparar as três regras nos cenários de E2.1 em `n ∈ {250, 1000}`.
 
 ### E2.4 Piloto
 
-`04-competitors.R` e `06-pilot.R`: WAFC (LASSO; grupos) contra `mgcv::gam`
+`R/competitors.R` e `scripts/02-pilot.R`: WAFC (LASSO; grupos) contra `mgcv::gam`
 com `s(u_k, by = x_j)`, B-splines + group LASSO (`grpreg`), regressão linear
 oráculo. Cenários: (a) todas `g_{jk}` suaves; (b) `g_{jk}` não homogêneas
 (bumps, blocks, heavisine); (c) mistura com metade das `g_{jk}` nulas
@@ -253,40 +258,39 @@ não: antes de mudar de rumo, testar `boundary = "interval"`, pesos
 adaptativos e limiarização em blocos. Registrar em `ESTADO.md`: variante
 (LASSO ou grupos), regra de sintonia, `J` padrão, e os números.
 
-**Critério de saída de E2:** E2.1 conferido; tabela do piloto; decisão
-registrada.
+**Critério de saída de E2:** testes de E2.1 a E2.3 passando; tabela do
+piloto; decisão registrada.
 
 ---
 
-## E3. `wafc()` no `WaveBased`
+## E3. Consolidação do código
 
-### E3.1 Refatoração e nascimento
+Depois do go de E2.5, o código de `wafc/` deixa de ser exploratório.
 
-Commit 1 (refatoração): internas de `wall()` renomeadas para `.wb_add_*`
-(ou movidas para `R/additive-design.R`), testes de `wall` passando antes e
-depois, sem mudança de comportamento. Commit 2: `wafc()` com `predict`,
-`coef`, `print`, `fitted`; testes contra o protótipo (mesmos dados e
-semente, mesmos coeficientes). Versão `2.7-0`, `NEWS.md`.
+### E3.1 Interface congelada
 
-### E3.2 `cv.wafc()` e métodos gráficos
+Assinaturas de `wafc()`, `cv.wafc()`, `predict`, `coef`, `plot` fixadas e
+registradas em `wafc/README.md`; variantes descartadas em E2.5 removidas;
+`tests/` cobrindo cada função pública; `Rscript -e 'testthat::test_dir("wafc/tests")'`
+limpo em menos de 60 s.
 
-`cv.wafc()` sobre `(J, λ)` com `type.measure = c("mse", "mae")`; `plot.wafc`
-com painel por `(j,k)` (função reconstruída e, se houver, a verdade), e o
-caminho das normas por par. `plot.cv.wafc`.
+### E3.2 Gráficos e documentação
 
-### E3.3 Documentação
+`plot.wafc` com painel por `(j,k)` (função reconstruída e, se houver, a
+verdade) e o caminho das normas por par; `plot.cv.wafc`; cabeçalhos roxygen
+completos; exemplo reproduzível em `wafc/README.md`.
 
-Roxygen; exemplo curto no `README.md` do pacote; vinheta "additive
-functional coefficients with wavelets" (a versão didática do argumento do
-artigo, com o cenário não homogêneo).
+### E3.3 Empacotamento (decisão do autor)
 
-### E3.4 Qualidade
+Com o código testado, decidir: pacote próprio `wafc`, função dentro do
+`WaveBased`, ou permanecer em `wafc/` e ser citado pelo repositório. O que a
+revista pede é código disponível e citável; a decisão afeta E7 (DOI), não
+E4 e E6. A pasta já está organizada como `R/` + `tests/` para que qualquer
+das três saídas seja mover arquivos.
 
-`R CMD check` limpo nas cinco plataformas do CI; testes de `wafc` em menos
-de 10 s (`skip_on_cran()` no resto); etiqueta `v2.7-0`.
-
-**Critério de saída de E3:** testes contra o protótipo passando; check
-limpo; um usuário que não é o autor ajusta o exemplo seguindo só a ajuda.
+**Critério de saída de E3:** interface congelada; testes limpos; um usuário
+que não é o autor ajusta o exemplo do `wafc/README.md` seguindo só ele;
+decisão de E3.3 registrada.
 
 ---
 
@@ -295,8 +299,10 @@ limpo; um usuário que não é o autor ajusta o exemplo seguindo só a ajuda.
 ### E4.1 Nascimento
 
 Nos moldes do `wall`: `R/`, `scripts/` numerados, `config/*.yaml`, `renv`
-fixando o `WaveBased` por commit, cache por unidade retomável, semente
-mestra única, `INSTRUCTIONS.md` e `CLAUDE.md` desde o primeiro commit.
+fixando o `WaveBased` por commit e o código de `wafc/` pelo commit do
+`wafc-draft` (submódulo ou cópia com o hash registrado em `PROVENANCE.md`),
+cache por unidade retomável, semente mestra única, `INSTRUCTIONS.md` e
+`CLAUDE.md` desde o primeiro commit.
 
 ### E4.2 Desenho
 
@@ -375,7 +381,8 @@ figura e parágrafo de interpretação prontos para E5b.
 
 ## E7. Fechamento e submissão
 
-1. `WaveBased` etiquetado na versão citada; DOI Zenodo do pacote e do compêndio.
+1. Código de `wafc/` na forma decidida em E3.3, etiquetado; DOI Zenodo do
+   código e do compêndio.
 2. Suplementar montado: provas, tabelas extras, diagnósticos.
 3. Checklist de `alvo-revista.md` §6 inteiro; instruções da revista relidas
    na semana da submissão.
@@ -392,13 +399,13 @@ Quatro trilhas que podem correr em paralelo depois de E1.1:
   independentes entre si; E1.5 precisa das duas), e daí E5a.
 - **Trilha computacional:** E2.1 assim que E1.1 e o enunciado de E1.2
   existirem; E2.2 e E2.3 em paralelo depois de E2.1; E2.4 e E2.5; E3; E4 e
-  E6 em paralelo.
+  E6 em paralelo. Tudo em `wafc/`.
 - **Trilha de literatura:** L1 e L2 a qualquer momento, antes de E5a.
 - **Trilha editorial:** E0.3 (autor); E5a quando a teoria tiver enunciados;
   E5b no fim.
 
-O ponto de sincronização obrigatório é E2.5: antes dele não se escreve
-`wafc()` nem a seção de computação em versão final.
+O ponto de sincronização obrigatório é E2.5: antes dele não se congela a
+interface nem se escreve a seção de computação em versão final.
 
 ---
 

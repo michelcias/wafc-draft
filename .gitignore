@@ -23,7 +23,7 @@ texput.log
 .RData
 .Rproj.user/
 *.rds
-prototype/cache/
+wafc/cache/
 
 # Editors and OS
 *~

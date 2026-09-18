@@ -69,18 +69,21 @@ documento normativo: fluxo, escrita, marcação, git). Em caso de conflito, o
   como conjectura.
 - Referência bibliográfica só entra no `.bib` depois de verificada (título,
   autores, ano, veículo). Uma citação de memória é marcada `[VERIFICAR]` até lá.
-- Código de produção vive fora deste repositório: as funções `wafc()` e
-  `cv.wafc()` no pacote `WaveBased` (`../../WaveBased`) e o compêndio
-  `wafc-studies`. Aqui ficam a conferência numérica (`derivations/check/`), o
-  protótipo em R (`prototype/`) e o que documenta a reprodutibilidade.
+- O código do método vive na pasta dedicada `wafc/` deste repositório
+  (decisão D4): funções em `wafc/R/`, testes em `wafc/tests/`, scripts em
+  `wafc/scripts/`. O `WaveBased` **não recebe código** por enquanto; o
+  pacote instalado é só uma dependência para avaliar as bases. O estudo de
+  simulação e a aplicação vão ao compêndio `wafc-studies`. Aqui ficam
+  também a conferência numérica (`derivations/check/`) e o que documenta a
+  reprodutibilidade.
 
 ## Repositórios vizinhos
 
 | Repositório | Papel |
 |---|---|
-| `../../WaveBased` | pacote R/C do autor (`michelcias/WaveBased`); bases de wavelets, `wall()` (aditivo logístico com LASSO) e onde `wafc()` vai nascer (E3) |
+| `../../WaveBased` | pacote R/C do autor (`michelcias/WaveBased`); fornece as bases de wavelets (`wbasis()`, `wtable()`); o `wall()` é referência de leitura para o desenho por blocos. Não recebe código deste projeto por enquanto (D4) |
 | `../../wall-manuscript` | artigos do WALL (teórico e aplicado); o teórico é o molde da arquitetura de prova (sieve, Besov, desigualdade oráculo, compressibilidade) |
 | `../../wall` | compêndio de benchmark do WALL; molde do `wafc-studies` |
 | `../bdm-draft` | projeto irmão; a origem destas convenções de trabalho |
-| `wafc-draft` (este) | manuscrito, documentos de trabalho, derivações, protótipo e plano |
+| `wafc-draft` (este) | manuscrito, documentos de trabalho, derivações, o código do método (`wafc/`) e o plano |
 | `wafc-studies` (a criar em E4.1) | compêndio de simulação e aplicação, repositório próprio |

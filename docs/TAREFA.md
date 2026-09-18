@@ -22,8 +22,8 @@ que ler antes está aqui e no plano.
    critério de saída.
 5. O que a tarefa toca: [`notacao.md`](notacao.md) se houver fórmula;
    [`proposta-metodo.md`](proposta-metodo.md) para a ideia; os
-   `derivations/` de que ela depende; `prototype/` se for código;
-   [`inventario-codigo.md`](inventario-codigo.md) se for tocar o `WaveBased`;
+   `derivations/` de que ela depende; `wafc/` se for código;
+   [`inventario-codigo.md`](inventario-codigo.md) e `wafc/README.md` se for código;
    [`alvo-revista.md`](alvo-revista.md) se for manuscrito. Se for prova, o
    passo correspondente do WALL teórico
    (`../../wall-manuscript/manuscript/theo/ms_theo_1.tex`).
@@ -32,8 +32,8 @@ que ler antes está aqui e no plano.
 
 | Etapa | Estado | Onde está |
 |---|---|---|
-| E0.1 nomes | proposto; D4, D5, D8 a ratificar | `plano-projeto.md` E0.1, `ESTADO.md` |
-| E0.2 onde o código vive | fechada (D7; D4 a ratificar) | `plano-projeto.md` E0.2 |
+| E0.1 nomes | D4 fechada (código em `wafc/`); D5, D8 adiadas | `plano-projeto.md` E0.1, `ESTADO.md` |
+| E0.2 onde o código vive | fechada (D4, D7) | `plano-projeto.md` E0.2 |
 | E0.3 template e instruções | EJS feita; **SS pelo autor** | `manuscript/ejs-template/` |
 | E0.4 ferramentas | levantadas; `WaveBased` instalado; `sparsegl`, `gh` faltam | `inventario-codigo.md` §4, `CONTINUAR.md` |
 | E0.5 inventário | fechada | `inventario-codigo.md` |
@@ -58,7 +58,7 @@ tarefa pode criar ou editar**.
 | E1.2 | `derivations/01-identificabilidade.md` (enunciado, hipóteses, prova, "o que não cobre") e `derivations/check/01-identificabilidade.R` imprimindo `OK`: posto cheio do desenho em `n` pequeno e recuperação de coeficientes conhecidos; o que muda com `boundary = "interval"` | E1.1 (usa a notação provisória de `notacao.md` se E1.1 não tiver fechado; símbolo novo vai ao handoff) | `derivations/01-identificabilidade.md`, `derivations/check/01-identificabilidade.R`, `docs/handoff-E1.2.md` |
 | E1.3 | `derivations/02-aproximacao-besov.tex` (+ `.pdf`) com o lema de aproximação em `L_2(P_U)` e, se preciso, em `L_∞`, transposto do Passo 1 do WALL com a diferença por periodização registrada; `check/02-aproximacao-besov.R` medindo o erro de projeção em `bumps` e `sin` contra `2^{−J s'}` | E1.1 (idem) | `derivations/02-aproximacao-besov.tex`, `derivations/02-aproximacao-besov.pdf`, `derivations/check/02-aproximacao-besov.R`, `docs/handoff-E1.3.md` |
 | E1.4 | `derivations/03-desenho-produtos.tex` (+ `.pdf`): Gram populacional do desenho de produtos; (i) fatoração sob `X ⊥ U`; (ii) autovalor restrito no caso geral sob `λ_min(E[XX' \| U]) ≥ κ_1`; (iii) versão empírica por concentração; `check/03-desenho-produtos.R` com `λ_min` restrito (ou compatibilidade) em `n = 200`, `J = 3`, `X ⊥ U` e `X` dependente de `U` | E1.1 (idem) | `derivations/03-desenho-produtos.tex`, `derivations/03-desenho-produtos.pdf`, `derivations/check/03-desenho-produtos.R`, `docs/handoff-E1.4.md` |
-| E2.1 | `prototype/00-dgp.R` (cenários suave, não homogêneo, nulo; `simulate_wafc()`), `prototype/01-design.R` (`wafc_design()` sobre `wbasis()` do `WaveBased`, blocos `X_j ⊙ ψ(U_k)`, colunas nomeadas, `penalty.factor`, versão esparsa) e `prototype/05-smoke.R`; conferência: com `θ*` na base e sem ruído, `glmnet` com `λ → 0` recupera `θ*` | E1.1 e o enunciado de E1.2 (a hipótese de identificabilidade fixa o que o desenho descarta) | `prototype/00-dgp.R`, `prototype/01-design.R`, `prototype/05-smoke.R`, `prototype/README.md` (só a tabela), `docs/handoff-E2.1.md` |
+| E2.1 | `wafc/R/load.R` (carrega `R/*.R`, declara dependências), `wafc/R/dgp.R` (cenários suave, não homogêneo, nulo; `simulate_wafc()`), `wafc/R/design.R` (`wafc_design()` sobre `wbasis()` do `WaveBased`, blocos `X_j ⊙ ψ(U_k)`, colunas nomeadas, `penalty.factor`, versão esparsa), `wafc/tests/test-design.R` (com `θ*` na base e sem ruído, `glmnet` com `λ → 0` recupera `θ*`; posto cheio; nomes das colunas) e `wafc/scripts/01-smoke.R` | E1.1 e o enunciado de E1.2 (a hipótese de identificabilidade fixa o que o desenho descarta) | `wafc/R/load.R`, `wafc/R/dgp.R`, `wafc/R/design.R`, `wafc/tests/test-design.R`, `wafc/scripts/01-smoke.R`, `wafc/README.md` (só a tabela), `docs/handoff-E2.1.md` |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
@@ -68,7 +68,8 @@ handoff.
 
 Tarefa que não está no catálogo: pedir ao chat principal para catalogá-la
 antes de abrir. E1.5, E1.6, E2.2 a E2.5 e E3 entram no catálogo quando as
-dependências fecharem.
+dependências fecharem. Todo código de tarefa vai para `wafc/`, nunca para o
+`WaveBased` (D4).
 
 ## 4. Regras do chat de tarefa
 
