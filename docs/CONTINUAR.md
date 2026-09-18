@@ -56,6 +56,10 @@ decisão em E3.3.
 | `sparsegl` | sparse group LASSO (E2.2), se a variante for adotada | `install.packages("sparsegl")` |
 | o próprio `WaveBased`, instalado de `../../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
 
+No Ubuntu, `grpreg`, `gglasso` e `sparsegl` também saem do repositório da
+distribuição (`sudo apt install r-cran-grpreg r-cran-gglasso r-cran-sparsegl`),
+que instala em `/usr/lib/R/site-library`; o `R` acha do mesmo jeito.
+
 ```r
 pk <- c("glmnet", "Matrix", "mgcv", "grpreg", "gglasso", "bench", "testthat", "devtools", "roxygen2", "remotes", "renv")
 install.packages(setdiff(pk, rownames(installed.packages())), repos = "https://cloud.r-project.org")
@@ -66,6 +70,7 @@ Conferência de que tudo roda (da raiz de `wafc-draft`):
 ```bash
 Rscript -e 'library(WaveBased); w <- wbasis(sort(runif(64)), j0 = 0, J = 3); cat(dim(w), "\n")'   # 64 8
 cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd -   # compila
+cd manuscript/ss-template && latexmk -pdf SS-template.tex && latexmk -c && cd -   # compila (9 páginas)
 ```
 
 Quando existirem: `Rscript derivations/check/01-identificabilidade.R` (imprime
@@ -73,9 +78,11 @@ Quando existirem: `Rscript derivations/check/01-identificabilidade.R` (imprime
 
 ## 3. Onde o trabalho está (resumo de 2026-09-18; o `ESTADO.md` manda)
 
-- **E0 quase fechada:** D4 decidida (código em `wafc/`); D5 e D8 adiadas;
-  falta publicar o repositório e fazer E0.3 (instruções e template da
-  *Statistica Sinica*).
+- **E0 fechada, menos a ratificação de D5:** D4 decidida (código em `wafc/`);
+  D5 e D8 adiadas; repositório publicado; E0.3 feita (instruções da
+  *Statistica Sinica* em `docs/ss-instrucoes-autores.md`, templates em
+  `manuscript/ss-template/`, teto corrigido para 40 páginas em espaço duplo).
+  O tipo de revisão da revista não consta da página oficial.
 - **Nada de teoria, protótipo ou manuscrito ainda.** `notacao.md` é esboço;
   E1.1 o congela.
 - **Tarefas que podem abrir agora em chats de tarefa:** L1 e L2 (catálogo em

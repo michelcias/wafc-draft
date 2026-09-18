@@ -6,11 +6,14 @@ exemplos, ou outro de alto nível "que tenha mais a cara da proposta". Este
 documento compara os candidatos, propõe um alvo e registra o que ele pede.
 A proposta é **decisão D5, a ratificar** (`ESTADO.md`).
 
-**Estado da verificação (2026-09-18):** as páginas do SCImago devolveram 403 e
-a página de instruções da *Statistica Sinica* não resolveu no DNS desta
-máquina; o que está abaixo sobre elas vem de buscas na web e precisa ser
-confirmado pelo autor nas páginas oficiais (tarefa E0.3). As páginas da IMS
-sobre a EJS foram lidas.
+**Estado da verificação (2026-09-18):** as páginas do SCImago devolveram 403,
+e o SJR da *Statistica Sinica* continua vindo de busca na web, a confirmar. As
+páginas da IMS sobre a EJS foram lidas. As instruções da *Statistica Sinica*
+foram capturadas pelo autor e estão transcritas em
+[`ss-instrucoes-autores.md`](ss-instrucoes-autores.md): **o teto é de 40
+páginas em espaço duplo, incluídas as referências**, e não as 30 que a busca
+na web tinha dado; o §3 e o §5 abaixo já refletem isso. O tipo de revisão não
+consta em lugar nenhum da página oficial.
 
 ---
 
@@ -18,7 +21,7 @@ sobre a EJS foram lidas.
 
 | Revista | SJR Q (Stat. & Prob.) | Formato típico | Por que sim | Por que não |
 |---|---|---|---|---|
-| **Statistica Sinica** | Q1 em 2024 (uma fonte diz Q2; confirmar) | método + teoria + simulação + aplicação; teto de **30 páginas** de manuscrito; suplementar para provas | é onde a linhagem do modelo mora: Xue & Yang (2006) e Wei, Huang & Li (2011) saíram lá; o leitor conhece additive coefficient models e group LASSO; o padrão de artigo é exatamente o que o plano produz | processo lento (12 a 18 meses é comum); exige aplicação real convincente; o teto de 30 páginas obriga provas ao suplementar |
+| **Statistica Sinica** | Q1 em 2024 (uma fonte diz Q2; confirmar) | método + teoria + simulação + aplicação; teto de **40 páginas em espaço duplo**, referências incluídas; suplementar para provas | é onde a linhagem do modelo mora: Xue & Yang (2006) e Wei, Huang & Li (2011) saíram lá; o leitor conhece additive coefficient models e group LASSO; o padrão de artigo é exatamente o que o plano produz | triagem dura (só ~40% passa dos co-editores); exige aplicação real convincente; a revista prefere provas e detalhes de simulação no suplementar |
 | **Electronic Journal of Statistics** | Q1 em 2024 | sem teto de páginas; open access sem taxa (IMS e Bernoulli); "same standard as other IMS journals" | cabe a teoria completa no corpo; sem custo; a revisão tende a ser mais rápida; template `imsart` já versionado aqui | a expectativa de teoria é maior (uma desigualdade oráculo "transposta do WALL" pode parecer pouco); menos peso para o pacote e a aplicação |
 | Scandinavian Journal of Statistics | Q2 (2024/2025, a confirmar) | teoria + simulação | é onde Sardy & Ma (2024) e o próprio autor (Montoril, Pinheiro & Vidakovic 2019) publicaram; leitor natural | não atende ao pedido de Q1 |
 | Journal of Computational and Graphical Statistics | Q1 (a confirmar) | método computacional + software | o pacote e a comparação numérica são fortes | a teoria ficaria em segundo plano; o WALL aplicado já mira lá, e dois artigos do mesmo grupo no mesmo veículo com o mesmo motor pedem diferenciação |
@@ -31,8 +34,8 @@ sobre a EJS foram lidas.
 natural de dois artigos da revista (Xue & Yang 2006; Wei, Huang & Li 2011) e
 o referee provável já está lá; (ii) o formato completo (teoria, simulação,
 aplicação, software) é o que o plano produz, e a revista valoriza os quatro;
-(iii) o teto de 30 páginas é folgado para o corpo com as provas no
-suplementar.
+(iii) o teto de 40 páginas em espaço duplo é folgado para o corpo com as
+provas no suplementar.
 
 **Reserva: *Electronic Journal of Statistics*.** Se a teoria ficar mais forte
 do que a aplicação (por exemplo, se E1.6 der uma taxa de adaptação limpa e
@@ -45,21 +48,26 @@ enunciados completos.
 
 ## 3. Requisitos formais
 
-### Statistica Sinica (a confirmar na página oficial, E0.3)
+### Statistica Sinica (página oficial lida em 2026-09-18)
 
-| Item | O que se sabe | Fonte |
+Transcrição completa em [`ss-instrucoes-autores.md`](ss-instrucoes-autores.md);
+aqui só o que decide o formato do manuscrito.
+
+| Item | Regra | Fonte |
 |---|---|---|
-| Extensão | "should normally not exceed 30 manuscript pages" | busca web, 2026-09-18 |
-| Template | LaTeX da revista, disponível no site | idem |
-| Submissão | ScholarOne (`mc04.manuscriptcentral.com/statisticasinica`) | idem |
-| Suplementar | aceito (provas, tabelas extras) | prática dos artigos citados |
-| Código | não é exigido; declarar disponibilidade | prática |
-| Revisão | simples cega (a confirmar) | |
-| Instruções | https://www3.stat.sinica.edu.tw/statistica/AUTHORS.HTM | inacessível daqui em 2026-09-18 |
+| Extensão | "should not exceed 40 double-spaced pages using the Statistica Sinica template", **incluídas referências e apêndice**; espaço duplo, 12pt, margens de 1 polegada | instruções, Editorial Policy e §I.1 |
+| Template | obrigatório; a conformidade é conferida na recepção e o manuscrito fora do template volta na hora | Editorial Policy |
+| Estrutura | resumo curto, palavras-chave em ordem alfabética, título corrente com menos de 45 caracteres, afiliações e e-mails na última página; seções e subseções numeradas, sem sub-subseções | §I.2 a §I.4 |
+| Submissão | ScholarOne (`mc04.manuscriptcentral.com/statisticasinica`); fonte LaTeX só depois do aceite | Submission, Manuscript Preparation |
+| Suplementar | um único PDF de até 10 MB, mesmo título e mesmos autores; seção "Supplementary Material" como última seção, antes dos agradecimentos; revisado junto | §IV |
+| Código | "software producing the evidence should be available for examination as well as pertinent datasets"; evidência numérica tem de ser reprodutível | Editorial Policy |
+| Triagem | co-editores e SAE cortam ~60% antes do AE; o AE manda a referee ~60% do que recebe | Editorial Policy |
+| Revisão | **não declarada** na página (nem simples nem dupla cega; sem exigência de anonimização) | §7 de `ss-instrucoes-autores.md` |
+| Instruções | https://www3.stat.sinica.edu.tw/statistica/ (aba *Instructions for Authors*) | capturadas em PDF pelo autor |
 
-Tarefa do autor em E0.3: abrir a página, transcrever as instruções em
-`docs/ss-instrucoes-autores.md` e baixar o template para
-`manuscript/ss-template/`.
+Template versionado em `manuscript/ss-template/` (`SS-template.tex`,
+`SS-template-bib.tex` com `\bibliographystyle{chicago}`, `supp-temp_20240820.tex`
+para o suplemento); os três compilam com o `latexmk` local.
 
 ### Electronic Journal of Statistics (confirmado em 2026-09-18)
 
@@ -111,7 +119,10 @@ afetam quais coeficientes.
   (E1.7), ou o artigo diz explicitamente que seleção não é o objetivo.
 - "Aplicação real?" E6, com efeito que varia com covariáveis e interpretação.
 
-## 5. Estrutura-alvo do manuscrito (30 páginas, SS)
+## 5. Estrutura-alvo do manuscrito (40 páginas, SS)
+
+Páginas em espaço duplo no template da revista. O teto de 40 **inclui as
+referências**, ao contrário do que esta tabela supunha.
 
 | Seção | Páginas | Conteúdo |
 |---|---|---|
@@ -122,12 +133,24 @@ afetam quais coeficientes.
 | 5 Simulation | 6 | desenho, competidores, métricas, resultados |
 | 6 Application | 4 | uma aplicação com interpretação |
 | 7 Discussion | 1 | limites, extensões (inferência, grupos, resposta não gaussiana) |
-| Referências | fora do teto | |
+| **Corpo** | **25,5** | |
+| Referências e afiliações | 3 a 4 | dentro do teto |
+| **Total** | **~29** | contra o teto de 40 |
+
+A folga de cerca de 11 páginas não está alocada de propósito: se a teoria
+pedir espaço, ela vai para as Seções 3 e 5, nessa ordem. A conferência é
+contra o PDF compilado no template, não contra esta tabela.
 
 ## 6. Checklist de submissão
 
-- [ ] Instruções oficiais relidas na semana da submissão.
-- [ ] `ms` no template, dentro do teto, provas no suplementar.
+- [ ] Instruções oficiais relidas na semana da submissão (`ss-instrucoes-autores.md`).
+- [ ] `ms` no template da revista, em espaço duplo, dentro das 40 páginas com
+      as referências contadas; provas no suplementar.
+- [ ] Título corrente com menos de 45 caracteres; palavras-chave em ordem
+      alfabética; afiliações e e-mails na última página; nenhuma sub-subseção.
+- [ ] Seção "Supplementary Material" antes dos agradecimentos, e o suplemento
+      num único PDF de até 10 MB com o mesmo título e os mesmos autores.
+- [ ] Figuras legíveis em preto e branco, sem referência a cor no texto.
 - [ ] Todos os números do texto conferem com `results/tables/`.
 - [ ] Cada legenda de figura enuncia o achado; unidades nos eixos.
 - [ ] Referências verificadas uma a uma no `.bib`; versão oficial, não arXiv.

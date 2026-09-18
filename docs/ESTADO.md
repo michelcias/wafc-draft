@@ -1,10 +1,10 @@
 # Estado do trabalho, handoff de continuidade
 
 **Última atualização:** 2026-09-18.
-**Etapa corrente:** E0 aberta (falta E0.3 pelo autor); repositório publicado
-em `michelcias/wafc-draft` (privado). E1.1 é o próximo do chat principal.
-Nenhum chat de tarefa em curso. Duas decisões do autor adiadas (D5, D8) e
-cinco perguntas na §4.
+**Etapa corrente:** E0 fechada, menos a ratificação de D5; repositório
+publicado em `michelcias/wafc-draft` (privado). E1.1 é o próximo do chat
+principal. Nenhum chat de tarefa em curso. Duas decisões do autor adiadas
+(D5, D8) e cinco perguntas na §4.
 **Versão viva do manuscrito:** nenhuma (nasce em E5a como `k = 1`).
 **Cor da rodada corrente:** `colR1` (entra em uso quando existir `k = 2`).
 
@@ -88,6 +88,41 @@ fez buscas de literatura. O que saiu:
   `latexmk`; o `WaveBased` 2.6-0 foi instalado de `../../WaveBased` e o
   `wall()` roda. Faltam `sparsegl` (E2.2) e `gh`.
 
+### 2026-09-18: E0.3 fechada (instruções e template da Statistica Sinica)
+
+O autor capturou as páginas oficiais da revista e baixou os templates; as
+instruções estão transcritas em inglês em
+[`ss-instrucoes-autores.md`](ss-instrucoes-autores.md) e o
+[`alvo-revista.md`](alvo-revista.md) foi corrigido. Os números que fecham a
+etapa:
+
+- **Teto de 40 páginas em espaço duplo no template, referências e apêndice
+  incluídos** (12pt, margens de 1 polegada), e não as 30 que a busca na web
+  tinha dado. A estrutura-alvo soma ~29 páginas, com ~11 de folga não
+  alocada.
+- **Template obrigatório e conferido na recepção**: manuscrito fora do
+  template volta antes de qualquer revisão. Versionado em
+  `manuscript/ss-template/`: `SS-template.tex` (bibliografia manual),
+  `SS-template-bib.tex` (BibTeX, `chicago`) e `supp-temp_20240820.tex`;
+  os três compilam com o TeX Live 2023 local (avisos de `fancyheadings`
+  obsoleto e de `\headheight`, sem erro).
+- **Triagem:** ~40% das submissões passam dos co-editores; o AE manda a
+  referee ~60% do que recebe. Alvo de prazo: 2 a 3 meses na primeira
+  rodada.
+- **Suplementar:** um único PDF de até 10 MB, mesmo título e mesmos autores,
+  revisado junto; seção "Supplementary Material" como última seção do corpo,
+  antes dos agradecimentos. A revista *prefere* provas, lemas técnicos e
+  detalhes de simulação no suplementar, o que é o que o plano já fazia.
+- **Reprodutibilidade é exigência editorial**, não cortesia: "software
+  producing the evidence should be available for examination as well as
+  pertinent datasets".
+- **O que a página não diz**, listado na §7 de `ss-instrucoes-autores.md`: o
+  **tipo de revisão** (nem cega simples nem dupla; sem exigência de
+  anonimização), taxas, licença, política formal de dados e código, limite
+  de resumo e de palavras-chave, e qual dos dois templates (Windows ou Mac)
+  é o zip baixado. Um símbolo da seção de fórmulas veio como imagem quebrada
+  na captura.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -146,8 +181,8 @@ Ordenadas pelo que bloqueia mais.
 
 Em ordem; (a) e (b) são independentes de (c) a (e).
 
-- (a) **Autor:** E0.3 (instruções e template da SS); responder a pergunta 3
-  se já tiver a base. D5 e D8 ficam para depois de E1.1.
+- (a) **Autor:** ratificar D5 (E0.3 fez o resto); responder a pergunta 3 se
+  já tiver a base. D5 e D8 ficam para depois de E1.1.
 - (b) **Chat principal:** E1.1 (congelar a notação; `macros.tex`); depois
   catalogar E1.3, E1.4 e E2.1 com os arquivos permitidos definitivos.
 - (c) **Chats de tarefa, em paralelo desde já:** L1 (verificação
@@ -162,3 +197,4 @@ Em ordem; (a) e (b) são independentes de (c) a (e).
 |---|---|
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
+| 2026-09-18 | Máquina nova conferida (R 4.6.1, `WaveBased` 2.6-0, `grpreg`, `gglasso`, `sparsegl` por `apt`); E0.3 fechada: instruções da SS transcritas, templates versionados e compilando, teto corrigido de 30 para 40 páginas |
