@@ -41,7 +41,8 @@ que ler antes está aqui e no plano.
 | E1.1 notação | **fechada** (D9 a D12): `ψ_{jk}`, `X_ℓ`, `U_m`, `θ_{ℓm,jk}` | `notacao.md`, `derivations/macros.tex` |
 | E1.2, E1.3, E1.4 | não abertas; **podem abrir já** (E1.1 fechou) | catálogo da §3 |
 | E1.5 a E1.7, E2, E3, E4, E5, E6, E7 | não abertas; E2.1 abre com o enunciado de E1.2 | |
-| L1, L2 | não abertas; **podem abrir já** | `literatura.md` |
+| L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
+| L2 busca de novidade | não aberta; **pode abrir já** | catálogo da §3 |
 
 Esta tabela é atualizada pelo chat principal quando uma etapa fecha; em caso
 de dúvida, o `ESTADO.md` manda.
@@ -53,7 +54,6 @@ tarefa pode criar ou editar**.
 
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
-| L1 | `docs/referencias-verificadas.bib` com cada entrada conferida no Crossref (título, autores, ano, veículo, volume, páginas, DOI) e sem a nota `[L1: confirmar]`; cada `[VERIFICAR]` de `docs/literatura.md` resolvido (status `verificado` com a entrada no `.bib`, ou o motivo de não ter achado); entradas `no wall` copiadas de `../../wall-manuscript/manuscript/theo/references_theo_1.bib` sem redigitar | nada | `docs/referencias-verificadas.bib`, `docs/literatura.md` (só a coluna de status e as linhas de bibliografia), `docs/handoff-L1.md` |
 | L2 | `docs/busca-novidade.md`: as quatro buscas de `literatura.md` ("Buscas pendentes"), uma tabela por busca (trabalho, o que faz, o que não faz, ameaça à novidade, status), leitura do PDF de Sardy & Ma (2024) com o que a teoria deles cobre, varredura da *Statistica Sinica* e da EJS desde 2015, e um veredito por contribuição de `alvo-revista.md` §4 | nada | `docs/busca-novidade.md`, `docs/literatura.md` (só linhas novas nas tabelas), `docs/handoff-L2.md` |
 | E0.3 (autor) | só falta o quartil 2024 da SS conferido no SCImago e anotado em `alvo-revista.md` §1; a transcrição e o template estão feitos | nada | `docs/alvo-revista.md` (§1), `docs/handoff-E0.3.md` |
 | E1.2 | `derivations/01-identificabilidade.md` (enunciado, hipóteses, prova, "o que não cobre") e `derivations/check/01-identificabilidade.R` imprimindo `OK`: posto cheio do desenho em `n` pequeno e recuperação de coeficientes conhecidos; o que muda com `boundary = "interval"` | E1.1, fechada: a notação de `notacao.md` é para seguir como está, e símbolo novo vai ao handoff, não ao arquivo | `derivations/01-identificabilidade.md`, `derivations/check/01-identificabilidade.R`, `docs/handoff-E1.2.md` |
@@ -63,9 +63,12 @@ tarefa pode criar ou editar**.
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
-no handoff. L1 e L2 tocam `literatura.md` em partes distintas (status de
-linhas existentes; linhas novas); se colidirem, L2 deixa as linhas no
-handoff.
+no handoff. O `literatura.md` está livre desde que L1 fechou; L2 é a única
+tarefa aberta que encosta nele.
+
+L2 começa por dois trabalhos que L1 encontrou e que não estavam na lista:
+Haris, Simon & Shojaie (2018, NeurIPS; é o dono do arXiv 1903.04631) e
+Amato, Antoniadis, De Feis & Gijbels (2022, *Stat. Comput.*).
 
 Tarefa que não está no catálogo: pedir ao chat principal para catalogá-la
 antes de abrir. E1.5, E1.6, E2.2 a E2.5 e E3 entram no catálogo quando as

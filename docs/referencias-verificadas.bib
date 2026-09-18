@@ -1,8 +1,57 @@
-% Entradas com dados bibliográficos vistos em busca na web em 2026-09-18.
-% Nenhuma foi conferida no Crossref ainda: L1 confirma cada uma (título,
-% autores, ano, veículo, volume, páginas, DOI) e remove a nota
-% "[L1: confirmar]". Nada daqui vai ao references_{k}.bib antes disso.
+% Referências verificadas em L1 (2026-09-18). Cada entrada foi conferida
+% contra o registro do Crossref (título, autores, ano, veículo, volume,
+% número, páginas, DOI). Quando o Crossref não guarda o campo, a fonte
+% complementar está em comentário acima da entrada. As entradas marcadas
+% "copiada do WALL" vieram de
+% ../../wall-manuscript/manuscript/theo/references_theo_1.bib sem
+% redigitar; nelas só se acrescentou a linha `doi`, conferida no Crossref.
+% Nada daqui leva mais a nota "[L1: confirmar]".
 
+% ---------------------------------------------------------------------
+% Coeficientes funcionais e coeficientes aditivos
+% ---------------------------------------------------------------------
+
+% Crossref registra o artigo em 757--779; a discussão (DOI
+% 10.1111/j.2517-6161.1993.tb01940.x) ocupa 779--796. A citação usual
+% "757--796" inclui a discussão.
+@article{Hastie-Tibshirani-1993,
+  author  = {Hastie, Trevor and Tibshirani, Robert},
+  title   = {Varying-coefficient models},
+  journal = {Journal of the Royal Statistical Society: Series B (Methodological)},
+  year    = {1993},
+  volume  = {55},
+  number  = {4},
+  pages   = {757--779},
+  doi     = {10.1111/j.2517-6161.1993.tb01939.x}
+}
+
+@article{Cai-Fan-Yao-2000,
+  author  = {Cai, Zongwu and Fan, Jianqing and Yao, Qiwei},
+  title   = {Functional-coefficient regression models for nonlinear time series},
+  journal = {Journal of the American Statistical Association},
+  year    = {2000},
+  volume  = {95},
+  number  = {451},
+  pages   = {941--956},
+  doi     = {10.1080/01621459.2000.10474284}
+}
+
+@article{Fan-Zhang-2008,
+  author  = {Fan, Jianqing and Zhang, Wenyang},
+  title   = {Statistical methods with varying coefficient models},
+  journal = {Statistics and Its Interface},
+  year    = {2008},
+  volume  = {1},
+  number  = {1},
+  pages   = {179--195},
+  doi     = {10.4310/SII.2008.v1.n1.a15}
+}
+
+% Sem DOI: a Statistica Sinica não registrou o volume 16 (2006) no
+% Crossref (busca com prefixo 10.5705 e ano 2006 devolve zero). Conferido
+% na primeira página do PDF da editora,
+% https://www3.stat.sinica.edu.tw/statistica/oldpdf/A16n418.pdf
+% ("Statistica Sinica 16(2006), 1423-1446").
 @article{Xue-Yang-2006,
   author  = {Xue, Lan and Yang, Lijian},
   title   = {Additive coefficient modeling via polynomial spline},
@@ -10,72 +59,7 @@
   year    = {2006},
   volume  = {16},
   number  = {4},
-  pages   = {1423--1446},
-  note    = {[L1: confirmar]}
-}
-
-@article{Wei-Huang-Li-2011,
-  author  = {Wei, Fengrong and Huang, Jian and Li, Hongzhe},
-  title   = {Variable selection and estimation in high-dimensional varying-coefficient models},
-  journal = {Statistica Sinica},
-  year    = {2011},
-  volume  = {21},
-  number  = {4},
-  pages   = {1515--1540},
-  note    = {[L1: confirmar]}
-}
-
-@article{Xue-Qu-2012,
-  author  = {Xue, Lan and Qu, Annie},
-  title   = {Variable selection in high-dimensional varying-coefficient models with global optimality},
-  journal = {Journal of Machine Learning Research},
-  year    = {2012},
-  volume  = {13},
-  pages   = {1973--1998},
-  note    = {[L1: confirmar páginas]}
-}
-
-@article{Antoniadis-Fan-2001,
-  author  = {Antoniadis, Anestis and Fan, Jianqing},
-  title   = {Regularization of wavelet approximations},
-  journal = {Journal of the American Statistical Association},
-  year    = {2001},
-  volume  = {96},
-  number  = {455},
-  pages   = {939--967},
-  doi     = {10.1198/016214501753208942},
-  note    = {[L1: confirmar]}
-}
-
-@article{Zhou-You-2004,
-  author  = {Zhou, Xian and You, Jinhong},
-  title   = {Wavelet estimation in varying-coefficient partially linear regression models},
-  journal = {Statistics \& Probability Letters},
-  year    = {2004},
-  volume  = {68},
-  number  = {1},
-  pages   = {91--104},
-  doi     = {10.1016/j.spl.2004.01.018},
-  note    = {[L1: confirmar]}
-}
-
-@article{Sardy-Tseng-2004,
-  author  = {Sardy, Sylvain and Tseng, Paul},
-  title   = {{AMlet}, {RAMlet}, and {GAMlet}: automatic nonlinear fitting of additive models, robust and generalized, with wavelets},
-  journal = {Journal of Computational and Graphical Statistics},
-  year    = {2004},
-  volume  = {13},
-  number  = {2},
-  pages   = {283--309},
-  note    = {[L1: confirmar número e DOI]}
-}
-
-@article{Sardy-Ma-2024,
-  author  = {Sardy, Sylvain and Ma, Xiaoyu},
-  title   = {Sparse additive models in high dimensions with wavelets},
-  journal = {Scandinavian Journal of Statistics},
-  year    = {2024},
-  note    = {arXiv:2207.04083. [L1: confirmar volume, páginas e DOI]}
+  pages   = {1423--1446}
 }
 
 @article{Xue-Liang-2010,
@@ -86,6 +70,374 @@
   volume  = {37},
   number  = {1},
   pages   = {26--46},
-  doi     = {10.1111/j.1467-9469.2009.00655.x},
-  note    = {[L1: confirmar volume e páginas]}
+  doi     = {10.1111/j.1467-9469.2009.00655.x}
+}
+
+@article{Liu-Yang-2010,
+  author  = {Liu, Rong and Yang, Lijian},
+  title   = {Spline-backfitted kernel smoothing of additive coefficient model},
+  journal = {Econometric Theory},
+  year    = {2010},
+  volume  = {26},
+  number  = {1},
+  pages   = {29--59},
+  doi     = {10.1017/S0266466609090604}
+}
+
+% O terceiro autor é Lambert-Lacroix, não Verhasselt (Crossref).
+@article{Antoniadis-Gijbels-LambertLacroix-2014,
+  author  = {Antoniadis, Anestis and Gijbels, Ir{\`e}ne and Lambert-Lacroix, Sophie},
+  title   = {Penalized estimation in additive varying coefficient models using grouped regularization},
+  journal = {Statistical Papers},
+  year    = {2014},
+  volume  = {55},
+  number  = {3},
+  pages   = {727--750},
+  doi     = {10.1007/s00362-013-0522-1}
+}
+
+% Páginas: o Crossref não as guarda para este registro; conferidas no
+% OpenAlex (1515--1540).
+@article{Wei-Huang-Li-2011,
+  author  = {Wei, Fengrong and Huang, Jian and Li, Hongzhe},
+  title   = {Variable selection and estimation in high-dimensional varying-coefficient models},
+  journal = {Statistica Sinica},
+  year    = {2011},
+  volume  = {21},
+  number  = {4},
+  pages   = {1515--1540},
+  doi     = {10.5705/ss.2009.316}
+}
+
+% O JMLR não registra DOI no Crossref; conferido na página do artigo,
+% https://www.jmlr.org/papers/v13/xue12a.html (13(63):1973--1998).
+@article{Xue-Qu-2012,
+  author  = {Xue, Lan and Qu, Annie},
+  title   = {Variable selection in high-dimensional varying-coefficient models with global optimality},
+  journal = {Journal of Machine Learning Research},
+  year    = {2012},
+  volume  = {13},
+  number  = {63},
+  pages   = {1973--1998},
+  url     = {https://www.jmlr.org/papers/v13/xue12a.html}
+}
+
+@article{Wang-Xia-2009,
+  author  = {Wang, Hansheng and Xia, Yingcun},
+  title   = {Shrinkage estimation of the varying coefficient model},
+  journal = {Journal of the American Statistical Association},
+  year    = {2009},
+  volume  = {104},
+  number  = {486},
+  pages   = {747--757},
+  doi     = {10.1198/jasa.2009.0138}
+}
+
+@article{Wang-Li-Huang-2008,
+  author  = {Wang, Lifeng and Li, Hongzhe and Huang, Jianhua Z.},
+  title   = {Variable selection in nonparametric varying-coefficient models for analysis of repeated measurements},
+  journal = {Journal of the American Statistical Association},
+  year    = {2008},
+  volume  = {103},
+  number  = {484},
+  pages   = {1556--1569},
+  doi     = {10.1198/016214508000000788}
+}
+
+% Páginas conferidas no Semantic Scholar (o Crossref e o OpenAlex não as
+% guardam para a Annals of Statistics deste período).
+@article{Klopp-Pensky-2015,
+  author  = {Klopp, Olga and Pensky, Marianna},
+  title   = {Sparse high-dimensional varying coefficient model: nonasymptotic minimax study},
+  journal = {The Annals of Statistics},
+  year    = {2015},
+  volume  = {43},
+  number  = {3},
+  pages   = {1273--1299},
+  doi     = {10.1214/15-AOS1309}
+}
+
+% ---------------------------------------------------------------------
+% Wavelets em regressão e em coeficientes variáveis
+% ---------------------------------------------------------------------
+
+@article{Donoho-Johnstone-1994,
+  author  = {Donoho, David L. and Johnstone, Iain M.},
+  title   = {Ideal spatial adaptation by wavelet shrinkage},
+  journal = {Biometrika},
+  year    = {1994},
+  volume  = {81},
+  number  = {3},
+  pages   = {425--455},
+  doi     = {10.1093/biomet/81.3.425}
+}
+
+% Páginas conferidas no Semantic Scholar.
+@article{Donoho-Johnstone-1998,
+  author  = {Donoho, David L. and Johnstone, Iain M.},
+  title   = {Minimax estimation via wavelet shrinkage},
+  journal = {The Annals of Statistics},
+  year    = {1998},
+  volume  = {26},
+  number  = {3},
+  pages   = {879--921},
+  doi     = {10.1214/aos/1024691081}
+}
+
+@article{Antoniadis-Fan-2001,
+  author  = {Antoniadis, Anestis and Fan, Jianqing},
+  title   = {Regularization of wavelet approximations},
+  journal = {Journal of the American Statistical Association},
+  year    = {2001},
+  volume  = {96},
+  number  = {455},
+  pages   = {939--967},
+  doi     = {10.1198/016214501753208942}
+}
+
+% Copiada do WALL (references_theo_1.bib); `doi` acrescentado.
+@article{cohen1993wavelets,
+  title     = {Wavelets on the interval and fast wavelet transforms},
+  author    = {Cohen, Albert and Daubechies, Ingrid and Vial, Pierre},
+  journal   = {Applied and Computational Harmonic Analysis},
+  volume    = {1},
+  number    = {1},
+  pages     = {54--81},
+  year      = {1993},
+  publisher = {Elsevier},
+  doi       = {10.1006/acha.1993.1005}
+}
+
+% Não está no WALL. O algoritmo de avaliação por produtos de matrizes
+% é apresentado na parte I; a parte II trata da regularidade local.
+@article{Daubechies-Lagarias-1991,
+  author  = {Daubechies, Ingrid and Lagarias, Jeffrey C.},
+  title   = {Two-scale difference equations. {I}. {E}xistence and global regularity of solutions},
+  journal = {SIAM Journal on Mathematical Analysis},
+  year    = {1991},
+  volume  = {22},
+  number  = {5},
+  pages   = {1388--1410},
+  doi     = {10.1137/0522089}
+}
+
+@article{Daubechies-Lagarias-1992,
+  author  = {Daubechies, Ingrid and Lagarias, Jeffrey C.},
+  title   = {Two-scale difference equations {II}. {L}ocal regularity, infinite products of matrices and fractals},
+  journal = {SIAM Journal on Mathematical Analysis},
+  year    = {1992},
+  volume  = {23},
+  number  = {4},
+  pages   = {1031--1079},
+  doi     = {10.1137/0523059}
+}
+
+@article{Zhou-You-2004,
+  author  = {Zhou, Xian and You, Jinhong},
+  title   = {Wavelet estimation in varying-coefficient partially linear regression models},
+  journal = {Statistics \& Probability Letters},
+  year    = {2004},
+  volume  = {68},
+  number  = {1},
+  pages   = {91--104},
+  doi     = {10.1016/j.spl.2004.01.018}
+}
+
+@article{Kovac-Silverman-2000,
+  author  = {Kovac, Arne and Silverman, Bernard W.},
+  title   = {Extending the scope of wavelet regression methods by coefficient-dependent thresholding},
+  journal = {Journal of the American Statistical Association},
+  year    = {2000},
+  volume  = {95},
+  number  = {449},
+  pages   = {172--183},
+  doi     = {10.1080/01621459.2000.10473912}
+}
+
+% O arXiv 1903.04631 é este artigo (Haris, Simon & Shojaie), não o de
+% Amato et al.; sem DOI no Crossref; veículo e páginas do journal_ref do
+% arXiv ("Advances in Neural Information Processing Systems 2018,
+% 8987-8997").
+@inproceedings{Haris-Simon-Shojaie-2018,
+  author    = {Haris, Asad and Simon, Noah and Shojaie, Ali},
+  title     = {Wavelet regression and additive models for irregularly spaced data},
+  booktitle = {Advances in Neural Information Processing Systems 31},
+  year      = {2018},
+  pages     = {8987--8997},
+  note      = {arXiv:1903.04631}
+}
+
+% Candidato provável ao que a linha "Amato, Antoniadis, De Feis & Gijbels"
+% queria citar; artigo 11 do fascículo (Crossref `article-number`), sem
+% intervalo de páginas.
+@article{Amato-Antoniadis-DeFeis-Gijbels-2022,
+  author  = {Amato, Umberto and Antoniadis, Anestis and De Feis, Italia and Gijbels, Ir{\`e}ne},
+  title   = {Wavelet-based robust estimation and variable selection in nonparametric additive models},
+  journal = {Statistics and Computing},
+  year    = {2022},
+  volume  = {32},
+  number  = {1},
+  pages   = {11},
+  doi     = {10.1007/s11222-021-10065-z}
+}
+
+% Páginas conferidas no Semantic Scholar.
+@article{Zhang-Wong-2003,
+  author  = {Zhang, Shuanglin and Wong, Man-Yu},
+  title   = {Wavelet threshold estimation for additive regression models},
+  journal = {The Annals of Statistics},
+  year    = {2003},
+  volume  = {31},
+  number  = {1},
+  pages   = {152--173},
+  doi     = {10.1214/aos/1046294460}
+}
+
+% ---------------------------------------------------------------------
+% Modelos aditivos esparsos e LASSO com bases
+% ---------------------------------------------------------------------
+
+@article{Sardy-Tseng-2004,
+  author  = {Sardy, Sylvain and Tseng, Paul},
+  title   = {{AMlet}, {RAMlet}, and {GAMlet}: automatic nonlinear fitting of additive models, robust and generalized, with wavelets},
+  journal = {Journal of Computational and Graphical Statistics},
+  year    = {2004},
+  volume  = {13},
+  number  = {2},
+  pages   = {283--309},
+  doi     = {10.1198/1061860043434}
+}
+
+% Versão publicada do arXiv:2207.04083 (o WALL cita o preprint como
+% sardy2022sparse).
+@article{Sardy-Ma-2024,
+  author  = {Sardy, Sylvain and Ma, Xiaoyu},
+  title   = {Sparse additive models in high dimensions with wavelets},
+  journal = {Scandinavian Journal of Statistics},
+  year    = {2024},
+  volume  = {51},
+  number  = {1},
+  pages   = {89--108},
+  doi     = {10.1111/sjos.12680}
+}
+
+% Copiada do WALL; `doi` acrescentado. Páginas conferidas no Semantic
+% Scholar.
+@article{meier2009high,
+  title     = {High-dimensional additive modeling},
+  author    = {Meier, Lukas and van de Geer, Sara and B{\"u}hlmann, Peter},
+  journal   = {The Annals of Statistics},
+  volume    = {37},
+  number    = {6B},
+  pages     = {3779--3821},
+  year      = {2009},
+  publisher = {Institute of Mathematical Statistics},
+  doi       = {10.1214/09-AOS692}
+}
+
+% Copiada do WALL; `doi` acrescentado.
+@article{ravikumar2009sparse,
+  title     = {Sparse additive models},
+  author    = {Ravikumar, Pradeep and Lafferty, John and Liu, Han and Wasserman, Larry},
+  journal   = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+  volume    = {71},
+  number    = {5},
+  pages     = {1009--1030},
+  year      = {2009},
+  publisher = {Wiley},
+  doi       = {10.1111/j.1467-9868.2009.00718.x}
+}
+
+% Páginas conferidas no OpenAlex.
+@article{Huang-Horowitz-Wei-2010,
+  author  = {Huang, Jian and Horowitz, Joel L. and Wei, Fengrong},
+  title   = {Variable selection in nonparametric additive models},
+  journal = {The Annals of Statistics},
+  year    = {2010},
+  volume  = {38},
+  number  = {4},
+  pages   = {2282--2313},
+  doi     = {10.1214/09-AOS781}
+}
+
+% Copiada do WALL; `doi` acrescentado.
+@book{buhlmann2011statistics,
+  title     = {Statistics for High-Dimensional Data: Methods, Theory and Applications},
+  author    = {B{\"u}hlmann, Peter and van de Geer, Sara},
+  year      = {2011},
+  publisher = {Springer},
+  address   = {Berlin},
+  doi       = {10.1007/978-3-642-20192-9}
+}
+
+@article{Simon-Friedman-Hastie-Tibshirani-2013,
+  author  = {Simon, Noah and Friedman, Jerome and Hastie, Trevor and Tibshirani, Robert},
+  title   = {A sparse-group lasso},
+  journal = {Journal of Computational and Graphical Statistics},
+  year    = {2013},
+  volume  = {22},
+  number  = {2},
+  pages   = {231--245},
+  doi     = {10.1080/10618600.2012.681250}
+}
+
+@article{Zou-2006,
+  author  = {Zou, Hui},
+  title   = {The adaptive lasso and its oracle properties},
+  journal = {Journal of the American Statistical Association},
+  year    = {2006},
+  volume  = {101},
+  number  = {476},
+  pages   = {1418--1429},
+  doi     = {10.1198/016214506000000735}
+}
+
+% Páginas conferidas no Semantic Scholar.
+@article{Bickel-Ritov-Tsybakov-2009,
+  author  = {Bickel, Peter J. and Ritov, Ya'acov and Tsybakov, Alexandre B.},
+  title   = {Simultaneous analysis of lasso and {D}antzig selector},
+  journal = {The Annals of Statistics},
+  year    = {2009},
+  volume  = {37},
+  number  = {4},
+  pages   = {1705--1732},
+  doi     = {10.1214/08-AOS620}
+}
+
+% Páginas conferidas no Semantic Scholar.
+@article{Lounici-Pontil-vandeGeer-Tsybakov-2011,
+  author  = {Lounici, Karim and Pontil, Massimiliano and van de Geer, Sara and Tsybakov, Alexandre B.},
+  title   = {Oracle inequalities and optimal inference under group sparsity},
+  journal = {The Annals of Statistics},
+  year    = {2011},
+  volume  = {39},
+  number  = {4},
+  pages   = {2164--2204},
+  doi     = {10.1214/11-AOS896}
+}
+
+% ---------------------------------------------------------------------
+% O próprio grupo
+% ---------------------------------------------------------------------
+
+@article{Montoril-Pinheiro-Vidakovic-2019,
+  author  = {Montoril, Michel H. and Pinheiro, Alu{\'i}sio and Vidakovic, Brani},
+  title   = {Wavelet-based estimators for mixture regression},
+  journal = {Scandinavian Journal of Statistics},
+  year    = {2019},
+  volume  = {46},
+  number  = {1},
+  pages   = {215--234},
+  doi     = {10.1111/sjos.12344}
+}
+
+@article{Motta-Montoril-2026,
+  author  = {Motta, Fl{\'a}via Castro and Montoril, Michel H.},
+  title   = {A {B}ayesian estimation approach for the wavelet-based mixture regression},
+  journal = {Communications in Statistics - Simulation and Computation},
+  year    = {2026},
+  volume  = {55},
+  number  = {6},
+  pages   = {2426--2434},
+  doi     = {10.1080/03610918.2025.2470797}
 }

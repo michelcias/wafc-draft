@@ -1,10 +1,10 @@
 # Estado do trabalho, handoff de continuidade
 
 **Última atualização:** 2026-09-18.
-**Etapa corrente:** E0 fechada, menos a ratificação de D5; E1.1 fechada
-(notação congelada). E1.2, E1.3, E1.4 e E2.1 estão liberadas para chats de
-tarefa. Nenhum chat de tarefa em curso. Duas decisões do autor adiadas (D5,
-D8) e quatro perguntas na §4.
+**Etapa corrente:** E0 fechada, menos a ratificação de D5; E1.1 e L1
+fechadas. Liberadas para chats de tarefa: L2, E1.2, E1.3 e E1.4 (E2.1 espera
+o enunciado de E1.2). Nenhum chat de tarefa em curso. Duas decisões do autor
+adiadas (D5, D8) e cinco perguntas na §4.
 **Versão viva do manuscrito:** nenhuma (nasce em E5a como `k = 1`).
 **Cor da rodada corrente:** `colR1` (entra em uso quando existir `k = 2`).
 
@@ -150,6 +150,38 @@ a expansão do bloco e os ambientes). O que ficou:
   os blocos `(ℓ, m)` em ordem lexicográfica, e dentro do bloco `j` crescente
   e `k` crescente. É o que E2.1 tem de implementar.
 
+### 2026-09-18: L1 fechada (verificação bibliográfica)
+
+Chat de tarefa, integrado neste. `docs/referencias-verificadas.bib` tem
+**35 entradas**, cada uma conferida no Crossref, e `literatura.md` não tem
+mais `[VERIFICAR]` nem `[L1: confirmar]`. Conferido aqui: 35 `@`-entradas,
+35 `\bibitem` com `bibtex` e `plain`, sem erro nem aviso; 32 com DOI, e as
+três sem DOI são Xue & Yang (2006), Xue & Qu (2012, JMLR) e Haris, Simon &
+Shojaie (2018, NeurIPS), que não têm registro.
+
+O que a verificação corrigiu, e que muda o que o artigo cita:
+
+- O arXiv 1903.04631 que `literatura.md` atribuía a Amato, Antoniadis, De
+  Feis & Gijbels é de **Haris, Simon & Shojaie** (NeurIPS 2018): aditivos
+  com wavelets em desenho irregular. O candidato ao que a linha queria
+  citar é Amato et al. (2022, *Stat. Comput.*). As duas entradas ficaram no
+  `.bib`, e **as duas entram na varredura de L2**; pelo resumo, nenhuma tem
+  o `X_ℓ` multiplicando.
+- Antoniadis & Gijbels (2014): o terceiro autor é **Lambert-Lacroix**, não
+  Verhasselt.
+- Klopp & Pensky é de **2015** (*Ann. Statist.* 43(3) 1273-1299).
+- Sardy & Ma (2024) saiu em *Scand. J. Statist.* 51(1) 89-108
+  (10.1111/sjos.12680); o WALL cita só o preprint. É o trabalho mais
+  próximo, então a citação tem de ser a publicada.
+- Donoho & Johnstone (1994 *Biometrika*; 1998 *Ann. Statist.*), Daubechies
+  & Lagarias e Bickel, Ritov & Tsybakov estavam marcados `no wall` mas não
+  estão no `references_theo_1.bib`; entraram com chave própria.
+
+**Lição de ferramenta** (vale para L2 e para E5b): Crossref e OpenAlex
+respondem desta máquina sem chave; o Semantic Scholar limita a ~1
+consulta/s; o Project Euclid bloqueia `curl`; a *Statistica Sinica* serve os
+PDFs antigos em `statistica/oldpdf/A{vol}n{iss}{art}.pdf`.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -202,6 +234,21 @@ Ordenadas pelo que bloqueia mais.
 4. **`X` dependente de `U`:** a teoria de E1.4 tenta o caso geral ou o
    artigo assume `X ⊥ U` e discute o geral? Decide-se quando E1.4 mostrar o
    que fecha.
+5. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+   `.bib` fica como está até a resposta):
+   - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
+     citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
+     distintos e ambos interessam a L2.
+   - Hastie & Tibshirani (1993): páginas 757-779 (só o artigo) ou 757-796
+     (com a discussão)? Proposta: **757-779**, que é o que o Crossref
+     registra.
+   - Daubechies & Lagarias: as duas partes ou só a parte I, que é a do
+     algoritmo do `WaveBased`? Proposta: **só a parte I**, e a parte II
+     entra se alguma prova precisar dela.
+   - Chaves do `.bib`: padrão único `Autor-Autor-Ano` ou manter as quatro
+     herdadas do WALL (`cohen1993wavelets` etc.)? Proposta: **manter as do
+     WALL**, porque o `ms_theo_1.tex` é o molde da prova e a citação
+     cruzada fica direta.
 
 ---
 
@@ -211,9 +258,8 @@ Ordenadas pelo que bloqueia mais.
 
 - (a) **Autor:** ratificar D5 e D8 (a notação já não depende disso);
   responder a pergunta 2 se já tiver a base da aplicação.
-- (b) **Chats de tarefa, em paralelo desde já:** L1 e L2 (não dependem da
-  notação); E1.2, E1.3 e E1.4 (a notação está congelada e os três tocam
-  arquivos distintos).
+- (b) **Chats de tarefa, em paralelo desde já:** L2 (L1 fechou e liberou o
+  `literatura.md`); E1.2, E1.3 e E1.4, que tocam arquivos distintos.
 - (c) **Chat de tarefa, depois do enunciado de E1.2:** E2.1, que precisa
   saber o que a identificabilidade descarta do desenho.
 - (d) **Chat principal:** integrar os handoffs e catalogar E1.5, E1.6 e
@@ -226,5 +272,6 @@ Ordenadas pelo que bloqueia mais.
 |---|---|
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
+| 2026-09-18 | L1 fechada em chat de tarefa e integrada: 35 referências verificadas, quatro correções de atribuição, dois trabalhos novos para L2 olhar |
 | 2026-09-18 | E1.1 fechada: notação congelada (`ψ_{jk}`, `X_ℓ`, `U_m`, `θ_{ℓm,jk}`, `U ∈ [0,1]^q`), D9 a D12, `macros.tex` reescrito e compilando |
 | 2026-09-18 | Máquina nova conferida (R 4.6.1, `WaveBased` 2.6-0, `grpreg`, `gglasso`, `sparsegl` por `apt`); E0.3 fechada: instruções da SS transcritas, templates versionados e compilando, teto corrigido de 30 para 40 páginas |
