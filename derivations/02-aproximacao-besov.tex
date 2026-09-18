@@ -1,0 +1,494 @@
+% E1.3 -- lema de aproximação em Besov pelo sieve de wavelets periodizadas.
+% Transposição do Passo 1 do WALL teórico (ms_theo_1.tex, Lemma "Besov
+% approximation error"; prova em supp_theo_1.tex, S.1). Conferência numérica:
+% check/02-aproximacao-besov.R (imprime OK). Notação: docs/notacao.md (E1.1).
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\input{macros}
+
+\title{E1.3. Aproximação em Besov pelo sieve de wavelets periodizadas}
+\author{wafc-draft, \texttt{derivations/02-aproximacao-besov.tex}}
+\date{2026-09-18}
+
+\begin{document}
+\maketitle
+
+\section*{Onde este resultado entra}
+
+Este arquivo fornece o termo de viés que a desigualdade oráculo (E1.5) e as
+taxas (E1.6) consomem: o erro cometido ao substituir cada componente
+$\gcomp{\cv}{\md}$ pela sua projeção no espaço de detalhes $\WJ$ da base
+periodizada, e o erro correspondente na função de regressão
+$f(x,u) = \sum_{\cv} x_{\cv}\,\fcoef{\cv}(u)$. É a transposição do Passo~1
+do WALL teórico, com três diferenças: a regularidade é Besov geral
+$\Besov{s}{\pi}{r}$, e não $\Besov{s}{2}{\infty}$, para que a regularidade
+efetiva $\seff = s - (1/\pi - 1/2)_{+}$ apareça (é ela que separa o sieve
+linear do LASSO quando $\pi < 2$); a função de regressão tem o produto
+$X_{\cv}\,\gcomp{\cv}{\md}(U_{\md})$, o que troca o fator $p^{2}$ do WALL por
+$(pq)^{2}\,C_{X}^{2}$; e a diferença por periodização, que o WALL não trata,
+fica registrada na Proposição~\ref{prop:periodizacao}.
+
+Numeração dos resultados: sequência global dos \texttt{derivations/}
+(\texttt{docs/TAREFA.md}, §5); este arquivo usa Lema~1, Lema~2, Corolário~1 e
+Proposição~1, a acertar pelo chat principal com o que E1.2 tiver numerado.
+
+\section{Objetos}
+
+\paragraph{Base.} Sejam $\phi$ e $\psi$ a função de escala e a wavelet de uma
+análise de multirresolução ortonormal de $L_{2}(\R)$, de suporte compacto,
+com $\psi$ limitada e com $N$ momentos nulos, $\int y^{a}\psi(y)\,dy = 0$
+para $a = 0, \dots, N-1$. Denotamos por $L$ o comprimento do filtro
+(\texttt{filter.size} no \texttt{WaveBased}), de modo que
+$\operatorname{supp}\psi \subseteq [0, L-1]$ e, para Daublets e Symmlets,
+$N = L/2$. A base periodizada em $[0,1]$ é
+\[
+  \wav{\lev}{\tsl}(u) \;=\; \sum_{\iota \in \mathbb{Z}} 2^{\lev/2}\,
+  \psi\bigl(2^{\lev}(u + \iota) - \tsl\bigr),
+  \qquad \lev \ge 0,\quad \tsl = 0, \dots, 2^{\lev} - 1,
+\]
+e o sistema $\{\mathbf{1}\} \cup \{\wav{\lev}{\tsl}\}$ é uma base ortonormal
+de $L_{2}[0,1]$ com a medida de Lebesgue, com $\int_{0}^{1}\wav{\lev}{\tsl} = 0$
+para toda wavelet (Meyer, 1992, cap.~III, \S 11; Daubechies, 1992, \S 9.3
+\textsc{[verificar]}). É a base que o \texttt{wbasis()} devolve com
+\texttt{boundary = "periodic"} e $\jzero = 0$: a primeira coluna é
+$\phi_{00} \equiv 1$, descartada (D2), e as demais são as $\wav{\lev}{\tsl}$,
+$\lev = 0, \dots, J-1$.
+
+\paragraph{Sieve e projeção.} $\WJ = \operatorname{span}\{\wav{\lev}{\tsl} :
+0 \le \lev < J\}$, de dimensão $\NJ = 2^{J} - 1$, é o complemento ortogonal
+das constantes dentro de $\VJ$. Para $g \in L_{2}[0,1]$ com $\int_{0}^{1} g = 0$,
+\[
+  \PiJ g \;=\; \sum_{\lev = 0}^{J-1}\sum_{\tsl = 0}^{2^{\lev}-1}
+  \theta_{\lev\tsl}\,\wav{\lev}{\tsl},
+  \qquad \theta_{\lev\tsl} = \inner{g}{\wav{\lev}{\tsl}}
+  = \int_{0}^{1} g(u)\,\wav{\lev}{\tsl}(u)\,du,
+\]
+é a projeção ortogonal de $g$ em $\WJ$, que coincide com a projeção em $\VJ$
+porque $\inner{g}{\mathbf{1}} = 0$. Escrevemos $\theta_{\lev\cdot} =
+(\theta_{\lev\tsl})_{\tsl}\in\R^{2^{\lev}}$ para o vetor de coeficientes do
+nível $\lev$; quando a componente é $\gcomp{\cv}{\md}$, os coeficientes são
+os $\coef{\cv}{\md}{\lev}{\tsl}$ da notação.
+
+\paragraph{Regularidade em forma de sequência.} Para $s > 0$ e
+$1 \le \pi, r \le \infty$, a norma de Besov em forma de sequência dos
+coeficientes de $g$ na base periodizada é
+\[
+  \norm{g}_{b^{s}_{\pi,r}} \;=\;
+  \Bigl\{\sum_{\lev \ge 0}\bigl(2^{\lev(s + 1/2 - 1/\pi)}\,
+  \norm{\theta_{\lev\cdot}}_{\pi}\bigr)^{r}\Bigr\}^{1/r},
+\]
+com a modificação usual para $r = \infty$ (supremo em $\lev$) e para
+$\pi = \infty$ (máximo em $\tsl$). É a norma de Donoho e Johnstone (1998,
+\S 2) e de Härdle et al.\ (1998, cap.~9 \textsc{[verificar]}). A
+regularidade efetiva em $L_{2}$ é $\seff = s - (1/\pi - 1/2)_{+}$.
+
+\section{Hipóteses}
+
+\begin{assumption}[base]\label{ass:base}
+$\phi$ e $\psi$ são como acima: suporte compacto, $\psi$ limitada, $N$
+momentos nulos, e a base periodizada $\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$
+é ortonormal e completa em $L_{2}[0,1]$.
+\end{assumption}
+
+\begin{assumption}[regularidade de Besov, forma de sequência]\label{ass:besov}
+Existem $s > 0$, $1 \le \pi, r \le \infty$ e $C_{g} < \infty$ tais que, para
+todo par $(\cv, \md)$, $\int_{0}^{1}\gcomp{\cv}{\md} = 0$ e
+$\norm{\gcomp{\cv}{\md}}_{b^{s}_{\pi,\infty}} \le C_{g}$, isto é,
+\[
+  \norm{\theta_{\cv\md,\lev\cdot}}_{\pi} \;\le\; C_{g}\,
+  2^{-\lev(s + 1/2 - 1/\pi)} \qquad \text{para todo } \lev \ge 0 .
+\]
+Exige-se $\seff > 0$, ou seja, $s > (1/\pi - 1/2)_{+}$; para o Lema~\ref{lem:sup}
+exige-se $s > 1/\pi$.
+\end{assumption}
+
+Três observações sobre a Hipótese~\ref{ass:besov}. (i) Ela é tomada como
+hipótese primitiva sobre a sequência de coeficientes, como fez o WALL
+(Assumption ``Besov regularity''), e não como pertencimento a um espaço de
+funções: é a única propriedade de $\gcomp{\cv}{\md}$ que as provas usam, e
+evita invocar a equivalência de normas que a base periodizada só fornece
+para funções periódicas. (ii) Como $\ell_{r} \subseteq \ell_{\infty}$ com
+$\norm{a}_{\infty} \le \norm{a}_{r}$, a hipótese com índice fino $r = \infty$
+é a mais fraca da escala, e cobre $\norm{g}_{b^{s}_{\pi,r}} \le C_{g}$ para
+qualquer $r$. (iii) Quais funções a satisfazem: se $\psi$ tem $N > s$
+momentos nulos e regularidade Hölder maior que $s$, a norma de sequência na
+base periodizada é equivalente à norma do espaço de Besov \emph{periódico}
+$\Besov{s}{\pi}{r}(\mathbb{T})$, o das funções de $[0,1]$ cuja extensão
+$1$-periódica está em $\Besov{s}{\pi}{r}$ localmente (Meyer, 1992, cap.~VI;
+Cohen, 2003, cap.~3 \textsc{[verificar]}). A implicação de que a prova
+precisa, função em Besov implica decaimento dos coeficientes, usa só os $N > s$
+momentos nulos e a limitação de $\psi$; a regularidade de $\psi$ entra só na
+recíproca. Uma função de $\Besov{s}{\pi}{r}[0,1]$ que não emenda em $0 \equiv 1$
+\emph{não} satisfaz a hipótese para $s > 1/2$; esse caso é a
+Proposição~\ref{prop:periodizacao}.
+
+\begin{assumption}[densidade das moduladoras]\label{ass:dens}
+$\bU \in [0,1]^{q}$ tem densidade conjunta limitada por $C_{U} < \infty$ (D11).
+Em consequência cada marginal $p_{U_{\md}}$ é limitada por $C_{U}$, pois
+integrar a conjunta nas outras $q-1$ coordenadas de $[0,1]^{q-1}$ não aumenta
+a cota.
+\end{assumption}
+
+\begin{assumption}[covariáveis lineares limitadas]\label{ass:X}
+$\max_{\cv}|X_{\cv}| \le C_{X}$ quase certamente.
+\end{assumption}
+
+\section{O lema em $L_{2}$}
+
+\begin{lemma}[erro de projeção em $L_{2}$]\label{lem:L2}
+Sob as Hipóteses~\ref{ass:base} e~\ref{ass:besov}, para todo $(\cv,\md)$ e
+todo $J \ge 0$,
+\[
+  \norm{\gcomp{\cv}{\md} - \PiJ\gcomp{\cv}{\md}}_{L_{2}[0,1]}^{2}
+  \;=\; \sum_{\lev \ge J}\norm{\theta_{\cv\md,\lev\cdot}}_{2}^{2}
+  \;\le\; \frac{C_{g}^{2}}{1 - 2^{-2\seff}}\; 2^{-2J\seff}.
+\]
+Se além disso vale a Hipótese~\ref{ass:dens},
+\[
+  \norm{\gcomp{\cv}{\md} - \PiJ\gcomp{\cv}{\md}}_{L_{2}(P_{U_{\md}})}^{2}
+  \;=\; \E\bigl[(\gcomp{\cv}{\md} - \PiJ\gcomp{\cv}{\md})^{2}(U_{\md})\bigr]
+  \;\le\; \frac{C_{U}\,C_{g}^{2}}{1 - 2^{-2\seff}}\; 2^{-2J\seff}.
+\]
+\end{lemma}
+
+\begin{proof}
+Fixe $(\cv,\md)$ e escreva $g = \gcomp{\cv}{\md}$, $\theta_{\lev\tsl} =
+\coef{\cv}{\md}{\lev}{\tsl}$.
+
+\emph{Passo 1 (soma de cauda).} A Hipótese~\ref{ass:besov} dá
+$\norm{\theta_{\lev\cdot}}_{\pi} < \infty$ em cada nível; pelo Passo~2 abaixo
+$\sum_{\lev}\norm{\theta_{\lev\cdot}}_{2}^{2} < \infty$, logo $g \in
+L_{2}[0,1]$ e, como a base é completa e $\inner{g}{\mathbf{1}} = 0$,
+$g = \sum_{\lev\ge 0}\sum_{\tsl}\theta_{\lev\tsl}\wav{\lev}{\tsl}$ em $L_{2}$.
+A projeção ortogonal em $\WJ$ retém os níveis $\lev < J$, e Parseval dá
+\[
+  \norm{g - \PiJ g}_{L_{2}[0,1]}^{2}
+  = \sum_{\lev\ge J}\sum_{\tsl=0}^{2^{\lev}-1}\theta_{\lev\tsl}^{2}
+  = \sum_{\lev \ge J}\norm{\theta_{\lev\cdot}}_{2}^{2}.
+\]
+
+\emph{Passo 2 (de $\ell_{\pi}$ para $\ell_{2}$ dentro do nível).} Em
+$\R^{2^{\lev}}$: se $\pi \le 2$, $\norm{a}_{2} \le \norm{a}_{\pi}$; se
+$\pi > 2$, a desigualdade de Hölder dá $\norm{a}_{2} \le
+(2^{\lev})^{1/2 - 1/\pi}\norm{a}_{\pi}$. Nos dois casos
+$\norm{\theta_{\lev\cdot}}_{2} \le 2^{\lev(1/2 - 1/\pi)_{+}}
+\norm{\theta_{\lev\cdot}}_{\pi}$, e com a Hipótese~\ref{ass:besov}
+\[
+  \norm{\theta_{\lev\cdot}}_{2}
+  \;\le\; C_{g}\,2^{-\lev\{s + 1/2 - 1/\pi - (1/2 - 1/\pi)_{+}\}}
+  \;=\; C_{g}\,2^{-\lev\seff},
+\]
+pois $s + 1/2 - 1/\pi - (1/2 - 1/\pi)_{+}$ vale $s$ quando $\pi \ge 2$ e
+$s - (1/\pi - 1/2)$ quando $\pi < 2$. É aqui que a perda $(1/\pi - 1/2)_{+}$
+aparece: para $\pi < 2$ a norma $\ell_{\pi}$ do nível controla a $\ell_{2}$
+sem ganho, e o expoente de $L_{2}$ fica $\seff < s$.
+
+\emph{Passo 3 (soma geométrica).}
+$\sum_{\lev\ge J}C_{g}^{2}\,2^{-2\lev\seff} = C_{g}^{2}\,2^{-2J\seff}/(1 - 2^{-2\seff})$,
+finita porque $\seff > 0$.
+
+\emph{Passo 4 (densidade).} $\E[h^{2}(U_{\md})] = \int_{0}^{1}h^{2}\,p_{U_{\md}}
+\le C_{U}\norm{h}_{L_{2}[0,1]}^{2}$ com $h = g - \PiJ g$.
+\end{proof}
+
+\section{O lema em $L_{\infty}$}
+
+O Lema~\ref{lem:L2} basta para o termo de viés da desigualdade oráculo. A
+versão uniforme é o que o WALL usa na localização (Assumption ``Besov
+regularity'', segunda consequência) e o que E1.4 e E1.5 podem precisar para
+controlar $\norm{f - f_{J}}_{n}$ de forma determinística ou para limitar as
+colunas do desenho.
+
+\begin{lemma}[erro de projeção uniforme]\label{lem:sup}
+Sob as Hipóteses~\ref{ass:base} e~\ref{ass:besov} com $s > 1/\pi$, cada
+$\gcomp{\cv}{\md}$ tem versão contínua e, para todo $J \ge 0$,
+\[
+  \norm{\gcomp{\cv}{\md} - \PiJ\gcomp{\cv}{\md}}_{\infty}
+  \;\le\; \frac{(L-1)\,\norm{\psi}_{\infty}\,C_{g}}{1 - 2^{-(s - 1/\pi)}}\;
+  2^{-J(s - 1/\pi)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\emph{Sobreposição limitada.} Para $u \in [0,1]$ e $\lev \ge 0$,
+\[
+  \sum_{\tsl=0}^{2^{\lev}-1}|\wav{\lev}{\tsl}(u)|
+  \;\le\; \sum_{\tsl\in\mathbb{Z}} 2^{\lev/2}\,|\psi(2^{\lev}u - \tsl)|
+  \;\le\; (L-1)\,2^{\lev/2}\,\norm{\psi}_{\infty},
+\]
+porque a soma sobre as translações periodizadas é a soma sobre todas as
+translações inteiras em $\R$, e $\psi(2^{\lev}u - \tsl) \ne 0$ exige
+$2^{\lev}u - \tsl \in (0, L-1)$, o que no máximo $L - 1$ inteiros $\tsl$
+satisfazem.
+
+\emph{Cota por nível.} Com $\max_{\tsl}|\theta_{\lev\tsl}| \le
+\norm{\theta_{\lev\cdot}}_{\pi} \le C_{g}\,2^{-\lev(s + 1/2 - 1/\pi)}$,
+\[
+  \Bigl\lVert \sum_{\tsl}\theta_{\lev\tsl}\wav{\lev}{\tsl}\Bigr\rVert_{\infty}
+  \;\le\; \max_{\tsl}|\theta_{\lev\tsl}| \sup_{u}\sum_{\tsl}|\wav{\lev}{\tsl}(u)|
+  \;\le\; (L-1)\norm{\psi}_{\infty}\,C_{g}\,2^{-\lev(s - 1/\pi)} .
+\]
+
+\emph{Soma.} Como $s > 1/\pi$, a série $\sum_{\lev}\sum_{\tsl}\theta_{\lev\tsl}
+\wav{\lev}{\tsl}$ converge absoluta e uniformemente; o limite uniforme é
+contínuo e coincide q.c.\ com o limite em $L_{2}$, que é $g$ (Passo~1 do
+Lema~\ref{lem:L2}). Logo $g$ tem versão contínua, $g - \PiJ g$ é a soma
+uniforme dos níveis $\lev \ge J$, e a soma geométrica das cotas por nível dá o
+enunciado.
+\end{proof}
+
+Para $\pi = 2$ a taxa é $2^{-J(s - 1/2)}$, a do WALL. A perda de $L_{2}$ para
+$L_{\infty}$ é $1/\pi$ e não $(1/\pi - 1/2)_{+}$: o controle uniforme paga
+o encaixe $\Besov{s}{\pi}{r} \hookrightarrow \Besov{s - 1/\pi}{\infty}{r}$
+inteiro.
+
+\section{O viés da função de regressão}
+
+Seja $f(x,u) = \sum_{\cv=1}^{p} x_{\cv}\bigl\{\lvl{\cv} +
+\sum_{\md=1}^{q}\gcomp{\cv}{\md}(u_{\md})\bigr\}$ a função de regressão e
+\[
+  f_{J}(x,u) \;=\; \sum_{\cv=1}^{p} x_{\cv}\Bigl\{\lvl{\cv} +
+  \sum_{\md=1}^{q}(\PiJ\gcomp{\cv}{\md})(u_{\md})\Bigr\}
+  \;=\; \sum_{\cv} x_{\cv}\lvl{\cv} + \sum_{\cv,\md}\sum_{\lev<J}\sum_{\tsl}
+  \coefs{\cv}{\md}{\lev}{\tsl}\; x_{\cv}\,\wav{\lev}{\tsl}(u_{\md})
+\]
+a sua aproximação no sieve, com $\coefs{\cv}{\md}{\lev}{\tsl} =
+\inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$. O vetor $(\bc, \thetastar)$ é
+o oráculo de E1.5: $f_{J}(\bX_{i},\bU_{i}) = \bZ_{i}\T(\bc,\thetastar)$
+com a matriz de desenho da notação (ordem das colunas D12).
+
+\begin{corollary}[viés do sieve]\label{cor:vies}
+Sob as Hipóteses~\ref{ass:base} a~\ref{ass:X},
+\[
+  \norm{f - f_{J}}_{L_{2}(P)}^{2}
+  \;=\; \E\bigl[(f - f_{J})^{2}(\bX,\bU)\bigr]
+  \;\le\; \frac{(pq)^{2}\,C_{X}^{2}\,C_{U}\,C_{g}^{2}}{1 - 2^{-2\seff}}\;
+  2^{-2J\seff},
+\]
+e, se $s > 1/\pi$, para todo $(x,u) \in [-C_{X},C_{X}]^{p}\times[0,1]^{q}$,
+\[
+  |f(x,u) - f_{J}(x,u)| \;\le\;
+  \frac{pq\,C_{X}\,(L-1)\norm{\psi}_{\infty}\,C_{g}}{1 - 2^{-(s-1/\pi)}}\;
+  2^{-J(s - 1/\pi)} ,
+\]
+de modo que $\norm{f - f_{J}}_{n} \le \norm{f - f_{J}}_{\infty}$ obedece à
+mesma cota, para qualquer amostra.
+\end{corollary}
+
+\begin{proof}
+$f - f_{J} = \sum_{\cv,\md} X_{\cv}\,h_{\cv\md}(U_{\md})$ com $h_{\cv\md} =
+\gcomp{\cv}{\md} - \PiJ\gcomp{\cv}{\md}$; os níveis $\lvl{\cv}$ cancelam.
+Cauchy--Schwarz sobre os $pq$ termos e $|X_{\cv}| \le C_{X}$ dão
+\[
+  \E\bigl[(f - f_{J})^{2}\bigr]
+  \;\le\; pq\sum_{\cv,\md}\E\bigl[X_{\cv}^{2}\,h_{\cv\md}^{2}(U_{\md})\bigr]
+  \;\le\; pq\,C_{X}^{2}\sum_{\cv,\md}\E\bigl[h_{\cv\md}^{2}(U_{\md})\bigr],
+\]
+e o Lema~\ref{lem:L2} em cada um dos $pq$ termos fecha a primeira cota: um
+fator $pq$ vem de Cauchy--Schwarz e outro da soma, como o $p^{2}$ do WALL. A
+segunda é a desigualdade triangular com o Lema~\ref{lem:sup}.
+\end{proof}
+
+A dependência entre $\bX$ e $\bU$ não entra: o viés só usa a limitação de
+$\bX$ e a densidade marginal de cada $U_{\md}$. O que a dependência afeta é
+a passagem da norma de predição para a norma de cada componente, que é a
+condição de desenho de E1.4.
+
+\section{A diferença por periodização}
+
+O WALL adota a hipótese em forma de sequência e não discute o que ela exclui.
+Para o WAFC vale registrar, porque a aplicação terá moduladoras cujos efeitos
+não emendam nas bordas (renda, idade, temperatura), e porque é o que motiva
+o reescalonamento para $[\varepsilon, 1-\varepsilon]$ do \texttt{wall()} e a
+opção \texttt{boundary = "interval"}.
+
+\begin{proposition}[custo da periodização]\label{prop:periodizacao}
+Seja a base da Hipótese~\ref{ass:base} e seja $g \in \Besov{s}{\pi}{r}[0,1]$
+(espaço de Besov do intervalo, sem condição de periodicidade) com
+$s > 1/\pi$, $N > s$ e $\int_{0}^{1} g = 0$. Então existe $C$ que depende de
+$g$, de $\psi$ e de $(s,\pi)$ tal que, para todo $J$ com $2^{J} \ge L - 1$,
+\[
+  \norm{g - \PiJ g}_{L_{2}[0,1]}^{2}
+  \;\le\; C\,2^{-2J\seff} \;+\; 2(L-1)\,\norm{\psi}_{1}^{2}\,\norm{g}_{\infty}^{2}\; 2^{-J},
+\]
+isto é, a taxa em $L_{2}$ é $2^{-J\min(\seff,\,1/2)}$. Quando $g(0) \ne g(1)$
+o segundo termo é da ordem exata $2^{-J}$ e $\norm{g - \PiJ g}_{\infty}$
+não converge a zero.
+\end{proposition}
+
+\begin{proof}[Prova (esboço; a extensão é o passo a verificar)]
+Seja $\tilde g$ a extensão $1$-periódica de $g$ a $\R$. Por construção da
+base periodizada, $\theta_{\lev\tsl} = \int_{\R}\tilde g(y)\,2^{\lev/2}
+\psi(2^{\lev}y - \tsl)\,dy$. Para $2^{\lev} \ge L-1$, separe em cada nível as
+translações \emph{interiores}, aquelas com $[\tsl, \tsl + L - 1] \subseteq
+[0, 2^{\lev}]$, cujo suporte fica dentro de $[0,1]$, das translações de
+\emph{borda}, que atravessam $0 \equiv 1$; há no máximo $L - 1$ destas por
+nível.
+
+\emph{Interiores.} Nelas $\theta_{\lev\tsl} = \inner{Eg}{\psi_{\lev\tsl}}_{\R}$
+para qualquer extensão $Eg$ de $g$ a $\R$. Tomando $E$ o operador de
+extensão limitado de $\Besov{s}{\pi}{r}[0,1]$ em $\Besov{s}{\pi}{r}(\R)$
+(Triebel, 1983; Cohen, 2003, cap.~3 \textsc{[verificar]}) e usando a
+caracterização de $\Besov{s}{\pi}{r}(\R)$ pelos coeficientes de wavelet, que
+para a implicação função $\Rightarrow$ sequência exige só $N > s$ momentos
+nulos, obtém-se $\norm{(\theta_{\lev\tsl})_{\tsl\ \mathrm{int}}}_{\pi} \le
+C_{1}\,2^{-\lev(s + 1/2 - 1/\pi)}$, e a soma de cauda dos interiores é
+$\le C\,2^{-2J\seff}$ pelo argumento do Lema~\ref{lem:L2}.
+
+\emph{Borda.} Como $s > 1/\pi$, $g$ é limitada, e $|\theta_{\lev\tsl}| \le
+\norm{g}_{\infty}\norm{\psi_{\lev\tsl}}_{1} = \norm{g}_{\infty}\norm{\psi}_{1}
+2^{-\lev/2}$; com $L - 1$ termos por nível,
+$\sum_{\lev\ge J}\sum_{\tsl\ \mathrm{borda}}\theta_{\lev\tsl}^{2} \le
+(L-1)\norm{\psi}_{1}^{2}\norm{g}_{\infty}^{2}\sum_{\lev\ge J}2^{-\lev} =
+2(L-1)\norm{\psi}_{1}^{2}\norm{g}_{\infty}^{2}\,2^{-J}$.
+
+\emph{Ordem exata.} Se $g$ é contínua em $[0,1]$ e $g(0) \ne g(1)$, para
+uma translação de borda com $2^{\lev}$ grande $\tilde g$ é, no suporte de
+$\psi_{\lev\tsl}$, $g(1) + o(1)$ à esquerda de $0$ e $g(0) + o(1)$ à direita,
+logo $\theta_{\lev\tsl} = 2^{-\lev/2}\{g(0) - g(1)\}\int_{y > a_{\tsl}}\psi(y)\,dy
++ o(2^{-\lev/2})$, com $a_{\tsl}$ o ponto do suporte de $\psi$ que cai em
+$0$; como $\int\psi = 0$ e $\psi$ não é nula em nenhum intervalo do suporte,
+essa integral parcial é não nula para algum $\tsl$ e o termo de borda é de
+ordem $2^{-\lev}$ em cada nível. A não convergência uniforme é a de qualquer
+série de wavelets num salto: $\PiJ g$ é contínua e $\tilde g$ não.
+\end{proof}
+
+O que isso muda para o WAFC:
+\begin{itemize}[nosep]
+  \item Sob a Hipótese~\ref{ass:besov} nada muda: ela já é uma hipótese
+    periódica. O que a Proposição diz é o \emph{preço} de a hipótese falhar:
+    com uma $\gcomp{\cv}{\md}$ que não emenda, o viés cai como $2^{-J/2}$, o
+    que em E1.6 leva a taxa de predição a $n^{-1/2}$ (a menos de logaritmos)
+    em vez de $n^{-2\seff/(2\seff+1)}$, uma perda para todo $\seff > 1/2$.
+  \item Com \texttt{boundary = "interval"} (Cohen, Daubechies e Vial, 1993),
+    o espaço $\VJ$ do intervalo reproduz polinômios de grau $< N$ e a sua
+    base caracteriza $\Besov{s}{\pi}{r}[0,1]$ sem periodicidade (Cohen,
+    2003, cap.~3 \textsc{[verificar]}); o Lema~\ref{lem:L2} vale então com
+    $\Besov{s}{\pi}{r}[0,1]$ no lugar do espaço periódico e a mesma prova,
+    pois $\mathbf{1} \in V_{\jzero}$ e a projeção de uma função de média
+    zero em $\VJ$ é ortogonal a $\mathbf{1}$. O preço é numérico e
+    estrutural: o bloco de escala $V_{\jzero}$ tem $2^{\jzero}$ funções, com
+    $\jzero$ grande o bastante para as duas zonas de borda não se tocarem
+    (o \texttt{wbasis()} exige $\jzero \ge 4$ para $L = 8$), a constante
+    deixa de ser uma coluna isolada e passa a ser uma combinação das funções
+    de escala, e a restrição $\int\gcomp{\cv}{\md} = 0$ tem de ser imposta de
+    outro modo (E1.2, E2.1).
+  \item O reescalonamento para $[\varepsilon, 1-\varepsilon]$ do
+    \texttt{wall()} ($\varepsilon = 1.9^{-J}$; Montoril, Pinheiro e
+    Vidakovic, 2019) afasta os dados da zona onde a periodização deixa
+    artefato, mas não entra na teoria (D11). Note que o termo de viés que
+    E1.5 usa é $\inf$ sobre o sieve da norma $L_{2}(P_{U})$, e não
+    necessariamente $\PiJ g$: quando $P_{U}$ não visita a zona de borda, o
+    melhor elemento de $\WJ$ em $L_{2}(P_{U})$ pode ser bem melhor que a
+    projeção de Lebesgue. Isso fica como pergunta (handoff).
+\end{itemize}
+
+\section{O que foi transposto e o que é novo}
+
+\begin{itemize}[nosep]
+  \item Transposto do WALL (Passo~1 e prova S.1): a hipótese em forma de
+    sequência; a soma de cauda por Parseval; a soma geométrica; o
+    Cauchy--Schwarz sobre as componentes com a densidade limitada.
+  \item Generalizado: $\Besov{s}{\pi}{r}$ com $\pi$ qualquer, via o Passo~2
+    do Lema~\ref{lem:L2}, de onde sai $\seff$; a versão uniforme com a
+    constante explícita de sobreposição $(L-1)\norm{\psi}_{\infty}$.
+  \item Novo: o produto $X_{\cv}\,\gcomp{\cv}{\md}(U_{\md})$ no
+    Corolário~\ref{cor:vies}, que custa $C_{X}^{2}$ e troca $p^{2}$ por
+    $(pq)^{2}$; a Proposição~\ref{prop:periodizacao}.
+\end{itemize}
+
+\section{O que isto não cobre}
+
+\begin{itemize}[nosep]
+  \item A aproximação \emph{não linear}. Para $\pi < 2$ a melhor aproximação
+    com $M$ termos escolhidos livremente atinge $M^{-s}$, enquanto o sieve
+    linear atinge só $\NJ^{-\seff}$; é essa diferença que o LASSO explora e
+    que o corolário de compressibilidade (E1.6, weak-$\ell_{\tau}$ com
+    $\tau = (s + 1/2)^{-1}$ no caso crítico) formaliza. O lema aqui é só o
+    viés do sieve cheio.
+  \item A norma empírica $\normn{f - f_{J}}$ além da cota uniforme: a versão
+    com probabilidade alta a partir de $\norm{f - f_{J}}_{L_{2}(P)}$ é
+    concentração e fica em E1.5.
+  \item A regularidade diferente por bloco ($s_{\cv\md}$, $\pi_{\cv\md}$): o
+    enunciado tomou $(s, \pi, C_{g})$ comuns; a versão heterogênea é a mesma
+    prova com $\min_{\cv\md}\seff_{\cv\md}$ na taxa.
+  \item A recíproca da caracterização (sequência $\Rightarrow$ função), que
+    exigiria regularidade Hölder de $\psi$ maior que $s$, e que as provas de
+    E1 não usam.
+  \item A extensão de $\Besov{s}{\pi}{r}[0,1]$ a $\R$ na
+    Proposição~\ref{prop:periodizacao}, que está citada e não provada.
+\end{itemize}
+
+\section{Conferência numérica}
+
+\texttt{check/02-aproximacao-besov.R} (imprime \texttt{OK}; cerca de 50~s).
+Base Daublets com $L = 8$ ($N = 4$), $\jzero = 0$, constante descartada;
+projeção por mínimos quadrados numa grade de $2^{12}$ pontos ($J \le 9$) e
+coeficientes por quadratura numa grade de $2^{15}$ pontos ($\lev \le 12$). O
+que saiu:
+\begin{itemize}[nosep]
+  \item Parseval: o erro de projeção em $\WJ$ e a soma de cauda dos
+    coeficientes diferem em no máximo $1.4\times10^{-4}$ relativo (bumps,
+    $J = 1, \dots, 8$).
+  \item $\sin(2\pi u)$, periódica e $C^{\infty}$: a queda por nível é
+    $3.92, 3.98, 4.00, 4.00, 4.00$ bits em $L_{2}$ e o mesmo em $L_{\infty}$
+    ($J = 4, \dots, 8$), isto é, $2^{-JN}$: para uma função periódica lisa o
+    limite é o número de momentos nulos, como a prova prevê.
+  \item bumps (Donoho e Johnstone), com $\seff = 3/2$ pelas quinas
+    $|u - t_{i}|$: as normas por nível $\norm{\theta_{\lev\cdot}}_{2}$ caem
+    $1.49, 1.35, 1.27$ bits em $\lev = 9 \to 12$ (média $1.37$; tolerância
+    $1/4$). Abaixo de $\lev \approx 8$ a queda é menor que $1$ bit porque a
+    largura mínima das protuberâncias é $0.005 \approx 2^{-7.6}$; é o regime
+    pré-assintótico, e é também a situação em que o LASSO ganha do sieve.
+    Uma quina periódica isolada, $|\sin\pi(u - 0.4)|$, dá quedas que oscilam
+    com a fase da quina na grade diádica ($2.66, 1.56, 0.13, 1.65, \dots$) e
+    média de quatro níveis igual a $1.50$.
+  \item Funções que não emendam ($u - 1/2$ e $e^{u}$ centrada) na base
+    periodizada: queda em $L_{2}$ de $0.50, 0.50, 0.51$ bits por nível em
+    $J = 7, 8, 9$, independentemente da regularidade interior, e erro
+    $L_{\infty}$ estacionado em $0.54$ e $0.92$ (saltos de $1.00$ e $1.72$):
+    é a Proposição~\ref{prop:periodizacao}.
+  \item As mesmas funções na base do intervalo ($\jzero = 4$, $\VJ$
+    inteiro, $J = 4, \dots, 9$): a linear é reproduzida a $10^{-10}$ e a
+    exponencial cai de $6.3\times10^{-6}$ em $J = 4$ a $9.3\times10^{-11}$ em
+    $J = 9$ (cerca de $4.4$ bits por nível até o piso numérico), contra
+    $0.13$ e $0.023$ na periodizada.
+\end{itemize}
+
+\section*{Referências}
+\sloppy
+
+Referências fora de \texttt{docs/referencias-verificadas.bib} estão marcadas
+\textsc{[verificar]} e vão ao handoff.
+
+\begin{itemize}[nosep]
+  \item Cohen, A. (2003). \emph{Numerical Analysis of Wavelet Methods}.
+    Studies in Mathematics and its Applications 32. Elsevier.
+    \textsc{[verificar]}
+  \item Cohen, A., Daubechies, I. e Vial, P. (1993). Wavelets on the
+    interval and fast wavelet transforms. \emph{Applied and Computational
+    Harmonic Analysis} 1, 54--81. (\texttt{cohen1993wavelets})
+  \item Daubechies, I. (1992). \emph{Ten Lectures on Wavelets}. SIAM.
+    \textsc{[verificar]}
+  \item Donoho, D. L. e Johnstone, I. M. (1998). Minimax estimation via
+    wavelet shrinkage. \emph{The Annals of Statistics} 26, 879--921.
+    (\texttt{Donoho-Johnstone-1998})
+  \item Härdle, W., Kerkyacharian, G., Picard, D. e Tsybakov, A. (1998).
+    \emph{Wavelets, Approximation, and Statistical Applications}. Lecture
+    Notes in Statistics 129. Springer. (\texttt{hardle1998wavelets} no WALL;
+    não está no \texttt{.bib} verificado) \textsc{[verificar]}
+  \item Meyer, Y. (1992). \emph{Wavelets and Operators}. Cambridge Studies in
+    Advanced Mathematics 37. Cambridge University Press. \textsc{[verificar]}
+  \item Montoril, M. H., Pinheiro, A. e Vidakovic, B. (2019). Wavelet-based
+    estimators for mixture regression. \emph{Scandinavian Journal of
+    Statistics} 46, 215--234. (\texttt{Montoril-Pinheiro-Vidakovic-2019})
+  \item Triebel, H. (1983). \emph{Theory of Function Spaces}. Birkhäuser.
+    \textsc{[verificar]}
+\end{itemize}
+
+\end{document}

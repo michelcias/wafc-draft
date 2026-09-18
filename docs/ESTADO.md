@@ -1,10 +1,10 @@
 # Estado do trabalho, handoff de continuidade
 
 **Última atualização:** 2026-09-18.
-**Etapa corrente:** E0 fechada, menos a ratificação de D5; E1.1, L1 e L2
-fechadas. Liberadas para chats de tarefa: E1.2, E1.3 e E1.4 (E2.1 espera o
-enunciado de E1.2). Nenhum chat de tarefa em curso. Duas decisões do autor
-adiadas (D5, D8), seis propostas de L2 a ratificar e sete perguntas na §4.
+**Etapa corrente:** E0 fechada, menos a ratificação de D5; E1.1, L1, L2,
+E1.2, E1.3 e E1.4 fechadas. Liberadas para chats de tarefa: E1.5 e E2.1.
+Nenhum chat de tarefa em curso. Duas decisões do autor adiadas (D5, D8),
+seis propostas de L2 a ratificar e sete perguntas na §4.
 **Versão viva do manuscrito:** nenhuma (nasce em E5a como `k = 1`).
 **Cor da rodada corrente:** `colR1` (entra em uso quando existir `k = 2`).
 
@@ -226,6 +226,68 @@ As linhas que L2 acrescentou ao `literatura.md` estão com status `resumo` ou
 `[VERIFICAR]` e **não podem entrar no `.bib`** antes de uma verificação como
 a de L1.
 
+### 2026-09-18: E1.2, E1.3 e E1.4 fechadas (o núcleo da teoria)
+
+Três chats de tarefa, integrados neste. Rodei as três conferências aqui
+antes de integrar, e as três imprimem `OK` e reproduzem os números dos
+handoffs: `01-identificabilidade.R` (7 s), `03-desenho-produtos.R` (9 s),
+`02-aproximacao-besov.R` (53 s).
+
+**E1.2, identificabilidade** (`derivations/01-identificabilidade.md`).
+Proposição 1 (das `β_ℓ` a partir de `f` sob `E[XX' | U]` não singular q.c.;
+de `(c_ℓ, g_{ℓm})` a partir de `β_ℓ` sob densidade positiva e centralização)
+e Lema 1 (a base periódica com `j_0 = 0` impõe a centralização no nível da
+base; `(c, θ)` é injetiva e `Σ` definida positiva a cada `J`). Números:
+`Z` com 30 colunas tem posto 30 em `n = 200`, `λ_min(Z'Z/n) = 7.8e-03`,
+recuperação sem ruído com erro `3e-15`. As deficiências previstas
+aparecem exatas: manter `φ_{00}` dá nulidade `4 = p q`; `U_2 = U_1` dá
+`14 = p N_J`; `X_2 = 1 + ψ_{10}(U_1)` dá `1`.
+
+**E1.3, aproximação em Besov** (`derivations/02-aproximacao-besov.tex`,
+7 páginas). Lema de aproximação em `L_2` e em `L_∞`, corolário para
+`f - f_J`, e uma proposição sobre o custo da periodização. Números: em
+`sin(2πu)` a queda por nível é `4.00` bits (isto é `2^{−JN}`, `N = 4`); em
+`bumps` a queda média em `j = 9..12` é `1.37`, contra `s' = 3/2`; numa
+função que não emenda em `0 ≡ 1`, a queda trava em `0.50` bits e o erro
+uniforme **não decai** (`0.54` e `0.92` em `J = 9`).
+
+**E1.4, Gram do desenho de produtos**
+(`derivations/03-desenho-produtos.tex`, 6 páginas), que entregou mais do que
+o catálogo pedia: no caso geral sai o **autovalor mínimo cheio**, não só a
+compatibilidade no cone. `λ_min(Σ) ≥ κ_1 c_U` e `λ_max(Σ) ≤ κ_2 C_U`.
+Números: sob `X ⊥ U` a fatoração `Π(E[XX'] ⊗ Σ_Ψ)Π'` bate a `7.6e-13`; com
+`X` dependente de `U`, `λ_min(Σ) = 0.2747` contra a cota `κ_1 c_U = 0.2503`
+(10% de folga); com `κ_1 = 0`, a Gram degenera com `J`, como previsto
+(`4e-04`, `<1e-04`, `<1e-04` em `J = 2, 3, 4`).
+
+O que isso muda no rumo:
+
+- **A pergunta 4 da §4 está respondida: o caso geral fecha** (vira D13). A
+  independência compra só a fatoração exata, não constante melhor.
+- **A linha de risco "a condição de desenho dos produtos não fecha em
+  geral" sai** da tabela de `proposta-metodo.md` §6, com número.
+- **A taxa `2^{−Js'}` só aparece quando `2^{−J}` fica abaixo da escala da
+  função** (em `bumps`, `J ≥ 9`). Os `n` de E4 (`≤ 2000`) com
+  `J_n ≍ log_2 n/(2s'+1)` não chegam lá: a simulação vive no regime
+  pré-assintótico, que é justamente onde o sieve linear perde e o LASSO
+  ganha. Isso é matéria da Seção 5 do artigo, não defeito da conferência.
+- **Periodização custa `1/2`:** para qualquer `g` que não emende, a taxa em
+  `L_2` trava em `2^{−J/2}` e o erro uniforme não converge. Daí a pergunta 6
+  da §4.
+- **Em `n` pequeno a compatibilidade é mais saudável que o autovalor cheio:**
+  `φ²(S)` fica em 65-75% do populacional em `n = 200`, contra 40-50% de
+  `λ_min(Σ̂)`. É `φ²(S)` que E1.5 consome.
+- **Achado sobre o `wall()`** (não tocado, D4): com `boundary = "interval"`
+  ele mantém as `2^{j_0}` funções de escala de cada covariável e ainda o
+  intercepto do `glmnet`, logo a constante entra `d + 1` vezes e a Gram fica
+  singular com nulidade `d`. O ajuste não sofre; a leitura dos coeficientes
+  de escala, sim. Fica registrado para o autor decidir se avisa lá.
+
+**Numeração global dos resultados** (TAREFA.md §5 tem a tabela): E1.2 fica
+com Proposição 1 e Lema 1; E1.3 com Lema 2, Lema 3, Corolário 1 e
+Proposição 2; E1.4 com Proposição 3. Os arquivos mantêm os contadores
+locais; o mapa é a autoridade quando E5a montar o manuscrito.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -238,6 +300,8 @@ a de L1.
 | D10 | 09-18 | **Coeficientes em `θ`**, com `θ_{ℓm,jk}` (bloco antes da wavelet); `β_ℓ` fica sendo só o coeficiente funcional | `β` não pode ser função e vetor na mesma seção |
 | D11 | 09-18 | **`U ∈ [0,1]^q` por hipótese populacional**, com densidade limitada longe de `0` e de `∞`; reescalonamento empírico só na seção de computação | teoria limpa em E1.3 a E1.6; o termo extra não vale o custo agora |
 | D12 | 09-18 | Ordem das colunas de `Z`: não penalizados, depois blocos `(ℓ, m)` lexicográficos, dentro do bloco `j` e `k` crescentes | fixa a interface de `wafc_design()` em E2.1 |
+| D13 | 09-18 | **A teoria assume o caso geral** `λ_min(E[XX' \| U]) ≥ κ_1 > 0` q.c.; `X ⊥ U` vira observação (a fatoração de Kronecker) | E1.4 fechou o caso geral com `λ_min(Σ) ≥ κ_1 c_U`, conferido a 10% da verdade; assumir independência custaria generalidade sem comprar constante |
+| D14 | 09-18 | **D11 é sobre a densidade conjunta** de `U` em `[0,1]^q`, não sobre as marginais | `U_2 = U_1` tem marginais uniformes e `Σ_Ψ` singular; a prova de E1.4 usa `c_U` da conjunta, e é daí que sai a "não colinearidade entre moduladoras" |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
 | D7 | 09-18 | Compêndio de simulação e aplicação em repositório próprio, `wafc-studies`, nos moldes do `wall` | o `wall` já resolveu cache, `renv` por commit e proveniência |
 
@@ -287,18 +351,32 @@ Ordenadas pelo que bloqueia mais.
 3. **Sparse group LASSO:** a variante em grupos entra em `wafc()` como
    opção (`penalty = "sglasso"`, dependência `sparsegl`) ou fica só no
    piloto e no artigo como comparação? Decide-se em E2.5 com número.
-4. **`X` dependente de `U`:** a teoria de E1.4 tenta o caso geral ou o
-   artigo assume `X ⊥ U` e discute o geral? Decide-se quando E1.4 mostrar o
-   que fecha.
-5. **Como o artigo se posiciona diante de Klopp & Pensky** (a mais
+4. **Centralização das componentes:** o `notacao.md` §2 escreve
+   `E[g_{ℓm}(U_m)] = 0` e a base impõe `∫_0^1 g_{ℓm} = 0`; o estimador
+   estima a versão de Lebesgue, e as duas ficam longe quando `U_m` não é
+   uniforme (na conferência de E1.2, `max |mean ψ_{jk}(U_2)| = 0.48` com
+   `U_2 ~ Beta(2,3)`). A Proposição 1 vale com as duas, mas o `.tex` tem de
+   dizer uma. Proposta: **Lebesgue**, como no WALL, com uma linha no
+   `notacao.md` §2. É a única mudança de hipótese que E1.2 pede.
+5. **Periodicidade no enunciado:** (a) hipótese em forma de sequência na
+   base periodizada, como o WALL, com a proposição do custo da periodização
+   como justificativa do reescalonamento e da opção `interval`; (b) teoria
+   na base do intervalo (CDV), sem periodicidade, pagando `p q (2^{j_0} − 1)`
+   parâmetros não penalizados; (c) as duas, teoria em (a) e `boundary` como
+   opção do código. Proposta de E1.3: **(c)**, que é o que o `wall()` faz.
+6. **`boundary = "interval"` no `wafc()` de E2.1:** entra com a
+   reparametrização `Φ Q` (colunas de escala não penalizadas) ou fica de
+   fora da primeira versão? Com o filtro padrão do `wall()` a opção exige
+   `j_0 ≥ 6`, o que são `63 p q` parâmetros não penalizados.
+7. **Como o artigo se posiciona diante de Klopp & Pensky** (a mais
    importante desta rodada): o WAFC se apresenta como extensão deles
    (honesto, e o referee da SS reconhece) ou como modelo diferente, com K&P
    citado como caso particular? A primeira muda a frase-tese de
    `alvo-revista.md` §4; a segunda obriga a Seção 2 a mostrar que o desenho
    aditivo não é o deles. Decide-se antes de E5a; E1.4 não depende.
-6. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
+8. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
-7. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+9. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
@@ -322,14 +400,18 @@ Ordenadas pelo que bloqueia mais.
 
 - (a) **Autor:** ratificar D5 e D8 (a notação já não depende disso);
   responder a pergunta 2 se já tiver a base da aplicação.
-- (b) **Chats de tarefa, em paralelo desde já:** E1.2, E1.3 e E1.4, que
-  tocam arquivos distintos. E1.4 abre com o achado de L2: a parte (i) é
-  citação de K&P, e o entregável é o termo cruzado entre moduladoras e a
-  parte (ii).
-- (b') **A catalogar quando o autor ratificar as propostas de L2:** a
-  verificação bibliográfica das linhas novas de `literatura.md` (uma L1 de
-  segunda rodada) e as edições de `alvo-revista.md` e `plano-projeto.md`
-  listadas na §6 de `busca-novidade.md`.
+- (b) **Chats de tarefa, em paralelo desde já:** E1.5 (oráculo; consome o
+  Corolário de E1.3 e `φ_0²(S; Σ̂) ≥ κ_1 c_U/2` de E1.4) e E2.1 (desenho em
+  `wafc/`, com a ordem de colunas de D12 e o que E1.2 manda descartar).
+  Os dois tocam arquivos distintos.
+- (b') **A catalogar:** uma L1 de segunda rodada, que tem trabalho de
+  três fontes: as linhas novas de `literatura.md` (L2, status `resumo`), as
+  referências que E1.3 e E1.4 citam e que não estão no `.bib`
+  (`hardle1998wavelets` e `tropp2012user` são cópia do WALL; Meyer 1992,
+  Cohen 2003, Daubechies 1992, Triebel 1983 e Tibshirani 2013 são novas) e
+  os `[VERIFICAR]` de teorema exato deixados nos dois `.tex`. Quando o autor
+  ratificar as propostas de L2, entram também as edições de
+  `alvo-revista.md` e `plano-projeto.md` da §6 de `busca-novidade.md`.
 - (c) **Chat de tarefa, depois do enunciado de E1.2:** E2.1, que precisa
   saber o que a identificabilidade descarta do desenho.
 - (d) **Chat principal:** integrar os handoffs e catalogar E1.5, E1.6 e
@@ -342,6 +424,7 @@ Ordenadas pelo que bloqueia mais.
 |---|---|
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
+| 2026-09-18 | E1.2, E1.3 e E1.4 fechadas em três chats de tarefa e integradas; as três conferências rodam e imprimem `OK` aqui; D13 e D14; a numeração global dos resultados fixada |
 | 2026-09-18 | L2 fechada em chat de tarefa e integrada: novidade central confirmada (interseção zero na SS e na EJS), mas Klopp & Pensky (2015) cobre E1.4 (i), E1.5 e E1.6 para `q = 1` e `X ⊥ U`; seis propostas de mudança de rumo a ratificar |
 | 2026-09-18 | L1 fechada em chat de tarefa e integrada: 35 referências verificadas, quatro correções de atribuição, dois trabalhos novos para L2 olhar |
 | 2026-09-18 | E1.1 fechada: notação congelada (`ψ_{jk}`, `X_ℓ`, `U_m`, `θ_{ℓm,jk}`, `U ∈ [0,1]^q`), D9 a D12, `macros.tex` reescrito e compilando |

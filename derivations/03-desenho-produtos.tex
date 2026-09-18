@@ -1,0 +1,328 @@
+% E1.4. Conferência numérica: derivations/check/03-desenho-produtos.R (passou em 2026-09-18).
+% Notação: docs/notacao.md (congelada em E1.1). Macros: derivations/macros.tex.
+% Molde: WALL teórico, Assumption 5.7 (population compatibility) e Lemma S.3
+% (restricted eigenvalue, matrix Bernstein) de ms_theo_1.tex / supp_theo_1.tex.
+% O que é transposto do WALL: a passagem populacional -> empírica por Bernstein
+% matricial (Passo 2b do Lema S.3). O que é novo: a Gram do desenho de produtos
+% fatora (ou se minora) através de E[XX' | U], e a condição populacional sobre a
+% parte em U é DERIVADA da densidade de U limitada por baixo, não imposta.
+% Numeração global dos resultados: pendente do chat principal (TAREFA.md, §5);
+% os rótulos internos são os que valem.
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.6cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black]{hyperref}
+\input{macros}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\kron}{\otimes}
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmax}{\lambda_{\max}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+\DeclareMathOperator{\vecop}{vec}
+
+\title{The population and empirical Gram matrices of the product design}
+\author{wafc-draft, derivation 03 (E1.4)}
+\date{2026-09-18}
+\begin{document}
+\maketitle
+
+\section*{Setting}
+
+The model and the notation are those of \texttt{docs/notacao.md}. The response is
+$Y = \sum_{\cv=1}^{p} \fcoef{\cv}(\bU) X_{\cv} + \varepsilon$ with
+$\fcoef{\cv}(u) = \lvl{\cv} + \sum_{\md=1}^{q} \gcomp{\cv}{\md}(u_{\md})$, $\bX = (X_1, \ldots, X_p)\T$
+and $\bU = (U_1, \ldots, U_q)\T \in [0,1]^q$. Each $\gcomp{\cv}{\md}$ is expanded in the periodized
+orthonormal wavelets $\{\wav{\lev}{\tsl} : \lev = 0, \ldots, J-1;\ \tsl = 0, \ldots, 2^{\lev}-1\}$ of a
+compactly supported family (D2: $\jzero = 0$, the constant scaling function discarded), so that each
+block $(\cv, \md)$ carries $\NJ = 2^J - 1$ wavelets and the penalized dimension is $d = p q \NJ$.
+
+Write $\bPsi(u) \in \R^{K}$, $K = 1 + q\NJ$, for the vector that collects the constant and the wavelets
+of the $q$ modulating covariates,
+\[
+    \bPsi(u) = \bigl(1,\ \wav{\lev}{\tsl}(u_1)_{\lev\tsl},\ \ldots,\ \wav{\lev}{\tsl}(u_q)_{\lev\tsl}\bigr)\T ,
+\]
+with the wavelets of each $u_{\md}$ ordered by $\lev$ increasing and, within a level, by $\tsl$ increasing.
+The row of the design matrix is, in the column order frozen in D12 (the $p$ unpenalized columns $X_{\cv}$
+first, then the blocks $(\cv, \md)$ in lexicographic order),
+\[
+    \bZ = \Pi\,\bigl(\bX \kron \bPsi(\bU)\bigr) \in \R^{p + d}, \qquad p + d = pK,
+\]
+where $\bX \kron \bPsi(\bU)$ is the Kronecker product, whose entries are $X_{\cv}\bPsi_a(\bU)$ in
+$\cv$-major order, and $\Pi$ is the fixed permutation matrix that moves the $p$ entries $X_{\cv}\cdot 1$
+to the front. The population and empirical Gram matrices are
+\[
+    \Gram = \E[\bZ\bZ\T], \qquad \Gramhat = \frac1n \sum_{i=1}^{n} \bZ_i\bZ_i\T ,
+\]
+and, for the $\bU$ part alone, $\Gram_{\bPsi} = \E[\bPsi(\bU)\bPsi(\bU)\T] \in \R^{K \times K}$.
+Since $\Pi$ is a permutation, $\Gram$ and $\Pi\T\Gram\Pi$ have the same spectrum, and every
+statement below about eigenvalues, restricted eigenvalues or compatibility constants is invariant
+to the column order; the order matters only for the bookkeeping of E2.1.
+
+For a support $S \subseteq \{1, \ldots, p + d\}$ with $|S| = s_0$ and a vector $\delta \in \R^{p+d}$,
+the compatibility constant of a symmetric matrix $A$ on $S$ is, as in Bühlmann and van de Geer (2011,
+Section~6.2),
+\[
+    \compat^2(S; A) = \min\Bigl\{ s_0\,\delta\T A\,\delta :\ \norm{\delta_S}_1 = 1,\ \norm{\delta_{S^c}}_1 \le 3 \Bigr\},
+\]
+and the trivial bound $\delta\T A\delta \ge \lmin(A)\norm{\delta}_2^2 \ge \lmin(A)\norm{\delta_S}_1^2/s_0$ gives
+\begin{equation}
+    \label{eq:compat-lmin}
+    \compat^2(S; A) \;\ge\; \lmin(A) \qquad \text{for every } S .
+\end{equation}
+Hence a lower bound on $\lmin$ is a compatibility (and restricted eigenvalue) bound on every support,
+with the same constant and no cone restriction, exactly as in the WALL (Lemma S.3 there). This is the
+form in which the condition is consumed by E1.5.
+
+\section*{Assumptions}
+
+\begin{assumption}[Modulating covariates]
+\label{ass:U}
+$\bU$ takes values in $[0,1]^q$ and has a joint Lebesgue density $p_{\bU}$ with
+\[
+    0 < c_U \le p_{\bU}(u) \le C_U < \infty \qquad \text{for all } u \in [0,1]^q .
+\]
+\end{assumption}
+
+\begin{assumption}[Linear covariates]
+\label{ass:X}
+$\norm{\bX}_\infty \le B_X$ almost surely, and there are constants $0 < \kappa_1 \le \kappa_2 < \infty$ such that
+\[
+    \kappa_1 \;\le\; \lmin\bigl(\E[\bX\bX\T \mid \bU]\bigr) \;\le\; \lmax\bigl(\E[\bX\bX\T \mid \bU]\bigr) \;\le\; \kappa_2
+    \qquad \text{almost surely.}
+\]
+\end{assumption}
+
+\begin{assumption}[Wavelet basis]
+\label{ass:psi}
+The wavelets $\wav{\lev}{\tsl}$, $\lev \ge 0$, are the periodization to $[0,1]$ of an orthonormal, compactly
+supported family, so that $\{1\} \cup \{\wav{\lev}{\tsl}\}$ is orthonormal in $L_2[0,1]$ under the Lebesgue
+measure and $\int_0^1 \wav{\lev}{\tsl} = 0$. There is a constant $C_\psi$, depending only on the family,
+such that
+\begin{equation}
+    \label{eq:pointwise}
+    \sup_{u \in [0,1]} \sum_{\lev=0}^{J-1}\sum_{\tsl=0}^{2^{\lev}-1} \wav{\lev}{\tsl}(u)^2 \;\le\; C_\psi\, 2^{J}
+    \qquad \text{for every } J \ge 1 .
+\end{equation}
+\end{assumption}
+
+Assumption~\ref{ass:U} is D11 read for the joint law; see Remark~\ref{rem:joint}. In
+Assumption~\ref{ass:X}, the constant $\kappa_1$ is the quantity that the identifiability step
+(E1.2) already needs; when $\bX$ and $\bU$ are independent it reduces to $\lmin(\E[\bX\bX\T]) \ge \kappa_1$.
+The bound~\eqref{eq:pointwise} holds for every compactly supported family: at each level $\lev$, at most
+$L$ periodized wavelets are nonzero at a given $u$, where $L$ is the support length of the mother
+wavelet, and $\norm{\wav{\lev}{\tsl}}_\infty = 2^{\lev/2}\norm{\psi}_\infty$, so the left side is at most
+$L\norm{\psi}_\infty^2 \sum_{\lev < J} 2^{\lev} \le L\norm{\psi}_\infty^2\, 2^{J}$. The numerical check finds
+$C_\psi \approx 1.35$ for Daublets with filter size 8.
+
+\section*{Statement}
+
+\begin{proposition}[Gram matrix of the product design]
+\label{prop:gram}
+Under Assumptions~\ref{ass:U} to \ref{ass:psi}, with $D = p + d = p(1 + q\NJ)$:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+    \item \textup{(The $\bU$ part.)} $c_U \le \lmin(\Gram_{\bPsi}) \le \lmax(\Gram_{\bPsi}) \le C_U$, for every $J$.
+    \item \textup{(Factorization under independence.)} If $\bX$ and $\bU$ are independent, then
+    \begin{align*}
+        \Gram &= \Pi\,\bigl(\E[\bX\bX\T] \kron \Gram_{\bPsi}\bigr)\,\Pi\T , \\
+        \lmin(\Gram) &= \lmin(\E[\bX\bX\T])\,\lmin(\Gram_{\bPsi}) \ge \kappa_1 c_U , \\
+        \lmax(\Gram) &= \lmax(\E[\bX\bX\T])\,\lmax(\Gram_{\bPsi}) \le \kappa_2 C_U .
+    \end{align*}
+    \item \textup{(General case.)} Without independence,
+    \[
+        \kappa_1\, \lmin(\Gram_{\bPsi}) \;\le\; \lmin(\Gram) \;\le\; \lmax(\Gram) \;\le\; \kappa_2\, \lmax(\Gram_{\bPsi}),
+    \]
+    hence $\kappa_1 c_U \le \lmin(\Gram) \le \lmax(\Gram) \le \kappa_2 C_U$.
+    In particular $\compat^2(S; \Gram) \ge \kappa_1 c_U$ for every support $S$, the unpenalized
+    coordinates included, by~\eqref{eq:compat-lmin}.
+    \item \textup{(Empirical version.)} Let $(\bX_i, \bU_i)$, $i = 1, \ldots, n$, be i.i.d.\ copies of $(\bX, \bU)$ and
+    $R_J = p\,B_X^2\,(1 + q\,C_\psi 2^{J})$. Then $\norm{\bZ_i}_2^2 \le R_J$ almost surely and, for every $t > 0$,
+    \[
+        \Prob\bigl(\opnorm{\Gramhat - \Gram} \ge t\bigr)
+        \;\le\; 2D \exp\!\left( - \frac{n\,t^2}{2R_J\,(\kappa_2 C_U + 2t/3)} \right) .
+    \]
+    Consequently, with $\gamma = \kappa_1 c_U$,
+    \[
+        \Prob\Bigl( \lmin(\Gramhat) \ge \tfrac{\gamma}{2} \Bigr)
+        \;\ge\; 1 - 2D\exp\!\left( - \frac{n\,\gamma^2}{8R_J\,(\kappa_2 C_U + \gamma/3)} \right) ,
+    \]
+    which tends to $1$ whenever $p\,q\,2^{J}\log(p\,q\,2^{J})/n \to 0$,
+    and on that event $\compat^2(S; \Gramhat) \ge \gamma/2$ for every support $S$.
+\end{enumerate}
+\end{proposition}
+
+\begin{remark}[Cone-restricted alternative for the empirical step]
+\label{rem:cone}
+Part (iv) transfers the full smallest eigenvalue, which is what the sieve regime
+$2^{J_n} \asymp n^{1/(2\seff+1)}$ of E1.6 makes available at no cost: there $p q 2^{J}\log(pq2^{J})/n \to 0$
+as soon as $p q$ grows slower than $n^{2\seff/(2\seff+1)}$ up to logarithms. If $pq$ were larger, the
+compatibility constant alone can still be transferred through the entrywise deviation: by Bühlmann and van de
+Geer (2011, Corollary~6.8 [VERIFICAR numeração]), $\norm{\Gramhat - \Gram}_\infty \le \compat^2(S;\Gram)/(32 s_0)$
+implies $\compat^2(S; \Gramhat) \ge \compat^2(S; \Gram)/2$, and a union bound over the $D^2$ entries, each
+bounded by $B_X^2 C_\psi' 2^{J}$ with variance at most $B_X^4 C_U C_\psi' 2^{J}$, gives
+$\norm{\Gramhat - \Gram}_\infty = O_p\bigl(2^{J/2}\sqrt{\log D/n} + 2^{J}\log D/n\bigr)$; the requirement becomes
+$s_0^2\, 2^{J}\log(pq2^{J})/n \to 0$, which involves $pq$ only through the logarithm. This is the "$s_0 \log(pq\NJ)$"
+form anticipated in the plan; it is not needed for the rates of E1.6 and is recorded for the case $pq \gg n^{1/2}$.
+\end{remark}
+
+\begin{remark}[Joint versus marginal density]
+\label{rem:joint}
+Part (i) is where the lower bound $c_U$ on the density enters, and it is the joint density on $[0,1]^q$
+that is needed. Marginal bounds are not enough: if $U_2 = U_1$ almost surely, each marginal is
+uniform, but $\wav{\lev}{\tsl}(U_1) - \wav{\lev}{\tsl}(U_2) \equiv 0$ and $\Gram_{\bPsi}$ is singular. The joint
+lower bound is thus the "no concurvity among the modulating covariates" condition of
+\texttt{proposta-metodo.md}, §4, item 2, made quantitative: it rules out one $U_{\md}$ being a function of the
+others. The WALL imposes the lower bound on $\lmin$ of the population Gram directly (its Assumption~5.7)
+and lets the density lower bound play "only a motivating role"; here the same bound is derived from the
+density, with the explicit constant $c_U$.
+\end{remark}
+
+\begin{remark}[What $\kappa_1 > 0$ excludes]
+\label{rem:kappa}
+Assumption~\ref{ass:X} fails exactly when some nontrivial linear combination of $X_1, \ldots, X_p$ is
+almost surely a function of $\bU$ on a set of positive probability. The canonical case is
+$X_1 \equiv 1$ and $X_2 = h(U_1)$: then $\E[\bX\bX\T \mid \bU]$ has rank one, $\kappa_1 = 0$, and the
+population Gram degenerates as $J$ grows, because $h(u_1)\wav{\lev}{\tsl}(u_1)$ is approached by the span of
+$\{1, \wav{\lev'}{\tsl'}(u_1)\}$. The numerical check exhibits this with $h(u) = u - 1/2$: $\lmin(\Gram)$ is
+$4\times 10^{-4}$ at $J = 2$ and below $10^{-4}$ at $J \ge 3$. Nothing in the proposition is lost by
+allowing dependence between $\bX$ and $\bU$ as long as $\kappa_1 > 0$; independence buys only the exact
+factorization of part (ii), not a better constant.
+\end{remark}
+
+\section*{Proof}
+
+\paragraph{Part (i).}
+For $a \in \R^{K}$ write $h_a(u) = a\T\bPsi(u) = a_0 + \sum_{\md=1}^{q} h_{a,\md}(u_{\md})$ with
+$h_{a,\md} = \sum_{\lev\tsl} a_{\md,\lev\tsl}\wav{\lev}{\tsl}$. Under Assumption~\ref{ass:psi} the functions
+$1, \wav{\lev}{\tsl}(u_1), \ldots, \wav{\lev}{\tsl}(u_q)$ are orthonormal in $L_2([0,1]^q, du)$: within one
+coordinate this is the orthonormality of the periodized system; across coordinates
+$\int \wav{\lev}{\tsl}(u_{\md})\wav{\lev'}{\tsl'}(u_{\md'})\,du = \int_0^1 \wav{\lev}{\tsl}\int_0^1 \wav{\lev'}{\tsl'} = 0$ for
+$\md \ne \md'$, and $\int \wav{\lev}{\tsl}(u_{\md})\,du = 0$, both because every wavelet integrates to zero.
+Hence $\int_{[0,1]^q} h_a(u)^2\,du = \norm{a}_2^2$, and by Assumption~\ref{ass:U}
+\[
+    c_U\norm{a}_2^2 \;\le\; \E\bigl[h_a(\bU)^2\bigr] = \int h_a(u)^2\,p_{\bU}(u)\,du \;\le\; C_U\norm{a}_2^2 .
+\]
+Since $a\T\Gram_{\bPsi}a = \E[h_a(\bU)^2]$, this is (i).
+
+\paragraph{Part (iii) first.}
+Let $\delta \in \R^{pK}$ and reshape it as $\Delta \in \R^{p \times K}$, row $\cv$ holding the $K$ coefficients
+attached to $X_{\cv}$, so that $\delta = \vecop(\Delta\T)$ and $(\bX \kron \bPsi(\bU))\T\delta = \bX\T\Delta\bPsi(\bU)$.
+By the tower property,
+\[
+    \delta\T\,\Pi\T\Gram\,\Pi\,\delta
+    = \E\Bigl[\bigl(\bX\T\Delta\bPsi(\bU)\bigr)^2\Bigr]
+    = \E\Bigl[\bPsi(\bU)\T\Delta\T\,\E[\bX\bX\T \mid \bU]\,\Delta\bPsi(\bU)\Bigr] .
+\]
+Assumption~\ref{ass:X} bounds the inner quadratic form between $\kappa_1\norm{\Delta\bPsi(\bU)}_2^2$ and
+$\kappa_2\norm{\Delta\bPsi(\bU)}_2^2$ almost surely, and
+$\E\norm{\Delta\bPsi(\bU)}_2^2 = \sum_{\cv=1}^{p} \Delta_{\cv\cdot}\Gram_{\bPsi}\Delta_{\cv\cdot}\T
+= \delta\T(I_p \kron \Gram_{\bPsi})\delta$, whose value lies between $\lmin(\Gram_{\bPsi})\norm{\delta}_2^2$ and
+$\lmax(\Gram_{\bPsi})\norm{\delta}_2^2$. Therefore
+\[
+    \kappa_1\lmin(\Gram_{\bPsi})\norm{\delta}_2^2 \;\le\; \delta\T\,\Pi\T\Gram\,\Pi\,\delta \;\le\; \kappa_2\lmax(\Gram_{\bPsi})\norm{\delta}_2^2 ,
+\]
+and since $\Pi$ is orthogonal this is the first display of (iii); part (i) gives the second. The
+compatibility statement is~\eqref{eq:compat-lmin}.
+
+\paragraph{Part (ii).}
+Under independence $\E[\bX\bX\T \mid \bU] = \E[\bX\bX\T]$, and the same computation gives, for every
+$\delta$, $\delta\T\Pi\T\Gram\Pi\delta = \E\bigl[\bPsi(\bU)\T\Delta\T\E[\bX\bX\T]\Delta\bPsi(\bU)\bigr]
+= \delta\T(\E[\bX\bX\T] \kron \Gram_{\bPsi})\delta$; two symmetric matrices with the same quadratic form are
+equal, which is the factorization. The eigenvalues of a Kronecker product of symmetric matrices are the
+products of the eigenvalues, so $\lmin(\Gram) = \lmin(\E[\bX\bX\T])\lmin(\Gram_{\bPsi})$ and likewise for
+$\lmax$. Finally $\lmin(\E[\bX\bX\T]) \ge \kappa_1$ because $\lmin$ is concave and
+$\E[\bX\bX\T] = \E\bigl[\E[\bX\bX\T\mid\bU]\bigr]$ (Jensen); the upper bound is the same argument with
+$\lmax$ convex. (Independence is used only through $\E[\bX\bX\T \mid \bU] = \E[\bX\bX\T]$; that weaker
+condition suffices for (ii).)
+
+\paragraph{Part (iv).}
+The row norm: $\norm{\bZ_i}_2^2 = \norm{\bX_i}_2^2\,\norm{\bPsi(\bU_i)}_2^2 \le pB_X^2\,(1 + qC_\psi 2^{J}) = R_J$
+by~\eqref{eq:pointwise} applied to each of the $q$ coordinates. The rest transposes Step~2b of the
+WALL's Lemma S.3 to unweighted summands. Set $A_i = (\bZ_i\bZ_i\T - \Gram)/n$, independent, centered,
+symmetric, with $\Gramhat - \Gram = \sum_i A_i$. Their range: $\opnorm{\bZ_i\bZ_i\T} = \norm{\bZ_i}_2^2 \le R_J$
+and $\opnorm{\Gram} \le \E\opnorm{\bZ\bZ\T} \le R_J$, so $\opnorm{A_i} \le 2R_J/n$. Their variance:
+$\E[(\bZ\bZ\T - \Gram)^2] = \E[\norm{\bZ}_2^2\,\bZ\bZ\T] - \Gram^2 \preceq R_J\,\Gram$, hence
+$\opnorm{\sum_i \E A_i^2} \le R_J\lmax(\Gram)/n \le R_J\kappa_2 C_U/n$ by (iii). The matrix Bernstein
+inequality (Tropp, 2012, Theorem~1.4, applied to $\pm\sum_i A_i$) gives
+\[
+    \Prob\bigl(\opnorm{\Gramhat - \Gram} \ge t\bigr)
+    \le 2D\exp\!\left( - \frac{t^2/2}{R_J\kappa_2 C_U/n + (2R_J/n)(t/3)} \right)
+    = 2D\exp\!\left( - \frac{n\,t^2}{2R_J(\kappa_2 C_U + 2t/3)} \right) .
+\]
+Take $t = \gamma/2$. On the complement event Weyl's inequality gives
+$\lmin(\Gramhat) \ge \lmin(\Gram) - \gamma/2 \ge \gamma/2$, using (iii). The exponent is
+$-c\,n/R_J$ with $c = \gamma^2/\{8(\kappa_2C_U + \gamma/3)\}$ fixed, and $R_J \asymp pq2^{J}$,
+$\log(2D) \asymp \log(pq2^{J})$; the probability bound tends to zero exactly when
+$n/(pq2^{J}) - \log(pq2^{J}) \to \infty$, which is implied by $pq2^{J}\log(pq2^{J})/n \to 0$ (the
+weaker $n/(pq2^J) \to \infty$ alone does not control the prefactor $2D$, as the WALL notes). The
+compatibility statement on the event is again~\eqref{eq:compat-lmin}. \qed
+
+\section*{What this does not cover}
+
+\begin{itemize}[leftmargin=*]
+    \item \textbf{The interval boundary.} With \texttt{boundary = "interval"} (Cohen, Daubechies and Vial,
+    1993) the basis is still orthonormal on $[0,1]$, so part (i) and the proof go through with $\NJ$ and
+    $C_\psi$ adjusted, \emph{provided the constant is represented once}. The CDV scaling functions at level
+    $\jzero$ reproduce constants, so keeping them together with the unpenalized $X_{\cv}$ makes $\Gram$
+    singular; the design must drop one scaling function per block, or impose $\int \gcomp{\cv}{\md} = 0$
+    explicitly. This is E1.2's question, not E1.4's; the proposition assumes the periodic design of D2.
+    Numerically, the installed \texttt{WaveBased} requires $\jzero \ge 6$ for the interval boundary with
+    filter size 20, so the option is out of reach at $J = 3$.
+    \item \textbf{Unbounded $\bX$.} Part (iv) uses $\norm{\bX}_\infty \le B_X$ through the range $R_J$.
+    Sub-Gaussian $\bX$ would need a truncation step (or the Bernstein inequality for sub-exponential
+    matrices); parts (i) to (iii) need only second moments.
+    \item \textbf{The empirical rescaling of $\bU$.} D11 puts the monotone transformation to $[\epsilon, 1-\epsilon]$
+    outside the theory. If the practical design uses $\widehat F_{\md}(U_{\md})$ instead of $U_{\md}$, the
+    Gram changes by a random reparametrization and the concentration step does not apply as stated.
+    \item \textbf{Growing $p$.} The constants $\kappa_1, \kappa_2, B_X$ are assumed uniform in $n$; if $p = p_n$,
+    Assumption~\ref{ass:X} must hold uniformly and $R_J$ carries the factor $p$. Nothing here treats $p \gg n$.
+    \item \textbf{Sharpness at small $n$.} The bound in (iv) is not informative at $n = 200$, $D = 30$
+    ($R_J\log D/n \approx 1.6$): the check finds $\lmin(\Gramhat)$ at about $0.4$ to $0.5$ of $\lmin(\Gram)$, the
+    Marchenko--Pastur order $(1 - \sqrt{D/n})^2 \approx 0.38$, while the compatibility constant on a support of
+    size 7 is at about $0.65$ to $0.75$ of its population value. The restricted quantity is what E1.5 uses,
+    and it is healthier than the full eigenvalue at the sample sizes of E2.
+\end{itemize}
+
+\section*{Numerical check}
+
+\texttt{derivations/check/03-desenho-produtos.R} (Daublets, filter size 8; $n = 200$; $J = 3$; $p = 2$ with
+$X_1 \equiv 1$; $q = 2$; $\bU$ uniform on $[0,1]^2$, so $c_U = C_U = 1$ and $\Gram_{\bPsi} = I_{15}$; $D = 30$).
+The population Gram is computed by midpoint quadrature on a $400 \times 400$ grid with $\E[\bX\bX\T\mid\bU = u]$
+in closed form. Scenario A has $X_2 = 1/2 + \eta$, $\eta \sim \mathrm{Unif}[-1,1]$ independent of $\bU$; scenario
+B has $X_2 = (U_1 - 1/2) + \eta$, so $\kappa_1 = 0.2503$ and $\kappa_2 = 1.3318$ (extremes of the pointwise
+eigenvalues over $u_1 \in [0,1]$); scenario C has $X_2 = U_1 - 1/2$, so $\kappa_1 = 0$. What it printed on
+2026-09-18:
+\begin{itemize}[leftmargin=*]
+    \item Orthonormality of $\{1, \wav{\lev}{\tsl}(u_{\md})\}$ on the grid to $3 \times 10^{-5}$ (quadrature error);
+    $C_\psi(J)$ equal to $1.105$, $1.238$, $1.300$, $1.331$ and $1.347$ for $J = 2, \ldots, 6$.
+    \item (ii) Scenario A: $\Gram$ equals the permuted Kronecker product to $7.6 \times 10^{-13}$;
+    $\lmin(\Gram) = 0.2500 = 0.2500 \times 1$, $\lmax(\Gram) = 1.3333 = 1.3333 \times 1$.
+    \item (iii) Scenario B: $\lmin(\Gram) = 0.2747 \ge \kappa_1 = 0.2503$; $\lmax(\Gram) = 1.2271 \le \kappa_2 = 1.3318$;
+    $\lmin(\E[\bX\bX\T]) = 0.4167 \ge \kappa_1$. The lower bound is within 10\% of the truth.
+    \item Scenario C: $\lmin(\Gram) = 4 \times 10^{-4}, < 10^{-4}, < 10^{-4}$ for $J = 2, 3, 4$.
+    \item (iv) Over 200 replications: full column rank in every replication at $n = 200$ (smallest
+    $\lmin(\Gramhat)$ equal to $0.047$ in A and $0.081$ in B); median $\lmin(\Gramhat)/\lmin(\Gram)$ equal to $0.40$ (A) and
+    $0.51$ (B) at $n = 200$, and $0.84$ and $0.96$ at $n = 3200$, where $\lmin(\Gramhat) \ge \lmin(\Gram)/2$ in all
+    replications; median $\opnorm{\Gramhat - \Gram}$ falls from $0.83$ to $0.21$ (A) and from $0.67$ to $0.16$ (B), a
+    factor $4.1$ and $4.2$ for a sixteenfold $n$; $\max_i\norm{\bZ_i}_2^2 \le 67.3 \le R_J = 93.6$.
+    \item Compatibility on a support of size 7 (the two unpenalized columns and five random wavelet columns),
+    computed exactly by $2^7$ quadratic programs (one per sign pattern of $\delta_S$): population
+    $\compat^2(S;\Gram) = 0.368$ (A) and $0.495$ (B), both above $\lmin(\Gram)$; at $n = 200$, over 20 replications,
+    median $0.240$ (A) and $0.363$ (B), minimum $0.182$ and $0.282$, always above $\lmin(\Gramhat)$.
+\end{itemize}
+
+\section*{References}
+
+\begin{itemize}[leftmargin=*]
+    \item Bühlmann, P. and van de Geer, S. (2011). \emph{Statistics for High-Dimensional Data}. Springer.
+    (\texttt{buhlmann2011statistics}, verified in L1.)
+    \item Cohen, A., Daubechies, I. and Vial, P. (1993). Wavelets on the interval and fast wavelet transforms.
+    \emph{Applied and Computational Harmonic Analysis} 1, 54--81. (\texttt{cohen1993wavelets}, verified in L1.)
+    \item Tropp, J. A. (2012). User-friendly tail bounds for sums of random matrices. \emph{Foundations of
+    Computational Mathematics} 12, 389--434. (\texttt{tropp2012user} in the WALL bibliography; not yet in
+    \texttt{referencias-verificadas.bib}.)
+\end{itemize}
+
+\end{document}

@@ -39,8 +39,11 @@ que ler antes está aqui e no plano.
 | E0.5 inventário | fechada | `inventario-codigo.md` |
 | E0.6 convenções do pacote | fixadas | `plano-projeto.md` E0.6 |
 | E1.1 notação | **fechada** (D9 a D12): `ψ_{jk}`, `X_ℓ`, `U_m`, `θ_{ℓm,jk}` | `notacao.md`, `derivations/macros.tex` |
-| E1.2, E1.3, E1.4 | não abertas; **podem abrir já** (E1.1 fechou) | catálogo da §3 |
-| E1.5 a E1.7, E2, E3, E4, E5, E6, E7 | não abertas; E2.1 abre com o enunciado de E1.2 | |
+| E1.2 identificabilidade | **fechada** (2026-09-18): Proposição 1 e Lema 1; conferência `OK` | `derivations/01-identificabilidade.md` |
+| E1.3 aproximação em Besov | **fechada** (2026-09-18): dois lemas, corolário e o custo da periodização; conferência `OK` | `derivations/02-aproximacao-besov.tex` |
+| E1.4 desenho de produtos | **fechada** (2026-09-18): autovalor mínimo cheio no caso geral (D13); conferência `OK` | `derivations/03-desenho-produtos.tex` |
+| E1.5, E2.1 | não abertas; **podem abrir já** | catálogo da §3 |
+| E1.6, E1.7, E2.2 a E2.5, E3 a E7 | não abertas; E1.6 abre quando E1.5 fechar | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
 
@@ -55,9 +58,7 @@ tarefa pode criar ou editar**.
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
 | E0.3 (autor) | só falta o quartil 2024 da SS conferido no SCImago e anotado em `alvo-revista.md` §1; a transcrição e o template estão feitos | nada | `docs/alvo-revista.md` (§1), `docs/handoff-E0.3.md` |
-| E1.2 | `derivations/01-identificabilidade.md` (enunciado, hipóteses, prova, "o que não cobre") e `derivations/check/01-identificabilidade.R` imprimindo `OK`: posto cheio do desenho em `n` pequeno e recuperação de coeficientes conhecidos; o que muda com `boundary = "interval"` | E1.1, fechada: a notação de `notacao.md` é para seguir como está, e símbolo novo vai ao handoff, não ao arquivo | `derivations/01-identificabilidade.md`, `derivations/check/01-identificabilidade.R`, `docs/handoff-E1.2.md` |
-| E1.3 | `derivations/02-aproximacao-besov.tex` (+ `.pdf`) com o lema de aproximação em `L_2(P_U)` e, se preciso, em `L_∞`, transposto do Passo 1 do WALL com a diferença por periodização registrada; `check/02-aproximacao-besov.R` medindo o erro de projeção em `bumps` e `sin` contra `2^{−J s'}` | E1.1, fechada (idem) | `derivations/02-aproximacao-besov.tex`, `derivations/02-aproximacao-besov.pdf`, `derivations/check/02-aproximacao-besov.R`, `docs/handoff-E1.3.md` |
-| E1.4 | `derivations/03-desenho-produtos.tex` (+ `.pdf`): Gram populacional do desenho de produtos; (i) fatoração sob `X ⊥ U`; (ii) autovalor restrito no caso geral sob `λ_min(E[XX' \| U]) ≥ κ_1`; (iii) versão empírica por concentração; `check/03-desenho-produtos.R` com `λ_min` restrito (ou compatibilidade) em `n = 200`, `J = 3`, `X ⊥ U` e `X` dependente de `U` | E1.1, fechada (idem) | `derivations/03-desenho-produtos.tex`, `derivations/03-desenho-produtos.pdf`, `derivations/check/03-desenho-produtos.R`, `docs/handoff-E1.4.md` |
+| E1.5 | `derivations/04-oraculo.tex` (+ `.pdf`): desigualdade oráculo para o LASSO com perda quadrática e erro sub-gaussiano, `c_ℓ` não penalizados, `λ ≍ σ ‖Z‖_max sqrt(log(p q N_J)/n)`, taxa lenta (sem condição de desenho) e taxa rápida (com E1.4); o viés entra pelo Corolário 1 de E1.3, e a constante de compatibilidade pela forma consumível de E1.4 (`φ_0²(S; Σ̂) ≥ κ_1 c_U / 2`, sem cone); `check/04-oraculo.R` medindo o erro de predição contra `λ² s_0` ao variar `n`, com `s_0` pequeno | E1.3 e E1.4, fechadas; segue Bühlmann & van de Geer (2011), Teoremas 6.1 e 6.2 | `derivations/04-oraculo.tex`, `derivations/04-oraculo.pdf`, `derivations/check/04-oraculo.R`, `docs/handoff-E1.5.md` |
 | E2.1 | `wafc/R/load.R` (carrega `R/*.R`, declara dependências), `wafc/R/dgp.R` (cenários suave, não homogêneo, nulo; `simulate_wafc()`), `wafc/R/design.R` (`wafc_design()` sobre `wbasis()` do `WaveBased`, blocos `X_j ⊙ ψ(U_k)`, colunas nomeadas, `penalty.factor`, versão esparsa), `wafc/tests/test-design.R` (com `θ*` na base e sem ruído, `glmnet` com `λ → 0` recupera `θ*`; posto cheio; nomes das colunas) e `wafc/scripts/01-smoke.R` | o enunciado de E1.2 (a hipótese de identificabilidade fixa o que o desenho descarta); a ordem das colunas é D12 | `wafc/R/load.R`, `wafc/R/dgp.R`, `wafc/R/design.R`, `wafc/tests/test-design.R`, `wafc/scripts/01-smoke.R`, `wafc/README.md` (só a tabela), `docs/handoff-E2.1.md` |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
@@ -65,10 +66,18 @@ catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**Quem abrir E1.4 leia antes a §1 de [`busca-novidade.md`](busca-novidade.md):**
-a fatoração da Gram sob `X ⊥ U` é a eq. (1.8) e o Lema 1 de Klopp & Pensky
-(2015), a citar, não a provar como nova. O entregável é o termo cruzado
-entre moduladoras e a parte (ii).
+**Quem abrir E1.5** lê antes o Corolário 1 de
+`derivations/02-aproximacao-besov.tex` e a Proposição de
+`derivations/03-desenho-produtos.tex`, além da §1 de
+[`busca-novidade.md`](busca-novidade.md): a desigualdade oráculo de Klopp &
+Pensky (2015) cobre o caso `q = 1` com `X ⊥ U`, e o que é novo aqui é o
+desenho aditivo.
+
+**Quem abrir E2.1** implementa a ordem de colunas de D12 e descarta o que
+E1.2 manda descartar: no periódico com `j_0 = 0`, a coluna `φ_{00}` do
+`wbasis()` e nada mais. A construção `Z = (X ⊗ Ψ(U))[, perm]` do
+`check/03-desenho-produtos.R` (`kron_rows()`, `perm_D12()`) serve de teste
+de referência.
 
 Tarefa que não está no catálogo: pedir ao chat principal para catalogá-la
 antes de abrir. E1.5, E1.6, E2.2 a E2.5 e E3 entram no catálogo quando as
@@ -98,7 +107,17 @@ dependências fecharem. Todo código de tarefa vai para `wafc/`, nunca para o
 Os `derivations/` numeram os resultados em sequência global (Proposição 1,
 Lema 1, ...), começando em E1.2. O manuscrito terá numeração própria, por
 rótulo do LaTeX. Resultado novo numera a partir do último registrado aqui
-pelo chat principal: **nenhum ainda**.
+pelo chat principal, com o mapa abaixo.
+
+| Arquivo | Resultados, na numeração global |
+|---|---|
+| `01-identificabilidade.md` (E1.2) | Proposição 1, Lema 1 |
+| `02-aproximacao-besov.tex` (E1.3) | Lema 2, Lema 3, Corolário 1, Proposição 2 |
+| `03-desenho-produtos.tex` (E1.4) | Proposição 3 |
+
+Os arquivos mantêm os contadores locais do LaTeX; **este mapa é a
+autoridade**, e é ele que E5a usa ao montar o manuscrito. O próximo
+resultado numera a partir de Proposição 3, Lema 3 e Corolário 1.
 
 A notação está congelada (E1.1): `ψ_{jk}` com nível `j` e translação `k`,
 covariável linear `X_ℓ`, moduladora `U_m`, coeficiente `θ_{ℓm,jk}`. As

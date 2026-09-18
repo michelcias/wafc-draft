@@ -154,7 +154,7 @@ tem de confirmar que não existe.
 
 | Risco | Sinal | Resposta |
 |---|---|---|
-| A condição de desenho dos produtos não fecha em geral | contra-exemplo com `X` e `U` dependentes | enunciar sob `X ⊥ U` primeiro (a Gram fatora em `E[XX'] ⊗ E[ψψ']`) e generalizar com hipótese explícita |
+| ~~A condição de desenho dos produtos não fecha em geral~~ **fechado em E1.4 (2026-09-18)** | | sob `λ_min(E[XX' \| U]) ≥ κ_1` e densidade conjunta de `U` limitada por baixo, `λ_min(Σ) ≥ κ_1 c_U`, sem cone (D13); a fatoração sob `X ⊥ U` vira observação. O que `κ_1 > 0` exclui é uma combinação linear de `X` ser função de `U` |
 | O LASSO puro seleciona coeficientes isolados e as `ĝ_{ℓm}` ficam "espinhosas" | ISE ruim nas funções suaves em E2.4 | sparse group LASSO, ou pós-processamento por limiarização em blocos; medir |
 | Periodização deixa artefato de borda nas `g_{ℓm}` | erro concentrado em `u` perto de 0 e 1 | `eps` do `wall`; `boundary = "interval"`; reportar o erro no interior |
 | Custo: `p q (2^J − 1)` colunas com `J` grande | `glmnet` lento com `n = 2000`, `p q = 50`, `J = 6` (`~3000` colunas) | desenho esparso do `wall` (`sparse = "auto"`), tabela `wtable()`; o `glmnet` aceita `dgCMatrix` |

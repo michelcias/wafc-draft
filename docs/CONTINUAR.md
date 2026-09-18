@@ -54,6 +54,7 @@ decisão em E3.3.
 | `gh` autenticado como `michelcias` (opcional) | criar repositórios, CI | `gh auth status` |
 | pacotes R: `glmnet`, `Matrix`, `mgcv`, `grpreg`, `gglasso`, `bench`, `testthat`, `devtools`, `roxygen2`, `remotes`, `renv` | protótipo, competidores, pacote | comando abaixo |
 | `sparsegl` | sparse group LASSO (E2.2), se a variante for adotada | `install.packages("sparsegl")` |
+| `quadprog` | constante de compatibilidade exata em `check/03-desenho-produtos.R` (E1.4) | `install.packages("quadprog")` |
 | o próprio `WaveBased`, instalado de `../../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
 
 No Ubuntu, `grpreg`, `gglasso` e `sparsegl` também saem do repositório da
@@ -73,8 +74,17 @@ cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd - 
 cd manuscript/ss-template && latexmk -pdf SS-template.tex && latexmk -c && cd -   # compila (9 páginas)
 ```
 
-Quando existirem: `Rscript derivations/check/01-identificabilidade.R` (imprime
-`OK`); `Rscript -e 'testthat::test_dir("wafc/tests")'`; `Rscript wafc/scripts/01-smoke.R`.
+As conferências das derivações, que devem imprimir `OK` (tempos desta
+máquina):
+
+```bash
+Rscript derivations/check/01-identificabilidade.R   # ~7 s
+Rscript derivations/check/03-desenho-produtos.R     # ~9 s, precisa de quadprog
+Rscript derivations/check/02-aproximacao-besov.R    # ~53 s
+```
+
+Quando existirem: `Rscript -e 'testthat::test_dir("wafc/tests")'`;
+`Rscript wafc/scripts/01-smoke.R`.
 
 ## 3. Onde o trabalho está (resumo de 2026-09-18; o `ESTADO.md` manda)
 
@@ -85,9 +95,12 @@ Quando existirem: `Rscript derivations/check/01-identificabilidade.R` (imprime
   O tipo de revisão da revista não consta da página oficial.
 - **Notação congelada** (E1.1, D9 a D12): `ψ_{jk}`, `X_ℓ`, `U_m`,
   `θ_{ℓm,jk}`, `U ∈ [0,1]^q`; `derivations/macros.tex` implementa e compila.
-  Fora isso, nada de teoria, protótipo ou manuscrito ainda.
-- **Tarefas que podem abrir agora em chats de tarefa:** L1, L2, E1.2, E1.3 e
-  E1.4 (catálogo em `TAREFA.md`); E2.1 depois do enunciado de E1.2.
+- **Teoria: E1.2, E1.3 e E1.4 fechadas**, com conferência numérica rodando.
+  Falta E1.5 (oráculo) e E1.6 (taxas). **Nada de protótipo nem de
+  manuscrito ainda**: `wafc/` está vazio e E2.1 é a primeira tarefa de
+  código.
+- **Tarefas que podem abrir agora em chats de tarefa:** E1.5 e E2.1
+  (catálogo em `TAREFA.md`).
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
   `instrucoes.md`.
