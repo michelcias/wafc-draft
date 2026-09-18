@@ -1,0 +1,27 @@
+% Macros do WAFC. Implementa docs/notacao.md (esboço; congela em E1.1).
+% Único lugar onde uma macro é definida; os derivations/*.tex fazem \input{macros}.
+\usepackage{amsmath,amssymb,amsthm}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\T}{^{\top}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\normn}[1]{\left\lVert #1 \right\rVert_{n}}
+\newcommand{\normL}[1]{\left\lVert #1 \right\rVert_{L_2(P)}}
+\newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\thetastar}{\btheta^{*}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\PiJ}{\Pi_{J}}
+\newcommand{\VJ}{V_{J}}
+\newcommand{\NJ}{N_{J}}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem{assumption}{Assumption}
+\newtheorem{remark}{Remark}

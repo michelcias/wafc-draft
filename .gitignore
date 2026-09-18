@@ -1,0 +1,36 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.blg
+*.bbl.bak
+*.synctex.gz
+*.synctex(busy)
+*.fdb_latexmk
+*.fls
+*.toc
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+*.abs
+*.spl
+texput.log
+
+# R
+.Rhistory
+.RData
+.Rproj.user/
+*.rds
+prototype/cache/
+
+# Editors and OS
+*~
+.DS_Store
+.vscode/
+.idea/
+
+# Local scratch (never versioned)
+scratch/
+docs/handoff-*.md.bak
