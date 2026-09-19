@@ -1,4 +1,6 @@
 % E1.3 -- lema de aproximação em Besov pelo sieve de wavelets periodizadas.
+% Emenda E1.3b (2026-09-19): a seção "A margem" e o Lema 10 (extensão sob
+% suporte próprio), que registram a função da margem do reescalonamento (D23).
 % Transposição do Passo 1 do WALL teórico (ms_theo_1.tex, Lemma "Besov
 % approximation error"; prova em supp_theo_1.tex, S.1). Conferência numérica:
 % check/02-aproximacao-besov.R (imprime OK). Notação: docs/notacao.md (E1.1).
@@ -11,9 +13,10 @@
 \usepackage{hyperref}
 \input{macros}
 
-\title{E1.3. Aproximação em Besov pelo sieve de wavelets periodizadas}
+\title{E1.3 e E1.3b. Aproximação em Besov pelo sieve de wavelets
+periodizadas, e a margem que compra a extensão}
 \author{wafc-draft, \texttt{derivations/02-aproximacao-besov.tex}}
-\date{2026-09-18}
+\date{2026-09-18; emenda E1.3b de 2026-09-19}
 
 \begin{document}
 \maketitle
@@ -33,9 +36,14 @@ $X_{\cv}\,\gcomp{\cv}{\md}(U_{\md})$, o que troca o fator $p^{2}$ do WALL por
 $(pq)^{2}\,C_{X}^{2}$; e a diferença por periodização, que o WALL não trata,
 fica registrada na Proposição~\ref{prop:periodizacao}.
 
-Numeração dos resultados: sequência global dos \texttt{derivations/}
-(\texttt{docs/TAREFA.md}, §5); este arquivo usa Lema~1, Lema~2, Corolário~1 e
-Proposição~1, a acertar pelo chat principal com o que E1.2 tiver numerado.
+Numeração dos resultados: a autoridade é a sequência global dos arquivos de
+\texttt{derivations} (\texttt{docs/TAREFA.md}, §5), na qual este arquivo tem
+Lema~2, Lema~3, Corolário~1 e Proposição~2. Os quatro ainda imprimem o
+contador local (Lema~1, Lema~2, Corolário~1, Proposição~1), e alinhá-los é
+tarefa do chat principal; o resultado acrescentado por E1.3b já imprime o
+número global, \textbf{Lema~10}, o que deixa a numeração impressa deste
+arquivo temporariamente descontínua. Todas as referências cruzadas usam
+\texttt{\textbackslash ref}, de modo que o alinhamento não quebra nada.
 
 \section{Objetos}
 
@@ -391,6 +399,295 @@ O que isso muda para o WAFC:
     projeção de Lebesgue. Isso fica como pergunta (handoff).
 \end{itemize}
 
+\section{A margem: suporte próprio e o lema de extensão (E1.3b)}
+
+A Proposição~\ref{prop:periodizacao} mede o preço de periodizar uma função
+que não emenda \emph{quando os dados visitam a borda}. A emenda desta seção
+observa que o reescalonamento do \texttt{wall()} garante que eles não a
+visitem, e converte isso em hipótese: a moduladora vive num subintervalo
+próprio de $[0,1]$, e a base é periodizada no intervalo maior. Tomar
+$[0,1]$ é sem perda de generalidade sobre a \emph{escala} de $U_{\md}$, não
+sobre o seu \emph{suporte}; é a margem que sobra que compra a extensão
+(D23). A Proposição~\ref{prop:periodizacao} passa a ser o caso
+$\varepsilon = 0$ desta seção.
+
+\begin{assumption}[margem e regularidade no suporte]\label{ass:margem}
+Existe $\varepsilon \in (0, 1/4]$, \emph{fixo}, isto é, não dependente de $J$
+nem de $n$, tal que $\operatorname{supp} P_{U_{\md}} \subseteq
+I_{\varepsilon} := [\varepsilon, 1-\varepsilon]$ para todo $\md$. Cada
+componente restrita ao suporte pertence a
+$\Besov{s}{\pi}{r}(I_{\varepsilon})$, com
+$\norm{\gcomp{\cv}{\md}}_{\Besov{s}{\pi}{r}(I_{\varepsilon})} \le C_{g}$ para
+todo $(\cv,\md)$, e $s > 1/\pi$.
+\end{assumption}
+
+A Hipótese~\ref{ass:margem} substitui a Hipótese~\ref{ass:besov}: não se
+pede mais que a componente emende em $0 \equiv 1$, nem se pede coisa alguma
+sobre ela fora do suporte, onde de resto ela não é identificada. A
+Hipótese~\ref{ass:dens} continua valendo como está (densidade limitada por
+$C_{U}$), agora com a densidade concentrada em $I_{\varepsilon}^{q}$.
+
+\setcounter{lemma}{9}
+\begin{lemma}[extensão que emende, com margem]\label{lem:extensao}
+Sob as Hipóteses~\ref{ass:base}, \ref{ass:dens} e~\ref{ass:margem}, para cada
+par $(\cv,\md)$ existe $\tilde g = \tilde g_{\cv\md} : [0,1] \to \R$ tal que:
+\begin{enumerate}[label=\textup{(\roman*)}, nosep]
+  \item $\tilde g = \gcomp{\cv}{\md} - a_{\cv\md}$ em $I_{\varepsilon}$, com
+    $a_{\cv\md} \in \R$ uma constante, e $\int_{0}^{1}\tilde g = 0$;
+  \item a extensão $1$-periódica de $\tilde g$ satisfaz a
+    Hipótese~\ref{ass:besov} com a constante
+    \[
+      \tilde C_{g} \;\le\; C_{\ast}\,\varepsilon^{-(s - 1/\pi)}\,C_{g},
+    \]
+    onde $C_{\ast}$ depende só de $s$, $\pi$, $r$ e da família de wavelets;
+  \item em consequência, para todo $J \ge 0$,
+    \[
+      \inf_{a\in\R,\;h \in \WJ}
+      \norm{\gcomp{\cv}{\md} - a - h}_{L_{2}(P_{U_{\md}})}^{2}
+      \;\le\; \frac{C_{U}\,\tilde C_{g}^{2}}{1 - 2^{-2\seff}}\;2^{-2J\seff},
+    \]
+    sem o termo $2^{-J}$ da Proposição~\ref{prop:periodizacao};
+  \item e o viés do sieve obedece à cota do Corolário~\ref{cor:vies} com
+    $C_{g}$ trocado por $\tilde C_{g}$,
+    \[
+      \inf_{(\bc,\btheta)} \norm{f - \bZ\T(\bc,\btheta)}_{L_{2}(P)}^{2}
+      \;\le\; \frac{(pq)^{2}C_{X}^{2}C_{U}\,\tilde C_{g}^{2}}{1 - 2^{-2\seff}}\;
+      2^{-2J\seff},
+    \]
+    pois os $\lvl{\cv}$ não são penalizados e absorvem
+    $\sum_{\md} a_{\cv\md}$.
+\end{enumerate}
+\end{lemma}
+
+A prova usa dois ingredientes citados e não provados aqui, ambos padrão:
+
+\begin{description}[nosep]
+  \item[(E1) Extensão.] Há operador de extensão linear e limitado
+    $E : \Besov{s}{\pi}{r}(I) \to \Besov{s}{\pi}{r}(\R)$, $Eg|_{I} = g$, com
+    norma uniforme em intervalos $I$ de comprimento entre $1/2$ e $1$
+    (Triebel, 1983, cap.~3; Cohen, 2003, \S 3.9). É o mesmo operador que a
+    Proposição~\ref{prop:periodizacao} já invoca.
+  \item[(E2) Produto localizado e dilatação.] Para $\rho \in
+    C^{\infty}_{c}(\R)$ com suporte em $[-3,3]$,
+    \[
+      \norm{\rho F}_{\Besov{s}{\pi}{r}(\R)} \;\le\;
+      C(s,\pi,r)\,\norm{\rho}_{C^{M}}\bigl(
+      \norm{F}_{L_{\pi}[-4,4]} + |F|_{\dot B^{s}_{\pi,r}(\R)}\bigr),
+      \qquad M = \lfloor s\rfloor + 1,
+    \]
+    e a seminorma homogênea escala como
+    \[
+      |F(\lambda\,\cdot)|_{\dot B^{s}_{\pi,r}} \;=\;
+      \lambda^{s - 1/\pi}\,|F|_{\dot B^{s}_{\pi,r}}
+    \]
+    (Triebel, 1983; \texttt{[VERIFICAR]}: a localização interna não foi
+    conferida). É de (E2)
+    que sai todo o $\varepsilon$ do enunciado. O que importa na primeira
+    desigualdade é que $\rho$ localiza: sem ela, a norma $L_{\pi}$ de uma
+    função dilatada por $\lambda$ traz um fator $\lambda^{-1/\pi}$ que
+    estragaria o expoente.
+\end{description}
+
+\begin{proof}
+Escreva $g$ para $\gcomp{\cv}{\md}|_{I_{\varepsilon}}$ e $L$ para o
+comprimento do filtro.
+
+\emph{Passo 1 (extensão à reta).} Por (E1), com $|I_{\varepsilon}| \in
+[1/2,1]$, existe $Eg \in \Besov{s}{\pi}{r}(\R)$ com $Eg = g$ em
+$I_{\varepsilon}$ e $\norm{Eg}_{\Besov{s}{\pi}{r}(\R)} \le C_{E}C_{g}$,
+$C_{E}$ independente de $\varepsilon$. Compondo com um corte fixo, igual a
+$1$ em $[0,1]$ e nulo fora de $[-1,2]$, pode-se supor $Eg$ de suporte
+compacto; e como $s > 1/\pi$, $\norm{Eg}_{\infty} \le C\norm{Eg}_{\Besov{s}{\pi}{r}}$.
+
+\emph{Passo 2 (corte na margem).} Fixe $\chi \in C^{\infty}(\R)$ com
+$\chi \equiv 0$ em $(-\infty,0]$, $\chi \equiv 1$ em $[1,\infty)$ e
+$0 \le \chi \le 1$, e ponha
+\[
+  \chi_{\varepsilon}(u) \;=\;
+  \chi\bigl(2u/\varepsilon - 1\bigr)\,
+  \chi\bigl(2(1-u)/\varepsilon - 1\bigr),
+  \qquad
+  \tilde g_{0} \;=\; \chi_{\varepsilon}\cdot Eg \ \text{ em } [0,1].
+\]
+Então $\chi_{\varepsilon} \equiv 1$ em $I_{\varepsilon}$, logo
+$\tilde g_{0} = g$ no suporte, e $\chi_{\varepsilon} \equiv 0$ fora de
+$(\varepsilon/2, 1-\varepsilon/2)$, logo a extensão $1$-periódica de
+$\tilde g_{0}$ se anula numa vizinhança de cada inteiro: não há salto em
+$0 \equiv 1$, e a Proposição~\ref{prop:periodizacao} não se aplica a ela.
+
+\emph{Passo 3 (os coeficientes).} Seja $\theta_{\lev\tsl} =
+\inner{\tilde g_{0}}{\wav{\lev}{\tsl}}$ na base periodizada. Como
+$\operatorname{supp}\tilde g_{0} \subset (0,1)$, cada coeficiente
+periodizado é a soma de no máximo duas integrais contra translações
+inteiras de $\psi$ em $\R$, de modo que basta majorar, em cada nível, a
+norma $\ell_{\pi}$ dos $\inner{\tilde g_{0}}{\psi_{\lev\tsl}}_{\R}$,
+$\tsl \in \mathbb{Z}$. Separe as translações em três famílias.
+
+\emph{(a) Interiores}, $\operatorname{supp}\psi_{\lev\tsl} \subseteq
+(\varepsilon, 1-\varepsilon)$. Aí $\tilde g_{0} = Eg$, e a caracterização de
+$\Besov{s}{\pi}{r}(\R)$ por coeficientes de wavelet, na direção função
+$\Rightarrow$ sequência, que exige só $N > s$ momentos nulos e $\psi$
+limitada de suporte compacto (a mesma usada na
+Proposição~\ref{prop:periodizacao}), dá
+$\norm{(\theta_{\lev\tsl})_{\mathrm{int}}}_{\pi} \le
+C_{1}\,2^{-\lev(s+1/2-1/\pi)}\norm{Eg}_{\Besov{s}{\pi}{r}}$.
+
+\emph{(b) Grosseiras na margem}: as que encontram
+$[0,\varepsilon]\cup[1-\varepsilon,1]$ e têm
+$(L-1)2^{-\lev} \ge \varepsilon/4$. A margem, na circunferência, é um único
+intervalo de comprimento $2\varepsilon \le 8(L-1)2^{-\lev}$, logo há no
+máximo $9(L-1)$ translações nesta família em cada nível, e a cota crua
+$|\theta_{\lev\tsl}| \le \norm{Eg}_{\infty}\norm{\psi}_{1}2^{-\lev/2}$ dá
+\[
+  \norm{(\theta_{\lev\tsl})_{\mathrm{b}}}_{\pi}
+  \;\le\; \{9(L-1)\}^{1/\pi}\norm{\psi}_{1}\norm{Eg}_{\infty}\,
+  2^{\lev(s-1/\pi)}\;2^{-\lev(s+1/2-1/\pi)} ,
+\]
+e nesta família $2^{\lev} \le 4(L-1)/\varepsilon$, de modo que tudo o que
+multiplica $2^{-\lev(s+1/2-1/\pi)}$ é
+$\le C_{2}\norm{Eg}_{\infty}\varepsilon^{-(s-1/\pi)}$.
+
+\emph{(c) Finas na margem}: as que encontram
+$[0,\varepsilon]\cup[1-\varepsilon,1]$ com $(L-1)2^{-\lev} < \varepsilon/4$.
+Basta tratar o lado $[0,\varepsilon]$: a construção é simétrica em
+$u \mapsto 1-u$, e as translações do outro lado são as deste depois de
+transladar por $1$. O suporte de cada uma cabe então em
+$[-\varepsilon/4,\ 5\varepsilon/4]$. Seja
+$J_{\varepsilon} = \lfloor \log_{2}\{2/(3\varepsilon)\}\rfloor \ge 0$, de modo
+que $\lambda := 2^{-J_{\varepsilon}} \in [3\varepsilon/2,\ 3\varepsilon)$, e
+seja $\rho \in C^{\infty}_{c}(\R)$ fixa, igual a $1$ em $[-2,2]$ e nula fora
+de $[-3,3]$. Ponha
+\[
+  V(t) \;=\; \rho(t)\,\tilde g_{0}(\lambda t)
+  \;=\; \bigl\{\rho(t)\,\chi_{\varepsilon}(\lambda t)\bigr\}\cdot
+  Eg(\lambda t) .
+\]
+O perfil $\rho(t)\chi_{\varepsilon}(\lambda t)$ percorre, quando
+$\varepsilon$ varia em $(0,1/4]$, uma família de funções de
+$C^{\infty}_{c}([-3,3])$ com derivadas limitadas \emph{uniformemente em
+$\varepsilon$}, porque $2\lambda/\varepsilon \in [3, 6]$. Como
+$\lambda \le 1$ e $s > 1/\pi$,
+\[
+  \norm{Eg(\lambda\,\cdot)}_{L_{\pi}[-4,4]} \le 8^{1/\pi}\norm{Eg}_{\infty},
+  \qquad
+  |Eg(\lambda\,\cdot)|_{\dot B^{s}_{\pi,r}} = \lambda^{s-1/\pi}
+  |Eg|_{\dot B^{s}_{\pi,r}} \le |Eg|_{\dot B^{s}_{\pi,r}} ,
+\]
+e (E2) dá
+\[
+  \norm{V}_{\Besov{s}{\pi}{r}(\R)} \;\le\;
+  C_{3}\norm{Eg}_{\Besov{s}{\pi}{r}(\R)} ,
+  \qquad C_{3} \text{ livre de } \varepsilon .
+\]
+É aqui que a localização de (E2) é indispensável: sem o corte $\rho$, a
+norma $L_{\pi}$ de $\tilde g_{0}(\lambda\,\cdot)$ traria
+$\lambda^{-1/\pi}$ e o expoente final seria $\varepsilon^{-s}$.
+A mudança de variável $u = \lambda t$ dá
+$\theta_{\lev\tsl} = 2^{-J_{\varepsilon}/2}\,
+\inner{V}{\psi_{\lev - J_{\varepsilon},\,\tsl}}_{\R}$: nesta família
+$\lev - J_{\varepsilon} \ge 0$, porque
+$2^{-\lev} < \varepsilon/\{4(L-1)\} \le \lambda$, e o suporte reescalado de
+$\psi_{\lev\tsl}$ cai em $[-1,2]$, onde $\rho \equiv 1$, de modo que trocar
+$\tilde g_{0}(\lambda\,\cdot)$ por $V$ não muda o coeficiente. A
+caracterização aplicada a $V$ no nível $\lev - J_{\varepsilon}$ dá
+\[
+  \norm{(\theta_{\lev\tsl})_{\mathrm{c}}}_{\pi}
+  \;\le\; C_{1}C_{3}\,2^{J_{\varepsilon}(s-1/\pi)}\,
+  2^{-\lev(s+1/2-1/\pi)}\norm{Eg}_{\Besov{s}{\pi}{r}},
+\]
+e $2^{J_{\varepsilon}} \le 2/(3\varepsilon) \le \varepsilon^{-1}$. Somando as
+três famílias e usando o Passo~1 sai (ii) com
+$\tilde C_{g} \le C_{\ast}\varepsilon^{-(s-1/\pi)}C_{g}$.
+
+\emph{Passo 4 (centralização e viés).} Ponha $a_{\cv\md} =
+\int_{0}^{1}\tilde g_{0}$ e $\tilde g = \tilde g_{0} - a_{\cv\md}$: subtrair
+constante não altera coeficiente de wavelet nenhum, logo (ii) vale para
+$\tilde g$, e $\int_{0}^{1}\tilde g = 0$, o que é (i). Tomando
+$a = -a_{\cv\md}$ e $h = \PiJ\tilde g$ e usando que
+$P_{U_{\md}}(I_{\varepsilon}) = 1$ e $\tilde g = g - a_{\cv\md}$ ali,
+\[
+  \inf_{a,h}\norm{g - a - h}_{L_{2}(P_{U_{\md}})}^{2}
+  \;\le\; \norm{\tilde g - \PiJ\tilde g}_{L_{2}(P_{U_{\md}})}^{2},
+\]
+e o Lema~\ref{lem:L2}, com $\tilde C_{g}$ no lugar de $C_{g}$, fecha (iii).
+Para (iv), $f$ coincide, no suporte de $P$, com a função de regressão de
+parâmetros $(\lvl{\cv} + \sum_{\md}a_{\cv\md},\ \tilde g_{\cv\md})$, e o
+Corolário~\ref{cor:vies} aplica-se a esta.
+\end{proof}
+
+\begin{remark}[o expoente de $\varepsilon$ é exato]\label{rem:exato}
+A degradação de (ii) não é artefato da construção. Se $s > 1/\pi$ e
+$s - 1/\pi \notin \mathbb{N}$, $\Besov{s}{\pi}{r}$ mergulha no espaço de
+Hölder de expoente $s - 1/\pi$ (Härdle et al., 1998, cap.~9). Seja
+$\tilde g$ \emph{qualquer} função $1$-periódica que coincida com $g$ em
+$I_{\varepsilon}$ a menos de constante. Por periodicidade
+$\tilde g(1-\varepsilon) = \tilde g(-\varepsilon)$, e o mergulho dá
+\[
+  |g(\varepsilon) - g(1-\varepsilon)|
+  \;=\; |\tilde g(\varepsilon) - \tilde g(-\varepsilon)|
+  \;\le\; C\,\norm{\tilde g}_{\Besov{s}{\pi}{r}}\,(2\varepsilon)^{s - 1/\pi},
+\]
+isto é, $\norm{\tilde g}_{\Besov{s}{\pi}{r}} \ge c\,|g(\varepsilon) -
+g(1-\varepsilon)|\,\varepsilon^{-(s-1/\pi)}$. O expoente $s - 1/\pi$ do
+Lema~\ref{lem:extensao} é portanto o certo, e o preço da margem é
+exatamente este: quanto menor a margem, mais abrupta a emenda, e maior a
+constante da classe em que a função emendada vive. A conferência numérica
+mede o expoente e encontra $s - 1/\pi$.
+\end{remark}
+
+\begin{remark}[a margem não pode encolher com $J$]\label{rem:nao-encolhe}
+O produto que (iii) controla é $\tilde C_{g}^{2}2^{-2J\seff} \asymp
+\varepsilon^{-2(s-1/\pi)}2^{-2J\seff}$. Com $\varepsilon = 2^{-cJ}$ o
+expoente garantido cai para $\seff - c\,(s - 1/\pi)$, isto é, para
+$s(1-c) + c/2$ quando $\pi = 2$. Em $c = 1$ isso é $1/2$, exatamente o que a
+Proposição~\ref{prop:periodizacao} já dava sem margem nenhuma; em
+$c = \log_{2}1.9 = 0.926$, que é o reescalonamento herdado do
+\texttt{wall()}, é $0.074\,s + 0.463$, uma melhora marginal. Só uma margem
+\emph{fixa}, desacoplada de $J$, compra a taxa cheia, e é por isso que a
+Hipótese~\ref{ass:margem} a pede fixa. A conferência numérica confirma a
+leitura: $1/2$ bit por nível com $\varepsilon = 2^{-(J+1)}$ e cerca de
+$0{.}96$ com $\varepsilon = 1{.}9^{-J}$, contra a taxa cheia com
+$\varepsilon$ fixo. Isso é o que a pergunta 6 do \texttt{ESTADO.md} pedia
+decidir, e o que E2.4 tem de medir em ISE.
+\end{remark}
+
+\begin{remark}[o que a margem custa em E1.4]\label{rem:gram}
+A mesma margem muda a constante de desenho. Na Proposição de E1.4
+(\texttt{03-desenho-produtos.tex}, parte (i)) a ortonormalidade da base em
+$L_{2}([0,1]^{q}, du)$ dá $\E[h_{a}(\bU)^{2}] \ge c_{U}\norm{a}_{2}^{2}$
+com a densidade limitada por baixo em todo o cubo. Com suporte próprio essa
+cota deixa de valer como está: o que sobra é
+\[
+  \E\bigl[(a\T\boldsymbol{\Psi}(\bU))^{2}\bigr] \;\ge\; c_{U}
+  \int_{I_{\varepsilon}^{q}} h_{a}(u)^{2}\,du
+  \;=\; c_{U}\,a\T G_{\varepsilon}a
+  \;\ge\; c_{U}\,\lambda_{\min}(G_{\varepsilon})\,\norm{a}_{2}^{2},
+\]
+\[
+  G_{\varepsilon} \;=\; \int_{I_{\varepsilon}^{q}}
+  \boldsymbol{\Psi}(u)\,\boldsymbol{\Psi}(u)\T\,du ,
+\]
+a Gram da base \emph{restrita ao suporte}, e não $c_{U}\norm{a}_{2}^{2}$.
+Como $G_{\varepsilon} \preceq I$, a troca só pode piorar a constante, e
+piora de um jeito que depende de $J$: $\lambda_{\min}(G_{\varepsilon}) = 0$
+assim que $\VJ$ contém função não nula suportada na margem, que na
+circunferência é um intervalo de comprimento $2\varepsilon$; como $\VJ$ é
+gerado pelas funções de escala $\phi_{J\tsl}$, de suporte
+$(L-1)2^{-J}$, basta $2^{J} \ge (L-1)/(2\varepsilon)$. A conferência
+numérica encontra a primeira direção nula um nível antes do limiar
+suficiente, e mostra o outro lado: margem acoplada à resolução mantém
+$\lambda_{\min}(G_{\varepsilon})$ longe de zero e estável em $J$.
+
+Isto é uma tensão, não uma contradição: a margem que compra a taxa é a que
+degenera a Gram, e a que preserva a Gram é a que não compra a taxa. A saída
+é que as direções nulas não são defeito do estimador, e sim coeficientes de
+wavelets invisíveis no suporte, cujas colunas de $\bZ$ se anulam quase
+certamente e que não afetam $f$ ali; o que E1.5 consome não é
+$\lambda_{\min}$ e sim uma constante de compatibilidade sobre as direções
+estimáveis, e nada aqui a exibe. Quem mede $\lambda_{\min}(G_{\varepsilon})$
+e o ISE contra $\varepsilon$ e $J$ é E2.4.
+\end{remark}
+
 \section{O que foi transposto e o que é novo}
 
 \begin{itemize}[nosep]
@@ -403,6 +700,12 @@ O que isso muda para o WAFC:
   \item Novo: o produto $X_{\cv}\,\gcomp{\cv}{\md}(U_{\md})$ no
     Corolário~\ref{cor:vies}, que custa $C_{X}^{2}$ e troca $p^{2}$ por
     $(pq)^{2}$; a Proposição~\ref{prop:periodizacao}.
+  \item Novo em E1.3b: o Lema~\ref{lem:extensao}, que troca a hipótese de
+    periodicidade por uma hipótese sobre o suporte, e as
+    Observações~\ref{rem:exato} a~\ref{rem:gram}, que fixam o expoente de
+    $\varepsilon$, proíbem a margem acoplada a $J$ e registram o que a
+    margem custa na Gram de E1.4. Nada disso tem paralelo no WALL, que não
+    reescalona na teoria.
 \end{itemize}
 
 \section{O que isto não cobre}
@@ -424,12 +727,25 @@ O que isso muda para o WAFC:
     exigiria regularidade Hölder de $\psi$ maior que $s$, e que as provas de
     E1 não usam.
   \item A extensão de $\Besov{s}{\pi}{r}[0,1]$ a $\R$ na
-    Proposição~\ref{prop:periodizacao}, que está citada e não provada.
+    Proposição~\ref{prop:periodizacao} e no Lema~\ref{lem:extensao}, que
+    está citada e não provada, assim como o ingrediente (E2) do
+    Lema~\ref{lem:extensao}, cuja localização interna em Triebel (1983)
+    está marcada \texttt{[VERIFICAR]}.
+  \item A constante de desenho sob suporte próprio. A
+    Observação~\ref{rem:gram} mostra que $\lambda_{\min}(G_{\varepsilon})$
+    se anula para $J$ grande e diz por que isso não é fatal, mas não exibe a
+    constante de compatibilidade sobre as direções estimáveis, que é o que
+    E1.5 de fato consome. Enquanto ela não existir, a taxa de E1.6 sob a
+    Hipótese~\ref{ass:margem} é conjectura, não teorema.
+  \item O caso em que o suporte de $P_{\bU}$ não é um cubo
+    $I_{\varepsilon}^{q}$, e o caso de margem diferente por moduladora, que
+    é a mesma prova com $\min_{\md}\varepsilon_{\md}$.
 \end{itemize}
 
 \section{Conferência numérica}
 
-\texttt{check/02-aproximacao-besov.R} (imprime \texttt{OK}; cerca de 50~s).
+\texttt{check/02-aproximacao-besov.R} (imprime \texttt{OK}; cerca de
+$72$~s, medidos em 2026-09-19).
 Base Daublets com $L = 8$ ($N = 4$), $\jzero = 0$, constante descartada;
 projeção por mínimos quadrados numa grade de $2^{12}$ pontos ($J \le 9$) e
 coeficientes por quadratura numa grade de $2^{15}$ pontos ($\lev \le 12$). O
@@ -463,12 +779,55 @@ que saiu:
     $0.13$ e $0.023$ na periodizada.
 \end{itemize}
 
+A parte C acrescentou, em E1.3b, o que mede a margem. A quantidade medida é
+a de (iii) do Lema~\ref{lem:extensao}, o \emph{ínfimo} sobre
+$\{a + h : a \in \R,\ h \in \WJ\}$ da norma $L_{2}$ restrita a
+$[\varepsilon, 1-\varepsilon]$, e não o erro da projeção de Lebesgue, que é
+outra coisa. Mesmas duas funções que não emendam, $u - 1/2$ e $e^{u}$,
+$J = 4, \dots, 9$:
+\begin{itemize}[nosep]
+  \item \emph{A taxa.} Queda por nível, em bits: $0.50$ com
+    $\varepsilon = 0$, que é a Proposição~\ref{prop:periodizacao};
+    $0.52$ a $0.58$ com $\varepsilon = 2^{-(J+1)}$, isto é, nenhuma melhora,
+    como a Observação~\ref{rem:nao-encolhe} prevê para $c = 1$; $0.96$ e
+    $0.97$ em média com $\varepsilon = 1.9^{-J}$, o reescalonamento herdado
+    do \texttt{wall()}, uma melhora real e parcial; e a taxa cheia com
+    margem fixa, $\varepsilon = 0.05$ e $\varepsilon = 0.10$, onde o erro
+    cai de $10^{-2}$ a $10^{-11}$ em três níveis (quedas de $4$ a $13$ bits)
+    e estaciona no piso numérico. É o Lema~\ref{lem:extensao}: com margem
+    fixa a função que não emenda deixa de ser um problema.
+  \item \emph{A Gram restrita.} $\lambda_{\min}(G_{\varepsilon})$ para
+    $q = 1$, $J = 2, \dots, 8$, na grade de $2^{14}$: vale $1$ em
+    $\varepsilon = 0$ (ortonormalidade); fica em $0.213$ com
+    $\varepsilon = 2^{-(J+1)}$ e em $0.0013$ com $\varepsilon = 1.9^{-J}$,
+    estável em $J$ nos dois casos; e desaba com margem fixa, de $0.62$ em
+    $J = 2$ a $10^{-12}$ em $J = 6$ ($\varepsilon = 0.05$) e a $10^{-16}$ em
+    $J = 6$ ($\varepsilon = 0.10$). A primeira direção nula aparece em
+    $J = 6$ e $J = 5$, um nível antes do limiar suficiente
+    $2^{J} \ge (L-1)/(2\varepsilon)$, que dá $J = 7$ e $J = 6$: combinações
+    quase nulas chegam antes das exatamente nulas. Em $J = 8$ já são $20$ e
+    $46$ direções nulas. É a Observação~\ref{rem:gram}, e é a tensão que
+    E2.4 tem de arbitrar.
+  \item \emph{A constante $C(\varepsilon)$.} Construída a extensão
+    explícita do Passo~2 da prova (corte $C^{\infty}$ de largura
+    $\varepsilon/2$ aplicado a $u - 1/2$), a sua norma de sequência
+    $b^{s}_{2,\infty}$ vale, em $\varepsilon = 0.4, 0.2, 0.1, 0.05$:
+    $0.14, 0.28, 0.48, 0.74$ para $s = 1$; $0.33, 1.10, 2.68, 5.84$ para
+    $s = 1.5$; $0.92, 4.41, 15.2, 46.7$ para $s = 2$. O expoente de
+    $1/\varepsilon$ medido no último par é $0.63$, $1.12$ e $1.62$,
+    convergindo por cima para $s - 1/\pi = 0.5, 1, 1.5$, que é o expoente do
+    Lema~\ref{lem:extensao} e o da cota inferior da
+    Observação~\ref{rem:exato}.
+\end{itemize}
+
 \section*{Referências}
 \sloppy
 
 Todas as referências deste arquivo foram conferidas em L3 (2026-09-19) e
-estão em \texttt{docs/referencias-verificadas.bib}. A única localização que a
-rodada não conseguiu confirmar está anotada abaixo, em Meyer (1992).
+estão em \texttt{docs/referencias-verificadas.bib}; E1.3b não acrescentou
+obra nenhuma. As localizações internas que não foram conferidas estão
+anotadas abaixo, em Meyer (1992), em Triebel (1983) e em Härdle et al.\
+(1998).
 
 \begin{itemize}[nosep]
   \item Cohen, A. (2003). \emph{Numerical Analysis of Wavelet Methods}.
@@ -489,7 +848,11 @@ rodada não conseguiu confirmar está anotada abaixo, em Meyer (1992).
   \item Härdle, W., Kerkyacharian, G., Picard, D. e Tsybakov, A. (1998).
     \emph{Wavelets, Approximation, and Statistical Applications}. Lecture
     Notes in Statistics 129. Springer. (\texttt{hardle1998wavelets},
-    copiada do WALL.) O cap.~9 é ``Wavelets and Besov Spaces'', pp.~101--124.
+    copiada do WALL.) O cap.~9 é ``Wavelets and Besov Spaces'', pp.~101--124;
+    é o capítulo que a Observação~\ref{rem:exato} invoca para o mergulho de
+    $\Besov{s}{\pi}{r}$ no espaço de Hölder de expoente $s - 1/\pi$
+    (\texttt{[VERIFICAR]}: o enunciado exato dentro do capítulo não foi
+    conferido).
   \item Meyer, Y. (1992). \emph{Wavelets and Operators}, volume~1. Cambridge
     Studies in Advanced Mathematics 37. Cambridge University Press.
     (\texttt{Meyer-1992}.) O cap.~6 é ``Wavelets and spaces of functions and
@@ -502,7 +865,10 @@ rodada não conseguiu confirmar está anotada abaixo, em Meyer (1992).
     Statistics} 46, 215--234. (\texttt{Montoril-Pinheiro-Vidakovic-2019})
   \item Triebel, H. (1983). \emph{Theory of Function Spaces}. Monographs in
     Mathematics 78. Birkhäuser, Basel. (\texttt{Triebel-1983}.) O cap.~3 é
-    ``Function Spaces on Domains'', pp.~188--211.
+    ``Function Spaces on Domains'', pp.~188--211, e é de lá que vem o
+    operador de extensão (E1). O ingrediente (E2), produto localizado e
+    dilatação, está no capítulo sobre espaços em $\R^{n}$;
+    \texttt{[VERIFICAR]}: a seção interna não foi conferida.
 \end{itemize}
 
 \end{document}

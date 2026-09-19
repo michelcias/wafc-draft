@@ -1,4 +1,4 @@
-## E1.3 -- conferência numérica do lema de aproximação em Besov
+## E1.3 e E1.3b -- conferência numérica dos lemas de aproximação em Besov
 ## (derivations/02-aproximacao-besov.tex).
 ##
 ## Mede o erro de projeção || g - Pi_J g || em L_2[0,1] e em L_inf, para a
@@ -7,7 +7,7 @@
 ## s' = s - (1/pi - 1/2)_+. As bases são avaliadas pelo WaveBased (wbasis(),
 ## wtable()), nunca reimplementadas. Roda com
 ##   Rscript derivations/check/02-aproximacao-besov.R
-## e termina imprimindo OK. Leva cerca de 30 s (parte B).
+## e termina imprimindo OK. Leva cerca de 2 min (partes B e C).
 ##
 ## O que se confere:
 ##   (1) Parseval: o erro L_2 da projeção coincide com a soma de cauda dos
@@ -27,11 +27,15 @@
 ##       erro L_inf não vai a zero (o termo de borda da Proposição do .tex);
 ##   (5) a mesma função na base do intervalo (Cohen-Daubechies-Vial) volta a
 ##       ter a taxa cheia (a linear é reproduzida exatamente).
+## A parte C acrescenta, para E1.3b, (6) a taxa restrita ao suporte, (7)
+## lambda_min da Gram restrita e (8) a degradação de C(eps); o cabeçalho da
+## parte diz o que cada uma mede.
 ##
-## Grades: 2^12 pontos (projeção por mínimos quadrados, J <= 9) e 2^15 pontos
-## (coeficientes por quadratura, um nível de cada vez, j <= 12). É mais que o
-## "J <= 3" da regra geral de conferência porque medir uma taxa exige vários
-## níveis assintóticos; o custo é de segundos.
+## Grades: 2^12 pontos (projeção por mínimos quadrados, J <= 9), 2^15 pontos
+## (coeficientes por quadratura, um nível de cada vez, j <= 12) e 2^14 pontos
+## (partes C7 e C8). É mais que o "J <= 3" da regra geral de conferência
+## porque medir uma taxa exige vários níveis assintóticos; o custo é de
+## segundos.
 
 suppressPackageStartupMessages(library(WaveBased))
 
@@ -183,6 +187,138 @@ tailB <- sapply(seq_along(jB), function(i)
 cat("    bumps: erro L_2 por soma de cauda, J = 6..12, e erro * 2^{J s'}:\n")
 print(round(rbind(J = jB, erro = tailB, `erro*2^(J s')` = tailB * 2^(jB * sp)), 4))
 
+## ===========================================================================
+## Parte C (E1.3b): a margem eps, o lema de extensão e a Gram restrita
+## ===========================================================================
+## Sob D23 a moduladora não vive em [0,1] e sim no suporte [eps, 1-eps], e a
+## base é periodizada no intervalo maior. O que se confere aqui:
+##   (6) o viés que E1.5 consome é o inf sobre W_J da norma L_2(P_U), isto é a
+##       melhor aproximação medida SÓ em [eps, 1-eps]; o Lema 10 diz que ela
+##       volta à taxa cheia 2^{-J s'} quando eps > 0 é fixo, contra os 1/2 bit
+##       por nível da Proposição do custo da periodização (que é o caso
+##       eps = 0). Com eps acoplado a J a constante C(eps) degrada junto e o
+##       ganho é parcial;
+##   (7) lambda_min(G_eps), com G_eps a Gram da base restrita ao suporte, que
+##       é a constante que substitui c_U em E1.4: eps > 0 fixo derruba-a a
+##       zero assim que V_J contém uma função de escala que cabe na margem
+##       periodizada, de comprimento 2 eps, isto é 2^J >= (L-1)/(2 eps);
+##   (8) a degradação de C(eps) do Lema 10: a norma de sequência da extensão
+##       explícita de u - 1/2 cresce como eps^{-(s - 1/pi)}.
+
+eps_of <- list("0" = function(J) 0, "2^-(J+1)" = function(J) 2^(-J - 1),
+               "1.9^-J" = function(J) 1.9^(-J),
+               "0.05" = function(J) 0.05, "0.10" = function(J) 0.10)
+
+## (6) melhor aproximação em W_J medida só no suporte -----------------------
+JC <- 4:Jmax
+Wc <- lapply(JC, function(J)
+  wbasis(u, j0 = 0L, J = J, family = fam, filter.size = fs,
+         wavelet.table = wtab)[, -1, drop = FALSE])
+names(Wc) <- as.character(JC)
+best_restr <- function(g, J, eps){
+  W   <- Wc[[as.character(J)]]
+  idx <- which(u >= eps & u <= 1 - eps)
+  r   <- g[idx] - qr.fitted(qr(W[idx, , drop = FALSE]), g[idx])   # qr.fitted
+  sqrt(sum(r^2) / ngrid)                     # || . ||_{L_2[eps, 1-eps]}
+}
+ok6 <- TRUE
+for (nm in c("linear", "expo")){
+  g <- funs[[nm]]
+  M <- sapply(names(eps_of), function(en)
+              sapply(JC, function(J) best_restr(g, J, eps_of[[en]](J))))
+  rownames(M) <- paste0("J=", JC)
+  S <- apply(M, 2, slope); rownames(S) <- paste0("J=", JC[-1])
+  cat(sprintf("\n(6) %s: melhor aproximação em W_J medida em [eps, 1-eps]:\n", nm))
+  print(signif(M, 3))
+  cat("queda por nível:\n"); print(round(S, 2))
+  m19 <- mean(S[, "1.9^-J"])
+  okk <- all(abs(S[, "0"] - 0.5) < 0.05) &&                       # Proposição
+         all(abs(S[(nrow(S) - 1):nrow(S), "2^-(J+1)"] - 0.5) < 0.1) &&
+         m19 > 0.7 && m19 < 1.3 &&
+         all(S[1:2, "0.05"] > 1.5) && all(S[1:2, "0.10"] > 1.5)
+  ok6 <- ok6 && okk
+  cat(sprintf("    eps = 0: 1/2 bit; eps = 2^-(J+1): 1/2 bit; eps = 1.9^-J: %.2f em média; margem fixa: acima de 3/2 até o piso numérico -> %s\n",
+              m19, if (okk) "ok" else "FALHA"))
+}
+
+## (7) lambda_min da Gram restrita ao suporte -------------------------------
+ngridG <- 2^14
+uG     <- (seq_len(ngridG) - 0.5) / ngridG
+JG     <- 2:8
+specG  <- function(J, eps){
+  W   <- wbasis(uG, j0 = 0L, J = J, family = fam, filter.size = fs,
+                wavelet.table = wtab)          # constante + as 2^J - 1 wavelets
+  idx <- which(uG >= eps & uG <= 1 - eps)
+  ev  <- sort(eigen(crossprod(W[idx, , drop = FALSE]) / ngridG,
+                    symmetric = TRUE, only.values = TRUE)$values)
+  c(lmin = ev[1], nzero = sum(ev < 1e-8))
+}
+SP <- lapply(names(eps_of), function(en)
+             sapply(JG, function(J) specG(J, eps_of[[en]](J))))
+names(SP) <- names(eps_of)
+LM <- sapply(SP, function(z) z["lmin", ]);  rownames(LM) <- paste0("J=", JG)
+NZ <- sapply(SP, function(z) z["nzero", ]); rownames(NZ) <- paste0("J=", JG)
+## limiar previsto: uma função de escala de V_J cabe na margem periodizada,
+## que na circunferência é um único intervalo de comprimento 2 eps
+Jstar <- sapply(names(eps_of), function(en){
+  Jt <- JG[sapply(JG, function(J){ e <- eps_of[[en]](J)
+        e > 0 && (fs - 1) / 2^J <= 2 * e })]
+  if (length(Jt)) min(Jt) else NA_integer_
+})
+Jobs <- sapply(colnames(NZ), function(cn){
+  Jt <- JG[NZ[, cn] > 0]; if (length(Jt)) min(Jt) else NA_integer_
+})
+cat("\n(7) lambda_min de G_eps (constante + wavelets, q = 1, Lebesgue no suporte):\n")
+print(signif(LM, 3))
+cat("direções nulas (autovalor < 1e-8):\n"); print(NZ)
+cat("primeiro J com direção nula, observado e previsto por 2^J >= (L-1)/(2 eps):\n")
+print(rbind(observado = Jobs, previsto = Jstar))
+ok7 <- all(abs(LM[, "0"] - 1) < 1e-6) &&
+       all(abs(LM[, "2^-(J+1)"] - LM[1, "2^-(J+1)"]) < 0.05) &&
+       all(abs(LM[, "1.9^-J"] / LM[1, "1.9^-J"] - 1) < 0.35) &&
+       is.na(Jobs[["0"]]) && is.na(Jobs[["2^-(J+1)"]]) && is.na(Jobs[["1.9^-J"]]) &&
+       all(abs(Jobs[c("0.05", "0.10")] - Jstar[c("0.05", "0.10")]) <= 1)
+cat(sprintf("    eps = 0 dá 1 (ortonormal); margem acoplada a J estabiliza em %.3f (2^-(J+1)) e %.4f (1.9^-J); margem fixa degenera a um nível do limiar -> %s\n",
+            LM[1, "2^-(J+1)"], LM[1, "1.9^-J"], if (ok7) "ok" else "FALHA"))
+
+## (8) como a constante C(eps) do Lema 10 degrada ---------------------------
+ngridE <- 2^14
+uE     <- (seq_len(ngridE) - 0.5) / ngridE
+smoothstep <- function(t){                    # 0 em t <= 0, 1 em t >= 1, C^inf
+  a <- exp(-1 / pmax(t, 1e-300)); b <- exp(-1 / pmax(1 - t, 1e-300))
+  ifelse(t <= 0, 0, ifelse(t >= 1, 1, a / (a + b)))
+}
+glue <- function(g, eps)                      # g~ = chi_eps * g, emenda em 0 = 1
+  smoothstep(2 * uE / eps - 1) * smoothstep(2 * (1 - uE) / eps - 1) * g
+lvlnormE <- function(g, j, chunk = 2^11){
+  acc <- numeric(2^j)
+  for (st in seq(1, ngridE, by = chunk)){
+    idx <- st:min(st + chunk - 1, ngridE)
+    W   <- wbasis(uE[idx], j0 = j, J = j + 1, family = fam, filter.size = fs,
+                  wavelet.table = wtab)[, -(1:2^j), drop = FALSE]
+    acc <- acc + drop(crossprod(W, g[idx]))
+  }
+  sqrt(sum((acc / ngridE)^2))
+}
+epsE <- c(0.4, 0.2, 0.1, 0.05); jE <- 0:10; sE <- c(1, 1.5, 2)
+g0   <- uE - 0.5                              # g(0) != g(1): o caso da Proposição
+Bn   <- sapply(epsE, function(e){
+  gt <- glue(g0, e); gt <- gt - mean(gt)
+  ln <- sapply(jE, lvlnormE, g = gt)
+  sapply(sE, function(s) max(2^(jE * s) * ln))   # || . ||_{b^s_{2,inf}}
+})
+dimnames(Bn) <- list(paste0("s=", sE), paste0("eps=", epsE))
+expE <- t(apply(Bn, 1, function(b) -diff(log2(b)) / diff(log2(epsE))))
+colnames(expE) <- paste0("eps=", epsE[-1])
+cat("\n(8) norma de sequência da extensão explícita de u - 1/2:\n"); print(signif(Bn, 3))
+cat("expoente medido de 1/eps:\n"); print(round(expE, 2))
+ok8 <- all(abs(expE[, ncol(expE)] - (sE - 0.5)) < 0.15)
+cat(sprintf("    esperado s - 1/pi = %s; medido no último par %s -> %s\n",
+            paste(sE - 0.5, collapse = ", "),
+            paste(round(expE[, ncol(expE)], 2), collapse = ", "),
+            if (ok8) "ok" else "FALHA"))
+
 ## --- veredito --------------------------------------------------------------
 cat("\n")
-if (ok1 && ok2 && ok3 && ok4 && ok5) cat("OK\n") else stop("FALHA na conferência de E1.3")
+if (ok1 && ok2 && ok3 && ok4 && ok5 && ok6 && ok7 && ok8) cat("OK\n") else
+  stop("FALHA na conferência de E1.3 / E1.3b")
