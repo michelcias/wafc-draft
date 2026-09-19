@@ -21,10 +21,12 @@
 #' Maps each column of \code{u} linearly onto \eqn{[\epsilon, 1-\epsilon]},
 #' the transformation used before evaluating the wavelet basis. The
 #' periodized basis carries an artifact on the boundary strip, and
-#' \eqn{\epsilon > 0} keeps the data away from it, as in
-#' \code{WaveBased::wall}. Under the populational hypothesis D11 the
-#' modulating covariates already live in \eqn{[0,1]^q}; the rescaling is a
-#' computational device and stays out of the theory.
+#' \eqn{\epsilon > 0} keeps the data away from it. The margin has a
+#' declared role (decision D23): it periodizes the basis on an interval
+#' strictly larger than the support of the data, which is what allows the
+#' functional coefficient to be replaced by an extension that emends into
+#' \eqn{0 \equiv 1}, so \eqn{\epsilon} is a fixed feature of the target
+#' and not a function of the resolution level \eqn{J}.
 #'
 #' @param u Matrix (or data frame, or vector) of modulating covariates, with
 #'   \eqn{n} rows and \eqn{q} columns.
@@ -135,8 +137,16 @@ wafc_rescale <- function(u, eps = 0, location = NULL, scale = NULL,
 #'   transformation is stored in the returned object. If \code{FALSE}, the
 #'   modulating covariates are assumed to lie in \eqn{[0,1]}.
 #' @param eps Value in \eqn{[0, 0.5)} used by the rescaling, of length 1 or
-#'   \eqn{q}. The default is \eqn{1.9^{-J}}, as in
-#'   \code{WaveBased::wall}, following Montoril, Chang and Vidakovic (2019).
+#'   \eqn{q}. The default does not depend on \eqn{J} (decision D23): it is
+#'   \eqn{0} when \code{boundary = "interval"}, where there is no
+#'   periodization to keep the data away from, and a fixed constant,
+#'   currently \eqn{0.05}, in the periodized case. That constant is
+#'   provisional and is the quantity step E2.4 measures, by reading
+#'   \eqn{\lambda_{\min}(G_\epsilon)} and the integrated squared error
+#'   against \eqn{\epsilon}. The rule \eqn{1.9^{-J}} of
+#'   \code{WaveBased::wall}, used until now, tied the margin to the finest
+#'   scale: it made every candidate of \code{\link{cv.wafc}} estimate a
+#'   slightly different target, and it is not admissible at \eqn{J = 1}.
 #' @param use.table Whether the basis is evaluated by table lookup, which is
 #'   faster than the exact Daubechies-Lagarias algorithm on large samples:
 #'   one of \code{"auto"} (default), \code{"always"} or \code{"never"}. See
@@ -211,7 +221,7 @@ wafc_design <- function(x, u, J, j0 = 0L, family = "Daublets",
     }
     j0 <- wafc_check_j0(j0)
     J <- wafc_check_J(J, j0, q)
-    eps <- wafc_eps(eps, J, rescale)
+    eps <- wafc_eps(eps, q, rescale, boundary)
     if (rescale) {
       rs <- wafc_rescale(u, eps = eps, clip = FALSE)
     } else {
@@ -378,12 +388,39 @@ wafc_check_J <- function(J, j0, q) {
   rep_len(as.integer(J), q)
 }
 
-## Boundary-avoidance constant of the rescaling, one entry per modulating
-## covariate: 1.9^(-J) by default, as in WaveBased::wall.
-wafc_eps <- function(eps, J, rescale) {
-  if (!rescale) return(rep_len(0, length(J)))
-  if (is.null(eps)) return(1.9^(-J))
-  eps <- wafc_recycle(eps, length(J), "eps")
+## Provisional default margin of the periodized case. The value is the
+## smallest fixed margin the numerical check of E1.3b measured as buying
+## the full approximation rate (part C of derivations/check/
+## 02-aproximacao-besov.R: at eps = 0.05 the restricted projection error
+## falls 4 to 13 bits per level, against 1/2 bit at eps = 0 and 0.96 bit
+## under the inherited rule 1.9^(-J)). It is PROVISIONAL, and provisional
+## in a direction that is already known: the same check reads
+## lambda_min(G_eps) collapsing to 10^(-12) at J = 6 under this margin,
+## because wavelets supported inside the excluded strip become invisible.
+## The margin that buys the rate is the one that degenerates the restricted
+## Gram matrix, and the arbitration between the two is what step E2.4
+## measures, over eps in {0, 2^(-(J+1)), 1.9^(-J), 0.02, 0.05, 0.10}
+## (decision D23).
+wafc_eps_periodic <- 0.05
+
+## Margin of the rescaling, one entry per modulating covariate. The value
+## does not depend on J (decision D23): the margin is what buys the
+## extension of g_{lm} to [0,1] that emends into 0 = 1 (E1.3b), a
+## populational device, and not a numerical convenience of the finest
+## scale. The rule 1.9^(-J) of WaveBased::wall, inherited by E2.1, made
+## every candidate of cv.wafc() estimate a slightly different target,
+## because the rescaled support moves with J; put the margin at the order
+## of one cell of the finest scale, 2^(-J), which is exactly where the
+## boundary wavelets of that level lose observations; and was not even
+## admissible at J = 1, where it gives 0.526, outside the [0, 0.5) that
+## wafc_rescale() requires. With boundary = "interval" there is no
+## periodization to keep the data away from and the default margin is zero.
+wafc_eps <- function(eps, q, rescale, boundary = "periodic") {
+  if (!rescale) return(rep_len(0, q))
+  if (is.null(eps)) {
+    return(rep_len(if (boundary == "interval") 0 else wafc_eps_periodic, q))
+  }
+  eps <- wafc_recycle(eps, q, "eps")
   if (any(!is.finite(eps)) || any(eps < 0) || any(eps >= 0.5)) {
     stop("'eps' must belong to [0, 0.5).", call. = FALSE)
   }

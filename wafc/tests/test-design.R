@@ -209,7 +209,7 @@ test_that("the design works with one linear and one modulating covariate", {
 
 test_that("a design built with spec repeats the basis and the rescaling", {
   d <- wafc_design(x0, u0, J = J, rescale = TRUE)
-  expect_equal(unname(d[["eps"]]), rep(1.9^(-J), q))
+  expect_equal(unname(d[["eps"]]), rep(wafc_eps_periodic, q))
   ## the same data give the same design
   d2 <- wafc_design(x0, u0, spec = d)
   expect_equal(as.matrix(d2[["Z"]]), as.matrix(d[["Z"]]), tolerance = 1e-12)
@@ -221,6 +221,55 @@ test_that("a design built with spec repeats the basis and the rescaling", {
   expect_equal(colnames(d3[["Z"]]), colnames(d[["Z"]]))
   expect_true(all(is.finite(as.matrix(d3[["Z"]]))))
   expect_error(wafc_design(x0, u0[, 1L, drop = FALSE], spec = d), "column")
+})
+
+## The margin of the rescaling is a feature of the target, not of the sieve
+## (decision D23, step E2.1b): it used to be 1.9^(-J), inherited from
+## WaveBased::wall, which moved the rescaled support with J and was not even
+## admissible at J = 1.
+test_that("the default margin does not depend on the resolution level", {
+  eps_of <- function(Jm) unname(wafc_design(x0, u0, J = Jm)[["eps"]])
+  expect_equal(eps_of(2L), rep(wafc_eps_periodic, q))
+  expect_equal(eps_of(5L), rep(wafc_eps_periodic, q))
+  expect_equal(eps_of(c(2L, 5L)), rep(wafc_eps_periodic, q))
+  expect_true(wafc_eps_periodic > 0 && wafc_eps_periodic < 0.5)
+  ## the rescaled support, and so the estimated target, is the same for
+  ## every candidate of the grid of cv.wafc()
+  d2 <- wafc_design(x0, u0, J = 2L)
+  d5 <- wafc_design(x0, u0, J = 5L)
+  expect_equal(d2[["location"]], d5[["location"]])
+  expect_equal(d2[["scale"]], d5[["scale"]])
+})
+
+test_that("a design at J = 1 is built with the defaults", {
+  d <- wafc_design(x0, u0, J = 1L)
+  expect_equal(d[["nvars"]], p + p * q * 1L)
+  expect_equal(unname(d[["NJ"]]), rep(1L, q))
+  expect_true(all(is.finite(as.matrix(d[["Z"]]))))
+  expect_equal(qr(as.matrix(d[["Z"]]))$rank, d[["nvars"]])
+})
+
+test_that("the margin asked for by the caller is the one used", {
+  d <- wafc_design(x0, u0, J = J, eps = 0.2)
+  expect_equal(unname(d[["eps"]]), rep(0.2, q))
+  expect_equal(range(wafc_rescale(u0, eps = 0.2)[["u"]]), c(0.2, 0.8))
+  d1 <- wafc_design(x0, u0, J = J, eps = c(0.1, 0.3))
+  expect_equal(unname(d1[["eps"]]), c(0.1, 0.3))
+  expect_equal(unname(wafc_design(x0, u0, J = J, rescale = FALSE)[["eps"]]),
+               rep(0, q))
+})
+
+## boundary = "interval" still raises an error in wafc_design(), so the
+## branch is read where it lives: with no periodization there is nothing to
+## keep the data away from and the default margin is zero.
+test_that("the default margin of the interval basis is zero", {
+  expect_equal(wafc_eps(NULL, q = 2L, rescale = TRUE, boundary = "interval"),
+               c(0, 0))
+  expect_equal(wafc_eps(NULL, q = 2L, rescale = TRUE, boundary = "periodic"),
+               rep(wafc_eps_periodic, 2L))
+  expect_equal(wafc_eps(0.1, q = 3L, rescale = TRUE, boundary = "interval"),
+               rep(0.1, 3L))
+  expect_error(wafc_eps(0.5, q = 1L, rescale = TRUE), "\\[0, 0.5\\)")
 })
 
 test_that("the design validates its arguments", {
