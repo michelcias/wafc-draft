@@ -615,6 +615,7 @@ documenta o padrão antigo.
 | D22 | 09-19 | **Centralização de Lebesgue:** a restrição de identificabilidade é `∫_0^1 g_{ℓm}(u) du = 0`, e não `E[g_{ℓm}(U_m)] = 0` como o `notacao.md` escrevia; a versão centrada em `P` sai pelo deslocamento `c_ℓ ↦ c_ℓ + Σ_m E{g_{ℓm}(U_m)}` e fica como observação | é o que a base impõe de graça (Lema 1 de E1.2) e o que o estimador estima; K&P (A1) usam base ortonormal em Lebesgue sem centralização, o WALL adota Lebesgue, e Xue & Yang centralizam em `P` mas recentralizam **empiricamente** na (3.4) deles. Adotar `P` obrigaria a mudar o alvo do Corolário 4 de E1.6, que hoje mede `‖ĝ − g‖_{L_2}` |
 | D23 | 09-19 | **A margem `eps` do reescalonamento tem função declarada:** periodizar a base num intervalo maior que o suporte dos dados, o que permite trocar `g` por uma extensão que emende em `0 ≡ 1`. Com isso a hipótese não é "densidade limitada por baixo em todo `[0,1]`" e sim sobre o **suporte**, e a constante de E1.4 passa a ser `c_U λ_min(G_eps)`, com `G_eps` a Gram da base restrita ao suporte. `rescale = TRUE` continua padrão e `boundary = "interval"` entra no `wafc()`, mas fica fora do manuscrito por enquanto | argumento do autor em 2026-09-19: tomar `[0,1]` é sem perda de generalidade sobre a escala, não sobre o suporte. O ganho é que a Proposição 2 de E1.3 (periodização trava a taxa em `2^{−J/2}`) deixa de se aplicar quando `eps > 0`; a emenda é E1.3b, e E2.4 mede `λ_min(G_eps)` e o ISE contra `eps` |
 | D24 | 09-19 | **As exigências de estilo da revista valem também nas derivações:** `E(·)`, `P(·)` e `Var(·)` em romano e com parênteses (§5 das instruções da SS), e um único `B_X` no lugar de `C_X` (E1.3) e `B_X` (E1.4). O `macros.tex` é ajustado quando E1.3b fechar | decisão do autor; manter dois conjuntos de símbolos para as mesmas quantidades é o que a notação congelada existe para evitar, e a revista não é negociável no ponto |
+| D26 | 09-19 | **A teoria fica em `eps = 0`, na base periodizada; a margem é dispositivo de amostra finita.** O Lema 10 de E1.3b permanece nas derivações como justificativa da margem para `J` na faixa admissível, e não como enunciado de taxa. Ficam **registradas duas rotas de princípio**, para o caso de um referee pedir teoria sem periodicidade: (i) enunciar na base do intervalo (CDV), que dispensa periodicidade, extensão, margem e Gram restrita; (ii) provar a compatibilidade sobre as direções estimáveis, que é, em essência, refazer o trabalho que a CDV já faz | a margem não produz ganho assintótico (o cruzamento das duas exigências é exato); e o manuscrito já enuncia a teoria sem margem, então nada muda nele |
 | D25 | 09-19 | **Forma das referências de software:** entram no `.bib` com versão e URL, conferidas no registro oficial do pacote quando não há DOI, numa seção própria do arquivo, e **não** entram em `literatura.md`, que é de trabalho | proposta de L4, ratificável sem custo: software não é literatura a posicionar, é dependência a citar, e a versão é o que a exigência de reprodutibilidade da revista pede |
 | D19 | 09-19 | **Interface de `cv.wafc()` e `wafc_tune()`** (E2.3): dobras fixas para toda a grade de `J`, expostas em `foldid`; desenho e caminho de `λ` por candidato construídos na amostra inteira, com as dobras reaproveitando as colunas; empate resolvido pelo menor `J`; `df` do BIC e do EBIC igual a não nulos mais os `p` níveis; `wafc_tune(rule)` como entrada única das cinco regras | segue o `cv.wall()` e é o que torna duas regras comparáveis na mesma réplica; ratificada pelo autor em 09-19 |
 | D20 | 09-19 | **O padrão de sintonia do WAFC é `cv.min`**, com `lambda.1se` como variante de estrutura e o BIC como alternativa barata; o EBIC não serve para escolher resolução neste desenho | custo de 1.00 a 1.04 sobre o oráculo da grade contra 1.05 a 1.67 das demais; ratificada pelo autor em 09-19 |
@@ -677,8 +678,12 @@ Ordenadas pelo que bloqueia mais.
    E2.1b).** A margem é **fixa**, porque só a fixa compra a taxa cheia, e já
    está implementada. O que resta é estreito e é de E2.4: **qual valor
    fixo**, medindo ISE e `λ_min(G_eps)` em
-   `eps ∈ {0, 2^{−(J+1)}, 1.9^{−J}, 0.02, 0.05, 0.10}`. O padrão atual,
-   `0.05`, está no código marcado como provisório.
+   `eps ∈ {0, 2^{−(J+1)}, 1.9^{−J}, 0.02, 0.05, 0.10}`, **mais a família
+   `eps = a (L−1) 2^{−J}` com `a` em torno de 1**, que é a escala da faixa
+   contaminada: em amostra finita a margem certa acompanha `J`, ainda que
+   não compre nada assintoticamente (D26). O padrão atual, `0.05`, está no
+   código marcado como provisório, e é largo demais para `J` pequeno e
+   estreito demais para `J` grande por esse critério.
 7. **~~Posicionamento diante de Klopp & Pensky~~ decidido (D18):**
    extensão deles. O parágrafo aprovado e a lista de contribuições reescrita
    estão em `alvo-revista.md` §4, e L2a está cumprida.
@@ -710,15 +715,31 @@ Ordenadas pelo que bloqueia mais.
    realizado em toda a varredura, ao custo de 5% a 11% de erro, e as
    escolhas de `J_n` e de `c` dependem de `s'` e `τ`, que ninguém conhece.
    E2.3 compara a regra teórica com a validação cruzada.
-13. **A compatibilidade sobre as direções estimáveis** (aberta por E1.3b, e
-   a mais séria desta rodada). Com margem fixa e `J` grande há wavelets
-   invisíveis no suporte, e `λ_min(G_eps) = 0`. A taxa de E1.6 sob a
-   Hipótese 5 fica conjectural até existir uma constante de compatibilidade
-   restrita às direções estimáveis. Três saídas: abrir uma subetapa
-   (E1.4b) e prová-la; deixar como limitação registrada, já que o
-   manuscrito enuncia a teoria em `eps = 0`; ou restringir a Hipótese 5 a
-   `2^J < (L−1)/(2 eps)`, que é a faixa em que o problema não existe e que
-   cobre todo `J` que a validação cruzada escolhe nos `n` do estudo.
+13. **~~A compatibilidade sobre as direções estimáveis~~ resolvida por
+   decisão de rumo (2026-09-19), e o caminho está em D26.** Registro do que
+   se aprendeu, porque é fácil reabrir por engano:
+
+   - A saída que eu havia proposto, restringir a Hipótese 5 a
+     `2^J < (L−1)/(2 eps)`, **não é assintótica**: o autor notou que ela
+     obriga `eps → 0` para `J` crescer. Com `eps = 2^{−cJ}` a condição vira
+     `2^{J(1−c)} < (L−1)/2`, que só admite `J → ∞` se `c ≥ 1`, e em `c = 1`
+     o expoente garantido pelo Lema 10 é **exatamente `1/2`**, tanto para
+     `π ≥ 2` quanto para `π < 2`: a mesma taxa que a periodização dá sem
+     margem nenhuma. No ponto em que a margem passa a ser compatível com
+     `J → ∞`, o ganho é zero.
+   - **Por que o zero não é acidente.** As duas exigências são a mesma
+     faixa, na mesma escala. Excluir a região contaminada pela emenda pede
+     `eps ≳ (L−1)2^{−J}`, porque é essa a largura das wavelets que
+     atravessam `0 ≡ 1`; preservar a Gram pede `2 eps < (L−1)2^{−J}`, para
+     que nenhuma wavelet caiba inteira na margem. A margem teria de ser
+     simultaneamente mais larga e mais estreita que `(L−1)2^{−J}`. Daí o
+     `1.9^{−J}` do `wall()` ter dado ganho **parcial** (0.96 bit medido em
+     E1.3b): ele fica logo acima do cruzamento.
+   - **A justificativa do autor para ligar `eps` a `J` continua válida, e é
+     numérica:** quanto maior `J`, mais estreita a faixa contaminada, e
+     menos margem é necessária. É implicitamente o que motiva a construção
+     de Cohen, Daubechies e Vial, que corrige as wavelets da borda em vez
+     de negociar a largura da faixa.
 14. **Cota inferior** (mais visível depois de D18, porque o artigo se
    declara extensão de quem tem a dele). Não existe aqui, e Klopp & Pensky
    têm a deles para `q = 1` com `X ⊥ U`. Três saídas: (a) citar K&P e dizer que a cota
@@ -744,13 +765,28 @@ Ordenadas pelo que bloqueia mais.
 17. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
    sem contar, medir no fim e então decidir entre resumir mais e mandar
    coisa ao suplemento.
-18. **Qual `s'` cada cenário declara.** E2.3 rodou a regra da teoria com
+18. **A rota do intervalo, se ficarmos encurralados** (registro, não
+   pergunta aberta). Levantado em 2026-09-19: a base CDV garante os quatro
+   pilares sem negociação. Aproximação, porque caracteriza `B^s_{π,r}[0,1]`
+   sem periodicidade, com a mesma prova e sem `C(eps)`. Identificabilidade,
+   porque a reparametrização `[Φ Q | Ψ]` da §5 de `01-identificabilidade.md`
+   dá colunas ortonormais em `L_2[0,1]` e de integral zero, e o bloco fica
+   com `2^J − 1` colunas, como no periódico. Desenho, porque a prova de
+   E1.4 só usa ortonormalidade em `[0,1]` e as cotas da densidade, de modo
+   que `λ_min(Σ) ≥ κ_1 c_U` sai verbatim, sem `λ_min(G_eps)`. Oráculo e
+   taxas, porque consomem só essas duas peças. **Duas ressalvas:** os
+   `p q (2^{j_0} − 1)` coeficientes de escala não penalizados são constantes
+   em `n` mas pesados em amostra finita (`15 p q` com filtro 8, `63 p q`
+   com filtro 20) e o `wbasis()` exige `j_0 ≳ log_2(5L)`, o que tira os `J`
+   pequenos da grade; e a cota pontual `Σ ψ²_{jk} ≤ C_ψ 2^J`, que E1.4 usa,
+   foi conferida na base periódica e **não** na CDV.
+19. **Qual `s'` cada cenário declara.** E2.3 rodou a regra da teoria com
    `s' = 3/2` no `smooth` (a quina da cúbica na extensão periódica) e
    `s' = 1/2` no não homogêneo. Se o `smooth` for lido por `s' = 4` (o
    limite dos `N = 4` momentos nulos) a conclusão não muda; se for `1/2`, a
    regra sobe para `J = 3` e o custo cai. E2.4 e E4 precisam do número
    declarado.
-19. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
+20. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
    pequeno e vai junto com `k = 2`: copiar as seis chaves novas para
    `references_1.bib` e citá-las onde L4 propôs (o lasso na Introduction e
    na seção do estimador; `glmnet` e R na computação; `WaveBased` onde as
@@ -764,7 +800,7 @@ Ordenadas pelo que bloqueia mais.
    Tibshirani (1996), Friedman, Hastie & Tibshirani (2010), a citação do R,
    o `sparsegl`, e o Johnstone de modelos de sequência. Frente curta nos
    moldes de L1 e L3, antes de E5b.
-20. **Pendências de acabamento do manuscrito**, todas para a semana da
+21. **Pendências de acabamento do manuscrito**, todas para a semana da
    submissão e nenhuma bloqueando (estão no checklist de `alvo-revista.md`
    §6): (a) o `chicago.bst` do template abrevia em "et al." a partir de três
    autores, contra a §4 das instruções, e a correção é no `.bst`, não no
@@ -773,7 +809,7 @@ Ordenadas pelo que bloqueia mais.
    entre bloco copiado e arquivo de origem; (c) autores, afiliações, e-mails
    na última página e agradecimentos, que hoje são os marcadores do
    template.
-21. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+22. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
