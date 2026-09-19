@@ -16,7 +16,7 @@ intervalo (reescalado para `[0, 1]`):
 
 ```
 Y = Σ_{ℓ=1}^{p} β_ℓ(U) X_ℓ + ε,           E[ε | X, U] = 0
-β_ℓ(u) = c_ℓ + Σ_{m=1}^{q} g_{ℓm}(u_m),   E[g_{ℓm}(U_m)] = 0
+β_ℓ(u) = c_ℓ + Σ_{m=1}^{q} g_{ℓm}(u_m),   ∫_0^1 g_{ℓm}(u) du = 0
 ```
 
 - **Modelo de coeficientes funcionais** (varying-coefficient) no sentido de
@@ -32,7 +32,9 @@ Y = Σ_{ℓ=1}^{p} β_ℓ(U) X_ℓ + ε,           E[ε | X, U] = 0
   clássico com um índice; `g_{ℓm} ≡ 0` para todo `m` devolve a regressão
   linear.
 
-A restrição `E[g_{ℓm}(U_m)] = 0` é a de identificabilidade das componentes
+A restrição `∫_0^1 g_{ℓm} = 0` (centralização de Lebesgue, D22; era
+`E[g_{ℓm}(U_m)] = 0` no registro de 2026-09-18) é a de identificabilidade
+das componentes
 aditivas; `c_ℓ` absorve o nível. Identificar `(c_ℓ, g_{ℓm})` a partir da
 distribuição de `(Y, X, U)` exige que `E[X X' | U]` seja não singular
 (quase certamente) e que as `U_m` não sejam funções uma da outra; isso vira

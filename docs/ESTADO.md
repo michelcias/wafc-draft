@@ -534,6 +534,7 @@ amostra, que nenhuma regra enxerga).
 | D5 | 09-19 | **Alvo primário: *Statistica Sinica***; reserva: *Electronic Journal of Statistics* | ratificada pelo autor; a linhagem do modelo está lá (Xue & Yang 2006; Wei, Huang & Li 2011) e o teto de 40 páginas em espaço duplo é folgado para a estrutura de ~29 planejada. O manuscrito nasce no template da revista (`manuscript/ss-template/`), com provas no suplementar |
 | D8 | 09-19 | **O método se chama WAFC**, *wavelet additive functional coefficients* | ratificada pelo autor; é a sigla do repositório, ecoa o WALL e cabe no título. As alternativas "WAVC" e "wavelet additive coefficient LASSO" ficam descartadas |
 | D21 | 09-19 | **A decisão sobre o teto de páginas fica para o fim**: E5b escreve sem contar, e quando o corpo estiver completo mede-se o compilado e decide-se entre resumir mais e mandar conteúdo ao suplemento | decisão do autor; a saída mais barata (tabelas ao suplemento) é a que a revista prefere e não exige reescrever prosa, desde que **E5b escreva cada tabela num `\input{}` próprio**, o que torna a mudança de lugar uma linha |
+| D22 | 09-19 | **Centralização de Lebesgue:** a restrição de identificabilidade é `∫_0^1 g_{ℓm}(u) du = 0`, e não `E[g_{ℓm}(U_m)] = 0` como o `notacao.md` escrevia; a versão centrada em `P` sai pelo deslocamento `c_ℓ ↦ c_ℓ + Σ_m E{g_{ℓm}(U_m)}` e fica como observação | é o que a base impõe de graça (Lema 1 de E1.2) e o que o estimador estima; K&P (A1) usam base ortonormal em Lebesgue sem centralização, o WALL adota Lebesgue, e Xue & Yang centralizam em `P` mas recentralizam **empiricamente** na (3.4) deles. Adotar `P` obrigaria a mudar o alvo do Corolário 4 de E1.6, que hoje mede `‖ĝ − g‖_{L_2}` |
 | D19 | 09-19 | **Interface de `cv.wafc()` e `wafc_tune()`** (E2.3): dobras fixas para toda a grade de `J`, expostas em `foldid`; desenho e caminho de `λ` por candidato construídos na amostra inteira, com as dobras reaproveitando as colunas; empate resolvido pelo menor `J`; `df` do BIC e do EBIC igual a não nulos mais os `p` níveis; `wafc_tune(rule)` como entrada única das cinco regras | segue o `cv.wall()` e é o que torna duas regras comparáveis na mesma réplica; **a ratificar** |
 | D20 | 09-19 | **O padrão de sintonia do WAFC é `cv.min`**, com `lambda.1se` como variante de estrutura e o BIC como alternativa barata; o EBIC não serve para escolher resolução neste desenho | custo de 1.00 a 1.04 sobre o oráculo da grade contra 1.05 a 1.67 das demais; **a ratificar** |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
@@ -582,13 +583,9 @@ Ordenadas pelo que bloqueia mais.
    opção, com o número de seleção de estrutura (3 de 3 blocos nulos contra
    0 do LASSO) e o preço em predição. Qual das duas é a principal continua
    sendo de E2.5.
-4. **Centralização das componentes:** o `notacao.md` §2 escreve
-   `E[g_{ℓm}(U_m)] = 0` e a base impõe `∫_0^1 g_{ℓm} = 0`; o estimador
-   estima a versão de Lebesgue, e as duas ficam longe quando `U_m` não é
-   uniforme (na conferência de E1.2, `max |mean ψ_{jk}(U_2)| = 0.48` com
-   `U_2 ~ Beta(2,3)`). A Proposição 1 vale com as duas, mas o `.tex` tem de
-   dizer uma. Proposta: **Lebesgue**, como no WALL, com uma linha no
-   `notacao.md` §2. É a única mudança de hipótese que E1.2 pede.
+4. **~~Centralização das componentes~~ decidida (D22):** Lebesgue,
+   `∫_0^1 g_{ℓm} = 0`. O `notacao.md` ganhou a §7 com a emenda e com o que
+   as fontes fazem; o `ms_1.tex` já estava assim.
 5. **Periodicidade no enunciado:** (a) hipótese em forma de sequência na
    base periodizada, como o WALL, com a proposição do custo da periodização
    como justificativa do reescalonamento e da opção `interval`; (b) teoria

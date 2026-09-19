@@ -46,7 +46,7 @@ existe.
 
 ```
 Y_i = Σ_{ℓ=1}^{p} β_ℓ(U_i) X_{iℓ} + ε_i,            i = 1, …, n
-β_ℓ(u) = c_ℓ + Σ_{m=1}^{q} g_{ℓm}(u_m),             E[g_{ℓm}(U_m)] = 0
+β_ℓ(u) = c_ℓ + Σ_{m=1}^{q} g_{ℓm}(u_m),             ∫_0^1 g_{ℓm}(u) du = 0
 ```
 
 | Símbolo | Significado | Nota |
@@ -56,7 +56,7 @@ Y_i = Σ_{ℓ=1}^{p} β_ℓ(U_i) X_{iℓ} + ε_i,            i = 1, …, n
 | `U = (U_1, …, U_q)'` | covariáveis moduladoras | `U ∈ [0,1]^q` por hipótese; ver §6.4 |
 | `β_ℓ` | coeficiente funcional de `X_ℓ` | `β_ℓ : [0,1]^q → ℝ` |
 | `c_ℓ` | nível do coeficiente `ℓ` | não penalizado |
-| `g_{ℓm}` | componente aditiva de `β_ℓ` em `U_m` | integral zero |
+| `g_{ℓm}` | componente aditiva de `β_ℓ` em `U_m` | integral zero em Lebesgue (D22) |
 | `ε` | erro | `E[ε | X, U] = 0`, sub-gaussiano de parâmetro `σ` |
 | `f(x, u)` | função de regressão `Σ_ℓ β_ℓ(u) x_ℓ` | |
 
@@ -127,4 +127,31 @@ a D12.
 4. **`U ∈ [0,1]^q` por hipótese populacional**, com densidade limitada longe
    de `0` e de `∞`. A transformação monótona que a prática exige é discutida
    na seção de computação e não entra na teoria de E1.3 a E1.6.
-5. **Nome do método:** WAFC, ainda provisório (D8, adiada pelo autor).
+5. **Nome do método:** WAFC (D8, ratificada em 2026-09-19).
+
+## 7. Emenda de 2026-09-19 (D22): centralização de Lebesgue
+
+A §2 escrevia `E[g_{ℓm}(U_m)] = 0`. A restrição oficial passa a ser
+`∫_0^1 g_{ℓm}(u) du = 0`, que é o que a base periódica com `j_0 = 0` impõe
+sem restrição numérica (Lema 1 de `01-identificabilidade.md`) e o que o
+estimador de fato estima. As duas coincidem quando `U_m` é uniforme; sob
+D11, que só pede densidade limitada longe de `0` e de `∞`, elas diferem por
+um nível, e a passagem é `c_ℓ ↦ c_ℓ + Σ_m E{g_{ℓm}(U_m)}`, que deixa a forma
+das componentes intacta.
+
+O que as fontes fazem, conferido nos originais: **Klopp & Pensky (2015)**,
+hipóteses (A1) e (A2), tomam a base ortonormal em `L_2([0,1])`, isto é em
+Lebesgue, com `φ_0 ≡ 1`, e não impõem centralização nenhuma, porque sem
+decomposição aditiva não há competição entre a constante e as componentes;
+a densidade entra só por `Φ = E(φφ')`. **Xue & Yang (2006)**, pp. 1425-1426,
+seguindo Stone (1985), centralizam na distribuição, `E{α_ls(X_s)} = 0`, e a
+equação (3.4) deles recentraliza as componentes ajustadas **empiricamente**,
+jogando a diferença no nível. O WALL teórico também adota centralização de
+Lebesgue (`ms_theo_1.tex`, §2.1).
+
+A versão de Xue & Yang continua disponível como observação: recentralizar
+`ĝ_{ℓm}` subtraindo a média empírica e somá-la a `ĉ_ℓ`. O que impede
+adotá-la como hipótese é o alvo do Corolário 4 de E1.6, que mede
+`‖ĝ_{ℓm} − g_{ℓm}‖_{L_2}`: com alvo centrado em `P` e estimador centrado em
+Lebesgue sobra uma constante que não desaparece sem um passo de
+recentralização que não está em prova nenhuma hoje.
