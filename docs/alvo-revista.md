@@ -180,6 +180,12 @@ referências**, ao contrário do que esta tabela supunha.
 | Referências e afiliações | 3 a 4 | dentro do teto |
 | **Total** | **~29** | contra o teto de 40 |
 
+**Medido em 2026-09-19, com `k = 1`:** as Seções 1 a 4 saíram em 24 páginas,
+contra as 14,5 desta tabela, e as referências em 4. Por D21, a conta final é
+feita quando o corpo estiver completo, contra o PDF compilado; até lá E5b
+escreve sem contar, mas **cada tabela vai num `\input{}` próprio**, para que
+mandá-la ao suplemento seja mover uma linha.
+
 A folga de cerca de 11 páginas não está alocada de propósito: se a teoria
 pedir espaço, ela vai para as Seções 3 e 5, nessa ordem. A conferência é
 contra o PDF compilado no template, não contra esta tabela.

@@ -5,7 +5,7 @@
 L3. Faltam E2.4 e E2.5 (piloto e go/no-go) para fechar E2. Nenhum chat de
 tarefa em curso e nenhuma tarefa catalogada. A ratificar: D17, as propostas
 L2b a L2f, as duas propostas de E2.3 (D19, D20) e as sete decisões de
-redação de E5a. **O teto de páginas é a decisão que trava E5b.**
+redação de E5a. O teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 1` (`manuscript/ms_1.tex`,
 `supp_1.tex`, `references_1.bib`); a próxima alteração pergunta se cria
 `k = 2`.
@@ -452,7 +452,7 @@ está, e a Seção 3 abre pelo Corolário 5 de E1.6, que no manuscrito é o
 `Theorem 1` (D16). O mapa completo da numeração global para os rótulos do
 LaTeX está no `ms_1.tex` e é o que E5b precisa.
 
-- **O teto virou a decisão urgente.** Corpo em 24 páginas mais 4 de
+- **O teto ficou para o fim (D21).** Corpo em 24 páginas mais 4 de
   referências, contra as 14,5 que `alvo-revista.md` §5 previa para as
   Seções 1 a 4. Com as 11 planejadas para E5b e as referências crescendo
   para ~6, o total projetado é **39 a 41 páginas**, isto é, no teto ou
@@ -533,6 +533,7 @@ amostra, que nenhuma regra enxerga).
 | D17 | 09-19 | **Interface de `wafc()`** (E2.2): o `λ` do objeto é o do objetivo, não o do motor; `intercept` resolvido por presença de covariável constante, com erro informativo nos casos ambíguos; `coef()` dobra o intercepto no nível e `predict()` usa os coeficientes crus; mínimo quadrado escrito no ponto nulo do caminho; `wafc_kkt()` e `wafc_blocks()` públicas | a escala de `λ` é o que liga o código à teoria de E1.5, e as outras quatro saem dos defeitos de motor medidos; **a ratificar** |
 | D5 | 09-19 | **Alvo primário: *Statistica Sinica***; reserva: *Electronic Journal of Statistics* | ratificada pelo autor; a linhagem do modelo está lá (Xue & Yang 2006; Wei, Huang & Li 2011) e o teto de 40 páginas em espaço duplo é folgado para a estrutura de ~29 planejada. O manuscrito nasce no template da revista (`manuscript/ss-template/`), com provas no suplementar |
 | D8 | 09-19 | **O método se chama WAFC**, *wavelet additive functional coefficients* | ratificada pelo autor; é a sigla do repositório, ecoa o WALL e cabe no título. As alternativas "WAVC" e "wavelet additive coefficient LASSO" ficam descartadas |
+| D21 | 09-19 | **A decisão sobre o teto de páginas fica para o fim**: E5b escreve sem contar, e quando o corpo estiver completo mede-se o compilado e decide-se entre resumir mais e mandar conteúdo ao suplemento | decisão do autor; a saída mais barata (tabelas ao suplemento) é a que a revista prefere e não exige reescrever prosa, desde que **E5b escreva cada tabela num `\input{}` próprio**, o que torna a mudança de lugar uma linha |
 | D19 | 09-19 | **Interface de `cv.wafc()` e `wafc_tune()`** (E2.3): dobras fixas para toda a grade de `J`, expostas em `foldid`; desenho e caminho de `λ` por candidato construídos na amostra inteira, com as dobras reaproveitando as colunas; empate resolvido pelo menor `J`; `df` do BIC e do EBIC igual a não nulos mais os `p` níveis; `wafc_tune(rule)` como entrada única das cinco regras | segue o `cv.wall()` e é o que torna duas regras comparáveis na mesma réplica; **a ratificar** |
 | D20 | 09-19 | **O padrão de sintonia do WAFC é `cv.min`**, com `lambda.1se` como variante de estrutura e o BIC como alternativa barata; o EBIC não serve para escolher resolução neste desenho | custo de 1.00 a 1.04 sobre o oráculo da grade contra 1.05 a 1.67 das demais; **a ratificar** |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
@@ -645,13 +646,9 @@ Ordenadas pelo que bloqueia mais.
    o Crossref diz "Alexander" (uniformizar nos dois repositórios ou deixar?).
    Proposta: abrir uma frente curta só para a âncora da partição da unidade
    quando E5a precisar dela.
-15. **O teto de páginas** (a mais urgente desta rodada, e ela trava E5b):
-   corpo em 24 páginas mais 4 de referências, e o projetado com E5b é de 39
-   a 41 contra o teto de 40. Três saídas: cortar ~2 páginas de prosa
-   comentada da Seção 3; mandar a taxa lenta e o lema de weak-`ℓ_τ` ao
-   suplemento, o que custa a contribuição 2 e E5a não recomenda; ou escrever
-   as Seções 5 a 7 em menos de 11 páginas, com as tabelas ao suplemento, que
-   é o que a revista prefere. Decidir antes de abrir E5b, não depois.
+15. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
+   sem contar, medir no fim e então decidir entre resumir mais e mandar
+   coisa ao suplemento.
 16. **Qual `s'` cada cenário declara.** E2.3 rodou a regra da teoria com
    `s' = 3/2` no `smooth` (a quina da cúbica na extensão periódica) e
    `s' = 1/2` no não homogêneo. Se o `smooth` for lido por `s' = 4` (o
