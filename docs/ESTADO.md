@@ -486,14 +486,13 @@ Ordenadas pelo que bloqueia mais.
   compressibilidade; consome os Corolários 2 e 3 e o Lema 7 de E1.5) e E2.2
   (`wafc()` com LASSO e a variante em grupos, já sabendo como o `glmnet`
   trata a coluna constante). Os dois tocam arquivos distintos.
-- (b') **A catalogar:** uma L1 de segunda rodada, que tem trabalho de
-  três fontes: as linhas novas de `literatura.md` (L2, status `resumo`), as
-  referências que E1.3 e E1.4 citam e que não estão no `.bib`
-  (`hardle1998wavelets` e `tropp2012user` são cópia do WALL; Meyer 1992,
-  Cohen 2003, Daubechies 1992, Triebel 1983 e Tibshirani 2013 são novas) e
-  os `[VERIFICAR]` de teorema exato deixados nos dois `.tex`. Quando o autor
-  ratificar as propostas de L2, entram também as edições de
-  `alvo-revista.md` e `plano-projeto.md` da §6 de `busca-novidade.md`.
+- (b') **Catalogada como L3** (`TAREFA.md` §3), e pode abrir junto com E1.6
+  e E2.2: a segunda rodada de verificação bibliográfica, com as linhas que
+  L2 deixou em `literatura.md`, as referências que E1.3 a E1.5 citam e não
+  estão no `.bib`, e as marcas de numeração de teorema nos `derivations/`.
+  Quando o autor ratificar as propostas de L2, entram também as edições de
+  `alvo-revista.md` e `plano-projeto.md` da §6 de `busca-novidade.md`, que
+  são do chat principal.
 - (c) **Chat de tarefa, depois do enunciado de E1.2:** E2.1, que precisa
   saber o que a identificabilidade descarta do desenho.
 - (d) **Chat principal:** integrar os handoffs e catalogar E1.5, E1.6 e
