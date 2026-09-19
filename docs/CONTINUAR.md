@@ -82,41 +82,45 @@ máquina):
 Rscript derivations/check/01-identificabilidade.R   # ~7 s
 Rscript derivations/check/03-desenho-produtos.R     # ~9 s, precisa de quadprog
 Rscript derivations/check/04-oraculo.R              # ~16 s, precisa de glmnet
-Rscript derivations/check/02-aproximacao-besov.R    # ~53 s
+Rscript derivations/check/02-aproximacao-besov.R    # ~72 s (com a emenda E1.3b)
 Rscript derivations/check/05-taxas.R                # ~7 min
 ```
 
 E o código do método, que já existe:
 
 ```bash
-Rscript -e 'testthat::test_dir("wafc/tests")'   # 402 passam, ~25 s
+Rscript -e 'testthat::test_dir("wafc/tests")'   # 420 passam, ~20 s
 Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
 Rscript wafc/scripts/03-tune-decomp.R           # ~2 min
 Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 min
 ```
 
-## 3. Onde o trabalho está (resumo de 2026-09-18; o `ESTADO.md` manda)
+## 3. Onde o trabalho está (resumo de 2026-09-19; o `ESTADO.md` manda)
 
-- **E0 fechada, menos a ratificação de D5:** D4 decidida (código em `wafc/`);
-  D5 e D8 adiadas; repositório publicado; E0.3 feita (instruções da
-  *Statistica Sinica* em `docs/ss-instrucoes-autores.md`, templates em
-  `manuscript/ss-template/`, teto corrigido para 40 páginas em espaço duplo).
-  O tipo de revisão da revista não consta da página oficial.
+- **E0 fechada.** Código em `wafc/` (D4); alvo *Statistica Sinica* (D5,
+  confirmada Q1 no SCImago) e método chamado **WAFC** (D8); instruções da
+  revista em `docs/ss-instrucoes-autores.md` e templates em
+  `manuscript/ss-template/`; teto de 40 páginas em espaço duplo, referências
+  incluídas. O tipo de revisão não consta da página oficial.
 - **Notação congelada** (E1.1, D9 a D12): `ψ_{jk}`, `X_ℓ`, `U_m`,
   `θ_{ℓm,jk}`, `U ∈ [0,1]^q`; `derivations/macros.tex` implementa e compila.
-- **Teoria: E1 fechada** (E1.2 a E1.6; E1.7 é condicional a E2.5), com as
-  cinco conferências numéricas rodando. O enunciado principal é o
-  Corolário 5 de `05-taxas.tex` (D16, a ratificar).
-- **Código: E2.1 a E2.3 fechadas.** `wafc/R/` tem o carregador, os cenários,
+- **Teoria: E1 fechada** (E1.2 a E1.6, mais a emenda E1.3b), com as cinco
+  conferências numéricas rodando. O enunciado principal é o Corolário 5 de
+  `05-taxas.tex` (D16). E1.7 espera a decisão de L2f
+  (`docs/selecao-estrutura.md`); E1.8 (rota do intervalo) está aberta e E1.9
+  (cota inferior) fica para depois dos resultados.
+- **Código: E2.1 a E2.3 fechadas**, mais a emenda E2.1b (margem `eps` fixa,
+  desacoplada de `J`). `wafc/R/` tem o carregador, os cenários,
   `wafc_design()`, `wafc()` com as duas penalidades e a sintonia
-  (`cv.wafc()`, BIC, EBIC, regra da teoria); 402 testes passam. Faltam o
-  piloto e o go/no-go (E2.4, E2.5).
+  (`cv.wafc()`, BIC, EBIC, regra da teoria); **420 testes passam**. E2.4
+  (piloto) está aberta; falta o go/no-go (E2.5).
 - **Manuscrito vivo em `k = 1`:** `manuscript/ms_1.tex` e `supp_1.tex`
   compilam limpos, em 28 e 26 páginas. Alterar pede decidir antes se nasce
-  `k = 2`.
-- **Bibliografia:** 57 entradas verificadas (L1 e L3); nada pendente.
-- **Nenhuma tarefa aberta no catálogo.** A próxima é E2.4 (piloto), que
-  espera a ratificação de D19 e D20.
+  `k = 2`, e há uma lista de edições acumuladas esperando (pergunta 9 do
+  `ESTADO.md`).
+- **Bibliografia:** 63 entradas verificadas (L1, L3 e L4); nada pendente.
+- **Abertas no catálogo:** E1.8 (rota do intervalo, em `derivations/`) e
+  E2.4 (piloto, em `wafc/`); não compartilham arquivo.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
   `instrucoes.md`.

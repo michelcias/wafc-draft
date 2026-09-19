@@ -66,10 +66,10 @@ fez buscas de literatura. O que saiu:
   LASSO" não apareceu na busca inicial; os três pilares existem em separado
   (Xue & Yang 2006; Zhou & You 2004; Sardy & Tseng 2004 e Sardy & Ma 2024;
   Wei, Huang & Li 2011). O trabalho mais próximo é Sardy & Ma (2024), sem o
-  `X_j` multiplicando. Detalhe em [`proposta-metodo.md`](proposta-metodo.md)
+  `X_ℓ` multiplicando. Detalhe em [`proposta-metodo.md`](proposta-metodo.md)
   §5 e [`literatura.md`](literatura.md); a confirmação é L2.
 - **O motor já existe.** A matriz de desenho do WAFC é a do `wall()` com cada
-  bloco multiplicado por `X_j`; o ajuste é o mesmo `glmnet`. Inventário em
+  bloco multiplicado por `X_ℓ`; o ajuste é o mesmo `glmnet`. Inventário em
   [`inventario-codigo.md`](inventario-codigo.md). A arquitetura de prova do
   WALL teórico (sieve, Besov, oráculo, compatibilidade, compressibilidade)
   transfere; o que é novo na teoria é a condição de desenho para produtos
@@ -595,8 +595,8 @@ documenta o padrão antigo.
 
 | # | Data | Decisão | Razão |
 |---|---|---|---|
-| D1 | 09-18 | O modelo é `Y = Σ_j β_j(U) X_j + ε`, `β_j(u) = c_j + Σ_k g_{jk}(u_k)`, com `X_1 ≡ 1` permitido (o aditivo puro e o parcialmente linear aditivo são casos particulares) | pedido do autor |
-| D2 | 09-18 | Base: wavelets ortonormais de suporte compacto do `WaveBased`; padrão periódico com `j0 = 0` e a função de escala constante descartada (identificabilidade no nível da base, como no `wall()`); `boundary = "interval"` como opção | herda o `wall()`; é o que faz a restrição `∫ g_{jk} = 0` sair de graça |
+| D1 | 09-18 | O modelo é `Y = Σ_ℓ β_ℓ(U) X_ℓ + ε`, `β_ℓ(u) = c_ℓ + Σ_m g_{ℓm}(u_m)` (escrito aqui já na notação de D9, congelada depois), com `X_1 ≡ 1` permitido (o aditivo puro e o parcialmente linear aditivo são casos particulares) | pedido do autor |
+| D2 | 09-18 | Base: wavelets ortonormais de suporte compacto do `WaveBased`; padrão periódico com `j0 = 0` e a função de escala constante descartada (identificabilidade no nível da base, como no `wall()`); `boundary = "interval"` como opção | herda o `wall()`; é o que faz a restrição `∫ g_{ℓm} = 0` sair de graça (D22) |
 | D3 | 09-18 | Estimador base: LASSO sobre todos os coeficientes de wavelet, `c_j` não penalizados; sparse group LASSO por par `(j,k)` é a variante a medir em E2 | pedido do autor (LASSO); a variante em grupos é a candidata natural à seleção de estrutura |
 | D4 | 09-18 | **O código do método vive na pasta `wafc/` deste repositório** (`R/`, `tests/`, `scripts/`); o `WaveBased` não recebe código por enquanto e é usado só como dependência para as bases (`wbasis()`, `wtable()`), confirmado pelo autor; **as funções criadas ficam privadas por enquanto** (neste repositório privado, sem pacote público, sem `install_github`); empacotar e publicar decide-se em E3.3, com o código testado | decisão do autor, contra a proposta de implementar dentro do `WaveBased` |
 | D9 | 09-18 | **Índices:** wavelet `ψ_{jk}` (nível `j`, translação `k`); covariável linear `X_ℓ`, `ℓ = 1, …, p`; moduladora `U_m`, `m = 1, …, q` | decisão do autor: não mexer no padrão da base; a colisão sai das covariáveis |
@@ -741,9 +741,13 @@ Ordenadas pelo que bloqueia mais.
      menos margem é necessária. É implicitamente o que motiva a construção
      de Cohen, Daubechies e Vial, que corrige as wavelets da borda em vez
      de negociar a largura da faixa.
-14. **Cota inferior** (mais visível depois de D18, porque o artigo se
-   declara extensão de quem tem a dele). Não existe aqui, e Klopp & Pensky
-   têm a deles para `q = 1` com `X ⊥ U`. Três saídas: (a) citar K&P e dizer que a cota
+14. **Cota inferior, registrada como E1.9 no plano** (mais visível depois de
+   D18, porque o artigo se declara extensão de quem tem a dele). Não existe
+   aqui, e Klopp & Pensky têm a deles para `q = 1` com `X ⊥ U`. **A decisão
+   de abrir fica para depois dos resultados de E2.5 e E4**, por escolha do
+   autor: se a evidência numérica sustentar o artigo, a cota é cortesia que
+   se responde em revisão; se a contribuição numérica ficar fraca, ela vira
+   o peso que falta. As três saídas: (a) citar K&P e dizer que a cota
    superior atinge a referência do modelo de sequência, que é o que o
    `05-taxas.tex` faz hoje; (b) abrir E1.8 e construir a cota para `q ≥ 2`,
    trabalho do porte de E1.4 mais E1.5; (c) restringir a afirmação de

@@ -4,9 +4,9 @@
 o que serve ao WAFC e o que não serve. Conclusão primeiro: **o motor inteiro
 já existe.** A matriz de desenho do WAFC é a do `wall()` com cada bloco
 multiplicado por uma coluna de `X`; o ajuste é o mesmo `glmnet` com família
-gaussiana em vez de binomial. O que é novo é (i) o produto por `X_j`, (ii) os
+gaussiana em vez de binomial. O que é novo é (i) o produto por `X_ℓ`, (ii) os
 `c_j` não penalizados no lugar do intercepto único, (iii) a variante em
-grupos, e (iv) os métodos que reconstroem `β̂_j(u)` e `ĝ_{jk}(u)`.
+grupos, e (iv) os métodos que reconstroem `β̂_ℓ(u)` e `ĝ_{ℓm}(u)`.
 
 **Como isso se usa depois de D4 (código em `wafc/`, não no `WaveBased`):** as
 funções exportadas do `WaveBased` (`wbasis()`, `wtable()`, `PHI()`, `PSI()`)
@@ -24,7 +24,7 @@ com nomes próprios.
 | avaliação de `φ`, `ψ` em pontos arbitrários (Daubechies–Lagarias), famílias Daublets/Symmlets/Coiflets, filtros próprios | `R/PHI.R`, `R/PSI.R`, `src/phi_psi_vec.c`, `src/wav_filters_*.c` | **sim, sem mudança** |
 | tabelas de interpolação (`wtable()`, `wtable_cache()`), 30 a 500× mais rápido | `R/wtable.R`, `src/wav_table.c`, `src/phi_psi_interp.c` | sim, sem mudança; obrigatório em `n` grande |
 | base decomposta `wbasis()` com `boundary = "periodic" / "none" / "interval"` (CDV) | `R/wbasis.R`, `src/wav_basis.c`, `src/cdv_edge.c`, `src/wav_basis_sparse.c` | sim, sem mudança |
-| `wall()`: entrada `x`, resposta, `J` por covariável, `j0`, reescalonamento para `[ε, 1−ε]` (`.wall_rescale_pars`, `.wall_eps`), tabela automática (`.wall_table`), desenho por blocos denso ou esparso (`.wall_design`, `.wall_wbasis_sparse`), descarte da função de escala constante quando `j0 = 0` periódico (`drop.phi`), `penalty.factor` (`.wall_penalty`), chamada ao `glmnet` | `R/wall.R` (~900 linhas) | **sim, como referência de leitura**: `wafc/R/design.R` reimplementa `.wall_rescale_pars`, `.wall_eps`, `.wall_design` (com o produto por `X_j`), `.wall_penalty` e `.wall_colnames` com nomes próprios, citando a origem em comentário; `.wall_wbasis_sparse` chama C interno e a versão esparsa em `wafc/` monta o `dgCMatrix` a partir de `wbasis()` denso por bloco |
+| `wall()`: entrada `x`, resposta, `J` por covariável, `j0`, reescalonamento para `[ε, 1−ε]` (`.wall_rescale_pars`, `.wall_eps`), tabela automática (`.wall_table`), desenho por blocos denso ou esparso (`.wall_design`, `.wall_wbasis_sparse`), descarte da função de escala constante quando `j0 = 0` periódico (`drop.phi`), `penalty.factor` (`.wall_penalty`), chamada ao `glmnet` | `R/wall.R` (~900 linhas) | **sim, como referência de leitura**: `wafc/R/design.R` reimplementa `.wall_rescale_pars`, `.wall_eps`, `.wall_design` (com o produto por `X_ℓ`), `.wall_penalty` e `.wall_colnames` com nomes próprios, citando a origem em comentário; `.wall_wbasis_sparse` chama C interno e a versão esparsa em `wafc/` monta o `dgCMatrix` a partir de `wbasis()` denso por bloco |
 | `cv.wall()`: CV sobre `(J, λ)`, `share.design`, paralelo | `R/cv.wall.R` | sim, como molde de `wafc/R/tune.R`; muda `type.measure` (`"mse"`, `"mae"`) |
 | métodos `predict`, `coef`, `plot` (path, componentes, rede) | `R/wall.R` | sim, como molde; `plot.wafc` ganha painel por `(j, k)` |
 | testes do `wall` | `tests/testthat/test-wall.R` | molde dos testes em `wafc/tests/` |

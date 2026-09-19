@@ -195,10 +195,10 @@ a EJS, cai o teto de páginas e sobe a expectativa de teoria.
 - **Toda taxa vem com as três peças**: o erro de aproximação (Besov, nível
   `J`), o erro de estimação (dimensão efetiva, `log` do número de colunas,
   `n`) e a condição de desenho que liga os dois (compatibilidade ou
-  autovalor restrito da matriz de produtos `X_j ψ(U_k)`). Uma taxa sem a
+  autovalor restrito da matriz de produtos `X_ℓ ψ_{jk}(U_m)`). Uma taxa sem a
   condição de desenho é conjectura.
 - **Hipótese de desenho é hipótese sobre `(X, U)` conjuntos**, não sobre cada
-  um: o que entra na Gram é `E[X_j X_{j'} ψ_a(U_k) ψ_b(U_{k'})]`. Escrever a
+  um: o que entra na Gram é `E(X_ℓ X_{ℓ'} ψ_{jk}(U_m) ψ_{j'k'}(U_{m'}))`. Escrever a
   hipótese nessa forma e só depois simplificá-la.
 - **Conferência numérica antes de prova.** Um resultado novo é primeiro testado
   em R com `n` pequeno (`n ≤ 200`, `J ≤ 3`) na forma densa; só depois se

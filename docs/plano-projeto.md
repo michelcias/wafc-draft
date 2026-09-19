@@ -1,14 +1,20 @@
 # Plano do projeto
 
 **Objetivo.** Um estimador para modelos de regressão com coeficientes
-funcionais aditivos, `Y = Σ_j β_j(U) X_j + ε` com `β_j(u) = c_j + Σ_k
-g_{jk}(u_k)`, em que cada `g_{jk}` é expandida numa base ortonormal de
+funcionais aditivos, `Y = Σ_ℓ β_ℓ(U) X_ℓ + ε` com `β_ℓ(u) = c_ℓ + Σ_m
+g_{ℓm}(u_m)`, em que cada `g_{ℓm}` é expandida numa base ortonormal de
 wavelets e todos os coeficientes são estimados por LASSO num único problema
 convexo. Três produtos: a teoria (desigualdade oráculo no desenho de
 produtos, taxas em Besov, adaptação), o código do método na pasta `wafc/`
 deste repositório (com testes; empacotamento decidido depois de E2.5),
-e um artigo num periódico Q1 de Statistics and Probability (alvo proposto:
-*Statistica Sinica*; reserva: EJS).
+e um artigo num periódico Q1 de Statistics and Probability (alvo ratificado
+em D5: *Statistica Sinica*, confirmada Q1 no SCImago; reserva: EJS).
+
+**Notação.** Este arquivo foi escrito antes de E1.1 e usava `j` e `k` para as
+covariáveis. Desde 2026-09-18 vale `notacao.md`, congelada: covariável linear
+`X_ℓ`, moduladora `U_m`, wavelet `ψ_{jk}`, coeficiente `θ_{ℓm,jk}` (D9 a D12),
+e centralização `∫_0^1 g_{ℓm} = 0` (D22). Os trechos abaixo foram passados
+para ela em 2026-09-19.
 
 **Como ler.** O trabalho está dividido em etapas `E0` a `E7`, mais duas de
 literatura (`L1`, `L2`), desenhadas para serem o mais independentes possível.
@@ -149,13 +155,16 @@ WALL teórico; cada arquivo diz o que foi transposto e o que é novo.
 
 ### E1.1 Congelar a notação
 
-`notacao.md` sai do estado "esboço": os cinco pontos da §6 decididos pelo
-autor; `derivations/macros.tex` atualizado. Chat principal.
+**Fechada em 2026-09-18.** `notacao.md` saiu do estado de esboço: os cinco
+pontos da §6 decididos pelo autor (D9 a D12), `derivations/macros.tex`
+reescrito. Emendas posteriores: D22 (centralização de Lebesgue) e D24
+(estilo da revista), nas §7 e §8 do arquivo.
 
 ### E1.2 `01-identificabilidade.md`
 
-Enunciado: sob `E[X X' | U]` não singular q.c., densidade conjunta de `U`
-positiva em `[0,1]^q` e `E[g_{jk}(U_k)] = 0`, o vetor `(c_j, g_{jk})` é
+**Fechada em 2026-09-18** (Proposição 1, Lema 1). Enunciado: sob
+`E(XX' | U)` não singular q.c., densidade conjunta de `U` positiva em
+`[0,1]^q` e `∫_0^1 g_{ℓm} = 0` (D22), o vetor `(c_ℓ, g_{ℓm})` é
 identificado pela função de regressão. Mostrar que a base periódica com `j0
 = 0` sem a função de escala impõe a restrição no nível da base, e o que
 muda com `boundary = "interval"` (restrição explícita). Conferência: em `n`
@@ -192,30 +201,75 @@ emenda é E1.3b e a medida é de E2.4.
 ### E1.5 `04-oraculo.tex`
 
 Desigualdade oráculo para o LASSO com perda quadrática, erro sub-gaussiano,
-`c_j` não penalizados, `λ ≍ σ ‖Z‖_{max} sqrt(log(p q N_J)/n)`: taxa lenta
-(sem condição de desenho) e taxa rápida (com E1.4). Segue Bühlmann & van de
-Geer (2011), Teorema 6.1/6.2, com o viés de E1.3 no lado direito.
+**Fechada em 2026-09-19** (Lemas 4 a 7, Teorema 1, Corolários 2 e 3), e sem
+condição de cone: a perfilagem dos níveis não penalizados dá
+`λ_min(B̃'B̃/n) ≥ λ_min(Σ̂)`. `c_ℓ` não penalizados;
+`λ ≍ σ σ̂_max sqrt(log(p q N_J)/n)`, com `σ̂_max = max_a sqrt(Σ̂_aa)`, que é a
+leitura certa de `‖Z‖_max` (a literal é de ordem `2^{J/2}` e destruiria a
+taxa). Segue Bühlmann & van de Geer (2011), **Corolário 6.1** (taxa lenta) e
+**Teorema 6.2** (versão com viés), com as coordenadas não penalizadas na
+§6.9 e não na §6.2.3 — numeração conferida em L3.
 Conferência: em simulação com `s_0` pequeno, o erro de predição escala como
 `λ² s_0` ao variar `n`.
 
 ### E1.6 `05-taxas.tex`
 
 Taxas: com `J_n ≍ log_2 n/(2s'+1)`, erro de predição `n^{−2s'/(2s'+1)}` a
-menos de logaritmos; erro `L_2` de cada `ĝ_{jk}` pela condição de desenho
+menos de logaritmos; erro `L_2` de cada `ĝ_{ℓm}` pela condição de desenho
 (a norma de predição controla cada componente); corolário de
 compressibilidade (weak-`ℓ_τ`): o LASSO adapta à dimensão efetiva, com a
-taxa melhor que a do sieve cheio, transposto do WALL (trilha rápida). O
-enunciado principal do artigo sai daqui.
+taxa melhor que a do sieve cheio, transposto do WALL (trilha rápida).
+**Fechada em 2026-09-19** (Lemas 8 e 9, Proposição 4, Teorema 2, Corolários
+4 e 5), com um achado que não estava previsto: a hipótese de Besov **já
+implica** weak-`ℓ_τ`, então a compressibilidade não custa hipótese. O
+enunciado principal do artigo sai daqui e é o Corolário 5 (D16).
 
 ### E1.7 (condicional) `06-selecao-grupos.tex`
 
-Só se E2.5 escolher a variante em grupos. Seleção consistente de
-`{(j,k): g_{jk} ≢ 0}` com sparse group LASSO adaptativo, seguindo Wei, Huang
-& Li (2011) e Huang, Horowitz & Wei (2010).
+**O escopo desta etapa está em decisão (L2f).** O plano original era
+seleção consistente de `{(ℓ,m): g_{ℓm} ≢ 0}` com sparse group LASSO
+adaptativo, seguindo Wei, Huang & Li (2011) e Huang, Horowitz & Wei (2010).
+L2 mostrou que a ideia não é nova, e as três saídas estão escritas em
+[`selecao-estrutura.md`](selecao-estrutura.md): a propriedade oráculo em
+grupos, a variante sem teorema, e a seleção por limiarização como corolário
+do Corolário 4. O autor decide.
+
+### E1.3b (emenda) A margem e o lema de extensão
+
+**Fechada em 2026-09-19.** Hipótese 5 e Lema 10 em
+`02-aproximacao-besov.tex`: com margem fixa, a componente pode ser
+substituída por uma extensão que emende, e o viés volta a `O(2^{−2Js'})`. O
+preço é `C(eps) ≍ eps^{−(s−1/π)}`, exato, e a margem **não pode encolher com
+`J`**. A tensão com a Gram restrita e a decisão de manter a teoria em
+`eps = 0` estão em D26.
+
+### E1.8 A rota do intervalo (aberta)
+
+`07-rota-intervalo.tex`: a teoria sem periodicidade, pronta para o caso de
+um referee pedir — o que transfere verbatim para a base CDV, o que precisa
+ser conferido nela, o enunciado verdadeiro para `eps > 0`, e a análise de
+`s'` por componente nos três regimes. **Não vai ao manuscrito agora** (D23,
+D26).
+
+### E1.9 (não aberta) Cota inferior para `q ≥ 2`
+
+Klopp & Pensky (2015) têm a cota inferior minimax para `q = 1` com
+`X ⊥ U`; para o desenho aditivo com `q ≥ 2` e `X` dependente de `U` **não
+há nenhuma**, e o `05-taxas.tex` diz isso explicitamente, comparando com a
+referência do modelo de sequência. Construí-la é trabalho do porte de E1.4
+mais E1.5 somadas e **não estava no plano**.
+
+**A decisão de abrir ou não fica para depois dos resultados** (E2.5 e E4):
+se a evidência numérica sustentar o artigo, a cota inferior é cortesia que
+um referee da SS pode pedir e que se responde em revisão; se a contribuição
+numérica ficar fraca, ela vira o peso que falta. Sob D18 o artigo se declara
+extensão de quem tem a dele, o que torna a ausência mais visível — é o risco
+assumido, registrado na pergunta 14 do `ESTADO.md`.
 
 **Critério de saída de E1:** E1.2 a E1.6 com prova e script de conferência
 imprimindo `OK`; hipóteses numeradas e congeladas; o teorema principal
-enunciado na forma que vai ao manuscrito.
+enunciado na forma que vai ao manuscrito. **Atingido em 2026-09-19**; E1.7 é
+condicional e E1.8 e E1.9 são opcionais.
 
 ---
 
@@ -228,16 +282,19 @@ Vive em `wafc/` (`R/`, `tests/`, `scripts/`; ver `wafc/README.md`). R sobre
 
 `R/dgp.R`, `R/design.R`, `tests/test-design.R`, `scripts/01-smoke.R`. O
 desenho é construído com `wbasis()` do `WaveBased` bloco a bloco e
-multiplicado por `X_j`; colunas nomeadas; `penalty.factor` zero nos `c_j`.
-Conferência (e primeiro teste): com `g_{jk}` na base (`θ*` conhecido) e sem
-ruído, o LASSO com `λ → 0` recupera `θ*`.
+multiplicado por `X_ℓ`; colunas nomeadas; `penalty.factor` zero nos `c_ℓ`.
+Conferência (e primeiro teste): com `g_{ℓm}` na base (`θ*` conhecido) e sem
+ruído, o LASSO com `λ → 0` recupera `θ*`. **Fechada em 2026-09-19**, com a
+ordem de colunas de D12 e o descarte de `φ_{00}`; a emenda E2.1b desacoplou
+a margem `eps` do nível `J`.
 
 ### E2.2 Variantes do estimador
 
 `R/fit.R`, `R/reconstruct.R`, `tests/test-fit.R`: `wafc()` com LASSO
-(`glmnet`, gaussiano) e sparse group LASSO (`sparsegl`; grupo por `(j, k)`);
-`predict`, `coef`; reconstrução de `ĝ_{jk}` e `β̂_j`. Registrar em
-`CONTINUAR.md` o pacote escolhido.
+(`glmnet`, gaussiano) e sparse group LASSO (`sparsegl`; grupo por bloco
+`(ℓ, m)`); `predict`, `coef`; reconstrução de `ĝ_{ℓm}` e `β̂_ℓ`. Registrar em
+`CONTINUAR.md` o pacote escolhido. **Fechada em 2026-09-19** (D17); o
+`sparsegl` ficou registrado como exigido só por `penalty = "sglasso"`.
 
 ### E2.3 Sintonia
 
@@ -325,7 +382,7 @@ cache por unidade retomável, semente mestra única, `INSTRUCTIONS.md` e
 
 | Fator | Níveis |
 |---|---|
-| regularidade das `g_{jk}` | suaves; não homogêneas; mistura |
+| regularidade das `g_{ℓm}` | suaves (`s' = 3/2`); não homogêneas (`s' = 1/2`); mistura (D27) |
 | esparsidade | todas ativas; metade nulas; esparso (`p q = 50`, 6 ativas) |
 | `n` | 250, 500, 1000, 2000 |
 | `(p, q)` | (2, 2), (4, 4), (10, 5) |
@@ -336,7 +393,7 @@ cache por unidade retomável, semente mestra única, `INSTRUCTIONS.md` e
 
 Métricas: ISE por função e total; RMSE de predição; suporte; tempo. A
 tabela principal do artigo é regularidade × método em `n = 1000`; a figura
-principal é `ĝ_{jk}` sobreposta à verdade em bumps e blocks, WAFC contra
+principal é `ĝ_{ℓm}` sobreposta à verdade em bumps e blocks, WAFC contra
 `mgcv`.
 
 ### E4.3 Piloto
@@ -377,7 +434,7 @@ conferem; checklist de `alvo-revista.md` §6.
 
 ### E6.1 Escolher os dados
 
-Critérios: efeito de `X_j` que plausivelmente varia com duas ou mais
+Critérios: efeito de `X_ℓ` que plausivelmente varia com duas ou mais
 moduladoras, `n` na casa dos milhares, dados públicos e citáveis, e
 interpretação que um leitor da revista reconheça. Candidatos a levantar
 (decisão do autor): salários (efeito de escolaridade variando com idade e
@@ -389,7 +446,7 @@ escolha e a razão.
 ### E6.2 Ajustar e comparar
 
 WAFC contra `mgcv` e linear; diagnóstico das funções estimadas; figura com
-`β̂_j(u)` interpretável.
+`β̂_ℓ(u)` interpretável.
 
 **Critério de saída de E6:** reproduzido pelo compêndio de ponta a ponta;
 figura e parágrafo de interpretação prontos para E5b.
