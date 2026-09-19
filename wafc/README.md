@@ -23,19 +23,19 @@ Carregar tudo numa sessão, da raiz do repositório:
 source("wafc/R/load.R")
 ```
 
-| Arquivo (a criar) | Etapa | O que tem |
+| Arquivo | Etapa | O que tem |
 |---|---|---|
-| `R/load.R` | E2.1 | `library()` das dependências e `source()` de `R/*.R` |
-| `R/dgp.R` | E2.1 | cenários: `g_{jk}` suaves (seno, polinômio), não homogêneas (bumps, blocks, heavisine de Donoho–Johnstone reescaladas), nulas; `X` gaussiano ou uniforme, com `X_1 ≡ 1`; `U` uniforme ou beta; erro gaussiano; `simulate_wafc(n, p, q, scenario, seed)` |
-| `R/design.R` | E2.1 | `wafc_rescale()`, `wafc_design(X, U, J, j0, family, filter.size, boundary, eps, table)`: blocos `X_j ⊙ wbasis(U_k)`, colunas nomeadas `x{j}:u{k}:l{l}m{m}`, `penalty.factor`, versão esparsa |
+| `R/load.R` ✓ | E2.1 | `wafc_depends`, `wafc_attach()`, `wafc_check_suggests()` e o `source()` de `R/*.R`; carrega com `source("wafc/R/load.R")` da raiz |
+| `R/dgp.R` ✓ | E2.1 | `wafc_component()` (seno, cosseno, cúbica, bumps, blocks, heavisine de Donoho–Johnstone, todas centradas em Lebesgue e de norma `L_2[0,1]` igual a 1), `wafc_scenario()` (a estrutura ativa: `β_1` aditivo em duas moduladoras, `β_2` em uma, `β_ℓ` constante para `ℓ ≥ 3`), `simulate_wafc(n, p, q, scenario, seed, snr, sigma, x_dist, u_dist, u_rho, cc, amplitude)` e `wafc_beta()` |
+| `R/design.R` ✓ | E2.1 | `wafc_rescale()` e `wafc_design(x, u, J, j0, family, filter.size, boundary, rescale, eps, use.table, wavelet.table, sparse, spec)`: blocos `X_ℓ ⊙ wbasis(U_m)` na ordem de D12, `φ_{00}` descartada, colunas nomeadas `x2:u1:psi3.5`, `penalty.factor`, `blocks`, `constant`, versão esparsa, e `spec` para reconstruir o desenho em dados novos |
 | `R/fit.R` | E2.2 | `wafc(x, u, y, J, ..., penalty = c("lasso", "sglasso"), lambda)`; `predict.wafc`, `coef.wafc`, `print.wafc` |
-| `R/reconstruct.R` | E2.2 | `wafc_functions(fit, s, grid)`: `ĉ_j`, `ĝ_{jk}(grid)`, `β̂_j(u)` |
+| `R/reconstruct.R` | E2.2 | `wafc_functions(fit, s, grid)`: `ĉ_ℓ`, `ĝ_{ℓm}(grid)`, `β̂_ℓ(u)` |
 | `R/tune.R` | E2.3 | `cv.wafc()` sobre `(J, λ)`; `wafc_bic()`, `wafc_ebic()` |
-| `R/competitors.R` | E2.4 | `mgcv::gam` com `s(u_k, by = x_j)`; B-splines + group LASSO (`grpreg`); linear oráculo; oráculo de suporte |
-| `R/plot.R` | E3.2 | `plot.wafc` (painel por `(j,k)`; caminho das normas), `plot.cv.wafc` |
-| `tests/test-design.R` | E2.1 | com `θ*` na base e sem ruído, `glmnet` com `λ → 0` recupera `θ*`; posto cheio; nomes |
+| `R/competitors.R` | E2.4 | `mgcv::gam` com `s(u_m, by = x_l)`; B-splines + group LASSO (`grpreg`); linear oráculo; oráculo de suporte |
+| `R/plot.R` | E3.2 | `plot.wafc` (painel por bloco `(ℓ,m)`; caminho das normas), `plot.cv.wafc` |
+| `tests/test-design.R` ✓ | E2.1 | com `θ*` na base e sem ruído, `glmnet` com `λ → 0` recupera `θ*`; posto cheio; nomes e ordem de D12 contra a construção de referência de `derivations/check/03-desenho-produtos.R`; esparso igual a denso; tabela igual à avaliação exata; os cenários do `dgp.R` |
 | `tests/test-fit.R`, `test-tune.R` | E2.2, E2.3 | idem por função |
-| `scripts/01-smoke.R` | E2.1 | um cenário, `n = 500`: recupera as funções; gráfico de `ĝ_{jk}` contra a verdade |
+| `scripts/01-smoke.R` ✓ | E2.1 | `Rscript wafc/scripts/01-smoke.R [n] [J] [cenário]` (padrão `500 4 smooth`): desenho, `cv.glmnet`, ISE por bloco em `lambda.min` e `lambda.1se`, erro de predição fora da amostra e `wafc/cache/01-smoke.png` com `ĝ_{ℓm}` contra a verdade |
 | `scripts/02-pilot.R` | E2.4 | cenários × `n` × métodos × réplicas; ISE por função, RMSE de predição, suporte, tempo; `Rscript wafc/scripts/02-pilot.R [n_rep] [--quick]` |
 
 Regras (`docs/instrucoes.md`, §6): toda função pública tem teste; o `wall()`
