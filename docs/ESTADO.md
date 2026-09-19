@@ -514,6 +514,29 @@ amostra, que nenhuma regra enxerga).
   porque `eps = 1.9^{−J} = 0.526` cai fora do `[0, 0.5)` que
   `wafc_rescale()` exige. A grade de `cv.wafc()` começa em `J = 2` por isso.
 
+### 2026-09-19: L4 fechada (referências de software)
+
+`referencias-verificadas.bib` vai de 57 a **63 entradas**; conferido aqui:
+63 `@`-entradas, 63 `\bibitem` e **zero erro e zero aviso** de BibTeX, tanto
+com `plain` quanto com o `chicago.bst` do template da revista. As cinco
+referências que faltavam existem, e o manuscrito já pode citar o lasso, o R,
+o `glmnet`, o `sparsegl`, o `WaveBased` e o Johnstone.
+
+- **Correção herdada do WALL:** a entrada `johnstone2019gaussian` de lá
+  atribui o livro à Cambridge University Press, e isso **não se confirma**:
+  não há registro no Crossref e a busca em livros da CUP devolveu zero em
+  2026-09-19. A página do autor e a folha de rosto dizem "Book Draft,
+  version of September 16, 2019", sem editora. Aqui ficou `unpublished`. Se
+  o WALL for submetido citando como livro da CUP, a referência sai errada lá
+  também.
+- **Duas armadilhas de composição**, anotadas no próprio `.bib`: um arroba
+  dentro de comentário quebra o BibTeX, e o `chicago.bst` avisa "empty
+  organization" num `manual` sem organização, razão de o `WaveBased` ter
+  entrado como `misc` com `howpublished`.
+- O `glmnet` e o `sparsegl` não têm páginas no Crossref (o JSS não as
+  registra); vieram do `CITATION` dos pacotes instalados. O DOI do R não é
+  de versão, então o ano é o da versão instalada e a versão vai na `note`.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -538,6 +561,7 @@ amostra, que nenhuma regra enxerga).
 | D22 | 09-19 | **Centralização de Lebesgue:** a restrição de identificabilidade é `∫_0^1 g_{ℓm}(u) du = 0`, e não `E[g_{ℓm}(U_m)] = 0` como o `notacao.md` escrevia; a versão centrada em `P` sai pelo deslocamento `c_ℓ ↦ c_ℓ + Σ_m E{g_{ℓm}(U_m)}` e fica como observação | é o que a base impõe de graça (Lema 1 de E1.2) e o que o estimador estima; K&P (A1) usam base ortonormal em Lebesgue sem centralização, o WALL adota Lebesgue, e Xue & Yang centralizam em `P` mas recentralizam **empiricamente** na (3.4) deles. Adotar `P` obrigaria a mudar o alvo do Corolário 4 de E1.6, que hoje mede `‖ĝ − g‖_{L_2}` |
 | D23 | 09-19 | **A margem `eps` do reescalonamento tem função declarada:** periodizar a base num intervalo maior que o suporte dos dados, o que permite trocar `g` por uma extensão que emende em `0 ≡ 1`. Com isso a hipótese não é "densidade limitada por baixo em todo `[0,1]`" e sim sobre o **suporte**, e a constante de E1.4 passa a ser `c_U λ_min(G_eps)`, com `G_eps` a Gram da base restrita ao suporte. `rescale = TRUE` continua padrão e `boundary = "interval"` entra no `wafc()`, mas fica fora do manuscrito por enquanto | argumento do autor em 2026-09-19: tomar `[0,1]` é sem perda de generalidade sobre a escala, não sobre o suporte. O ganho é que a Proposição 2 de E1.3 (periodização trava a taxa em `2^{−J/2}`) deixa de se aplicar quando `eps > 0`; a emenda é E1.3b, e E2.4 mede `λ_min(G_eps)` e o ISE contra `eps` |
 | D24 | 09-19 | **As exigências de estilo da revista valem também nas derivações:** `E(·)`, `P(·)` e `Var(·)` em romano e com parênteses (§5 das instruções da SS), e um único `B_X` no lugar de `C_X` (E1.3) e `B_X` (E1.4). O `macros.tex` é ajustado quando E1.3b fechar | decisão do autor; manter dois conjuntos de símbolos para as mesmas quantidades é o que a notação congelada existe para evitar, e a revista não é negociável no ponto |
+| D25 | 09-19 | **Forma das referências de software:** entram no `.bib` com versão e URL, conferidas no registro oficial do pacote quando não há DOI, numa seção própria do arquivo, e **não** entram em `literatura.md`, que é de trabalho | proposta de L4, ratificável sem custo: software não é literatura a posicionar, é dependência a citar, e a versão é o que a exigência de reprodutibilidade da revista pede |
 | D19 | 09-19 | **Interface de `cv.wafc()` e `wafc_tune()`** (E2.3): dobras fixas para toda a grade de `J`, expostas em `foldid`; desenho e caminho de `λ` por candidato construídos na amostra inteira, com as dobras reaproveitando as colunas; empate resolvido pelo menor `J`; `df` do BIC e do EBIC igual a não nulos mais os `p` níveis; `wafc_tune(rule)` como entrada única das cinco regras | segue o `cv.wall()` e é o que torna duas regras comparáveis na mesma réplica; ratificada pelo autor em 09-19 |
 | D20 | 09-19 | **O padrão de sintonia do WAFC é `cv.min`**, com `lambda.1se` como variante de estrutura e o BIC como alternativa barata; o EBIC não serve para escolher resolução neste desenho | custo de 1.00 a 1.04 sobre o oráculo da grade contra 1.05 a 1.67 das demais; ratificada pelo autor em 09-19 |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
@@ -663,7 +687,16 @@ Ordenadas pelo que bloqueia mais.
    limite dos `N = 4` momentos nulos) a conclusão não muda; se for `1/2`, a
    regra sobe para `J = 3` e o custo cai. E2.4 e E4 precisam do número
    declarado.
-18. **~~Cinco referências~~ catalogadas como L4:** as mesmas cinco, e que não estão
+18. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
+   pequeno e vai junto com `k = 2`: copiar as seis chaves novas para
+   `references_1.bib` e citá-las onde L4 propôs (o lasso na Introduction e
+   na seção do estimador; `glmnet` e R na computação; `WaveBased` onde as
+   bases são avaliadas; `sparsegl` na variante em grupos; Johnstone ao lado
+   de Donoho & Johnstone 1998). Duas perguntas de forma ficaram: o Johnstone
+   é `unpublished` (o que se confirma) ou se mantém a forma do WALL, que não
+   se sustenta; e o `citation("WaveBased")` pede também a entrada do método,
+   mas os métodos que ele lista não são os que o WAFC usa, então ficou só a
+   do pacote. Texto original da pergunta: as mesmas cinco, e que não estão
    verificadas, por isso hoje `glmnet` e `WaveBased` aparecem sem citação:
    Tibshirani (1996), Friedman, Hastie & Tibshirani (2010), a citação do R,
    o `sparsegl`, e o Johnstone de modelos de sequência. Frente curta nos
@@ -728,6 +761,7 @@ Ordenadas pelo que bloqueia mais.
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
 | 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
+| 2026-09-19 | L4 fechada e integrada: `.bib` com 63 entradas, e a entrada do Johnstone corrigida contra a que o WALL carrega |
 | 2026-09-19 | E0.3 fechada de vez: o autor confirmou no SCImago que a *Statistica Sinica* é Q1 em Statistics and Probability |
 | 2026-09-19 | D18 decidida (o artigo é extensão de Klopp & Pensky) com o parágrafo de posicionamento escrito; D16, D5 e D8 ratificadas; E5a catalogada e destravada |
 | 2026-09-19 | E1.6, E2.2 e L3 fechadas e integradas: **E1 inteira**, com a compressibilidade saindo de graça da hipótese de Besov (D16); `wafc()` com as duas penalidades e KKT fechando no caminho inteiro (D17); `.bib` com 57 entradas e duas citações de teorema corrigidas |

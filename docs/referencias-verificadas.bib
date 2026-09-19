@@ -7,6 +7,13 @@
 % redigitar; nelas só se acrescentou a linha `doi`, conferida no Crossref.
 % Nada daqui leva mais a nota "[L1: confirmar]".
 %
+% Terceira rodada (L4, 2026-09-19): entraram as referências de que o
+% manuscrito precisa para citar o lasso, o software usado e a referência
+% minimax do modelo de sequência. As de software (R, glmnet, sparsegl,
+% WaveBased) ficam na última seção e não vão ao docs/literatura.md, que
+% registra trabalho, não ferramenta; a fonte de conferência delas é o
+% registro oficial do pacote (`citation()`, DESCRIPTION) quando não há DOI.
+%
 % Segunda rodada (L3, 2026-09-19): entraram as linhas que L2 deixou com
 % status "resumo" ou "[VERIFICAR]" em docs/literatura.md, mais as fontes
 % que as derivações E1.2 a E1.5 citam (os livros de wavelets e de espaços
@@ -243,6 +250,26 @@
   doi     = {10.1214/aos/1024691081}
 }
 
+% Copiada do WALL (references_theo_1.bib), com uma correção: a entrada de lá
+% traz `publisher = {Cambridge University Press}, address = {Cambridge}`, e
+% isso não se confirma. O livro não tem registro no Crossref, e a busca em
+% livros da Cambridge University Press por "Gaussian estimation" Johnstone
+% devolveu zero resultados em 2026-09-19. A fonte oficial é a página do
+% autor (https://imjohnstone.su.domains/), que oferece "Book Draft, version
+% of September 16, 2019"; a folha de rosto do PDF diz "Draft version,
+% September 16, 2019" e não nomeia editora. Por isso o tipo é
+% `unpublished`, com a data da versão na `note`. Se o livro sair, a entrada
+% troca de tipo. (Um "arroba" em comentário quebra o BibTeX, que não lê `%`
+% como comentário fora de uma entrada; por isso os tipos aparecem aqui em
+% crase, sem o prefixo.)
+@unpublished{johnstone2019gaussian,
+  title  = {Gaussian Estimation: Sequence and Wavelet Models},
+  author = {Johnstone, Iain M.},
+  year   = {2019},
+  note   = {Draft version of September 16, 2019},
+  url    = {https://imjohnstone.su.domains/GE_09_16_19.pdf}
+}
+
 @article{Antoniadis-Fan-2001,
   author  = {Antoniadis, Anestis and Fan, Jianqing},
   title   = {Regularization of wavelet approximations},
@@ -458,6 +485,23 @@
 % ---------------------------------------------------------------------
 % Modelos aditivos esparsos e LASSO com bases
 % ---------------------------------------------------------------------
+
+% Copiada do WALL (references_theo_1.bib); `doi` acrescentado, e o campo
+% `publisher` retirado por ser redundante com o veículo. Crossref confere
+% autor, título, 58(1) 267--288 e `published-print` 1996. O Crossref imprime
+% hoje o nome atual do periódico ("Journal of the Royal Statistical Society
+% Series B: Statistical Methodology"); aqui fica o nome de 1996, como na
+% entrada `Hastie-Tibshirani-1993` deste arquivo.
+@article{tibshirani1996regression,
+  title   = {Regression shrinkage and selection via the lasso},
+  author  = {Tibshirani, Robert},
+  journal = {Journal of the Royal Statistical Society: Series B (Methodological)},
+  volume  = {58},
+  number  = {1},
+  pages   = {267--288},
+  year    = {1996},
+  doi     = {10.1111/j.2517-6161.1996.tb02080.x}
+}
 
 @article{Sardy-Tseng-2004,
   author  = {Sardy, Sylvain and Tseng, Paul},
@@ -751,4 +795,83 @@
   number  = {6},
   pages   = {2426--2434},
   doi     = {10.1080/03610918.2025.2470797}
+}
+
+% ---------------------------------------------------------------------
+% Software (entraram em L4; não vão ao docs/literatura.md)
+% ---------------------------------------------------------------------
+
+% A citação e o DOI são os que `citation()` devolve no R instalado aqui,
+% R 4.6.1 (2026-06-24), "Happy Hop". O Crossref registra o DOI como tipo
+% `database`, com publisher "R Foundation for Statistical Computing" e
+% `published-print` 2026-06-24, que é a data da versão usada; o campo
+% `issued` do Crossref (2000) é o do registro, não o da versão, e por isso
+% o ano de citação é o da versão, 2026.
+@manual{RCoreTeam-2026,
+  title        = {R: A Language and Environment for Statistical Computing},
+  author       = {{R Core Team}},
+  organization = {R Foundation for Statistical Computing},
+  address      = {Vienna, Austria},
+  year         = {2026},
+  note         = {Version 4.6.1},
+  doi          = {10.32614/R.manuals},
+  url          = {https://www.R-project.org/}
+}
+
+% Copiada do WALL (references_theo_1.bib); `doi` acrescentado. Autores,
+% título, 33(1) e ano conferidos no Crossref e na página do artigo no JSS
+% (https://www.jstatsoft.org/article/view/v033i01). O Crossref não guarda
+% páginas para o JSS; "1--22" vem do arquivo CITATION do pacote instalado
+% (glmnet 5.0), que é a fonte oficial. Esta é a citação do `glmnet`, o
+% motor de E2.2.
+@article{friedman2010regularization,
+  author  = {Friedman, Jerome and Hastie, Trevor and Tibshirani, Robert},
+  title   = {Regularization Paths for Generalized Linear Models via Coordinate Descent},
+  journal = {Journal of Statistical Software},
+  year    = {2010},
+  volume  = {33},
+  number  = {1},
+  pages   = {1--22},
+  doi     = {10.18637/jss.v033.i01}
+}
+
+% Conferida no Crossref e na página do artigo no JSS
+% (https://www.jstatsoft.org/article/view/v110i06): 110(6), 2024. As
+% páginas ("1--23") vêm do CITATION do pacote instalado (sparsegl 1.1.1),
+% porque o Crossref não as guarda para o JSS. Nome do terceiro autor: o
+% Crossref parte "Anibal Sólon" (nome) e "Heinsfeld" (sobrenome); o
+% CITATION do pacote trata "Sólon Heinsfeld" como sobrenome, e é essa a
+% forma impressa na página do JSS, adotada aqui com chaves para o BibTeX
+% não a quebrar. A linha de `inventario-codigo.md` §4 já grafava assim.
+@article{Liang-Cohen-SolonHeinsfeld-Pestilli-McDonald-2024,
+  author  = {Liang, Xiaoxuan and Cohen, Aaron and {S{\'o}lon Heinsfeld}, Anibal and Pestilli, Franco and McDonald, Daniel J.},
+  title   = {{sparsegl}: An {R} Package for Estimating Sparse Group Lasso},
+  journal = {Journal of Statistical Software},
+  year    = {2024},
+  volume  = {110},
+  number  = {6},
+  pages   = {1--23},
+  doi     = {10.18637/jss.v110.i06}
+}
+
+% Pacote do autor, sem veículo e sem DOI: entra como software, com versão e
+% URL do repositório, e não como artigo. Conferido na instalação local
+% (`citation("WaveBased")` e `DESCRIPTION`): versão 2.6-0, de 2026-08-20,
+% autor e mantenedor Michel H. Montoril. O clone em ../../WaveBased aponta
+% para https://github.com/michelcias/WaveBased, e o commit instalado aqui é
+% e494b0e (2026-08-21); quem fixa o commit é o compêndio, não esta entrada.
+% As citações de metodologia que `citation("WaveBased")` pede junto
+% (wdensity, wmixreg, bwmixreg, bwregime) não são as funções usadas aqui:
+% o WAFC só chama `wbasis()` e `wtable()`.
+% Tipo `misc` e não `manual`: o chicago.bst do template da revista avisa
+% "empty organization" num `manual` sem organização, e é pelo
+% `howpublished` que a versão e a URL chegam à lista de referências (o
+% campo `url` sozinho o estilo não imprime). O `\url` exige o pacote
+% `hyperref`, que o ms_1.tex já carrega.
+@misc{Montoril-WaveBased-2026,
+  author       = {Montoril, Michel H.},
+  title        = {{WaveBased}: {W}avelet-{B}ased {E}stimation},
+  year         = {2026},
+  howpublished = {R package version 2.6-0, \url{https://github.com/michelcias/WaveBased}},
+  url          = {https://github.com/michelcias/WaveBased}
 }

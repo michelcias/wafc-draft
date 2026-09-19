@@ -51,7 +51,7 @@ que ler antes está aqui e no plano.
 | E2.3 sintonia | **fechada** (2026-09-19): `cv.wafc()`, BIC, EBIC e a regra da teoria; 402 testes passam | `wafc/R/tune.R`, `wafc/scripts/02-tune.R` |
 | E5a manuscrito, Seções 1 a 4 | **fechada** (2026-09-19): `k = 1` compila limpo, 28 e 26 páginas | `manuscript/ms_1.tex`, `supp_1.tex` |
 | E1.3b emenda de extensão | **em curso** (aberta em 2026-09-19) | catálogo da §3 |
-| L4 referências de software | não aberta; **pode abrir já** | catálogo da §3 |
+| L4 referências de software | **fechada** (2026-09-19): `.bib` com 63 entradas | `referencias-verificadas.bib` |
 | E1.7, E2.4, E2.5, E3, E4, E5b, E6, E7 | não abertas; E2.4 espera a ratificação de D19 e D20 | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
@@ -68,13 +68,12 @@ tarefa pode criar ou editar**.
 |---|---|---|---|
 
 | E1.3b | emenda a `derivations/02-aproximacao-besov.tex` (+ `.pdf`): um **lema de extensão** e a observação de que a Proposição 2 (o custo da periodização) é o caso `eps = 0`. O enunciado a provar: se `U_m` tem suporte em `[eps, 1 − eps]` com `eps > 0` e `g_{ℓm}` pertence à classe de Besov **no suporte**, então existe extensão `g̃` a `[0,1]` que emenda em `0 ≡ 1`, está na mesma classe com norma `≤ C(eps)‖g‖`, e o viés em `L_2(P_U)` volta a `O(2^{−2Js'})`, sem o termo `2^{−J}` da Proposição 2. O operador de extensão é o que o próprio arquivo já cita (Triebel 1983, cap. 3; Cohen 2003, §3.9); registrar como a constante degrada quando `eps → 0`, que é o preço da margem. Registrar também, em observação, que a mesma margem muda a constante de E1.4: com suporte próprio, `E[(a'ψ(U))²] ≥ c_U λ_min(G_eps)‖a‖²`, com `G_eps` a Gram da base **restrita ao suporte**, e não `c_U‖a‖²` — quem mede `λ_min(G_eps)` contra `eps` e `J` é E2.4. Numeração global: o lema novo é o **Lema 10**. `check/02-aproximacao-besov.R` ganha uma seção que mede, numa `g` que não emenda (`u − 1/2`, `e^u`), o erro de projeção **restrito a `[eps, 1−eps]`** contra o erro em `[0,1]`, em `eps ∈ {0, 2^{−J−1}, 1.9^{−J}}`, mostrando a taxa de `1/2` bit por nível virar a taxa cheia; e `λ_min(G_eps)` nos mesmos `eps` | E1.3 e E1.4, fechadas; a origem é a discussão de 2026-09-19 registrada em D23 | `derivations/02-aproximacao-besov.tex`, `derivations/02-aproximacao-besov.pdf`, `derivations/check/02-aproximacao-besov.R`, `docs/handoff-E1.3b.md` |
-| L4 | frente curta de verificação, nos moldes de L1 e L3, para as referências que o manuscrito precisa citar e que não estão em `docs/referencias-verificadas.bib`: **Tibshirani (1996)** para o LASSO; **Friedman, Hastie & Tibshirani (2010, JSS)** para o `glmnet`; a **citação do R** (`citation()`, com o ano da versão usada aqui, 4.6.1); o **`sparsegl`** (Liang, Cohen, Sólon Heinsfeld, Pestilli & McDonald, 2024, JSS, pela linha de `inventario-codigo.md` §4, a conferir); o **`WaveBased`**, que é pacote do autor e não tem veículo, e portanto entra como software com versão e URL do repositório, não como artigo; e **Johnstone**, *Gaussian Estimation: Sequence and Wavelet Models*, que o WALL cita como `johnstone2019gaussian` e que a observação sobre a referência minimax quer ao lado de Donoho & Johnstone (1998) — copiar do `references_theo_1.bib` do WALL sem redigitar, se estiver lá. Cada entrada conferida no Crossref (ou na fonte oficial do pacote, quando não houver DOI), com o comentário de conferência acima da entrada, como em L1 e L3. Registrar em `literatura.md` só o que for trabalho, não o que for software | nada; L1 e L3 fecharam | `docs/referencias-verificadas.bib`, `docs/literatura.md` (só linhas novas), `docs/handoff-L4.md` |
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**Abertas agora: E1.3b (em curso) e L4.** Elas não compartilham arquivo. A próxima depois dela é E2.4 (piloto), que espera a
+**Aberta agora: E1.3b (em curso).** A próxima depois dela é E2.4 (piloto), que espera a
 ratificação de D19 e D20 e a resposta sobre `s'` de cada cenário (pergunta
 16). Tarefa nova pede catalogação antes de abrir.
 
