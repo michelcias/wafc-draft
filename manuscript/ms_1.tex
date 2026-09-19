@@ -1,0 +1,956 @@
+% WAFC -- manuscrito, versao k = 1 (E5a). Template da Statistica Sinica
+% (manuscript/ss-template/SS-template-bib.tex), decisao D5.
+% Secoes 1 a 4; as Secoes 5 a 7 entram em E5b. As provas estao em supp_1.tex.
+% Notacao: docs/notacao.md, congelada em E1.1. Os enunciados vem de
+% derivations/01 a 05; o comentario acima de cada um diz de onde.
+\documentclass[12pt]{article} %***
+\usepackage[sectionbib]{natbib}
+\usepackage{array,epsfig,fancyheadings,rotating}
+\usepackage[]{hyperref}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{sectsty, secdot}
+\sectionfont{\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont}
+\renewcommand{\theequation}{\thesection\arabic{equation}}
+\subsectionfont{\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textwidth=31.9pc
+\textheight=46.5pc
+\oddsidemargin=1pc
+\evensidemargin=1pc
+\headsep=15pt
+\topmargin=.6cm
+\parindent=1.7pc
+\parskip=0pt
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{multirow}
+\usepackage{amsthm}
+
+% Marcacao de alteracoes a partir de k = 2 (docs/instrucoes.md, S3): a cor da
+% rodada corrente e colR1, e o ulem fornece o \sout das remocoes sugeridas.
+% A versao k = 1 nao leva marcacao, porque nao ha versao anterior.
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\definecolor{colR1}{RGB}{0,90,200}
+
+\setcounter{page}{1}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{assumption}{Assumption}
+\pagestyle{fancy}
+
+% --- macros -------------------------------------------------------------
+% Implementam docs/notacao.md, como derivations/macros.tex, com tres
+% diferencas exigidas pelo estilo da revista (S5 de ss-instrucoes-autores.md):
+% E(.) e P(.) em romano e com parenteses, no lugar do \mathbb{E}[.] das
+% derivacoes, e B_X no lugar dos dois simbolos C_X (E1.3) e B_X (E1.4) para a
+% cota das covariaveis lineares.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Prob}{\mathrm{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\T}{^{\top}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\normn}[1]{\left\lVert #1 \right\rVert_{n}}
+\newcommand{\normL}[1]{\left\lVert #1 \right\rVert_{L_2(P)}}
+\newcommand{\inner}[2]{\langle #1, #2 \rangle}
+\newcommand{\cv}{\ell}
+\newcommand{\md}{m}
+\newcommand{\lev}{j}
+\newcommand{\tsl}{k}
+\newcommand{\jzero}{j_{0}}
+\newcommand{\NJ}{N_{J}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\fcoef}[1]{\beta_{#1}}
+\newcommand{\lvl}[1]{c_{#1}}
+\newcommand{\gcomp}[2]{g_{#1#2}}
+\newcommand{\wav}[2]{\psi_{#1#2}}
+\newcommand{\VJ}{V_{J}}
+\newcommand{\WJ}{W_{J}}
+\newcommand{\PiJ}{\Pi_{J}}
+\newcommand{\coef}[4]{\theta_{#1#2,#3#4}}
+\newcommand{\coefs}[4]{\theta^{*}_{#1#2,#3#4}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\thetastar}{\btheta^{*}}
+\newcommand{\thetahat}{\widehat{\btheta}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\chat}{\widehat{\mathbf{c}}}
+\newcommand{\Gram}{\Sigma}
+\newcommand{\Gramhat}{\widehat{\Sigma}}
+\newcommand{\pen}{\lambda}
+\newcommand{\penn}{\lambda_{n}}
+\newcommand{\Szero}{S_{0}}
+\newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
+\newcommand{\seff}{s'}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\MA}{M_{\Amat}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\Mstar}{M^{\star}}
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\def\n{\noindent}
+\lhead[\fancyplain{} \leftmark]{}
+\chead[]{}
+\rhead[]{\fancyplain{}\rightmark}
+\cfoot{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\renewcommand{\baselinestretch}{2}
+
+\markright{ \hbox{\footnotesize\rm Statistica Sinica
+  }\hfill\\[-13pt]
+  \hbox{\footnotesize\rm
+  }\hfill }
+
+\markboth{\hfill{\footnotesize\rm AUTHOR(S)} \hfill}
+{\hfill {\footnotesize\rm WAVELET ADDITIVE FUNCTIONAL COEFFICIENTS} \hfill}
+
+\renewcommand{\thefootnote}{}
+$\ $\par
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont \vspace{0.8pc}
+\centerline{\large\bf SPARSE WAVELET ESTIMATION OF}
+\vspace{2pt}
+\centerline{\large\bf ADDITIVE FUNCTIONAL COEFFICIENTS}
+\vspace{.4cm}
+\centerline{Author(s)}
+\vspace{.4cm}
+\centerline{\it Affiliation(s)}
+\vspace{.55cm} \fontsize{9}{11.5pt plus.8pt minus.6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{quotation}
+\noindent {\it Abstract:}
+We study a varying coefficient model in which the effect of each linear
+covariate is additive in several modulating covariates, and each additive
+component is expanded in a periodized wavelet basis. The resulting design is
+a sieve of products between a linear covariate and a wavelet evaluated at a
+modulator, and the components are estimated by a single lasso problem in
+which the levels of the coefficients are left unpenalized. Three results are
+established. The population Gram matrix of the product design has its
+smallest eigenvalue bounded away from zero under a conditional second moment
+condition on the linear covariates and a bounded joint density for the
+modulators, with no independence between the two groups of covariates; the
+estimator satisfies a nonasymptotic oracle inequality that needs no cone
+condition, because the unpenalized levels are profiled out; and, at a
+resolution level chosen inside an explicit window, the prediction error and
+the componentwise error attain the rate of nonlinear wavelet approximation up
+to a logarithmic factor, under the same Besov condition that governs the
+linear sieve. The last result rests on the observation that the Besov
+condition already implies compressibility of the sieve coefficients, so that
+adaptivity costs no additional assumption. The estimator is a single convex
+program and is fit by coordinate descent on a sparse design matrix.
+
+\vspace{9pt}
+\noindent {\it Key words and phrases:}
+Additive coefficient model, Besov space, effective dimension, lasso, oracle
+inequality, varying coefficient model, wavelets.
+\par
+\end{quotation}\par
+
+\def\thefigure{\arabic{figure}}
+\def\thetable{\arabic{table}}
+
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+% o contador de equacoes do template nao reinicia por secao, o que produzia
+% "(3.6)" logo depois de "(2.5)"; o \numberwithin reinicia.
+\numberwithin{equation}{section}
+
+\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:intro}
+
+Applied problems often present an effect that is not constant across the
+sample. The return to schooling changes with age and with experience, the
+effect of temperature on electricity demand changes with the hour of the day
+and with humidity, and the effect of a treatment changes with the age and the
+body mass index of the patient. The varying coefficient model of
+\citet{Hastie-Tibshirani-1993} and \citet*{Cai-Fan-Yao-2000} accommodates this
+by letting the coefficient of each covariate be a function of a modulating
+variable; see \citet{Fan-Zhang-2008} for a review. When more than one variable
+modulates the effect, a fully nonparametric coefficient runs into the curse of
+dimensionality, and the standard remedy is to make each coefficient additive
+in the modulators, which is the additive coefficient model of
+\citet{Xue-Yang-2006}, studied further by \citet{Xue-Liang-2010} and
+\citet{Liu-Yang-2010}.
+
+The estimators available for this model are built from polynomial splines and
+from kernels, and are governed by a global smoothness index, so that a
+component with a peak, a jump or a change of regime is either oversmoothed or
+paid for everywhere in the domain. Wavelet bases combined with an $\ell_1$
+penalty are the standard answer to this difficulty, because a function whose
+smoothness is inhomogeneous is still economically represented by a few large
+coefficients \citep{Donoho-Johnstone-1994, Donoho-Johnstone-1998,
+Antoniadis-Fan-2001}. They have been used for varying coefficients without an
+additive structure and without penalization \citep*{Zhou-You-2004,
+Montoril-Morettin-Chiann-2018}, and for additive models without a multiplying
+covariate \citep{Sardy-Tseng-2004, Zhang-Wong-2003, Haris-Simon-Shojaie-2018,
+Amato-Antoniadis-DeFeis-Gijbels-2022, Sardy-Ma-2024}; penalized estimation in
+the additive coefficient model itself has been carried out with grouped
+penalties on spline bases \citep{Wei-Huang-Li-2011,
+Antoniadis-Gijbels-LambertLacroix-2014, Ma-Carroll-Liang-Xu-2015}, again under
+global smoothness.
+
+\citet{Klopp-Pensky-2015} study the varying coefficient model in which a
+single index modulates every coefficient. They expand each coefficient
+function in an orthonormal basis, estimate the resulting array by a block
+lasso, and obtain a nonasymptotic oracle inequality, a Besov rate that adapts
+to inhomogeneous smoothness, and a matching minimax lower bound, under the
+assumption that the covariates are independent of the index. The present paper
+carries that programme to the situation an applied problem usually presents,
+in which several variables modulate a coefficient at once. We let each
+coefficient be additive in the modulators, which keeps the estimator free of
+the curse of dimensionality in their number, we allow the covariates to depend
+on the modulators, and we penalize coefficient by coefficient rather than in
+blocks, leaving the levels of the coefficients unpenalized. Each of these
+costs something. Additivity produces cross terms between distinct modulators,
+so the population Gram matrix no longer factorizes as a Kronecker product and
+has to be bounded directly; dependence between the covariates and the
+modulators replaces a marginal second moment by a conditional one; and the
+unpenalized levels leave a term in the risk that block penalization does not
+incur. Our main result, Theorem~\ref{thm:main}, states that the estimator
+attains the rate of nonlinear wavelet approximation up to a logarithmic
+factor, under the same Besov assumption that governs the linear sieve, and it
+reduces to the rate of Klopp and Pensky when a single modulator is present.
+
+We call the resulting procedure WAFC, for wavelet additive functional
+coefficients. Its contributions are of three kinds. The first is the theory of
+the additive product design: a design condition for the Gram matrix of the
+products between a linear covariate and a wavelet of a modulator, which
+carries a cross term between distinct modulators and does not assume
+independence (Proposition~\ref{prop:gram}); an oracle inequality that needs no
+cone condition, because the unpenalized levels are profiled out
+(Theorem~\ref{thm:oracle}); and rates obtained by compressibility
+(Theorem~\ref{thm:main}). The second is the reading that compressibility costs
+no assumption: the Besov condition on the components already implies that
+their wavelet coefficients lie in a weak $\ell_\tau$ ball with
+$\tau = (s+1/2)^{-1}$ (Lemma~\ref{lem:weak}), and it is this that separates
+the rate of the estimator from the rate of the linear sieve when the Besov
+integrability index is smaller than two. The third is computational: the
+estimator is one convex program on a sparse design matrix, and the resolution
+level and the penalty are chosen jointly.
+
+The rest of the paper is organized as follows. Section~\ref{sec:model}
+introduces the model, its identification, the wavelet sieve and the estimator.
+Section~\ref{sec:theory} states the assumptions and the theory, opening with
+the main rate and then giving the three results it rests on.
+Section~\ref{sec:computation} describes the computation, the scale of the
+penalty and the tuning rules. Proofs are collected in the online Supplementary
+Material.
+% E5b: acrescentar aqui a mencao as Secoes 5 (Simulation), 6 (Application) e
+% 7 (Discussion), e a frase de fechamento do roteiro.
+
+Throughout, $\norm{a}_\pi$ is the $\ell_\pi$ norm of a vector,
+$\normn{h}^2 = n^{-1}\sum_{i\le n} h_i^2$ is the empirical norm,
+$\lmin(\cdot)$ and $\lmaxx(\cdot)$ are the extreme eigenvalues of a symmetric
+matrix, $\opnorm{\cdot}$ is the operator norm, and $a_n \asymp b_n$ means that
+$a_n/b_n$ is bounded away from zero and infinity. For a support
+$S$, $\delta_S$ is the vector that agrees with $\delta$ on $S$ and vanishes
+elsewhere.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Model and Wavelet Sieve}
+\label{sec:model}
+
+\subsection{The additive functional coefficient model}
+\label{sec:model-def}
+
+Let $Y$ be a scalar response, $\bX = (X_1,\dots,X_p)\T$ a vector of linear
+covariates and $\bU = (U_1,\dots,U_q)\T$ a vector of modulating covariates,
+taking values in $[0,1]^q$ after a monotone transformation of each
+coordinate. The model is
+\begin{equation}
+  \label{eq:model}
+  Y \;=\; \sum_{\cv=1}^{p} \fcoef{\cv}(\bU)\,X_{\cv} \;+\; \varepsilon,
+  \qquad \E(\varepsilon \mid \bX, \bU) = 0,
+\end{equation}
+with each functional coefficient additive in the modulators,
+\begin{equation}
+  \label{eq:additive}
+  \fcoef{\cv}(u) \;=\; \lvl{\cv} \;+\; \sum_{\md=1}^{q}\gcomp{\cv}{\md}(u_{\md}),
+  \qquad \int_{0}^{1}\gcomp{\cv}{\md}(v)\,dv = 0,
+  \qquad \cv = 1,\dots,p .
+\end{equation}
+The constant $\lvl{\cv}$ is the level of the $\cv$th coefficient and
+$\gcomp{\cv}{\md}$ is the component of that coefficient along the $\md$th
+modulator. The centering in \eqref{eq:additive} is with respect to Lebesgue
+measure, which is the convention of the wavelet literature and the one the
+basis of Section~\ref{sec:sieve} imposes at no cost; the parametrization
+centered at the law of $\bU$ is obtained from it by the shift
+$\lvl{\cv} \mapsto \lvl{\cv} + \sum_{\md}\E\{\gcomp{\cv}{\md}(U_{\md})\}$,
+which moves mass between the levels and the components but changes neither
+$\fcoef{\cv}$ nor the estimator.
+
+The model contains several familiar ones. With $X_1 \equiv 1$ the first
+coefficient is an additive intercept, so that $p = 1$ gives the additive model
+and $p > 1$ with $\gcomp{\cv}{\md} \equiv 0$ for $\cv \ge 2$ gives the
+partially linear additive model; $q = 1$ gives the classical varying
+coefficient model with a single index; and $\gcomp{\cv}{\md}\equiv 0$ for all
+pairs gives linear regression. Writing
+$f(x,u) = \sum_{\cv} x_{\cv}\fcoef{\cv}(u)$ for the regression function, the
+first question is whether the distribution of $(Y,\bX,\bU)$ determines the
+parameters. Two degeneracies have to be excluded: if $\bX$ is confined to a
+hyperplane given $\bU$, only a combination of the coefficients is determined,
+and if one modulator is a function of another, only the sum of the
+corresponding components is.
+
+% derivations/01-identificabilidade.md, Proposicao 1 (numeracao global).
+\begin{proposition}[Identification]
+\label{prop:identif}
+Suppose that $\E\norm{\bX}_2^2 < \infty$, that $\E(\bX\bX\T \mid \bU)$ is
+nonsingular almost surely, and that $\bU$ has a Lebesgue density on $[0,1]^q$
+that is positive almost everywhere. Then, among the parametrizations that
+satisfy \eqref{eq:additive}, the levels $\lvl{1},\dots,\lvl{p}$ and the
+components $\gcomp{\cv}{\md} \in L_2[0,1]$ are determined by $f$: the levels
+uniquely, and each component up to a Lebesgue null set.
+\end{proposition}
+
+Dependence between $\bX$ and $\bU$ is allowed, and so is dependence among the
+modulators; what the two conditions exclude is a linear combination of the
+linear covariates that is a function of the modulators, and a modulator that
+is a function of the others. Both exclusions return in quantitative form in
+Section~\ref{sec:theory}.
+
+\subsection{The wavelet sieve}
+\label{sec:sieve}
+
+Let $\phi$ and $\psi$ be the scaling function and the mother wavelet of an
+orthonormal multiresolution analysis of $L_2(\R)$, compactly supported, with
+$\psi$ bounded and with $N$ vanishing moments, and let $L$ be the length of
+the filter, so that the support of $\psi$ is contained in $[0,L-1]$. Write
+\begin{equation}
+  \label{eq:periodized}
+  \wav{\lev}{\tsl}(u) \;=\; \sum_{\iota \in \mathbb{Z}}
+  2^{\lev/2}\psi\{2^{\lev}(u+\iota) - \tsl\},
+  \qquad \lev \ge 0, \quad \tsl = 0,\dots,2^{\lev}-1,
+\end{equation}
+for the periodization of the basis to $[0,1]$. The system
+$\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$ is an orthonormal basis of
+$L_2[0,1]$ under Lebesgue measure and every wavelet in it integrates to zero
+\citep[Section 9.3]{Daubechies-1992}. We take the coarsest level to be
+$\jzero = 0$, so that the only scaling function is the constant
+$\phi_{00}\equiv 1$, and we discard it: it is already carried by the level
+$\lvl{\cv}$. The sieve of resolution $J$ is then
+\[
+  \WJ \;=\; \mathrm{span}\{\wav{\lev}{\tsl} : 0 \le \lev < J,\;
+  0 \le \tsl < 2^{\lev}\},
+  \qquad \dim \WJ = \NJ = 2^{J}-1,
+\]
+the orthogonal complement of the constants inside the multiresolution space
+$\VJ$, and $\PiJ$ is the orthogonal projection onto it. Every element of $\WJ$
+integrates to zero, so that the identification constraint of
+\eqref{eq:additive} holds by construction, no numerical restriction is imposed
+on the fit, and the sieve is a plain linear space.
+
+% derivations/01-identificabilidade.md, Lema 1 (numeracao global).
+\begin{lemma}[The basis carries the constraint]
+\label{lem:basis}
+Under the conditions of Proposition~\ref{prop:identif}, for every $J$ the map
+\[
+  (\bc, \btheta) \;\longmapsto\;
+  \sum_{\cv=1}^{p} x_{\cv}\Bigl\{\lvl{\cv} + \sum_{\md=1}^{q}
+  \sum_{\lev<J}\sum_{\tsl} \coef{\cv}{\md}{\lev}{\tsl}
+  \wav{\lev}{\tsl}(u_{\md})\Bigr\}
+\]
+is injective on $\R^{p}\times\R^{d}$, $d = pq\NJ$; equivalently, the
+population Gram matrix of the design defined in \eqref{eq:design} is positive
+definite. If instead the column $X_{\cv}\phi_{00}(U_{\md})$ is retained in
+each block, that matrix is singular with nullity exactly $pq$.
+\end{lemma}
+
+Replacing $\gcomp{\cv}{\md}$ by $\PiJ\gcomp{\cv}{\md}$ leaves a bias, which
+Section~\ref{sec:theory} controls under a Besov condition. Two practical
+consequences of periodization deserve mention. A component whose values at the
+two ends of the interval disagree is not periodic, and its projection error
+then stalls at the order $2^{-J/2}$ in $L_2$ regardless of the interior
+smoothness (Proposition~S3.1 in the Supplementary Material). The two remedies,
+rescaling the modulators to a proper subinterval and using the basis of
+\citet*{cohen1993wavelets} adapted to the interval, are matters of computation
+and are discussed in Section~\ref{sec:computation}.
+
+\subsection{The estimator}
+\label{sec:estimator}
+
+Let $(Y_i,\bX_i,\bU_i)$, $i = 1,\dots,n$, be independent copies of
+$(Y,\bX,\bU)$. The row of the design matrix is the vector of the $p$ linear
+covariates followed by the $d = pq\NJ$ products between a linear covariate and
+a wavelet of a modulator,
+\begin{equation}
+  \label{eq:design}
+  \bZ = [\,\Amat \;\; \Bmat\,], \qquad
+  \Amat_{i\cv} = X_{i\cv}, \qquad
+  \Bmat_{i,(\cv\md,\lev\tsl)} = X_{i\cv}\,\wav{\lev}{\tsl}(U_{i\md}),
+\end{equation}
+with the blocks $(\cv,\md)$ in lexicographic order and, inside a block, the
+wavelets ordered by level and then by translation. Writing
+$\bY = (Y_1,\dots,Y_n)\T$, the estimator is
+\begin{equation}
+  \label{eq:estimator}
+  (\chat,\thetahat) \;\in\; \mathop{\rm arg\,min}_{(\bc,\btheta)\in
+  \R^{p}\times\R^{d}}
+  \Bigl\{\normn{\bY - \Amat\bc - \Bmat\btheta}^{2}
+  \;+\; 2\pen\norm{\btheta}_{1}\Bigr\} .
+\end{equation}
+The penalty does not reach the levels $\bc$: they are $p$ parameters of a
+parametric part, and shrinking them would bias every fitted coefficient by a
+constant. The fitted components and coefficients are recovered from
+$\thetahat$ by
+\[
+  \widehat{g}_{\cv\md}(v) = \sum_{\lev<J}\sum_{\tsl}
+  \widehat{\theta}_{\cv\md,\lev\tsl}\,\wav{\lev}{\tsl}(v),
+  \qquad
+  \widehat{\fcoef{\cv}}(u) = \widehat{c}_{\cv}
+  + \sum_{\md=1}^{q}\widehat{g}_{\cv\md}(u_{\md}).
+\]
+Problem \eqref{eq:estimator} is a lasso with some coordinates unpenalized, so
+it is convex, and it is strictly convex, hence uniquely solved, whenever the
+Gram matrix of $\bZ$ is nonsingular. Two structural variants are available at
+no conceptual cost and are discussed in Section~\ref{sec:computation}: a
+sparse group lasso \citep{Simon-Friedman-Hastie-Tibshirani-2013} whose groups
+are the blocks $(\cv,\md)$, which removes an entire component when a modulator
+does not act on a coefficient, and the block lasso of
+\citet{Klopp-Pensky-2015}. The theory below is for \eqref{eq:estimator}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Theory}
+\label{sec:theory}
+
+\subsection{Assumptions}
+\label{sec:assumptions}
+
+\begin{assumption}[Sampling and error]
+\label{ass:sample}
+The observations $(Y_i,\bX_i,\bU_i)$, $i \le n$, are independent and
+identically distributed and follow \eqref{eq:model}, and the error is
+conditionally sub-Gaussian: there is $\sigma < \infty$ with
+$\E\{\exp(t\varepsilon_i) \mid \bX_i,\bU_i\} \le \exp(\sigma^2t^2/2)$ almost
+surely, for all real $t$.
+\end{assumption}
+
+\begin{assumption}[Linear covariates]
+\label{ass:X}
+$\max_{\cv}|X_{\cv}| \le B_X$ almost surely, and there are constants
+$0 < \kappa_1 \le \kappa_2 < \infty$ with
+$\kappa_1 \le \lmin\{\E(\bX\bX\T\mid\bU)\} \le
+\lmaxx\{\E(\bX\bX\T\mid\bU)\} \le \kappa_2$ almost surely.
+\end{assumption}
+
+\begin{assumption}[Modulating covariates]
+\label{ass:U}
+$\bU$ takes values in $[0,1]^q$ and has a joint Lebesgue density $p_{\bU}$
+with $0 < c_U \le p_{\bU}(u) \le C_U < \infty$ for every $u \in [0,1]^q$.
+\end{assumption}
+
+\begin{assumption}[Basis]
+\label{ass:basis}
+The wavelets are the periodization \eqref{eq:periodized} of an orthonormal,
+compactly supported family with $\psi$ bounded and $N$ vanishing moments, and
+$\jzero = 0$.
+\end{assumption}
+
+\begin{assumption}[Besov regularity]
+\label{ass:besov}
+There are $s > 0$, $1 \le \pi, r \le \infty$ and $C_g < \infty$ such that
+every component satisfies $\int_0^1 \gcomp{\cv}{\md} = 0$ and, writing
+$\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$
+and $\theta^{*}_{\cv\md,\lev\cdot}$ for the vector of the coefficients of
+level $\lev$,
+\[
+  \norm{\theta^{*}_{\cv\md,\lev\cdot}}_{\pi} \;\le\;
+  C_g\,2^{-\lev(s + 1/2 - 1/\pi)} \qquad \text{for every } \lev \ge 0 .
+\]
+The effective regularity $\seff = s - (1/\pi - 1/2)_{+}$ is positive.
+\end{assumption}
+
+Assumptions~\ref{ass:X} and \ref{ass:U} are the quantitative forms of the two
+conditions of Proposition~\ref{prop:identif}. In the second it is the joint
+density that is bounded below, not the marginals: if $U_2 = U_1$ almost surely
+both marginals are uniform and the design is singular.
+Assumption~\ref{ass:besov} is taken as a condition on the sequence of
+coefficients rather than as membership in a function space, as in
+\citet{Klopp-Pensky-2015}; when $\psi$ has more than $s$ vanishing moments and
+enough Hölder regularity the two are equivalent, on the circle
+\citep[Section 3.6]{Cohen-2003}, and the implication that the proofs use needs
+only the vanishing moments. The index $\seff$ is the regularity that a linear
+sieve sees and $s$ is the one that nonlinear approximation sees; they differ
+exactly when $\pi < 2$, which is the regime of inhomogeneous smoothness.
+
+\subsection{The main result}
+\label{sec:main}
+
+Write $\widehat{f}_i = \Amat_i\chat + \Bmat_i\thetahat$ for the fit, $d_n$ for
+the number of penalized columns at resolution $J_n$, and fix a confidence
+level $\alpha \in (0,1)$. The penalty is the one that the oracle inequality of
+Section~\ref{sec:oracle} calls for, namely
+\begin{equation}
+  \label{eq:lambda}
+  \penn \;=\; 2\sigma B_X\sqrt{2C_U}\,
+  \sqrt{\frac{2\log(2d_n/\alpha)}{n}} \;\asymp\;
+  \sigma B_X \sqrt{C_U}\,\sqrt{\frac{J_n}{n}} .
+\end{equation}
+
+% derivations/05-taxas.tex, Corolario 5 (numeracao global); D16.
+\begin{theorem}[Rate of nonlinear approximation]
+\label{thm:main}
+Let Assumptions~\ref{ass:sample} to \ref{ass:besov} hold with $p$, $q$ and all
+the constants fixed as $n$ grows, and set $\tau = (s+1/2)^{-1}$. Suppose
+$\seff > s/(2s+1)$ and take $J_n = \lceil c \log_2 n\rceil$ with
+\begin{equation}
+  \label{eq:window}
+  \max\Bigl\{\frac{\tau}{2},\; \frac{2-\tau}{4\seff}\Bigr\}
+  \;\le\; c \;<\; 1 ,
+\end{equation}
+a window that is nonempty precisely under that condition. Then, with $\penn$
+as in \eqref{eq:lambda},
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\Bigr\},
+  \qquad
+  \sum_{\cv,\md}\bigl\lVert \widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\Bigr\} .
+\]
+\end{theorem}
+
+Three readings of Theorem~\ref{thm:main} matter. First, the exponent is the
+one of nonlinear wavelet approximation, $2s/(2s+1)$, and not the one of the
+linear sieve, $2\seff/(2\seff+1)$ of Theorem~\ref{thm:sieve} below; the two
+agree when $\pi \ge 2$ and separate when $\pi < 2$, which is where the
+$\ell_1$ penalty pays for itself. Second, the rate is attained under
+Assumption~\ref{ass:besov} alone: no compressibility is assumed on top of it,
+because the Besov condition already implies it, with
+$\tau = (s+1/2)^{-1}$, by Lemma~\ref{lem:weak}. Third, the rate
+$(\log n/n)^{2s/(2s+1)}$ is the minimax reference of the Gaussian sequence
+model over weak $\ell_\tau$ balls with per coordinate noise of order $\penn$
+\citep{Donoho-Johnstone-1998}; the logarithmic factor is the price of the
+single, nonadaptive penalty level \eqref{eq:lambda}, which takes a union bound
+over the $d_n$ columns. No lower bound is proved here for $q \ge 2$: the
+comparison is with the reference of the sequence model, and the minimax lower
+bound of \citet{Klopp-Pensky-2015} covers the case of a single modulator with
+covariates independent of it.
+
+The proof combines three ingredients, given below: the approximation error of
+the sieve, the design condition, and a nonasymptotic oracle inequality.
+Section~\ref{sec:rates} assembles them, first at a dense reading of the
+estimation term, which gives the sieve rate, and then at a sparse comparator,
+which gives Theorem~\ref{thm:main}.
+
+\subsection{Approximation and the design condition}
+\label{sec:approx}
+
+% derivations/02-aproximacao-besov.tex, Lema 2 e Corolario 1 (numeracao global).
+\begin{lemma}[Bias of the sieve]
+\label{lem:bias}
+Under Assumptions~\ref{ass:basis} and \ref{ass:besov}, for every pair
+$(\cv,\md)$ and every $J \ge 0$,
+\[
+  \bigl\lVert \gcomp{\cv}{\md} - \PiJ\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2}
+  \;=\; \sum_{\lev \ge J}\norm{\theta^{*}_{\cv\md,\lev\cdot}}_{2}^{2}
+  \;\le\; \frac{C_g^{2}}{1-2^{-2\seff}}\,2^{-2J\seff} .
+\]
+If in addition Assumptions~\ref{ass:X} and \ref{ass:U} hold, then, with
+$f_J(x,u) = \sum_{\cv}x_{\cv}\{\lvl{\cv} +
+\sum_{\md}(\PiJ\gcomp{\cv}{\md})(u_{\md})\}$,
+\begin{equation}
+  \label{eq:bias}
+  \bigl\lVert f - f_J\bigr\rVert_{L_2(P)}^{2} \;\le\;
+  \frac{(pq)^{2}B_X^{2}C_UC_g^{2}}{1-2^{-2\seff}}\,2^{-2J\seff}
+  \;=:\; \mathcal{B}_{J}^{2} .
+\end{equation}
+\end{lemma}
+
+The exponent is $\seff$ and not $s$, and this is where the loss
+$(1/\pi-1/2)_{+}$ enters: inside a level, an $\ell_\pi$ bound with $\pi < 2$
+controls the $\ell_2$ norm without gain. The bias uses only the bound on the
+linear covariates and the marginal density of each modulator, so dependence
+between $\bX$ and $\bU$ does not affect it. What it does affect is the passage
+from the prediction norm to the norm of each component, which is the design
+condition.
+
+Let $\bPsi(u) \in \R^{K}$, $K = 1 + q\NJ$, collect the constant and the
+wavelets of the $q$ modulators, so that the row of $\bZ$ in
+\eqref{eq:design} is a permutation of the Kronecker product
+$\bX \otimes \bPsi(\bU)$. Write $\Gram = \E(\bZ\bZ\T)$ and
+$\Gramhat = \bZ\T\bZ/n$ for the population and empirical Gram matrices and
+$\Gram_{\bPsi} = \E\{\bPsi(\bU)\bPsi(\bU)\T\}$ for the part in the modulators
+alone.
+
+% derivations/03-desenho-produtos.tex, Proposicao 3 (numeracao global).
+\begin{proposition}[Gram matrix of the product design]
+\label{prop:gram}
+Let Assumptions~\ref{ass:X} to \ref{ass:basis} hold and write $D = p + d$ and
+$\gamma = \kappa_1 c_U$.
+\begin{enumerate}
+\item[(i)] $c_U \le \lmin(\Gram_{\bPsi}) \le \lmaxx(\Gram_{\bPsi}) \le C_U$
+for every $J$, and consequently
+$\gamma \le \lmin(\Gram) \le \lmaxx(\Gram) \le \kappa_2 C_U$. If $\bX$ and
+$\bU$ are independent, $\Gram$ is, up to the permutation of columns, the
+Kronecker product $\E(\bX\bX\T)\otimes\Gram_{\bPsi}$, and the two bounds are
+attained as products of eigenvalues.
+\item[(ii)] With $R_J = pB_X^{2}(1 + qC_\psi 2^{J})$, where $C_\psi$ depends
+only on the wavelet family, $\norm{\bZ_i}_2^{2} \le R_J$ almost surely and
+\[
+  \Prob\Bigl(\lmin(\Gramhat) \ge \frac{\gamma}{2}\Bigr)
+  \;\ge\; 1 - 2D\exp\Bigl\{-\frac{n\gamma^{2}}
+  {8R_J(\kappa_2C_U + \gamma/3)}\Bigr\},
+\]
+which tends to one whenever $pq2^{J}\log(pq2^{J})/n \to 0$.
+\end{enumerate}
+\end{proposition}
+
+Part (i) is stated for the general case: independence between the covariates
+and the modulators buys the exact factorization but not a better constant. A
+lower bound on the smallest eigenvalue dominates every compatibility and
+restricted eigenvalue constant, on every support and with no cone restriction,
+since $\delta\T A \delta \ge \lmin(A)\norm{\delta}_2^2 \ge
+\lmin(A)\norm{\delta_S}_1^2/|S|$, and it is in this form that the next
+subsection consumes it. In the resolution regime of Section~\ref{sec:rates}
+the requirement of part (ii) is of the same order as the rate itself, so it
+costs nothing there; if $pq$ were larger than $n^{1/2}$, only the
+compatibility constant could be transferred, through the entrywise deviation
+\citep[Corollary 6.8]{buhlmann2011statistics}, at the price of a factor
+$s_0^{2}$ and of the cone.
+
+\subsection{A nonasymptotic oracle inequality}
+\label{sec:oracle}
+
+Let $\betastar = (\bc,\thetastar)$ be the sieve oracle, that is the vector
+whose components are the levels and the coefficients
+$\coefs{\cv}{\md}{\lev}{\tsl}$ of Assumption~\ref{ass:besov} for $\lev < J$,
+so that $f_J$ is its fit, and let
+\[
+  \bb = f - f_J \in \R^{n}, \qquad \Szero = \mathrm{supp}(\thetastar),
+  \qquad s_0 = |\Szero|, \qquad v = \thetahat - \thetastar .
+\]
+Let $\PA$ be the orthogonal projection onto the column space of $\Amat$, which
+exists whenever $\Amat$ has rank $p$, let $\MA = I_n - \PA$, and let
+$\Btil = \MA\Bmat$ and $\gtil = \lmin(\Btil\T\Btil/n)$ be the residualized
+design and its smallest eigenvalue. Finally let
+$\smax^{2} = \max_a (\Gramhat)_{aa}$ be the largest empirical norm of a
+penalized column.
+
+% derivations/04-oraculo.tex, Teorema 1 (numeracao global).
+\begin{theorem}[Oracle inequality]
+\label{thm:oracle}
+Let Assumption~\ref{ass:sample} hold, suppose $\Amat$ has rank $p$, and take
+$\pen \ge 2\pen_0$ with
+$\pen_0 = \sigma\smax\{2\log(2d/\alpha)/n\}^{1/2}$. On the event
+$\mathcal{T} = \{\norm{\Btil\T\bveps/n}_{\infty} \le \pen/2\}$, which has
+probability at least $1 - \alpha$:
+\begin{enumerate}
+\item[(i)] with no condition on the design,
+$\normn{\Btil v}^{2} \le 6\pen\norm{\thetastar}_{1} + 4\normn{\bb}^{2}$;
+\item[(ii)] if $\gtil > 0$,
+\[
+  \normn{\Btil v}^{2} \le \frac{64\pen^{2}s_0}{\gtil} + 16\normn{\bb}^{2},
+  \qquad
+  \norm{v}_{2}^{2} \le \frac{64\pen^{2}s_0}{\gtil^{2}}
+  + \frac{16\normn{\bb}^{2}}{\gtil} ;
+\]
+\item[(iii)] in either regime,
+$\normn{\widehat{f}-f} \le \normn{\Btil v} + 2\normn{\bb}
++ \normn{\PA\bveps}$, and
+$\E(\normn{\PA\bveps}^{2}\mid\bX,\bU) \le \sigma^{2}p/n$.
+\end{enumerate}
+\end{theorem}
+
+Three features separate Theorem~\ref{thm:oracle} from the standard treatment
+\citep[Chapter 6]{buhlmann2011statistics}. The unpenalized levels are not
+placed inside the support, which would require a compatibility condition on a
+cone; they are profiled out, and the Schur complement transfers the full
+smallest eigenvalue of $\Gramhat$ to the residualized block,
+$\gtil \ge \lmin(\Gramhat)$, so that Proposition~\ref{prop:gram}(ii) is used
+as it stands and the constant does not depend on $\Szero$. The model is
+misspecified inside the sieve, and the deterministic residual $\bb$ is handled
+by Young's inequality rather than by duality, which keeps the statement
+nonasymptotic and valid also when the bias dominates. The penalty is
+calibrated by the empirical column norms and not by $\max_{i,a}|Z_{ia}|$: the
+former is bounded in probability by $2B_X^2C_U$, while the latter is of order
+$2^{J/2}$ and would inflate $\pen$ by that factor and destroy the rates of
+Section~\ref{sec:rates}. The term $\sigma^{2}p/n$ in part (iii) is the price
+of leaving the $p$ levels out of the penalty; no choice of $\pen$ removes it,
+it is of smaller order than the estimation term whenever
+$p \lesssim s_0\log(pq\NJ)$, and it is absent from
+\citet{Klopp-Pensky-2015}, where the levels are penalized along with
+everything else.
+
+\subsection{Rates}
+\label{sec:rates}
+
+Under Assumption~\ref{ass:besov} the sieve oracle is generically dense: the
+coefficients decay but do not vanish, so that $s_0 = d$ and part (ii) of
+Theorem~\ref{thm:oracle}, read at the oracle, delivers the rate of the linear
+sieve.
+
+% derivations/05-taxas.tex, Teorema 2 (numeracao global).
+\begin{theorem}[Rate of the linear sieve]
+\label{thm:sieve}
+Let Assumptions~\ref{ass:sample} to \ref{ass:besov} hold with $p$, $q$ and the
+constants fixed, and take
+\begin{equation}
+  \label{eq:Jn}
+  J_n = \min\bigl\{J \in \mathbb{N} :\;
+  2^{J} \ge (n/\log n)^{1/(2\seff+1)}\bigr\},
+\end{equation}
+so that $J_n = \log_2 n/(2\seff+1) + O(\log\log n)$. Then the requirement of
+Proposition~\ref{prop:gram}(ii) holds along $J_n$, being itself of the exact
+order $(\log n/n)^{2\seff/(2\seff+1)}$, and, with $\penn$ as in
+\eqref{eq:lambda},
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2\seff/(2\seff+1)}\Bigr\} .
+\]
+At this resolution the estimation term and the bias term are of the same
+order, and the term $\sigma^{2}p/n$ of Theorem~\ref{thm:oracle}(iii) is of
+strictly smaller order.
+\end{theorem}
+
+% derivations/05-taxas.tex, Corolario 4 (numeracao global).
+\begin{corollary}[Components and coefficients]
+\label{cor:components}
+In the setting of Theorem~\ref{thm:sieve}, and with $r_n$ denoting the rate of
+that theorem,
+\[
+  \sum_{\cv,\md}\bigl\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2} = O_p(r_n),
+  \qquad
+  \bigl\lVert\widehat{\fcoef{\cv}}-\fcoef{\cv}
+  \bigr\rVert_{L_2([0,1]^{q})} = O_p(r_n^{1/2}),
+  \quad \cv = 1,\dots,p,
+\]
+and the same statements hold with the rate of Theorem~\ref{thm:main} in place
+of $r_n$ under the conditions of that theorem.
+\end{corollary}
+
+The passage from the prediction norm to the norm of a single component is
+where the design condition is used a second time, and the smallest eigenvalue
+appears squared in the constant. Two further statements complete the picture.
+The first dispenses with the design condition altogether, at the price of a
+slower rate, and is the unconditional statement of this paper.
+
+% derivations/05-taxas.tex, Proposicao 4 (numeracao global).
+\begin{proposition}[Slow rate, no design condition]
+\label{prop:slow}
+Let Assumptions~\ref{ass:sample}, \ref{ass:basis} and \ref{ass:besov} hold,
+with $\Amat$ of rank $p$ and $\penn$ as in \eqref{eq:lambda}. Then
+$\normn{\widehat{f}-f}^{2} = O_p\{\penn\norm{\thetastar}_{1} +
+\mathcal{B}_{J_n}^{2} + p/n\}$, where
+$\norm{\thetastar}_{1} \le pqC_g\sum_{\lev<J_n}2^{\lev(1/2-s)}$ does not
+depend on $\pi$. In particular, if $s > 1/2$ then
+$\normn{\widehat{f}-f}^{2} = O_p\{(J_n/n)^{1/2}\}$ for every
+$J_n \ge \log_2 n/(4\seff)$; and if $s < 1/2$, the choice
+$2^{J_n} \asymp (n/J_n)^{1/(1-2s+4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} = O_p\{(J_n/n)^{2\seff/(1-2s+4\seff)}\}$, an
+exponent that equals $2s/(2s+1)$ when $\pi \ge 2$.
+\end{proposition}
+
+The second is the approximation lemma that produces Theorem~\ref{thm:main}.
+For a vector $\btheta$ let $\theta_{(1)} \ge \theta_{(2)} \ge \cdots$ be the
+nonincreasing rearrangement of the absolute values of its entries and let
+$\btheta^{(M)}$ retain the $M$ largest of them.
+
+% derivations/05-taxas.tex, Lema 9 (numeracao global).
+\begin{lemma}[Besov regularity implies compressibility]
+\label{lem:weak}
+Under Assumptions~\ref{ass:basis} and \ref{ass:besov} with
+$\pi(s+1/2) > 1$, the sieve oracle satisfies, for every $J$ and every
+$k \ge 1$,
+\[
+  \theta^{*}_{(k)} \;\le\; C_\tau\,k^{-1/\tau},
+  \qquad \tau = \frac{1}{s+1/2},
+  \qquad C_\tau = C_g(pq\,A_{s,\pi})^{s+1/2},
+  \qquad A_{s,\pi} = 1 + \frac{1}{1-2^{1-\pi(s+1/2)}},
+\]
+with constants that do not depend on $J$ and with $\tau \in (0,2)$ for every
+$s > 0$. Consequently
+$\sum_{k>M}\theta^{*2}_{(k)} \le \tau(2-\tau)^{-1}C_\tau^{2}M^{1-2/\tau}$ for
+every $M \ge 1$.
+\end{lemma}
+
+Theorem~\ref{thm:main} follows by reading Theorem~\ref{thm:oracle}(ii) not at
+the oracle but at the best $M$ term approximation of it, which is legitimate
+because the proof of that theorem uses the comparator only through the
+decomposition of $\bY$ and the size of its support. Balancing the two terms
+that result, $\pen^{2}M/\gtil$ from estimation and
+$M^{1-2/\tau}$ from the truncation, gives the effective dimension
+\begin{equation}
+  \label{eq:Mstar}
+  \Mstar_n \;\asymp\; \Bigl(\frac{n}{J_n}\Bigr)^{\tau/2}
+  \;\ll\; d_n \asymp pq\,2^{J_n},
+\end{equation}
+and a bound of order $\penn^{2-\tau}$, which is the rate of
+Theorem~\ref{thm:main}. The three inequalities that define the window
+\eqref{eq:window} are, in order, that the minimum in $M$ be interior, that the
+bias of the sieve not dominate, and that the requirement of
+Proposition~\ref{prop:gram}(ii) hold. Nothing in this argument says that the
+estimator selects $\Mstar_n$ coordinates: no minimal signal or
+irrepresentability condition is used, and what compressibility buys is a rate
+governed by $\Mstar_n$ rather than by $d_n$, not the recovery of a support.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Computation and Tuning}
+\label{sec:computation}
+
+\subsection{The design matrix and the solver}
+\label{sec:solver}
+
+The design \eqref{eq:design} is built one block at a time: the $n \times \NJ$
+matrix of the wavelets of $U_{\md}$ is evaluated once per modulator, by the
+cascade algorithm of \citet{Daubechies-Lagarias-1991}, and then multiplied
+rowwise by $X_{\cv}$. Since a compactly supported wavelet of level $\lev$ is
+nonzero on an interval of length $(L-1)2^{-\lev}$, at most $L-1$ of the
+$2^{\lev}$ columns of a level are nonzero at a given observation, so a block
+has at most $n(L-1)J$ nonzero entries out of $n\NJ$ and the design is stored in
+sparse form as soon as $J$ is moderate. Evaluating the basis once on a grid and
+looking the values up removes the cascade from the inner loop of a
+simulation.
+
+Problem \eqref{eq:estimator} is then a lasso with $p$ unpenalized coordinates,
+which coordinate descent solves along a path of penalty levels; we use the
+\texttt{glmnet} package. Two points of scale deserve care, because they are
+what ties the software to the theory. First, the penalty level reported for a
+fit is the $\pen$ of \eqref{eq:estimator} and not the one of the solver, which
+rescales its own by the ratio between the total number of columns and the
+number of penalized ones when some coordinates carry zero penalty; the
+conversion is checked by verifying the Karush-Kuhn-Tucker conditions of
+\eqref{eq:estimator} at every point of the path. Second, when one linear
+covariate is the constant, its column has zero variance, and the solver may
+either drop it or share the level with its own intercept; the fit is the same
+either way, but the level $\lvl{\cv}$ of the constant covariate is only
+recovered after the intercept is added back to it.
+
+\subsection{Rescaling and the boundary}
+\label{sec:boundary}
+
+The theory places $\bU$ in $[0,1]^q$ by assumption. In practice each modulator
+is mapped to that interval by a monotone transformation, and, as in the
+wavelet lasso of \citet*{Montoril-Pinheiro-Vidakovic-2019}, the image is
+$[\epsilon, 1-\epsilon]$ with $\epsilon$ of the order $2^{-J}$, which keeps the
+observations away from the strip where the periodization of
+\eqref{eq:periodized} leaves an artifact; the price is that the fitted
+component integrates to zero over the rescaled range and not over $[0,1]$, a
+shift of level and not of shape. The alternative is the basis adapted to the
+interval of \citet*{cohen1993wavelets}, which reproduces polynomials on $[0,1]$
+and characterizes Besov regularity without any periodicity
+\citep[Section 3.9]{Cohen-2003}, so that Lemma~\ref{lem:bias} holds with the
+Besov space of the interval and the same proof. Its cost is structural: the
+coarsest level must be large enough for the two boundary zones to be disjoint,
+the constant is no longer a single column but a combination of the scaling
+functions, and the constraint of \eqref{eq:additive} has to be imposed by
+reparametrization, which leaves $pq(2^{\jzero}-1)$ unpenalized parameters
+instead of none. We therefore keep the periodized basis as the default and
+offer the interval basis as an option.
+
+\subsection{Choosing the resolution and the penalty}
+\label{sec:tuning}
+
+The pair $(J,\pen)$ is chosen jointly. The default is $K$ fold cross
+validation on a grid of resolutions, with the folds drawn once and reused for
+every $J$, one design and one penalty path per resolution, and the usual two
+readings of the curve: the minimizer of the cross validated error and the
+largest penalty within one standard error of it. Two cheaper rules are also
+available, the Bayesian information criterion and its extended version, with
+degrees of freedom equal to the number of nonzero coefficients plus the $p$
+levels, which is the usual unbiased count for the lasso.
+
+The theory supplies a fourth rule, since \eqref{eq:Jn} and \eqref{eq:lambda}
+are explicit. It is not a practical competitor as it stands, because it needs
+$\sigma$, which has to be estimated, and $\seff$, which is unknown, and
+because it is a statement about order, so that at moderate sample sizes it can
+sit above the resolution that minimizes the realized error, the pre-asymptotic
+regime being wide when $\seff$ is small. Its interest is as a reference for
+what the cross validated choice ought to approach, and the difference between
+the two is a finite sample quantity worth measuring. The four rules are
+compared in the simulation study.
+
+A remark on the structural variant. Replacing $\norm{\btheta}_1$ in
+\eqref{eq:estimator} by the sparse group lasso penalty of
+\citet{Simon-Friedman-Hastie-Tibshirani-2013}, with one group per block
+$(\cv,\md)$, adds a second tuning parameter and removes entire components
+rather than isolated coefficients, which is what a reader interested in
+knowing which modulators act on which coefficients would want. It is a
+different estimator, with a different oracle inequality
+\citep{Lounici-Pontil-vandeGeer-Tsybakov-2011}, and the theory above does not
+cover it; the choice between the two is settled empirically.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Supplementary Materials}
+
+The online Supplementary Material contains the proofs of all the results
+stated in the paper, together with the auxiliary lemmas they use: the
+identification argument and the properties of the periodized basis, the
+approximation lemmas in $L_2$ and in the supremum norm and the proposition on
+the cost of periodization, the population and empirical bounds for the Gram
+matrix of the product design, the four lemmas behind the oracle inequality,
+and the two lemmas behind the rates.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgements}
+
+Write the acknowledgements here.
+\par
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibhang=1.7pc
+\bibsep=2pt
+\fontsize{9}{14pt plus.8pt minus .6pt}\selectfont
+\renewcommand\bibname{\large \bf References}
+\expandafter\ifx\csname
+natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL}\fi
+
+\bibliographystyle{chicago}
+\bibliography{references_1}
+
+%-------------------------------------------
+\vskip .65cm
+\noindent
+first author affiliation
+\vskip 2pt
+\noindent
+E-mail: (first author email)
+\vskip 2pt
+
+\noindent
+second author affiliation
+\vskip 2pt
+\noindent
+E-mail: (second author email)
+
+\end{document}

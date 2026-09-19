@@ -1,0 +1,1022 @@
+% WAFC -- suplemento, versao k = 1 (E5a). Template da Statistica Sinica
+% (manuscript/ss-template/supp-temp_20240820.tex). Traz as provas dos
+% resultados de ms_1.tex e os lemas auxiliares. As fontes sao
+% derivations/01 a 05; o comentario acima de cada secao diz qual.
+\documentclass[10pt]{book}
+\usepackage[sectionbib]{natbib}
+\usepackage{array,epsfig,fancyheadings,rotating}
+\usepackage{hyperref}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textwidth=31.9pc
+\textheight=46.5pc
+\oddsidemargin=1pc
+\evensidemargin=1pc
+\headsep=15pt
+\topmargin=.6cm
+\parindent=1.7pc
+\parskip=0pt
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\definecolor{colR1}{RGB}{0,90,200}
+
+\setcounter{page}{1}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{proposition}{Proposition}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{remark}{Remark}[section]
+\pagestyle{fancy}
+
+% --- macros: as mesmas de ms_1.tex (docs/notacao.md) ---------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Prob}{\mathrm{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\T}{^{\top}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\normn}[1]{\left\lVert #1 \right\rVert_{n}}
+\newcommand{\inner}[2]{\langle #1, #2 \rangle}
+\newcommand{\cv}{\ell}
+\newcommand{\md}{m}
+\newcommand{\lev}{j}
+\newcommand{\tsl}{k}
+\newcommand{\jzero}{j_{0}}
+\newcommand{\NJ}{N_{J}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\fcoef}[1]{\beta_{#1}}
+\newcommand{\lvl}[1]{c_{#1}}
+\newcommand{\gcomp}[2]{g_{#1#2}}
+\newcommand{\wav}[2]{\psi_{#1#2}}
+\newcommand{\VJ}{V_{J}}
+\newcommand{\WJ}{W_{J}}
+\newcommand{\PiJ}{\Pi_{J}}
+\newcommand{\coef}[4]{\theta_{#1#2,#3#4}}
+\newcommand{\coefs}[4]{\theta^{*}_{#1#2,#3#4}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\thetastar}{\btheta^{*}}
+\newcommand{\thetahat}{\widehat{\btheta}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\betahat}{\widehat{\bbeta}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\chat}{\widehat{\mathbf{c}}}
+\newcommand{\Gram}{\Sigma}
+\newcommand{\Gramhat}{\widehat{\Sigma}}
+\newcommand{\pen}{\lambda}
+\newcommand{\penn}{\lambda_{n}}
+\newcommand{\Szero}{S_{0}}
+\newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
+\newcommand{\seff}{s'}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\MA}{M_{\Amat}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\Mstar}{M^{\star}}
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+\newcommand{\compat}{\phi_{0}}
+\newcommand{\GBA}{\Gramhat_{\Bmat\mid\Amat}}
+\newcommand{\thbar}{\bar{\btheta}}
+\newcommand{\bbar}{\bar{\bb}}
+\newcommand{\thstarM}[1]{\btheta^{*,(#1)}}
+\DeclareMathOperator{\vecop}{vec}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\supp}{supp}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\def\n{\noindent}
+\lhead[\fancyplain{} \leftmark]{}
+\chead[]{}
+\rhead[]{\fancyplain{}\rightmark}
+\cfoot{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\renewcommand{\baselinestretch}{2}
+
+\markright{ \hbox{\footnotesize\rm Statistica Sinica: Supplement
+}\hfill\\[-13pt]
+\hbox{\footnotesize\rm
+}\hfill }
+
+\markboth{\hfill{\footnotesize\rm AUTHOR(S)} \hfill}
+{\hfill {\footnotesize\rm WAVELET ADDITIVE FUNCTIONAL COEFFICIENTS} \hfill}
+
+\renewcommand{\thefootnote}{}
+$\ $\par \fontsize{12}{14pt plus.8pt minus .6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\centerline{\large\bf SPARSE WAVELET ESTIMATION OF}
+\vspace{2pt}
+\centerline{\large\bf ADDITIVE FUNCTIONAL COEFFICIENTS}
+\vspace{.25cm}
+\centerline{Author(s)}
+\vspace{.4cm}
+\centerline{\it Affiliation(s)}
+\vspace{.55cm}
+\centerline{\bf Supplementary Material}
+\vspace{.55cm}
+\fontsize{9}{11.5pt plus.8pt minus .6pt}\selectfont
+\noindent
+This supplement contains the proofs of the results stated in the paper and
+the auxiliary lemmas they use. Section S1 fixes the notation and the objects.
+Section S2 proves the identification results of Section 2 of the paper,
+Section S3 the approximation lemma, Section S4 the bounds for the Gram matrix
+of the product design, Section S5 the oracle inequality, and Section S6 the
+rates. References to numbered results without a section prefix are to the
+paper; results numbered with the prefix S are stated and proved here.
+\par
+
+\setcounter{section}{0}
+\setcounter{equation}{0}
+\def\theequation{S\arabic{section}.\arabic{equation}}
+\def\thesection{S\arabic{section}}
+
+\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Notation and objects}
+
+The model, the basis and the estimator are those of Sections 2.1 to 2.3 of the
+paper. We write $\bZ = [\Amat\;\Bmat]$ for the design matrix of equation
+(2.4), with $\Amat \in \R^{n\times p}$ the unpenalized block and
+$\Bmat \in \R^{n\times d}$, $d = pq\NJ$, the block of products; $\bY$, $f$ and
+$\bveps$ for the vectors with entries $Y_i$, $f(\bX_i,\bU_i)$ and
+$\varepsilon_i$; $\Gramhat = \bZ\T\bZ/n$ and $\Gram = \E(\bZ\bZ\T)$; and, for
+$a, h \in \R^n$, $\normn{a}^2 = n^{-1}\sum_i a_i^2$ and
+$\inner{a}{h}_n = n^{-1}\sum_i a_ih_i$.
+
+The sieve oracle is $\betastar = (\bc,\thetastar)$, with
+$\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$
+for $\lev < J$, so that $f_J = \bZ\betastar$ is the best approximation of $f$
+in the sieve in the sense of Lemma 2; the deterministic residual is
+$\bb = f - f_J$, the oracle support is $\Szero = \supp(\thetastar)$ and
+$s_0 = |\Szero|$, and $v = \thetahat - \thetastar$. When $\Amat$ has rank $p$
+we write $\PA = \Amat(\Amat\T\Amat)^{-1}\Amat\T$, $\MA = I_n - \PA$,
+$\Btil = \MA\Bmat$, $\GBA = \Btil\T\Btil/n$ and $\gtil = \lmin(\GBA)$, and
+finally $\smax^2 = \max_a(\Gramhat)_{aa}$, the maximum being over the $d$
+penalized columns.
+
+For a support $S$ and a symmetric matrix $A$, the compatibility constant is
+\[
+  \compat^2(S;A) = \min\bigl\{|S|\,\delta\T A \delta :\;
+  \norm{\delta_S}_1 = 1,\; \norm{\delta_{S^c}}_1 \le 3 \bigr\},
+\]
+and the elementary bound
+$\delta\T A\delta \ge \lmin(A)\norm{\delta}_2^2 \ge
+\lmin(A)\norm{\delta_S}_1^2/|S|$ gives
+\begin{equation}
+  \label{eq:compat-lmin}
+  \compat^2(S;A) \;\ge\; \lmin(A) \qquad \text{for every } S,
+\end{equation}
+so that a lower bound on the smallest eigenvalue is a compatibility bound on
+every support, with the same constant and no cone restriction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/01-identificabilidade.md
+\section{Identification and the periodized basis}
+\setcounter{equation}{0}
+
+\subsection*{Proof of Proposition 1}
+
+\emph{Levels and components are determined by the coefficients.} Let $\beta$
+and $\tilde\beta$ be measurable maps from $[0,1]^q$ to $\R^p$ with
+$\sum_{\cv}\fcoef{\cv}(\bU)X_{\cv} = \sum_{\cv}\tilde\beta_{\cv}(\bU)X_{\cv}$
+almost surely, and put $\delta(u) = \beta(u)-\tilde\beta(u)$. Then
+$\{\delta(\bU)\T\bX\}^2 = 0$ almost surely, and since $\delta(\bU)$ is
+measurable with respect to $\bU$ and $\E\norm{\bX}_2^2 < \infty$,
+\[
+  0 \;=\; \E\bigl[\{\delta(\bU)\T\bX\}^2 \mid \bU\bigr]
+  \;=\; \delta(\bU)\T\,\E(\bX\bX\T\mid\bU)\,\delta(\bU)
+  \qquad \text{almost surely.}
+\]
+The conditional second moment matrix is positive definite almost surely, and a
+positive definite quadratic form vanishes only at the origin, so
+$\delta(\bU) = 0$ almost surely.
+
+\emph{Levels and components are determined within a coefficient.} Because the
+density of $\bU$ is positive Lebesgue almost everywhere, a set is null for the
+law of $\bU$ if and only if it is Lebesgue null, so the identity
+$\lvl{\cv} + \sum_{\md}\gcomp{\cv}{\md}(u_{\md}) =
+\tilde{c}_{\cv} + \sum_{\md}\tilde{g}_{\cv\md}(u_{\md})$ holds Lebesgue almost
+everywhere on $[0,1]^q$. Write $\Delta = \lvl{\cv}-\tilde{c}_{\cv}$ and
+$\delta_{\md} = \gcomp{\cv}{\md}-\tilde{g}_{\cv\md} \in L_2[0,1] \subset
+L_1[0,1]$, so that $\Delta + \sum_{\md}\delta_{\md}(u_{\md}) = 0$ almost
+everywhere. Each summand is integrable on the cube by Tonelli's theorem.
+Integrating in all coordinates and using $\int_0^1\delta_{\md} = 0$, which
+holds because both parametrizations satisfy (2.2), gives $\Delta = 0$; fixing
+$\md$ and integrating in the remaining coordinates gives
+$\delta_{\md}(u_{\md}) = 0$ for almost every $u_{\md}$. \qed
+
+\begin{remark}
+\label{rem:centering}
+If the centering $\int_0^1 \gcomp{\cv}{\md} = 0$ is replaced by
+$\E\{\gcomp{\cv}{\md}(U_{\md})\} = 0$, the same proof applies under the
+two sided density bound of Assumption 3, since then $L_2[0,1]$ and
+$L_2(P_{U_{\md}})$ coincide as sets: the step that uses Fubini's theorem
+yields $\delta_{\md}$ constant almost everywhere, and the constant is its
+mean, which is zero. The two parametrizations are related by
+$\lvl{\cv} \mapsto \lvl{\cv} + \sum_{\md}\E\{\gcomp{\cv}{\md}(U_{\md})\}$, as
+stated in Section 2.1 of the paper. The difference is not cosmetic for the
+estimator: the design of Section 2.3, which omits the constant scaling
+function, estimates the version centered with respect to Lebesgue measure.
+\end{remark}
+
+\subsection*{Proof of Lemma 1}
+
+\emph{The basis.} The periodization of the scaling function is
+$\phi^{\rm per}_{00}(u) = \sum_{\iota}\phi(u+\iota)$, a finite sum at each $u$
+because the support is compact, and it equals the constant function one, since
+the integer translates of an orthonormal scaling function with
+$\int\phi = 1$ form a partition of unity. For a wavelet, exchanging the finite
+sum with the integral,
+$\int_0^1\wav{\lev}{\tsl} = \int_{\R}2^{\lev/2}\psi(2^{\lev}y-\tsl)\,dy =
+2^{-\lev/2}\int_{\R}\psi = 0$ by the vanishing moment of order zero. That
+$\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$ is an orthonormal basis of $L_2[0,1]$
+is the standard construction of the periodized multiresolution analysis
+\citep[Section 9.3]{Daubechies-1992}. Since $\dim\VJ = 2^J$ and the $2^J-1$
+wavelets of level below $J$ are orthogonal to the constant, $\WJ$ is exactly
+the set of elements of $\VJ$ with zero integral.
+
+\emph{Injectivity.} Suppose two parameter vectors give the same regression
+function almost surely. The functions
+$\beta^J_{\cv}(u) = \lvl{\cv}+\sum_{\md}g^J_{\cv\md}(u_{\md})$, with
+$g^J_{\cv\md} = \sum_{\lev\tsl}\coef{\cv}{\md}{\lev}{\tsl}\wav{\lev}{\tsl}$,
+are measurable and bounded, so the first part of Proposition 1 gives
+$\beta^J_{\cv} = \tilde\beta^J_{\cv}$ almost surely; each $g^J_{\cv\md}$ has
+zero integral by the previous paragraph, so the second part gives
+$\lvl{\cv} = \tilde{c}_{\cv}$ and
+$\sum_{\lev\tsl}(\btheta-\tilde\btheta)_{\cv\md,\lev\tsl}\wav{\lev}{\tsl} = 0$
+almost everywhere, whence $\btheta = \tilde\btheta$ by orthonormality. For the
+Gram matrix, $\E\norm{\bZ}_2^2 < \infty$ because $\E\norm{\bX}_2^2 < \infty$
+and each wavelet is bounded, and for $a \ne 0$,
+$a\T\Gram a = \E\{(a\T\bZ)^2\} = \norm{f_a}^2_{L_2(P)} > 0$ by injectivity,
+where $f_a$ is the regression function with parameter $a$.
+
+\emph{Nullity when the scaling column is kept.} With $\phi_{00}\equiv 1$ the
+column $X_{\cv}\phi_{00}(U_{\md})$ coincides with the unpenalized column
+$X_{\cv}$, for each of the $pq$ pairs, so the $pq$ vectors that oppose one to
+the other lie in the kernel and are linearly independent. There are no others:
+a kernel vector defines
+$\sum_{\cv}X_{\cv}\{a_{\cv} + \sum_{\md}(\alpha_{\cv\md} +
+\sum_{\lev\tsl}a_{\cv\md,\lev\tsl}\wav{\lev}{\tsl}(U_{\md}))\} = 0$ almost
+surely; by Proposition 1 applied to the part with zero integral,
+$a_{\cv\md,\lev\tsl} = 0$ and $a_{\cv}+\sum_{\md}\alpha_{\cv\md} = 0$, which
+is the space of dimension $pq$ spanned by those vectors. \qed
+
+\begin{remark}[The interval basis]
+\label{rem:cdv}
+With the basis of \citet*{cohen1993wavelets} the wavelets of level
+$\lev \ge \jzero$ are orthogonal to $V_{\jzero}$, which contains the
+constants, so they still have zero integral and the penalized part of each
+block satisfies (2.2) with no restriction. The $2^{\jzero}$ scaling functions
+do not: the constant is the combination $1 = \sum_{\tsl}\mu_{\tsl}
+\phi^{\rm int}_{\jzero\tsl}$ with
+$\mu_{\tsl} = \int_0^1\phi^{\rm int}_{\jzero\tsl}$, and the subspace with zero
+integral is $\{\mu\T\alpha = 0\}$. Keeping the $2^{\jzero}$ scaling columns of
+each block unrestricted repeats the constant and makes $\Gram$ singular with
+nullity $pq$, as in the last part of Lemma 1; reparametrizing
+$\alpha_{\cv\md} = Q\gamma_{\cv\md}$ with $Q$ an orthonormal basis of
+$\{\mu\T\alpha = 0\}$ restores injectivity, at the price of
+$pq(2^{\jzero}-1)$ unpenalized parameters.
+\end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/02-aproximacao-besov.tex
+\section{Approximation by the wavelet sieve}
+\setcounter{equation}{0}
+
+\subsection*{Proof of Lemma 2}
+
+Fix a pair $(\cv,\md)$ and write $g = \gcomp{\cv}{\md}$ and
+$\theta_{\lev\tsl} = \coefs{\cv}{\md}{\lev}{\tsl}$.
+
+\emph{Tail sum.} By Step 2 below the coefficients are square summable, so
+$g \in L_2[0,1]$ and, the system being complete and $g$ orthogonal to the
+constant, $g = \sum_{\lev\ge0}\sum_{\tsl}\theta_{\lev\tsl}\wav{\lev}{\tsl}$ in
+$L_2$. The orthogonal projection onto $\WJ$ retains the levels below $J$, and
+Parseval's identity gives
+$\norm{g-\PiJ g}^2_{L_2[0,1]} = \sum_{\lev\ge J}
+\norm{\theta_{\lev\cdot}}_2^2$.
+
+\emph{From $\ell_\pi$ to $\ell_2$ inside a level.} In $\R^{2^{\lev}}$ one has
+$\norm{a}_2 \le \norm{a}_{\pi}$ when $\pi \le 2$, and
+$\norm{a}_2 \le (2^{\lev})^{1/2-1/\pi}\norm{a}_{\pi}$ by Hölder's inequality
+when $\pi > 2$. In both cases $\norm{\theta_{\lev\cdot}}_2 \le
+2^{\lev(1/2-1/\pi)_{+}}\norm{\theta_{\lev\cdot}}_{\pi}$, and
+Assumption 5 gives
+\[
+  \norm{\theta_{\lev\cdot}}_2 \;\le\;
+  C_g\,2^{-\lev\{s+1/2-1/\pi-(1/2-1/\pi)_{+}\}}
+  \;=\; C_g\,2^{-\lev\seff},
+\]
+since the exponent equals $s$ when $\pi \ge 2$ and $s-(1/\pi-1/2)$ when
+$\pi < 2$. This is where the loss $(1/\pi-1/2)_{+}$ appears.
+
+\emph{Geometric sum and density.}
+$\sum_{\lev\ge J}C_g^2 2^{-2\lev\seff} = C_g^2 2^{-2J\seff}/(1-2^{-2\seff})$,
+finite because $\seff > 0$, which is the first display of Lemma 2. For the
+second, write $f-f_J = \sum_{\cv,\md}X_{\cv}h_{\cv\md}(U_{\md})$ with
+$h_{\cv\md} = \gcomp{\cv}{\md}-\PiJ\gcomp{\cv}{\md}$, the levels cancelling.
+By the Cauchy-Schwarz inequality over the $pq$ terms and
+$|X_{\cv}| \le B_X$,
+\[
+  \E\{(f-f_J)^2\} \;\le\; pq\sum_{\cv,\md}
+  \E\{X_{\cv}^2h_{\cv\md}^2(U_{\md})\}
+  \;\le\; pq\,B_X^2\sum_{\cv,\md}\E\{h_{\cv\md}^2(U_{\md})\},
+\]
+and $\E\{h^2(U_{\md})\} = \int_0^1 h^2 p_{U_{\md}} \le C_U\norm{h}^2_{L_2[0,1]}$,
+the marginal density being bounded by $C_U$ because integrating the joint
+density over the other $q-1$ coordinates of $[0,1]^{q-1}$ does not increase
+the bound. One factor $pq$ comes from the Cauchy-Schwarz inequality and the
+other from the sum. \qed
+
+The uniform version is used in Section S5 to bound the empirical norm of the
+bias without an appeal to Markov's inequality.
+
+\begin{lemma}[Uniform approximation error]
+\label{lem:sup}
+Under Assumptions 4 and 5 with $s > 1/\pi$, each component has a continuous
+version and, for every $J \ge 0$,
+\[
+  \norm{\gcomp{\cv}{\md}-\PiJ\gcomp{\cv}{\md}}_{\infty}
+  \;\le\; \frac{(L-1)\norm{\psi}_{\infty}C_g}{1-2^{-(s-1/\pi)}}\,
+  2^{-J(s-1/\pi)} ,
+\]
+and therefore
+$\normn{\bb} \le \norm{f-f_J}_{\infty} \le pq B_X(L-1)\norm{\psi}_{\infty}
+C_g\,2^{-J(s-1/\pi)}/\{1-2^{-(s-1/\pi)}\}$ for every sample.
+\end{lemma}
+
+\begin{proof}
+At a point $u$ and a level $\lev$ at most $L-1$ periodized translates are
+nonzero, because $\psi(2^{\lev}u-\tsl)\ne0$ requires
+$2^{\lev}u-\tsl \in (0,L-1)$, so
+$\sum_{\tsl}|\wav{\lev}{\tsl}(u)| \le (L-1)2^{\lev/2}\norm{\psi}_{\infty}$.
+With $\max_{\tsl}|\theta_{\lev\tsl}| \le \norm{\theta_{\lev\cdot}}_{\pi} \le
+C_g2^{-\lev(s+1/2-1/\pi)}$ the level contributes at most
+$(L-1)\norm{\psi}_{\infty}C_g2^{-\lev(s-1/\pi)}$ in the supremum norm. Since
+$s > 1/\pi$ the series converges absolutely and uniformly, so its sum is
+continuous and agrees almost everywhere with $g$; the tail from level $J$ on
+is the geometric sum of the displayed bounds, and the statement for $f-f_J$ is
+the triangle inequality over the $pq$ terms.
+\end{proof}
+
+The next proposition is the one referred to in Section 2.2 of the paper: it
+quantifies what the periodized basis charges for a component that does not
+match at the two ends of the interval.
+
+\begin{proposition}[Cost of periodization]
+\label{prop:periodization}
+Let the basis be as in Assumption 4 and let
+$g \in \Besov{s}{\pi}{r}[0,1]$, the Besov space of the interval and not of the
+circle, with $s > 1/\pi$, $N > s$ and $\int_0^1 g = 0$. Then there is a
+constant $C$ depending on $g$, on $\psi$ and on $(s,\pi)$ such that, for every
+$J$ with $2^J \ge L-1$,
+\[
+  \norm{g-\PiJ g}^2_{L_2[0,1]} \;\le\; C\,2^{-2J\seff}
+  \;+\; 2(L-1)\norm{\psi}_1^2\norm{g}^2_{\infty}\,2^{-J},
+\]
+so that the $L_2$ rate is $2^{-J\min(\seff,1/2)}$. If $g$ is continuous with
+$g(0) \ne g(1)$, the second term is of the exact order $2^{-J}$ and
+$\norm{g-\PiJ g}_{\infty}$ does not converge to zero.
+\end{proposition}
+
+\begin{proof}
+Let $\tilde g$ be the one periodic extension of $g$, so that
+$\theta_{\lev\tsl} = \int_{\R}\tilde g(y)2^{\lev/2}\psi(2^{\lev}y-\tsl)\,dy$.
+At a level with $2^{\lev} \ge L-1$, separate the interior translates, whose
+support lies inside $[0,1]$, from the at most $L-1$ boundary translates that
+cross the identification of $0$ with $1$. For an interior translate,
+$\theta_{\lev\tsl} = \inner{Eg}{\psi_{\lev\tsl}}_{\R}$ for any extension $Eg$
+of $g$ to the line; taking $E$ a bounded extension operator from
+$\Besov{s}{\pi}{r}[0,1]$ to $\Besov{s}{\pi}{r}(\R)$
+\citep[Chapter 3]{Triebel-1983} and using the wavelet characterization of the
+latter, which for the implication from the function to the sequence requires
+only $N > s$ vanishing moments, gives
+$\norm{(\theta_{\lev\tsl})_{\rm int}}_{\pi} \le C_12^{-\lev(s+1/2-1/\pi)}$,
+whose tail sum is bounded as in Lemma 2. For a boundary translate,
+$s > 1/\pi$ makes $g$ bounded and
+$|\theta_{\lev\tsl}| \le \norm{g}_{\infty}\norm{\psi_{\lev\tsl}}_1 =
+\norm{g}_{\infty}\norm{\psi}_12^{-\lev/2}$, and there are at most $L-1$ of
+them per level, so their tail sum is at most
+$2(L-1)\norm{\psi}_1^2\norm{g}_{\infty}^22^{-J}$. For the exact order, if $g$
+is continuous with $g(0) \ne g(1)$ then on the support of a boundary translate
+$\tilde g$ equals $g(1)+o(1)$ to the left of the identification point and
+$g(0)+o(1)$ to the right, so
+$\theta_{\lev\tsl} = 2^{-\lev/2}\{g(0)-g(1)\}\int_{y>a_{\tsl}}\psi(y)\,dy +
+o(2^{-\lev/2})$; since $\int\psi = 0$ and $\psi$ vanishes on no subinterval of
+its support, that partial integral is nonzero for some translate, and the
+boundary contribution of the level is of order $2^{-\lev}$. The failure of
+uniform convergence is that of any wavelet series at a jump.
+\end{proof}
+
+Under Assumption 5 nothing changes, since that assumption is already a
+periodic one; what Proposition S3.1 gives is the price of its failure. With
+the basis of \citet*{cohen1993wavelets} the space $\VJ$ reproduces polynomials
+of degree below $N$ and its basis characterizes $\Besov{s}{\pi}{r}[0,1]$
+without periodicity \citep[Section 3.9]{Cohen-2003}, so Lemma 2 holds with
+that space and the same proof.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/03-desenho-produtos.tex
+\section{The Gram matrix of the product design}
+\setcounter{equation}{0}
+
+Recall $\bPsi(u) \in \R^{K}$, $K = 1+q\NJ$, the vector that collects the
+constant and the wavelets of the $q$ modulators, and the identity
+$\bZ = \Pi\{\bX \otimes \bPsi(\bU)\}$, where $\Pi$ is the fixed permutation
+that moves the $p$ entries $X_{\cv}\cdot 1$ to the front. Since $\Pi$ is
+orthogonal, every statement about eigenvalues is invariant to the column
+order. Assumption 4 also gives a constant $C_\psi$, depending only on the
+family, with
+\begin{equation}
+  \label{eq:pointwise}
+  \sup_{u\in[0,1]}\sum_{\lev<J}\sum_{\tsl}\wav{\lev}{\tsl}(u)^2
+  \;\le\; C_\psi\,2^{J} \qquad \text{for every } J \ge 1 :
+\end{equation}
+at each level at most $L$ periodized wavelets are nonzero at a given $u$ and
+$\norm{\wav{\lev}{\tsl}}_{\infty} = 2^{\lev/2}\norm{\psi}_{\infty}$, so the
+left side is at most
+$L\norm{\psi}^2_{\infty}\sum_{\lev<J}2^{\lev} \le L\norm{\psi}^2_{\infty}2^J$.
+
+\subsection*{Proof of Proposition 2}
+
+\emph{Part (i), the modulators.} For $a \in \R^{K}$ write
+$h_a(u) = a\T\bPsi(u) = a_0 + \sum_{\md}h_{a,\md}(u_{\md})$ with
+$h_{a,\md} = \sum_{\lev\tsl}a_{\md,\lev\tsl}\wav{\lev}{\tsl}$. The functions
+$1$ and $\wav{\lev}{\tsl}(u_{\md})$, $\md = 1,\dots,q$, are orthonormal in
+$L_2([0,1]^q,du)$: within one coordinate this is the orthonormality of the
+periodized system, and across coordinates
+$\int\wav{\lev}{\tsl}(u_{\md})\wav{\lev'}{\tsl'}(u_{\md'})\,du =
+\int_0^1\wav{\lev}{\tsl}\int_0^1\wav{\lev'}{\tsl'} = 0$ for
+$\md \ne \md'$, because every wavelet integrates to zero. Hence
+$\int_{[0,1]^q}h_a^2 = \norm{a}_2^2$ and, by Assumption 3,
+$c_U\norm{a}_2^2 \le \E\{h_a(\bU)^2\} \le C_U\norm{a}_2^2$, which is the claim
+since $a\T\Gram_{\bPsi}a = \E\{h_a(\bU)^2\}$.
+
+\emph{Part (i), the full matrix.} Let $\delta \in \R^{pK}$ and reshape it as
+$\Delta \in \R^{p\times K}$, row $\cv$ holding the coefficients attached to
+$X_{\cv}$, so that $\{\bX\otimes\bPsi(\bU)\}\T\delta = \bX\T\Delta\bPsi(\bU)$.
+By the tower property,
+\[
+  \delta\T\Pi\T\Gram\Pi\delta
+  = \E\bigl[\{\bX\T\Delta\bPsi(\bU)\}^2\bigr]
+  = \E\bigl[\bPsi(\bU)\T\Delta\T\,\E(\bX\bX\T\mid\bU)\,\Delta\bPsi(\bU)\bigr].
+\]
+Assumption 2 bounds the inner quadratic form between
+$\kappa_1\norm{\Delta\bPsi(\bU)}_2^2$ and $\kappa_2\norm{\Delta\bPsi(\bU)}_2^2$
+almost surely, and
+$\E\norm{\Delta\bPsi(\bU)}_2^2 = \delta\T(I_p\otimes\Gram_{\bPsi})\delta$ lies
+between $\lmin(\Gram_{\bPsi})\norm{\delta}_2^2$ and
+$\lmaxx(\Gram_{\bPsi})\norm{\delta}_2^2$. Combining the two and using the
+first part gives $\gamma = \kappa_1c_U \le \lmin(\Gram)$ and
+$\lmaxx(\Gram) \le \kappa_2C_U$. If $\bX$ and $\bU$ are independent, the
+conditional second moment matrix is constant, the same computation gives
+$\delta\T\Pi\T\Gram\Pi\delta = \delta\T\{\E(\bX\bX\T)\otimes\Gram_{\bPsi}\}
+\delta$ for every $\delta$, and two symmetric matrices with the same quadratic
+form are equal; the eigenvalues of a Kronecker product of symmetric matrices
+are the products of the eigenvalues, and
+$\lmin\{\E(\bX\bX\T)\} \ge \kappa_1$ by Jensen's inequality, since $\lmin$ is
+concave and $\E(\bX\bX\T) = \E\{\E(\bX\bX\T\mid\bU)\}$.
+
+\emph{Part (ii), the empirical matrix.} First the range:
+$\norm{\bZ_i}_2^2 = \norm{\bX_i}_2^2\norm{\bPsi(\bU_i)}_2^2 \le
+pB_X^2(1+qC_\psi2^J) = R_J$ by \eqref{eq:pointwise} applied to each of the $q$
+coordinates. Set $A_i = (\bZ_i\bZ_i\T-\Gram)/n$, independent, centered and
+symmetric, with $\Gramhat - \Gram = \sum_i A_i$. Then
+$\opnorm{\bZ_i\bZ_i\T} = \norm{\bZ_i}_2^2 \le R_J$ and
+$\opnorm{\Gram} \le R_J$, so $\opnorm{A_i} \le 2R_J/n$; and
+$\E\{(\bZ\bZ\T-\Gram)^2\} = \E(\norm{\bZ}_2^2\bZ\bZ\T) - \Gram^2 \preceq
+R_J\Gram$, so that
+$\opnorm{\sum_i\E A_i^2} \le R_J\lmaxx(\Gram)/n \le R_J\kappa_2C_U/n$. The
+matrix Bernstein inequality \citep[Theorem 1.4]{tropp2012user} applied to
+$\pm\sum_iA_i$ gives, for every $t>0$,
+\[
+  \Prob\bigl(\opnorm{\Gramhat-\Gram} \ge t\bigr)
+  \;\le\; 2D\exp\Bigl\{-\frac{nt^2}{2R_J(\kappa_2C_U+2t/3)}\Bigr\},
+\]
+and $t = \gamma/2$ with Weyl's inequality gives
+$\lmin(\Gramhat) \ge \lmin(\Gram)-\gamma/2 \ge \gamma/2$ on the complementary
+event, which is the display of part (ii). The exponent is $-cn/R_J$ with $c$
+fixed and $R_J \asymp pq2^J$, while $\log(2D) \asymp \log(pq2^J)$, so the
+bound tends to zero exactly when $n/(pq2^J) - \log(pq2^J) \to \infty$, which
+is implied by $pq2^J\log(pq2^J)/n \to 0$. On that event
+$\compat^2(S;\Gramhat) \ge \gamma/2$ for every support, by
+\eqref{eq:compat-lmin}. \qed
+
+\begin{remark}[What the two assumptions exclude]
+\label{rem:excl}
+Assumption 2 fails exactly when a nontrivial linear combination of the linear
+covariates is almost surely a function of the modulators on a set of positive
+probability; in the canonical case $X_1\equiv1$ and $X_2 = h(U_1)$ the
+conditional second moment matrix has rank one and the population Gram matrix
+degenerates as $J$ grows, because $h(u_1)\wav{\lev}{\tsl}(u_1)$ is approached
+by the span of the basis. In Assumption 3 it is the joint density that is
+bounded below: if $U_2 = U_1$ almost surely, both marginals are uniform but
+$\wav{\lev}{\tsl}(U_1)-\wav{\lev}{\tsl}(U_2) \equiv 0$ and
+$\Gram_{\bPsi}$ is singular. Independence between $\bX$ and $\bU$ buys the
+exact factorization of part (i) and nothing else.
+\end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/04-oraculo.tex
+\section{The oracle inequality}
+\setcounter{equation}{0}
+
+Four lemmas precede the proof of Theorem 2.
+
+\begin{lemma}[Profiling and the Schur complement]
+\label{lem:profile}
+Suppose $\Amat$ has rank $p$. Then $\thetahat$ minimizes
+$\normn{\MA\bY-\Btil\btheta}^2+2\pen\norm{\btheta}_1$ and
+$\chat = (\Amat\T\Amat)^{-1}\Amat\T(\bY-\Bmat\thetahat)$; with
+$v = \thetahat-\thetastar$,
+\begin{equation}
+  \label{eq:decomp}
+  \widehat{f}-f_J \;=\; \Btil v + \PA(\bb+\bveps);
+\end{equation}
+$\GBA$ is the Schur complement of the block $\Amat$ in $\Gramhat$ and
+\begin{equation}
+  \label{eq:schur}
+  \gtil \;=\; \lmin(\GBA) \;\ge\; \lmin(\Gramhat);
+\end{equation}
+and if $\lmin(\Gramhat)>0$ the minimizer in (2.5) is unique.
+\end{lemma}
+
+\begin{proof}
+The objective is convex and, for fixed $\btheta$, quadratic and coercive in
+$\bc$, with minimum at the stated value and minimized value
+$\normn{\MA(\bY-\Bmat\btheta)}^2 = \normn{\MA\bY-\Btil\btheta}^2$, since $\MA$
+is a symmetric idempotent; minimizing first in $\bc$ and then in $\btheta$
+gives the same set of minimizers as minimizing jointly. For
+\eqref{eq:decomp}, $\Amat\chat = \PA(\bY-\Bmat\thetahat)$ and
+$\Amat\bc = \PA\Amat\bc$, and $\bY = \Amat\bc+\Bmat\thetastar+\bb+\bveps$, so
+$\Amat(\chat-\bc) = \PA(\bb+\bveps)-\PA\Bmat v$ and
+$\widehat{f}-f_J = \MA\Bmat v + \PA(\bb+\bveps)$. For \eqref{eq:schur}, the
+variational characterization of the Schur complement gives, for every
+$v \in \R^d$,
+\[
+  v\T\GBA v \;=\; \min_{u\in\R^p}(u\T,v\T)\,\Gramhat\,(u\T,v\T)\T
+  \;\ge\; \min_{u}\lmin(\Gramhat)(\norm{u}_2^2+\norm{v}_2^2)
+  \;=\; \lmin(\Gramhat)\norm{v}_2^2 .
+\]
+Finally $\lmin(\Gramhat)>0$ makes the quadratic term strictly convex, and
+adding a convex function preserves strict convexity.
+\end{proof}
+
+\begin{lemma}[Calibration of the penalty]
+\label{lem:calib}
+Under Assumption 1, for every $\alpha \in (0,1)$,
+$\Prob(\norm{\Btil\T\bveps/n}_{\infty} > \pen_0) \le \alpha$ with
+$\pen_0 = \sigma\smax\{2\log(2d/\alpha)/n\}^{1/2}$.
+\end{lemma}
+
+\begin{proof}
+Condition on the covariates, so that $\Btil$ and $\smax$ are fixed and the
+errors are independent and sub-Gaussian with parameter $\sigma$. For a column
+$a$, $(\Btil\T\bveps)_a/n$ is sub-Gaussian with parameter
+$\sigma\lVert\Btil^{(a)}\rVert_2/n$, and, $\MA$ being an orthogonal
+projection, $\lVert\Btil^{(a)}\rVert_2 \le \lVert\Bmat^{(a)}\rVert_2 =
+\sqrt{n}\,(\Gramhat)_{aa}^{1/2} \le \sqrt{n}\,\smax$. With
+$t = \pen_0$ the sub-Gaussian tail bound is at most $\alpha/d$ per column; a
+union bound over the $d$ columns and the tower property finish the proof.
+\end{proof}
+
+\begin{lemma}[Empirical column norms]
+\label{lem:columns}
+Under Assumptions 2 to 4, every penalized column has
+$\E\{(\Gramhat)_{aa}\} \le B_X^2C_U$ and, for every $t>0$, with
+$R'_J = B_X^2\norm{\psi}^2_{\infty}2^{J-1}$,
+\[
+  \Prob(\smax^2 > B_X^2C_U+t) \;\le\;
+  d\exp\Bigl\{-\frac{nt^2}{2(R'_JB_X^2C_U+R'_Jt/3)}\Bigr\} .
+\]
+In particular $\Prob(\smax^2 \le 2B_X^2C_U) \to 1$ whenever
+$2^J\log d/n \to 0$.
+\end{lemma}
+
+\begin{proof}
+For the column $a = (\cv\md,\lev\tsl)$ the summand is
+$W_i = X_{i\cv}^2\wav{\lev}{\tsl}(U_{i\md})^2 \ge 0$, with
+$\E(W) \le B_X^2\int_0^1\wav{\lev}{\tsl}^2p_{U_{\md}} \le B_X^2C_U$ by
+orthonormality and the bounded marginal density, and
+$0 \le W_i \le B_X^2\norm{\psi}_{\infty}^22^{J-1} = R'_J$ because
+$\lev \le J-1$. Then $\Var(W) \le \E(W^2) \le R'_J\E(W) \le R'_JB_X^2C_U$, and
+the one sided Bernstein inequality with a union bound over the $d$ columns
+gives the display. With $t = B_X^2C_U$ the exponent is
+$-3nB_X^2C_U/(8R'_J)$ and $R'_J \asymp 2^J$.
+\end{proof}
+
+\begin{lemma}[The $\ell_1$ norm of the sieve oracle]
+\label{lem:l1}
+Under Assumption 5, for every pair $(\cv,\md)$ and every level,
+$\sum_{\tsl}|\coefs{\cv}{\md}{\lev}{\tsl}| \le
+2^{\lev(1-1/\pi)}\norm{\theta^{*}_{\cv\md,\lev\cdot}}_{\pi} \le
+C_g2^{\lev(1/2-s)}$, with no dependence on $\pi$, and therefore
+$\norm{\thetastar}_1 \le pqC_g\sum_{\lev<J}2^{\lev(1/2-s)}$, which is
+$O(1)$ if $s>1/2$, of order $J$ if $s = 1/2$ and of order
+$2^{J(1/2-s)}$ if $s<1/2$.
+\end{lemma}
+
+\begin{proof}
+Hölder's inequality in $\R^{2^{\lev}}$ gives
+$\norm{a}_1 \le (2^{\lev})^{1-1/\pi}\norm{a}_{\pi}$, and Assumption 5 bounds
+the $\ell_\pi$ norm of the level by $C_g2^{-\lev(s+1/2-1/\pi)}$; the resulting
+exponent is $\lev(1-1/\pi)-\lev(s+1/2-1/\pi) = \lev(1/2-s)$, in which $\pi$
+has disappeared. Summing over the levels below $J$ and over the $pq$ blocks
+gives the three regimes of the geometric sum.
+\end{proof}
+
+\subsection*{Proof of Theorem 2}
+
+\emph{Step 1, the basic inequality.} By Lemma S5.1, $\thetahat$ minimizes the
+residualized objective; comparing its value at $\thetahat$ with its value at
+$\thetastar$, and using $\MA\Amat = 0$, so that
+$\MA\bY = \Btil\thetastar + \MA(\bb+\bveps)$, gives, with
+$r = \MA(\bb+\bveps)$,
+\begin{equation}
+  \label{eq:basic}
+  \normn{\Btil v}^2 + 2\pen\norm{\thetahat}_1
+  \;\le\; 2\inner{r}{\Btil v}_n + 2\pen\norm{\thetastar}_1 .
+\end{equation}
+
+\emph{Step 2, the two noises.} Since $\MA\Btil = \Btil$ and $\MA$ is
+symmetric, $\inner{r}{\Btil v}_n = \inner{\bb+\bveps}{\Btil v}_n$. The
+stochastic part is handled by duality: on $\mathcal{T}$,
+$2|\inner{\bveps}{\Btil v}_n| \le
+2\norm{\Btil\T\bveps/n}_{\infty}\norm{v}_1 \le \pen\norm{v}_1$. The
+deterministic part is handled by the Cauchy-Schwarz and Young inequalities,
+and not by duality, because $\bb$ is not small coordinatewise:
+$2|\inner{\bb}{\Btil v}_n| \le 2\normn{\bb}\normn{\Btil v} \le
+\normn{\Btil v}^2/2 + 2\normn{\bb}^2$. Substituting both in
+\eqref{eq:basic},
+\begin{equation}
+  \label{eq:basic2}
+  \tfrac12\normn{\Btil v}^2 + 2\pen\norm{\thetahat}_1
+  \;\le\; \pen\norm{v}_1 + 2\pen\norm{\thetastar}_1 + 2\normn{\bb}^2 .
+\end{equation}
+
+\emph{Step 3, the slow rate.} Bounding
+$\norm{v}_1 \le \norm{\thetahat}_1+\norm{\thetastar}_1$ in
+\eqref{eq:basic2} gives
+$\tfrac12\normn{\Btil v}^2 + \pen\norm{\thetahat}_1 \le
+3\pen\norm{\thetastar}_1 + 2\normn{\bb}^2$, which is part (i). No property of
+$\Gramhat$ was used.
+
+\emph{Step 4, the cone.} Since $\thetastar$ vanishes off $\Szero$,
+$\norm{\thetahat}_1 \ge \norm{\thetastar}_1 - \norm{v_{\Szero}}_1 +
+\norm{v_{\Szero^c}}_1$ and
+$\norm{v}_1 = \norm{v_{\Szero}}_1+\norm{v_{\Szero^c}}_1$; substituting in
+\eqref{eq:basic2} and cancelling $2\pen\norm{\thetastar}_1$,
+\begin{equation}
+  \label{eq:cone}
+  \tfrac12\normn{\Btil v}^2 + \pen\norm{v_{\Szero^c}}_1
+  \;\le\; 3\pen\norm{v_{\Szero}}_1 + 2\normn{\bb}^2 .
+\end{equation}
+
+\emph{Step 5, two cases.} If $2\normn{\bb}^2 \le \pen\norm{v_{\Szero}}_1$,
+then \eqref{eq:cone} gives
+$\tfrac12\normn{\Btil v}^2 + \pen\norm{v_{\Szero^c}}_1 \le
+4\pen\norm{v_{\Szero}}_1$; by the Cauchy-Schwarz inequality and
+\eqref{eq:schur}, $\norm{v_{\Szero}}_1 \le \sqrt{s_0}\norm{v}_2 \le
+\sqrt{s_0}\normn{\Btil v}/\sqrt{\gtil}$, so
+$\normn{\Btil v} \le 8\pen\sqrt{s_0/\gtil}$ and
+$\norm{v}_2^2 \le \normn{\Btil v}^2/\gtil \le 64\pen^2s_0/\gtil^2$; the same
+display gives $\norm{v_{\Szero^c}}_1 \le 4\norm{v_{\Szero}}_1$ and hence
+$\norm{v}_1 \le 5\norm{v_{\Szero}}_1 \le 40\pen s_0/\gtil$. If instead
+$2\normn{\bb}^2 > \pen\norm{v_{\Szero}}_1$, then \eqref{eq:cone} gives
+$\tfrac12\normn{\Btil v}^2 < 8\normn{\bb}^2$, that is
+$\normn{\Btil v}^2 < 16\normn{\bb}^2$, together with
+$\pen\norm{v}_1 < 10\normn{\bb}^2$ and
+$\norm{v}_2^2 < 16\normn{\bb}^2/\gtil$. Each quantity is bounded by the
+maximum of the two cases, hence by their sum, which is part (ii).
+
+\emph{Step 6, prediction.} By \eqref{eq:decomp},
+$\widehat{f}-f = \Btil v + \PA(\bb+\bveps) - \bb$, and $\PA$ being a
+projection, $\normn{\PA\bb} \le \normn{\bb}$, which gives the triangle
+inequality of part (iii). Conditionally on the covariates the errors are
+independent, centered and of variance at most $\sigma^2$, so
+\[
+  \E(\normn{\PA\bveps}^2\mid\bX,\bU)
+  = \frac1n\tr\{\PA\,\mathrm{Cov}(\bveps\mid\bX,\bU)\}
+  \le \frac{\sigma^2}{n}\tr(\PA) \le \frac{\sigma^2p}{n},
+\]
+since the diagonal entries of $\PA$ are nonnegative and its trace is the rank
+of $\Amat$. \qed
+
+\begin{remark}[Why there is no cone condition]
+\label{rem:nocone}
+The usual treatment of unpenalized coordinates \citep[Section
+6.9]{buhlmann2011statistics} places them inside the support and requires
+compatibility on the cone $\norm{\delta_{S^c}}_1 \le 3\norm{\delta_S}_1$.
+Profiling removes them from the problem, and \eqref{eq:schur} transfers the
+full smallest eigenvalue of $\Gramhat$ to the residualized block, so that
+Proposition 2(ii) is used as it stands and the constant does not depend on
+$\Szero$. If only the restricted version of the design condition were
+available, the cone would return, and with the constant $4$ rather than $3$,
+since Step 5 produces $\norm{v_{\Szero^c}}_1 \le 4\norm{v_{\Szero}}_1$: the
+bias consumes part of the slack.
+\end{remark}
+
+\begin{corollary}[The two rates with the design condition instantiated]
+\label{cor:instant}
+Add Assumptions 2 to 5 and suppose $2^J\log d/n \to 0$, which is implied by
+the requirement of Proposition 2(ii). Take
+$\pen = 2\sigma B_X\sqrt{2C_U}\{2\log(2d/\alpha)/n\}^{1/2}$. Then, with
+probability at least $1-\alpha-\alpha'-\alpha''$ up to terms that tend to
+zero,
+\[
+  \normn{\widehat{f}-f}^2 \;\lesssim\;
+  \frac{\sigma^2B_X^2C_U}{\kappa_1c_U}\,\frac{s_0\log(pq\NJ)}{n}
+  \;+\; \frac{\mathcal{B}^2_J}{\alpha'} \;+\; \frac{\sigma^2p}{n\alpha''},
+\]
+and, with no condition on the design, the same bound with
+$\pen\norm{\thetastar}_1$ of Lemma S5.4 in place of the first term.
+\end{corollary}
+
+\begin{proof}
+Intersect four events: $\mathcal{T}$, of probability at least $1-\alpha$, by
+Lemma S5.2; $\{\smax^2 \le 2B_X^2C_U\}$, by Lemma S5.3, which makes the stated
+$\pen$ admissible, that is $\pen \ge 2\pen_0$;
+$\{\lmin(\Gramhat)\ge\gamma/2\}$, by Proposition 2(ii), which with
+\eqref{eq:schur} gives $\gtil \ge \gamma/2$; and
+$\{\normn{\bb}^2 \le \mathcal{B}_J^2/\alpha'\}$, which is Markov's inequality
+applied to $\E\normn{\bb}^2 = \norm{f-f_J}^2_{L_2(P)} \le \mathcal{B}_J^2$,
+the identity holding because the observations are identically distributed.
+Substituting in parts (ii) and (iii) of Theorem 2 gives the statement, and
+part (i) with Lemma S5.4 gives the unconditional version.
+\end{proof}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/05-taxas.tex
+\section{Rates}
+\setcounter{equation}{0}
+
+Throughout this section $p$, $q$, $\sigma$, $B_X$, $c_U$, $C_U$, $\kappa_1$,
+$\kappa_2$, $C_g$, $s$, $\pi$, $r$ and $\alpha$ are fixed as $n$ grows,
+$J = J_n \to \infty$, $d_n = pq(2^{J_n}-1)$,
+$L_n = \log(2d_n/\alpha) \asymp J_n$, and $\penn$ is as in (3.1). Since the
+constants of Theorem 2 depend on the confidence levels only through
+$1/\alpha'$ and $1/\alpha''$, taking $\alpha' = \alpha'' = \epsilon/3$ gives,
+for each $\epsilon>0$, a constant $M_\epsilon$ with
+$\Prob(\normn{\widehat{f}-f}^2 > M_\epsilon r_n) < \epsilon$, which is the
+meaning of the statements in $O_p$ below. We also write
+$\Lambda = \kappa_2C_U+\gamma/2$.
+
+The first lemma is Theorem 2 read at an arbitrary comparator. It consumes no
+new step: the proof of that theorem uses the oracle only through the
+decomposition of $\bY$ and through the size of its support.
+
+\begin{lemma}[Theorem 2 with an arbitrary comparator]
+\label{lem:comparator}
+Under Assumption 1, with $\Amat$ of rank $p$ and $\pen \ge 2\pen_0$, on the
+event $\mathcal{T}$ the following hold simultaneously for every
+$\bar\bbeta = (\bar\bc,\thbar)$, with $\bbar = f - \bZ\bar\bbeta$,
+$\bar M = |\supp(\thbar)|$ and $\bar v = \thetahat-\thbar$:
+$\tfrac12\normn{\Btil\bar v}^2 + \pen\norm{\thetahat}_1 \le
+3\pen\norm{\thbar}_1 + 2\normn{\bbar}^2$; if $\gtil>0$,
+$\normn{\Btil\bar v}^2 \le 64\pen^2\bar M/\gtil + 16\normn{\bbar}^2$ and
+$\norm{\bar v}_2^2 \le 64\pen^2\bar M/\gtil^2 +
+16\normn{\bbar}^2/\gtil$; and
+\begin{equation}
+  \label{eq:oracle-min}
+  \normn{\widehat{f}-f}^2 \;\le\;
+  3\min_{\bar\bbeta}\Bigl\{\frac{64\pen^2\bar M}{\gtil}
+  + 20\normn{\bbar}^2\Bigr\} + 3\normn{\PA\bveps}^2 .
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Follow the proof of Theorem 2 with
+$(\bar\bc,\thbar,\bbar,\supp(\thbar),\bar M,\bar v)$ in place of
+$(\bc,\thetastar,\bb,\Szero,s_0,v)$. Step 1 uses only
+$\bY = \Amat\bar\bc+\Bmat\thbar+\bbar+\bveps$, which is the definition of
+$\bbar$, and $\MA\Amat = 0$. Step 2 uses $\mathcal{T}$, which does not depend
+on the comparator, and $\normn{\MA\bbar} \le \normn{\bbar}$. Steps 3 to 5 are
+algebra with $\supp(\thbar)$ in place of $\Szero$, using
+$\thbar_{\supp(\thbar)^c} = 0$, the Cauchy-Schwarz inequality and
+\eqref{eq:schur}. Step 6 gives
+$\widehat{f}-\bZ\bar\bbeta = \Btil\bar v + \PA(\bbar+\bveps)$ and hence
+$\widehat{f}-f = \Btil\bar v+\PA(\bbar+\bveps)-\bbar$. Since $\mathcal{T}$,
+$\gtil$ and the condition on $\pen$ do not involve $\bar\bbeta$, the
+inequalities hold simultaneously on the same event and the minimum may be
+taken; \eqref{eq:oracle-min} follows from
+$(x+y+z)^2 \le 3(x^2+y^2+z^2)$.
+\end{proof}
+
+\subsection*{Proof of Lemma 3}
+
+\emph{The envelope.} Fix $\epsilon>0$ and count
+$N(\epsilon) = \#\{a : |\theta^{*}_a| > \epsilon\}$. Inside a block and a
+level, Markov's inequality in the $\ell_\pi$ norm gives
+$\#\{\tsl : |\coefs{\cv}{\md}{\lev}{\tsl}|>\epsilon\} \le
+\epsilon^{-\pi}\norm{\theta^{*}_{\cv\md,\lev\cdot}}^{\pi}_{\pi}$, and
+Assumption 5 gives
+$\norm{\theta^{*}_{\cv\md,\lev\cdot}}^{\pi}_{\pi} \le
+C_g^{\pi}2^{-\lev\pi(s+1/2-1/\pi)} = C_g^{\pi}2^{\lev(1-a)}$ with
+$a = \pi(s+1/2)>1$. Since a level has $2^{\lev}$ coordinates,
+\[
+  N_{\cv\md}(\epsilon) \;\le\; \sum_{\lev\ge0}
+  \min\{2^{\lev},\, C_g^{\pi}\epsilon^{-\pi}2^{\lev(1-a)}\} .
+\]
+The two arguments agree at $2^{\lev_\epsilon a} = (C_g/\epsilon)^{\pi}$, that
+is at $2^{\lev_\epsilon} = (C_g/\epsilon)^{\tau}$, since
+$\pi/a = (s+1/2)^{-1} = \tau$. Below that level the minimum is $2^{\lev}$ and
+the sum is at most $2^{\lev_\epsilon}$; above it the minimum is the second
+term, which decreases geometrically with ratio $2^{1-a}<1$, and the sum is
+$2^{\lev_\epsilon}/(1-2^{1-a})$. Adding the two parts and the $pq$ blocks
+gives $N(\epsilon) \le pqA_{s,\pi}(C_g/\epsilon)^{\tau}$; truncating at
+$\lev<J$ only decreases the count, so the bound holds for every $J$. Finally,
+$\epsilon < \theta^{*}_{(k)}$ implies $N(\epsilon) \ge k$, hence
+$\epsilon \le C_g(pqA_{s,\pi}/k)^{1/\tau}$, and letting $\epsilon$ increase to
+$\theta^{*}_{(k)}$ gives the envelope; and $\tau = (s+1/2)^{-1} < 2$ for every
+$s>0$.
+
+\emph{The tail.} With $2/\tau>1$,
+$\sum_{k>M}\theta^2_{(k)} \le C_\tau^2\sum_{k>M}k^{-2/\tau} \le
+C_\tau^2\int_M^{\infty}x^{-2/\tau}dx = C_\tau^2M^{1-2/\tau}\tau/(2-\tau)$.
+\qed
+
+We also record that, on the event of Proposition 2(ii) with $t = \gamma/2$,
+\begin{equation}
+  \label{eq:lmax}
+  \normn{\Bmat\delta}^2 \le \lmaxx(\Gramhat)\norm{\delta}_2^2
+  \quad\text{and}\quad \lmaxx(\Gramhat) \le \Lambda,
+\end{equation}
+the first because $\Bmat\T\Bmat/n$ is a principal submatrix of $\Gramhat$ and
+the second by Weyl's inequality and Proposition 2(i).
+
+\subsection*{Proof of Proposition 3}
+
+By parts (i) and (iii) of Theorem 2, on $\mathcal{T}$,
+$\normn{\Btil v}^2 \le 6\pen\norm{\thetastar}_1+4\normn{\bb}^2$ and
+$\normn{\widehat{f}-f}^2 \le 3(\normn{\Btil v}^2+4\normn{\bb}^2+
+\normn{\PA\bveps}^2)$, and no property of $\Gramhat$ enters. Lemma S5.3 makes
+$\penn$ admissible with probability tending to one, since
+$2^{J_n}\log d_n/n \to 0$ in every regime considered; Markov's inequality
+applied to $\E\normn{\bb}^2 \le \mathcal{B}^2_{J_n}$, from Lemma 2, and to
+$\E(\normn{\PA\bveps}^2\mid\bX,\bU) \le \sigma^2p/n$ gives the general
+statement. If $s>1/2$, Lemma S5.4 gives $\norm{\thetastar}_1 = O(1)$ and
+$\penn\norm{\thetastar}_1 \asymp (J_n/n)^{1/2}$, and it suffices that the bias
+not dominate, that is $2^{-2J_n\seff} \le (J_n/n)^{1/2}$, which holds for
+$J_n \ge \log_2(n/J_n)/(4\seff)$. If $s<1/2$, then
+$\norm{\thetastar}_1 \asymp 2^{J_n(1/2-s)}$, the two terms are
+$(J_n/n)^{1/2}2^{J_n(1/2-s)}$ and $2^{-2J_n\seff}$, and equating them gives
+$2^{J_n} \asymp (n/J_n)^{1/(1-2s+4\seff)}$ with common value
+$(J_n/n)^{2\seff/(1-2s+4\seff)}$; when $\seff = s$ the denominator is
+$1+2s$. \qed
+
+\subsection*{Proof of Theorem 3}
+
+By the definition of $J_n$,
+$(n/\log n)^{1/(2\seff+1)} \le 2^{J_n} < 2(n/\log n)^{1/(2\seff+1)}$ and
+$J_n \asymp \log n$, so
+\[
+  \frac{pq2^{J_n}\log(pq2^{J_n})}{n}
+  \;\asymp\; \frac{(n/\log n)^{1/(2\seff+1)}\log n}{n}
+  \;=\; \Bigl(\frac{\log n}{n}\Bigr)^{2\seff/(2\seff+1)}
+  \;\longrightarrow\; 0,
+\]
+which is the requirement of Proposition 2(ii); \eqref{eq:schur} then gives
+$\gtil \ge \gamma/2$ with probability tending to one. On that event
+Corollary S5.1 with $s_0 \le d_n$ gives
+\[
+  \normn{\widehat{f}-f}^2 \;\lesssim\;
+  \frac{\sigma^2B_X^2C_U}{\kappa_1c_U}\frac{d_nL_n}{n}
+  + \frac{\mathcal{B}^2_{J_n}}{\alpha'} + \frac{\sigma^2p}{n\alpha''} .
+\]
+With $d_n \asymp pq2^{J_n}$ and $L_n \asymp \log n$ the first term is the
+display above; the second is
+$\mathcal{B}^2_{J_n} \asymp 2^{-2J_n\seff} \le
+(\log n/n)^{2\seff/(2\seff+1)}$ by the lower bound on $2^{J_n}$; and the third
+is $O(1/n)$, of strictly smaller order because $2\seff/(2\seff+1)<1$. \qed
+
+\subsection*{Proof of Corollary 1}
+
+Inside a block the wavelets of level below $J$ are orthonormal in $L_2[0,1]$,
+so
+$\lVert\widehat{g}_{\cv\md}-\PiJ\gcomp{\cv}{\md}\rVert^2_{L_2[0,1]} =
+\sum_{\lev\tsl}v^2_{\cv\md,\lev\tsl}$, and summing over the $pq$ blocks gives
+$\norm{v}_2^2$; adding the bias of Lemma 2 in each block,
+\[
+  \sum_{\cv,\md}\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \rVert^2_{L_2[0,1]} \;\le\; 2\norm{v}_2^2
+  + \frac{2pqC_g^2}{1-2^{-2\seff}}2^{-2J\seff} .
+\]
+Theorem 2(ii) bounds $\norm{v}_2^2$ by
+$64\pen^2s_0/\gtil^2+16\normn{\bb}^2/\gtil$, and on the event of Theorem 3 the
+quantity $\gtil$ is bounded below by the constant $\gamma/2$, so the two terms
+are of the same order as those of Theorem 3, the only difference being a
+constant with $\gamma^{-2}$ in place of $\gamma^{-1}$. This is where the
+design condition is used a second time. For the levels, Lemma S5.1 gives
+$\Amat(\chat-\bc) = \PA(\bb+\bveps)-\PA\Bmat v$, so that
+$\normn{\Amat(\chat-\bc)} \le \normn{\bb}+\normn{\PA\bveps}+
+\lmaxx(\Gramhat)^{1/2}\norm{v}_2$, while $\Amat\T\Amat/n$ is a principal
+submatrix of $\Gramhat$, whence
+$\norm{\chat-\bc}_2^2 \le \normn{\Amat(\chat-\bc)}^2/(\gamma/2)$. Finally the
+components of a functional coefficient depend on distinct coordinates of $u$
+and the basis is orthonormal, so
+$\lVert\widehat{\fcoef{\cv}}-\fcoef{\cv}\rVert_{L_2([0,1]^q)} \le
+|\widehat{c}_{\cv}-\lvl{\cv}| + \sum_{\md}\lVert\widehat{g}_{\cv\md}-
+\gcomp{\cv}{\md}\rVert_{L_2[0,1]}$, with $q$ fixed. The same argument applies
+verbatim under the conditions of Theorem 1. \qed
+
+\subsection*{Proof of Theorem 1}
+
+\emph{A nonasymptotic bound.} Apply Lemma S6.1 with
+$\bar\bbeta = (\bc,\thstarM{M})$, the best $M$ term approximation of the
+oracle. Then $\bar M \le M$ and
+$\bbar = \bb + \Bmat(\thetastar-\thstarM{M})$, so that, by the
+Cauchy-Schwarz inequality, Lemma 3 and \eqref{eq:lmax},
+\[
+  \normn{\bbar}^2 \;\le\; 2\normn{\bb}^2
+  + 2\lmaxx(\Gramhat)\norm{\thetastar-\thstarM{M}}_2^2
+  \;\le\; 2\normn{\bb}^2 + \frac{2\Lambda C_\tau^2\tau}{2-\tau}M^{1-2/\tau} .
+\]
+Substituting in \eqref{eq:oracle-min}, on the intersection of $\mathcal{T}$
+with $\{\lmin(\Gramhat)\ge\gamma/2\}$,
+\[
+  \normn{\widehat{f}-f}^2 \;\le\; 3\min_{1\le M\le d}h(M)
+  + 120\normn{\bb}^2 + 3\normn{\PA\bveps}^2,
+  \qquad
+  h(M) = \frac{64\pen^2}{\gtil}M
+  + \frac{40\Lambda C_\tau^2\tau}{2-\tau}M^{1-2/\tau} .
+\]
+The function $h$ is strictly convex on the positive half line, since
+$1-2/\tau<0$, and $h'$ vanishes at
+$\Mstar = \{5\Lambda C_\tau^2\gtil/(8\pen^2)\}^{\tau/2}$, where
+$h(\Mstar) = 2(2-\tau)^{-1}(64\pen^2/\gtil)\Mstar$; moreover
+$h(\lceil\Mstar\rceil) \le h(\Mstar)+64\pen^2/\gtil \le 2h(\Mstar)$ whenever
+$\Mstar \ge 1$, because $(2-\tau)/2<1$.
+
+\emph{The resolution.} With $\penn^2 \asymp \sigma^2B_X^2C_UJ_n/n$,
+$\gtil \in [\gamma/2,\Lambda]$ and the other constants fixed,
+$\Mstar_n \asymp \penn^{-\tau} \asymp (n/J_n)^{\tau/2}$ and
+$h(\Mstar_n) \asymp \penn^2\Mstar_n \asymp (J_n/n)^{(2-\tau)/2}$. Writing
+$J_n = \lceil c\log_2 n\rceil$, so that $2^{J_n} \asymp n^{c}$, the three
+inequalities of the window (3.2) are, in order: $\Mstar_n \le d_n$, which asks
+$(n/J_n)^{\tau/2} \lesssim pq\,n^{c}$, that is $c \ge \tau/2$ up to
+logarithms; that the bias not dominate, $n^{-2c\seff} \lesssim
+(J_n/n)^{(2-\tau)/2}$, that is $c \ge (2-\tau)/(4\seff)$; and the requirement
+of Proposition 2(ii), $n^{c-1}\log n \to 0$, that is $c<1$. The term
+$\sigma^2p/n$ is of smaller order because $(2-\tau)/2<1$. The window is
+nonempty if and only if $\tau/2<1$, which always holds, and
+$(2-\tau)/(4\seff)<1$, that is $\seff>(2-\tau)/4$.
+
+\emph{Under Assumption 5 the hypothesis is automatic.} By Lemma 3 the
+envelope holds with $\tau = (s+1/2)^{-1}$, whence $2-\tau = 4s/(2s+1)$,
+$(2-\tau)/2 = 2s/(2s+1)$ and $(2-\tau)/4 = s/(2s+1)$, which is the condition
+$\seff>s/(2s+1)$ of the statement; for $\pi \ge 2$ it holds for every $s>0$,
+and for $\pi<2$ it reads $2s^2/(2s+1)>1/\pi-1/2$. The rate for the components
+is the argument of Corollary 1 with
+$\norm{\thetahat-\thetastar}_2 \le \norm{\bar v}_2 +
+\norm{\thetastar-\thstarM{M}}_2$ and Lemma S6.1, the only difference being an
+extra factor $\gtil^{-1}$ in the first term, which does not change the order.
+Finally $2s/(2s+1) \ge 2\seff/(2\seff+1)$, with equality only when
+$\seff = s$, by monotonicity of $x \mapsto 2x/(2x+1)$ and $\seff \le s$, so
+the rate is never worse than that of Theorem 3 and is strictly better when
+$\pi<2$. \qed
+
+\begin{remark}[What compressibility buys]
+\label{rem:s0}
+Read at the oracle, Theorem 2(ii) has $s_0 = d$ and delivers the rate of the
+sieve; read at a sparse comparator, through Lemma S6.1, it delivers the rate
+of Theorem 1. It is the same inequality in both cases, and neither says
+anything about $\supp(\thetahat)$: no minimal signal and no
+irrepresentability condition is used, and what is gained is a rate governed by
+the effective dimension $\Mstar_n$ rather than by $d_n$.
+\end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibhang=1.7pc
+\bibsep=2pt
+\fontsize{9}{14pt plus.8pt minus .6pt}\selectfont
+\renewcommand\bibname{\large \bf References}
+\bibliographystyle{chicago}
+\bibliography{references_1}
+
+\end{document}
