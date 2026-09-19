@@ -536,6 +536,7 @@ amostra, que nenhuma regra enxerga).
 | D21 | 09-19 | **A decisão sobre o teto de páginas fica para o fim**: E5b escreve sem contar, e quando o corpo estiver completo mede-se o compilado e decide-se entre resumir mais e mandar conteúdo ao suplemento | decisão do autor; a saída mais barata (tabelas ao suplemento) é a que a revista prefere e não exige reescrever prosa, desde que **E5b escreva cada tabela num `\input{}` próprio**, o que torna a mudança de lugar uma linha |
 | D22 | 09-19 | **Centralização de Lebesgue:** a restrição de identificabilidade é `∫_0^1 g_{ℓm}(u) du = 0`, e não `E[g_{ℓm}(U_m)] = 0` como o `notacao.md` escrevia; a versão centrada em `P` sai pelo deslocamento `c_ℓ ↦ c_ℓ + Σ_m E{g_{ℓm}(U_m)}` e fica como observação | é o que a base impõe de graça (Lema 1 de E1.2) e o que o estimador estima; K&P (A1) usam base ortonormal em Lebesgue sem centralização, o WALL adota Lebesgue, e Xue & Yang centralizam em `P` mas recentralizam **empiricamente** na (3.4) deles. Adotar `P` obrigaria a mudar o alvo do Corolário 4 de E1.6, que hoje mede `‖ĝ − g‖_{L_2}` |
 | D23 | 09-19 | **A margem `eps` do reescalonamento tem função declarada:** periodizar a base num intervalo maior que o suporte dos dados, o que permite trocar `g` por uma extensão que emende em `0 ≡ 1`. Com isso a hipótese não é "densidade limitada por baixo em todo `[0,1]`" e sim sobre o **suporte**, e a constante de E1.4 passa a ser `c_U λ_min(G_eps)`, com `G_eps` a Gram da base restrita ao suporte. `rescale = TRUE` continua padrão e `boundary = "interval"` entra no `wafc()`, mas fica fora do manuscrito por enquanto | argumento do autor em 2026-09-19: tomar `[0,1]` é sem perda de generalidade sobre a escala, não sobre o suporte. O ganho é que a Proposição 2 de E1.3 (periodização trava a taxa em `2^{−J/2}`) deixa de se aplicar quando `eps > 0`; a emenda é E1.3b, e E2.4 mede `λ_min(G_eps)` e o ISE contra `eps` |
+| D24 | 09-19 | **As exigências de estilo da revista valem também nas derivações:** `E(·)`, `P(·)` e `Var(·)` em romano e com parênteses (§5 das instruções da SS), e um único `B_X` no lugar de `C_X` (E1.3) e `B_X` (E1.4). O `macros.tex` é ajustado quando E1.3b fechar | decisão do autor; manter dois conjuntos de símbolos para as mesmas quantidades é o que a notação congelada existe para evitar, e a revista não é negociável no ponto |
 | D19 | 09-19 | **Interface de `cv.wafc()` e `wafc_tune()`** (E2.3): dobras fixas para toda a grade de `J`, expostas em `foldid`; desenho e caminho de `λ` por candidato construídos na amostra inteira, com as dobras reaproveitando as colunas; empate resolvido pelo menor `J`; `df` do BIC e do EBIC igual a não nulos mais os `p` níveis; `wafc_tune(rule)` como entrada única das cinco regras | segue o `cv.wall()` e é o que torna duas regras comparáveis na mesma réplica; **a ratificar** |
 | D20 | 09-19 | **O padrão de sintonia do WAFC é `cv.min`**, com `lambda.1se` como variante de estrutura e o BIC como alternativa barata; o EBIC não serve para escolher resolução neste desenho | custo de 1.00 a 1.04 sobre o oráculo da grade contra 1.05 a 1.67 das demais; **a ratificar** |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
@@ -604,7 +605,13 @@ Ordenadas pelo que bloqueia mais.
    estão em `alvo-revista.md` §4, e L2a está cumprida.
 8. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
-9. **Idioma do código e das derivações.** E2.1 escreveu o Roxygen e os
+9. **Edições acumuladas para `k = 2`** (decidido: não tocar em `ms_1`
+   avulso). Entram de uma vez, quando E1.3b e L4 fecharem: a frase de §4.3
+   sobre a regra teórica, que vira número com o que E2.3 mediu (`λ_n` de 7 a
+   13 vezes o `λ` ótimo; sensível a `s'`, não sistematicamente acima); as
+   citações de software que L4 trouxer; a observação de extensão de E1.3b; e
+   a frase de reprodutibilidade no resumo ou na discussão.
+10. **Idioma do código e das derivações.** E2.1 escreveu o Roxygen e os
    comentários de `wafc/` em inglês (é o que vira pacote em E3.3, e o
    `wall.R` é todo em inglês); os `derivations/` estão misturados, `02` e
    `04` em português e `03` em inglês. D6 fala de documentos e manuscrito,
@@ -612,11 +619,11 @@ Ordenadas pelo que bloqueia mais.
    derivações** (traduzir só quando E5a montar o manuscrito), e alinhar o
    `03`. Se aceita, entra uma correção de uma linha por ambiente no
    `macros.tex`, que hoje imprime "Lemma 4" enquanto a prosa diz "Lema 4".
-10. **~~`rescale = TRUE` como padrão~~ decidido (D23):** continua padrão, e
+11. **~~`rescale = TRUE` como padrão~~ decidido (D23):** continua padrão, e
    agora com razão declarada, não herdada. O deslocamento de centralização
    que ele causa é um nível, e a leitura correta é que a componente é
    identificada no suporte.
-11. **~~Quem escolhe `J`~~ não era pergunta:** o plano sempre disse
+12. **~~Quem escolhe `J`~~ não era pergunta:** o plano sempre disse
    `cv.wafc()` sobre `(J, λ)`, como o `cv.wall()` (`plano-projeto.md` E2.3);
    o handoff de E1.6 leu o plano como se ele só falasse de `λ`. O que fica
    de E1.6 é **matéria de medição para E2.3**, não bloqueio: a regra teórica
@@ -624,18 +631,18 @@ Ordenadas pelo que bloqueia mais.
    realizado em toda a varredura, ao custo de 5% a 11% de erro, e as
    escolhas de `J_n` e de `c` dependem de `s'` e `τ`, que ninguém conhece.
    E2.3 compara a regra teórica com a validação cruzada.
-12. **Cota inferior** (mais visível depois de D18, porque o artigo se
+13. **Cota inferior** (mais visível depois de D18, porque o artigo se
    declara extensão de quem tem a dele). Não existe aqui, e Klopp & Pensky
    têm a deles para `q = 1` com `X ⊥ U`. Três saídas: (a) citar K&P e dizer que a cota
    superior atinge a referência do modelo de sequência, que é o que o
    `05-taxas.tex` faz hoje; (b) abrir E1.8 e construir a cota para `q ≥ 2`,
    trabalho do porte de E1.4 mais E1.5; (c) restringir a afirmação de
    otimalidade a `q = 1`. O referee da SS pode cobrar a (b).
-13. **`p` crescente com `n`.** A teoria fixa `p` e `q`. Se a aplicação de E6
+14. **`p` crescente com `n`.** A teoria fixa `p` e `q`. Se a aplicação de E6
    tiver `p` grande, o termo `σ² p / n` deixa de ser de ordem menor e a
    janela do Corolário 5 estreita; mudar isso mexe em E1.3 e E1.4, não só em
    E1.6.
-14. **Bibliografia, pontos de L3** (nenhum bloqueia): a identidade
+15. **Bibliografia, pontos de L3** (nenhum bloqueia): a identidade
    `Σ_l φ(x − l) ≡ 1`, usada na prova do Lema 1(i) de E1.2, ficou **sem
    âncora** — a expressão não ocorre em Daubechies (1992), a quem estava
    atribuída, e os candidatos a conferir são Härdle et al. (1998, cap. 5) e
@@ -646,24 +653,30 @@ Ordenadas pelo que bloqueia mais.
    o Crossref diz "Alexander" (uniformizar nos dois repositórios ou deixar?).
    Proposta: abrir uma frente curta só para a âncora da partição da unidade
    quando E5a precisar dela.
-15. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
+16. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
    sem contar, medir no fim e então decidir entre resumir mais e mandar
    coisa ao suplemento.
-16. **Qual `s'` cada cenário declara.** E2.3 rodou a regra da teoria com
+17. **Qual `s'` cada cenário declara.** E2.3 rodou a regra da teoria com
    `s' = 3/2` no `smooth` (a quina da cúbica na extensão periódica) e
    `s' = 1/2` no não homogêneo. Se o `smooth` for lido por `s' = 4` (o
    limite dos `N = 4` momentos nulos) a conclusão não muda; se for `1/2`, a
    regra sobe para `J = 3` e o custo cai. E2.4 e E4 precisam do número
    declarado.
-17. **Cinco referências que o manuscrito precisa** e que não estão
+18. **~~Cinco referências~~ catalogadas como L4:** as mesmas cinco, e que não estão
    verificadas, por isso hoje `glmnet` e `WaveBased` aparecem sem citação:
    Tibshirani (1996), Friedman, Hastie & Tibshirani (2010), a citação do R,
    o `sparsegl`, e o Johnstone de modelos de sequência. Frente curta nos
    moldes de L1 e L3, antes de E5b.
-18. **O `chicago.bst` do template** abrevia em "et al." a partir de três
-   autores, e a §4 das instruções da revista manda listar os três. Aceitar o
-   `.bst` como está ou ajustá-lo? Decisão de antes da submissão.
-19. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+19. **Pendências de acabamento do manuscrito**, todas para a semana da
+   submissão e nenhuma bloqueando (estão no checklist de `alvo-revista.md`
+   §6): (a) o `chicago.bst` do template abrevia em "et al." a partir de três
+   autores, contra a §4 das instruções, e a correção é no `.bst`, não no
+   texto; (b) substituir os `\input` pelas cópias dos arquivos de macro, de
+   modo que o pacote enviado seja autocontido, registrando a correspondência
+   entre bloco copiado e arquivo de origem; (c) autores, afiliações, e-mails
+   na última página e agradecimentos, que hoje são os marcadores do
+   template.
+20. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos

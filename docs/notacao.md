@@ -97,6 +97,9 @@ bloco as wavelets por `j` crescente e, dentro do nível, por `k` crescente.
 | `‖h‖_n² = (1/n) Σ_i h(X_i, U_i)²` | norma empírica |
 | `‖h‖²_{L_2(P)}` | norma populacional |
 | `φ_0` | constante de compatibilidade (Bühlmann & van de Geer) |
+| `B_X` | cota de `‖X‖_∞` (D24; era `C_X` em E1.3 e `B_X` em E1.4) |
+| `c_U`, `C_U` | cotas da densidade conjunta de `U` no seu suporte (D14, D23) |
+| `κ_1`, `κ_2` | cotas dos autovalores de `E(XX' \| U)` |
 | `S_0`, `S` | suporte do oráculo; um suporte genérico |
 
 O grupo da variante em grupos (E2.2) é o bloco `(ℓ, m)`: o subvetor
@@ -155,3 +158,20 @@ adotá-la como hipótese é o alvo do Corolário 4 de E1.6, que mede
 `‖ĝ_{ℓm} − g_{ℓm}‖_{L_2}`: com alvo centrado em `P` e estimador centrado em
 Lebesgue sobra uma constante que não desaparece sem um passo de
 recentralização que não está em prova nenhuma hoje.
+
+## 8. Emenda de 2026-09-19 (D24): as exigências de estilo da revista
+
+A §5 das instruções da *Statistica Sinica* manda escrever `E(X)` para
+esperança, em romano e com parênteses, e não `\mathbb{E}[X]` nem um `E`
+caligráfico; o mesmo para `Var(X)` e para a probabilidade. O manuscrito já
+nasceu assim, e a notação passa a ser essa **também nas derivações**, para
+que os dois não imprimam símbolos diferentes para a mesma coisa.
+
+Na mesma emenda, `C_X` (E1.3) e `B_X` (E1.4) eram dois nomes para a cota de
+`‖X‖_∞`: fica **`B_X`**, como na tabela da §4.
+
+O `derivations/macros.tex` ainda imprime `\mathbb{E}`; a troca é feita quando
+E1.3b fechar, para não mudar o arquivo debaixo de uma tarefa em curso. Os
+`.tex` de E1.3 a E1.6 recompilam com a macro nova sem alteração de fonte,
+porque `\E` continua sendo `\E`; o que muda é como ele imprime.
+
