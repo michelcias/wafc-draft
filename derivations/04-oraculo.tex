@@ -1,0 +1,797 @@
+% E1.5 -- desigualdade oráculo para o LASSO no desenho de produtos.
+% Molde: Bühlmann & van de Geer (2011), Seção 6.2 (Teoremas 6.1 e 6.2), com
+% três diferenças: os p níveis c_l não são penalizados, o modelo é mal
+% especificado dentro do sieve (o viés de E1.3 entra no lado direito), e a
+% constante de desenho vem de E1.4 na forma de autovalor cheio, o que dispensa
+% a condição de cone. Arquitetura de passos transposta do WALL teórico
+% (ms_theo_1.tex, Apêndice "Slow-Rate Track", Passo 3, e Lemma "LASSO
+% prediction consistency"), adaptada da perda logística para a quadrática.
+% Conferência numérica: check/04-oraculo.R (imprime OK; ~16 s).
+% Notação: docs/notacao.md (congelada em E1.1). Macros: derivations/macros.tex.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black]{hyperref}
+\input{macros}
+
+% --- atalhos locais deste arquivo (macros.tex é o único lugar das macros do
+% --- projeto; estes símbolos existem só aqui, como em 03-desenho-produtos.tex)
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\MA}{M_{\Amat}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betahat}{\widehat{\bbeta}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\GBA}{\Gramhat_{\Bmat\mid\Amat}}
+
+% Numeração global dos resultados (docs/TAREFA.md, §5): E1.2 usou Proposição 1
+% e Lema 1; E1.3 usou Lema 2, Lema 3, Corolário 1 e Proposição 2; E1.4 usou
+% Proposição 3. Este arquivo continua a sequência, e os contadores estão
+% ajustados para que o número impresso JÁ SEJA o número global.
+\setcounter{lemma}{3}
+\setcounter{proposition}{3}
+\setcounter{corollary}{1}
+\setcounter{theorem}{0}
+
+\title{E1.5. Desigualdade oráculo para o LASSO no desenho de produtos}
+\author{wafc-draft, \texttt{derivations/04-oraculo.tex}}
+\date{2026-09-19}
+
+\begin{document}
+\maketitle
+
+\section*{Onde este resultado entra}
+
+Este arquivo junta as duas peças já fechadas e produz a cota não assintótica
+que E1.6 transforma em taxa. De E1.3 vem o \emph{viés}: o erro de substituir
+$f$ pela sua aproximação $f_{J}$ no sieve (Corolário~\ref{cor:vies-E13} abaixo
+é a citação do Corolário~1 daquele arquivo). De E1.4 vem a \emph{condição de
+desenho}, na forma consumível que aquele arquivo entregou, a saber
+$\lmin(\Gramhat) \ge \kappa_{1}c_{U}/2$ com probabilidade alta, que por
+\eqref{eq:compat-lmin-E14} domina qualquer constante de compatibilidade,
+\emph{sem restrição de cone}. O que este arquivo acrescenta é o argumento do
+LASSO propriamente dito, com três desvios do molde de Bühlmann e van de Geer
+(2011, Seção~6.2):
+
+\begin{enumerate}[label=(\alph*), leftmargin=*, nosep]
+  \item os $p$ níveis $\lvl{\cv}$ \textbf{não são penalizados} (D3). O
+    tratamento usual põe as coordenadas não penalizadas dentro do suporte $S$
+    e paga uma condição de cone; aqui elas são \emph{perfiladas}
+    (Lema~\ref{lem:perfil}), e o complemento de Schur transfere o autovalor de
+    $\Gramhat$ ao bloco penalizado residualizado. É o que faz a hipótese de
+    E1.4 bastar sem cone.
+  \item o modelo é \textbf{mal especificado dentro do sieve}: $f \notin
+    \operatorname{span}$ das colunas de $\bZ$, e o resíduo determinístico
+    $\bb = f - f_{J}$ entra como um segundo termo de ruído, tratado por
+    Young em vez de por dualidade.
+  \item a \textbf{calibração} de $\pen$ é feita pelas normas empíricas das
+    colunas, e não pelo máximo de $\bZ$: a diferença é um fator $2^{J/2}$ na
+    taxa (Lema~\ref{lem:colunas} e Observação~\ref{rem:calib}).
+\end{enumerate}
+
+\paragraph{Diante de Klopp e Pensky (2015).} A varredura de L2
+(\texttt{docs/busca-novidade.md}, §1) registrou que para $q = 1$ e
+$\bX \perp \bU$ aquele trabalho já tem desigualdade oráculo não assintótica no
+mesmo desenho de produtos, com $\Gram = \Omega \otimes \Phi$ (eq.~1.8) e
+concentração da Gram empírica restrita (Lema~1). O que aqui é novo, e é o que
+a posição do artigo tem de sustentar: aditividade em $q \ge 2$ moduladoras,
+com o termo cruzado entre $U_{\md}$ e $U_{\md'}$ que não é produto de
+Kronecker; $\bX$ dependente de $\bU$; LASSO puro em vez de LASSO em blocos; e
+os níveis $\lvl{\cv}$ fora da penalidade, que em K\&P entram nela. O preço
+desta última escolha aparece explicitamente no Teorema~\ref{thm:oraculo}(iii),
+como o termo paramétrico $\sigma^{2}p/n$, que K\&P não têm.
+
+\section{Objetos}
+
+\paragraph{Modelo e amostra.} $(Y_{i}, \bX_{i}, \bU_{i})$, $i = 1, \dots, n$,
+são independentes e identicamente distribuídos, com
+\[
+  Y_{i} \;=\; f(\bX_{i}, \bU_{i}) + \varepsilon_{i},
+  \qquad
+  f(x,u) \;=\; \sum_{\cv=1}^{p} x_{\cv}\Bigl\{\lvl{\cv} +
+  \sum_{\md=1}^{q}\gcomp{\cv}{\md}(u_{\md})\Bigr\},
+\]
+na notação de \texttt{docs/notacao.md} (D1). Escrevemos
+$\bY = (Y_{i})_{i} \in \R^{n}$, $\bveps = (\varepsilon_{i})_{i}$,
+$f = (f(\bX_{i},\bU_{i}))_{i}$ e, para $a, h \in \R^{n}$,
+$\normn{a}^{2} = n^{-1}\sum_{i}a_{i}^{2}$ e
+$\inner{a}{h}_{n} = n^{-1}\sum_{i}a_{i}h_{i}$.
+
+\paragraph{Desenho, em dois blocos.} Na ordem de colunas de D12, a matriz
+$\bZ \in \R^{n \times (p+d)}$, $d = pq\NJ$, parte em
+\[
+  \bZ = [\,\Amat \;\; \Bmat\,], \qquad
+  \Amat_{i\cv} = X_{i\cv}, \qquad
+  \Bmat_{i,(\cv\md,\lev\tsl)} = X_{i\cv}\,\wav{\lev}{\tsl}(U_{i\md}),
+\]
+o bloco $\Amat \in \R^{n\times p}$ dos $p$ termos não penalizados e o bloco
+$\Bmat \in \R^{n \times d}$ dos produtos. Escrevemos
+$\Gramhat = \bZ\T\bZ/n$ e, para o parâmetro,
+$\bbeta = (\bc, \btheta) \in \R^{p} \times \R^{d}$.
+
+\paragraph{Estimador.} Com $\pen > 0$,
+\begin{equation}
+  \label{eq:estimador}
+  \betahat = (\chat, \thetahat)
+  \;\in\; \operatorname*{arg\,min}_{(\bc,\btheta) \in \R^{p}\times\R^{d}}
+  \Bigl\{ \normn{\bY - \Amat\bc - \Bmat\btheta}^{2}
+  \;+\; 2\pen\,\norm{\btheta}_{1} \Bigr\},
+\end{equation}
+e $\widehat{f} = \Amat\chat + \Bmat\thetahat$ é o ajuste. A penalidade não
+toca $\bc$: é D3.
+
+\paragraph{Oráculo e viés.} $\betastar = (\bc, \thetastar)$ é o vetor de E1.3,
+com $\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$
+para $\lev < J$, de modo que $f_{J} = \bZ\betastar$ é a aproximação no sieve.
+O resíduo determinístico é
+\[
+  \bb \;=\; f - f_{J} \;\in\; \R^{n},
+  \qquad
+  \normn{\bb}^{2} = \frac1n\sum_{i}\bigl(f - f_{J}\bigr)^{2}(\bX_{i},\bU_{i}).
+\]
+Escrevemos $\Szero = \operatorname{supp}(\thetastar)$ e $s_{0} = |\Szero|$.
+Note que $s_{0}$ é a esparsidade \emph{do oráculo do sieve}, não uma hipótese
+sobre o modelo: sob a Hipótese de Besov de E1.3 os $\coefs{\cv}{\md}{\lev}{\tsl}$
+decaem mas não se anulam, e em geral $s_{0} = d$. É por isso que a taxa lenta
+do Teorema~\ref{thm:oraculo}(i), que não menciona $s_{0}$, é o enunciado
+incondicional, e a taxa rápida de (ii) é útil quando $\thetastar$ é
+comprimível; a distinção é a mesma que o WALL faz entre o Teorema~1 e o
+Corolário de compressibilidade, e é matéria de E1.6.
+
+\paragraph{Perfilagem.} $\PA = \Amat(\Amat\T\Amat)^{-1}\Amat\T$ é a projeção
+ortogonal sobre o espaço-coluna de $\Amat$ (definida quando $\Amat$ tem posto
+$p$) e $\MA = I_{n} - \PA$. Os objetos residualizados são
+\[
+  \Btil = \MA\Bmat, \qquad \widetilde{\bY} = \MA\bY,
+  \qquad
+  \GBA = \Btil\T\Btil/n \in \R^{d\times d},
+  \qquad
+  \gtil = \lmin(\GBA).
+\]
+Finalmente, a maior norma empírica de coluna penalizada,
+\[
+  \smax^{2} \;=\; \max_{a}\; \frac1n\sum_{i=1}^{n}\Bmat_{ia}^{2}
+  \;=\; \max_{a} (\Gramhat)_{aa}, \qquad a \text{ percorrendo as } d
+  \text{ colunas penalizadas},
+\]
+que é mensurável em $(\bX,\bU)$. É esta a quantidade que o plano chama
+$\norm{\bZ}_{\max}$ (Observação~\ref{rem:calib}).
+
+\section{Hipóteses}
+
+Além das hipóteses de E1.3 (base, regularidade de Besov, densidade das
+moduladoras, $\bX$ limitada) e de E1.4 (moduladoras, covariáveis lineares,
+base de wavelets), que são citadas onde entram, este arquivo usa duas.
+
+\begin{assumption}[amostra]\label{ass:iid}
+$(Y_{i},\bX_{i},\bU_{i})_{i \le n}$ são i.i.d.\ e seguem o modelo acima.
+\end{assumption}
+
+\begin{assumption}[erro sub-gaussiano]\label{ass:subg}
+Existe $\sigma < \infty$ tal que, quase certamente,
+\[
+  \E\bigl[e^{t\varepsilon_{i}} \mid \bX_{i}, \bU_{i}\bigr]
+  \;\le\; e^{\sigma^{2}t^{2}/2} \qquad \text{para todo } t \in \R .
+\]
+Em particular $\E[\varepsilon_{i}\mid\bX_{i},\bU_{i}] = 0$ e
+$\operatorname{Var}(\varepsilon_{i}\mid\bX_{i},\bU_{i}) \le \sigma^{2}$. O erro
+gaussiano homocedástico é o caso $\sigma^{2} = \operatorname{Var}(\varepsilon)$.
+\end{assumption}
+
+Duas peças já provadas são usadas na forma em que foram deixadas. Elas
+\emph{não} consomem números novos: os contadores abaixo são recuados para que
+apareçam com o número global que já têm (Corolário~1 de E1.3, Proposição~3 de
+E1.4).
+
+\setcounter{corollary}{0}
+\begin{corollary}[viés do sieve; provado em E1.3]\label{cor:vies-E13}
+Sob as hipóteses de E1.3,
+\[
+  \norm{f - f_{J}}_{L_{2}(P)}^{2}
+  \;\le\; \frac{(pq)^{2}C_{X}^{2}C_{U}C_{g}^{2}}{1 - 2^{-2\seff}}\,2^{-2J\seff}
+  \;=:\; \mathcal{B}_{J}^{2},
+\]
+e, se $s > 1/\pi$, $\normn{\bb} \le \norm{f - f_{J}}_{\infty} \le
+pq\,C_{X}(L-1)\norm{\psi}_{\infty}C_{g}\,2^{-J(s-1/\pi)}/(1 - 2^{-(s-1/\pi)})$
+para qualquer amostra.
+\end{corollary}
+
+\setcounter{proposition}{2}
+\begin{proposition}[Gram empírica; provada em E1.4, parte~(iv)]\label{prop:gram-E14}
+Sob as hipóteses de E1.4, com $\gamma = \kappa_{1}c_{U}$ e
+$D = p + d$,
+\[
+  \Prob\bigl(\lmin(\Gramhat) \ge \gamma/2\bigr)
+  \;\ge\; 1 - 2D\exp\!\left(-\frac{n\gamma^{2}}{8R_{J}(\kappa_{2}C_{U} + \gamma/3)}\right),
+  \qquad R_{J} = pB_{X}^{2}(1 + qC_{\psi}2^{J}),
+\]
+probabilidade que tende a $1$ quando $pq2^{J}\log(pq2^{J})/n \to 0$. Além
+disso, para toda matriz simétrica $A$ e todo suporte $S$,
+\begin{equation}
+  \label{eq:compat-lmin-E14}
+  \compat^{2}(S; A) \;\ge\; \lmin(A).
+\end{equation}
+\end{proposition}
+
+\setcounter{corollary}{1}   % o próximo corolário NOVO é o 2 da sequência global
+
+\section{Os quatro lemas}
+
+\begin{lemma}[perfilagem dos níveis e complemento de Schur]\label{lem:perfil}
+Suponha que $\Amat$ tenha posto $p$. Então:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
+  \item $\thetahat$ minimiza $\normn{\widetilde{\bY} - \Btil\btheta}^{2}
+    + 2\pen\norm{\btheta}_{1}$ e
+    $\chat = (\Amat\T\Amat)^{-1}\Amat\T(\bY - \Bmat\thetahat)$;
+  \item com $v = \thetahat - \thetastar$,
+    \begin{equation}
+      \label{eq:decomp-fit}
+      \widehat{f} - f_{J} \;=\; \Btil v \;+\; \PA(\bb + \bveps);
+    \end{equation}
+  \item $\GBA = \Gramhat_{\Bmat\Bmat} - \Gramhat_{\Bmat\Amat}
+    \Gramhat_{\Amat\Amat}^{-1}\Gramhat_{\Amat\Bmat}$ e
+    \begin{equation}
+      \label{eq:schur}
+      \gtil \;=\; \lmin(\GBA) \;\ge\; \lmin(\Gramhat);
+    \end{equation}
+  \item se $\lmin(\Gramhat) > 0$, o minimizador em \eqref{eq:estimador} é único.
+\end{enumerate}
+\end{lemma}
+
+\begin{lemma}[calibração de $\pen$]\label{lem:calib}
+Sob as Hipóteses~\ref{ass:iid} e~\ref{ass:subg}, para todo $\alpha \in (0,1)$,
+\[
+  \Prob\Bigl( \bigl\lVert \Btil\T\bveps/n \bigr\rVert_{\infty}
+  \;>\; \pen_{0} \Bigr) \;\le\; \alpha,
+  \qquad
+  \pen_{0} \;=\; \sigma\,\smax\sqrt{\frac{2\log(2d/\alpha)}{n}} .
+\]
+\end{lemma}
+
+\begin{lemma}[normas empíricas das colunas]\label{lem:colunas}
+Sob as hipóteses de E1.3 e E1.4 ($\max_{\cv}|X_{\cv}| \le B_{X}$ q.c., densidade
+marginal de cada $U_{\md}$ limitada por $C_{U}$, wavelets periodizadas de uma
+família de suporte compacto), para toda coluna penalizada $a$ vale
+$\E[(\Gramhat)_{aa}] \le B_{X}^{2}C_{U}$ e, para todo $t > 0$,
+\[
+  \Prob\bigl(\smax^{2} > B_{X}^{2}C_{U} + t\bigr)
+  \;\le\; d\,\exp\!\left(-\frac{n\,t^{2}}{2\bigl(R_{J}'B_{X}^{2}C_{U} + R_{J}'t/3\bigr)}\right),
+  \qquad R_{J}' = B_{X}^{2}\norm{\psi}_{\infty}^{2}\,2^{J-1}.
+\]
+Em particular $\Prob(\smax^{2} \le 2B_{X}^{2}C_{U}) \to 1$ sempre que
+$2^{J}\log d/n \to 0$.
+\end{lemma}
+
+\begin{lemma}[norma $\ell_{1}$ do oráculo em Besov]\label{lem:l1besov}
+Sob a Hipótese de regularidade de Besov de E1.3, para todo $(\cv,\md)$ e todo
+$\lev \ge 0$,
+\[
+  \sum_{\tsl}\bigl|\coefs{\cv}{\md}{\lev}{\tsl}\bigr|
+  \;\le\; 2^{\lev(1 - 1/\pi)}\,\norm{\theta^{*}_{\cv\md,\lev\cdot}}_{\pi}
+  \;\le\; C_{g}\,2^{\lev(1/2 - s)},
+\]
+\emph{sem dependência de $\pi$}, e portanto
+\[
+  \norm{\thetastar}_{1}
+  \;\le\; pq\,C_{g}\sum_{\lev=0}^{J-1}2^{\lev(1/2-s)}
+  \;\asymp\; pq\,C_{g}\times
+  \begin{cases}
+    (1 - 2^{-(s-1/2)})^{-1}, & s > 1/2,\\[2pt]
+    J, & s = 1/2,\\[2pt]
+    (2^{1/2-s}-1)^{-1}\,2^{J(1/2-s)}, & s < 1/2 .
+  \end{cases}
+\]
+\end{lemma}
+
+\section{O teorema}
+
+\begin{theorem}[desigualdade oráculo]\label{thm:oraculo}
+Sob as Hipóteses~\ref{ass:iid} e~\ref{ass:subg}, suponha $\Amat$ de posto $p$
+e $\pen \ge 2\pen_{0}$ com $\pen_{0}$ do Lema~\ref{lem:calib}. Seja
+$\mathcal{T} = \{\lVert\Btil\T\bveps/n\rVert_{\infty} \le \pen/2\}$, evento de
+probabilidade pelo menos $1 - \alpha$. Em $\mathcal{T}$, com
+$v = \thetahat - \thetastar$:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(Taxa lenta; nenhuma condição de desenho.)}
+    \[
+      \tfrac12\normn{\Btil v}^{2} + \pen\norm{\thetahat}_{1}
+      \;\le\; 3\pen\norm{\thetastar}_{1} + 2\normn{\bb}^{2},
+      \qquad\text{em particular}\qquad
+      \normn{\Btil v}^{2} \le 6\pen\norm{\thetastar}_{1} + 4\normn{\bb}^{2}.
+    \]
+  \item \textup{(Taxa rápida.)} Se $\gtil > 0$,
+    \[
+      \normn{\Btil v}^{2} \le \frac{64\,\pen^{2}s_{0}}{\gtil} + 16\normn{\bb}^{2},
+      \quad
+      \norm{v}_{1} \le \frac{40\,\pen\,s_{0}}{\gtil} + \frac{10\normn{\bb}^{2}}{\pen},
+      \quad
+      \norm{v}_{2}^{2} \le \frac{64\,\pen^{2}s_{0}}{\gtil^{2}}
+      + \frac{16\normn{\bb}^{2}}{\gtil}.
+    \]
+  \item \textup{(Erro de predição.)} Em qualquer dos dois regimes,
+    \[
+      \normn{\widehat{f} - f} \;\le\; \normn{\Btil v} + 2\normn{\bb} + \normn{\PA\bveps},
+      \qquad
+      \normn{\widehat{f} - f}^{2} \;\le\; 3\bigl(\normn{\Btil v}^{2}
+      + 4\normn{\bb}^{2} + \normn{\PA\bveps}^{2}\bigr),
+    \]
+    e $\E\bigl[\normn{\PA\bveps}^{2} \mid \bX, \bU\bigr] \le \sigma^{2}p/n$, de
+    modo que $\Prob(\normn{\PA\bveps}^{2} > \sigma^{2}p/(n\alpha')) \le \alpha'$
+    para todo $\alpha' \in (0,1)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{corollary}[as duas taxas, com E1.3 e E1.4 instanciados]\label{cor:taxas}
+Acrescente as hipóteses de E1.3 e E1.4 e suponha $2^{J}\log d/n \to 0$ --- o
+que \emph{não} é hipótese nova, pois é implicado pela condição
+$pq2^{J}\log(pq2^{J})/n \to 0$ que a Proposição~\ref{prop:gram-E14} já exige,
+com $d = pq\NJ \asymp pq2^{J}$. Tome
+\[
+  \pen \;=\; 2\sigma\,B_{X}\sqrt{2C_{U}}\;\sqrt{\frac{2\log(2d/\alpha)}{n}},
+  \qquad d = pq\NJ .
+\]
+Então, com probabilidade que tende a $1$ menos $\alpha + \alpha' + \alpha''$,
+\[
+  \normn{\widehat{f} - f}^{2}
+  \;\lesssim\;
+  \underbrace{\frac{\sigma^{2}B_{X}^{2}C_{U}}{\kappa_{1}c_{U}}\;
+  \frac{s_{0}\log(pq\NJ)}{n}}_{\text{estimação}}
+  \;+\;
+  \underbrace{\frac{\mathcal{B}_{J}^{2}}{\alpha'}}_{\text{viés}}
+  \;+\;
+  \underbrace{\frac{\sigma^{2}p}{n\,\alpha''}}_{\text{níveis}},
+  \qquad
+  \mathcal{B}_{J}^{2} \asymp (pq)^{2}C_{X}^{2}C_{U}C_{g}^{2}\,2^{-2J\seff},
+\]
+e, sem nenhuma condição de desenho, a versão lenta com
+$\pen\norm{\thetastar}_{1}$ no lugar do termo de estimação, com
+$\norm{\thetastar}_{1}$ dado pelo Lema~\ref{lem:l1besov}.
+\end{corollary}
+
+\begin{corollary}[o que E1.6 consome]\label{cor:componentes}
+Nas condições do Teorema~\ref{thm:oraculo}(ii), como as
+$\{\wav{\lev}{\tsl}\}_{\lev<J}$ são ortonormais em $L_{2}[0,1]$,
+\[
+  \sum_{\cv,\md}\bigl\lVert \widehat{g}_{\cv\md} - \PiJ\gcomp{\cv}{\md}
+  \bigr\rVert_{L_{2}[0,1]}^{2} \;=\; \norm{v}_{2}^{2}
+  \;\le\; \frac{64\,\pen^{2}s_{0}}{\gtil^{2}} + \frac{16\normn{\bb}^{2}}{\gtil},
+\]
+com $\widehat{g}_{\cv\md} = \sum_{\lev<J,\tsl}\coef{\cv}{\md}{\lev}{\tsl}
+\wav{\lev}{\tsl}$, e portanto, pelo Lema~1 de E1.3 e a desigualdade triangular,
+\[
+  \sum_{\cv,\md}\bigl\lVert \widehat{g}_{\cv\md} - \gcomp{\cv}{\md}
+  \bigr\rVert_{L_{2}[0,1]}^{2}
+  \;\le\; 2\norm{v}_{2}^{2}
+  + \frac{2pq\,C_{g}^{2}}{1 - 2^{-2\seff}}\,2^{-2J\seff} .
+\]
+\end{corollary}
+
+\begin{remark}[por que não há cone]\label{rem:cone}
+O tratamento usual de coordenadas não penalizadas (Bühlmann e van de Geer,
+2011, Seção~6.2.3) as coloca dentro do suporte $S$ e exige a compatibilidade
+$\compat^{2}(S;\Gramhat)$ no cone $\norm{\delta_{S^{c}}}_{1} \le
+3\norm{\delta_{S}}_{1}$. Aqui a perfilagem do Lema~\ref{lem:perfil} as remove
+do problema, e \eqref{eq:schur} transfere o autovalor cheio de $\Gramhat$ ao
+bloco residualizado: $\gtil \ge \lmin(\Gramhat) \ge \gamma/2$ pela
+Proposição~\ref{prop:gram-E14}. Nada de cone, nada de $\compat^{2}$, e a
+constante é a mesma para todo $\Szero$. Isso só é possível porque E1.4
+entregou o autovalor mínimo cheio, e não a compatibilidade restrita (D13); com
+a versão restrita da Observação~1 daquele arquivo (o regime $pq \gg n^{1/2}$),
+o cone volta, e com uma diferença a registrar: o passo do
+Teorema~\ref{thm:oraculo}(ii), Caso~1, produz
+$\norm{v_{\Szero^{c}}}_{1} \le 4\norm{v_{\Szero}}_{1}$, e não $3$, porque o
+viés consome parte da folga. A constante $3$ da definição de $\compat^{2}$ em
+E1.4 teria de virar $4$ nesse regime.
+\end{remark}
+
+\begin{remark}[a calibração é pelas colunas, não pelo máximo]\label{rem:calib}
+O plano escreve $\pen \asymp \sigma\norm{\bZ}_{\max}\sqrt{\log(pq\NJ)/n}$. A
+leitura correta de $\norm{\bZ}_{\max}$ é a norma empírica máxima de coluna,
+$\smax$, que é a normalização que Bühlmann e van de Geer supõem
+($(\Gramhat)_{aa} = 1$) e a que o Lema~\ref{lem:calib} usa; pelo
+Lema~\ref{lem:colunas} ela é $O_{p}(1)$. A leitura literal,
+$\max_{i,a}|Z_{ia}|$, seria da ordem $B_{X}\norm{\psi}_{\infty}2^{(J-1)/2}$ e
+inflaria $\pen$ por $2^{J/2}$, destruindo a taxa de E1.6. A conferência
+numérica separa as duas: em $J = 2, \dots, 6$ com $n = 4000$, $\smax$ vai de
+$1.02$ a $1.14$ enquanto $\max_{i,a}|Z_{ia}|$ vai de $3.04$ a $11.47$, o fator
+$2^{J/2}$ previsto. É o mesmo ponto que o WALL faz ao observar que a
+calibração sub-gaussiana $\pen_{n} \asymp \sqrt{J_{n}/n}$ não sofre inflação
+logarítmica (Lemma ``LASSO prediction consistency'', Passo~3a).
+\end{remark}
+
+\begin{remark}[o termo $\sigma^{2}p/n$]\label{rem:pn}
+É o preço de não penalizar os $p$ níveis: um projeto de dimensão $p$ ajustado
+por mínimos quadrados custa $\sigma^{2}p/n$ em predição, e nenhuma escolha de
+$\pen$ o remove. Ele é dominado pelo termo de estimação sempre que
+$p \lesssim s_{0}\log(pq\NJ)$, o que vale em todos os regimes de E1.6 ($p$
+fixo). A cota de Markov usada no Teorema~\ref{thm:oraculo}(iii) é exata em
+média: a conferência acha $\E\normn{\PA\bveps}^{2}/(\sigma^{2}p/n)$ entre
+$0.90$ e $1.19$.
+\end{remark}
+
+\section{Provas}
+
+\subsection*{Lema~\ref{lem:perfil}}
+
+\emph{(i).} O objetivo de \eqref{eq:estimador} é convexo e, para $\btheta$
+fixo, quadrático e coercivo em $\bc$ (posto $p$), com mínimo em
+$\bc = (\Amat\T\Amat)^{-1}\Amat\T(\bY - \Bmat\btheta)$ e valor
+$\normn{\MA(\bY - \Bmat\btheta)}^{2} = \normn{\widetilde{\bY} -
+\Btil\btheta}^{2}$, pois $\MA$ é idempotente e simétrico. Minimizar primeiro em
+$\bc$ e depois em $\btheta$ dá o mesmo conjunto de minimizadores que minimizar
+conjuntamente.
+
+\emph{(ii).} Como $\Amat\chat = \PA(\bY - \Bmat\thetahat)$ e
+$\Amat\bc = \PA\Amat\bc$, e $\bY = \Amat\bc + \Bmat\thetastar + \bb + \bveps$,
+\[
+  \Amat(\chat - \bc) = \PA\bigl(\Bmat\thetastar + \bb + \bveps
+  - \Bmat\thetahat\bigr) = \PA(\bb + \bveps) - \PA\Bmat v ,
+\]
+logo $\widehat{f} - f_{J} = \Amat(\chat-\bc) + \Bmat v = \MA\Bmat v +
+\PA(\bb+\bveps) = \Btil v + \PA(\bb+\bveps)$.
+
+\emph{(iii).} A identidade é
+$\Btil\T\Btil/n = (\Bmat\T\Bmat - \Bmat\T\Amat(\Amat\T\Amat)^{-1}\Amat\T\Bmat)/n$,
+onde os fatores $n$ se cancelam. Para a desigualdade, a caracterização
+variacional do complemento de Schur dá, para todo $v \in \R^{d}$,
+\[
+  v\T\GBA\,v
+  \;=\; \min_{u\in\R^{p}} \begin{pmatrix}u\\v\end{pmatrix}\T \Gramhat
+  \begin{pmatrix}u\\v\end{pmatrix}
+  \;\ge\; \min_{u\in\R^{p}} \lmin(\Gramhat)\bigl(\norm{u}_{2}^{2} + \norm{v}_{2}^{2}\bigr)
+  \;=\; \lmin(\Gramhat)\norm{v}_{2}^{2},
+\]
+o mínimo sendo atingido em $u = -\Gramhat_{\Amat\Amat}^{-1}\Gramhat_{\Amat\Bmat}v$.
+
+\emph{(iv).} $\lmin(\Gramhat) > 0$ torna
+$\bbeta \mapsto \normn{\bY - \bZ\bbeta}^{2}$ estritamente convexa; somar uma
+função convexa preserva a estrita convexidade. \qed
+
+\subsection*{Lema~\ref{lem:calib}}
+
+Condicione em $(\bX,\bU) = ((\bX_{i},\bU_{i})_{i})$. Nessa condicional $\Btil$
+e $\smax$ são constantes e os $\varepsilon_{i}$ são independentes e
+sub-gaussianos de parâmetro $\sigma$ (Hipótese~\ref{ass:subg} e a
+independência da amostra). Para a coluna $a$,
+$(\Btil\T\bveps)_{a}/n = n^{-1}\sum_{i}\Btil_{ia}\varepsilon_{i}$ é
+sub-gaussiana de parâmetro $\sigma\lVert\Btil^{(a)}\rVert_{2}/n$, de modo que
+\[
+  \Prob\Bigl(\bigl|(\Btil\T\bveps)_{a}/n\bigr| > t \;\Big|\; \bX,\bU\Bigr)
+  \;\le\; 2\exp\!\left(-\frac{n^{2}t^{2}}{2\sigma^{2}\lVert\Btil^{(a)}\rVert_{2}^{2}}\right).
+\]
+Como $\MA$ é uma projeção ortogonal, $\lVert\Btil^{(a)}\rVert_{2} =
+\norm{\MA\Bmat^{(a)}}_{2} \le \lVert\Bmat^{(a)}\rVert_{2} =
+\sqrt{n}\,(\Gramhat)_{aa}^{1/2} \le \sqrt{n}\,\smax$. Com
+$t = \pen_{0} = \sigma\smax\sqrt{2\log(2d/\alpha)/n}$ o expoente é no máximo
+$-\log(2d/\alpha)$, e cada coordenada tem probabilidade no máximo $\alpha/d$.
+A união sobre as $d$ colunas e a torre fecham. \qed
+
+\subsection*{Lema~\ref{lem:colunas}}
+
+Para a coluna $a = (\cv\md,\lev\tsl)$, o somando é
+$W_{i} = X_{i\cv}^{2}\wav{\lev}{\tsl}(U_{i\md})^{2} \ge 0$. A média:
+$\E[W] \le B_{X}^{2}\,\E[\wav{\lev}{\tsl}(U_{\md})^{2}] =
+B_{X}^{2}\int_{0}^{1}\wav{\lev}{\tsl}^{2}\,p_{U_{\md}} \le B_{X}^{2}C_{U}$,
+pela ortonormalidade e pela densidade marginal limitada (Hipótese de densidade
+de E1.3). O alcance: $\norm{\wav{\lev}{\tsl}}_{\infty} =
+2^{\lev/2}\norm{\psi}_{\infty}$ e $\lev \le J-1$, logo
+$0 \le W_{i} \le B_{X}^{2}\norm{\psi}_{\infty}^{2}2^{J-1} = R_{J}'$. A
+variância: $\operatorname{Var}(W) \le \E[W^{2}] \le R_{J}'\,\E[W] \le
+R_{J}'B_{X}^{2}C_{U}$. A desigualdade de Bernstein unilateral e a união sobre
+as $d$ colunas dão o enunciado. Com $t = B_{X}^{2}C_{U}$ o expoente é
+$-3nB_{X}^{2}C_{U}/(8R_{J}')$, e $R_{J}' \asymp 2^{J}$, de modo que
+$d\exp(-cn/2^{J}) \to 0$ sempre que $2^{J}\log d/n \to 0$. \qed
+
+\subsection*{Lema~\ref{lem:l1besov}}
+
+Em $\R^{2^{\lev}}$ e para $1 \le \pi \le \infty$, Hölder dá
+$\norm{a}_{1} \le (2^{\lev})^{1-1/\pi}\norm{a}_{\pi}$ (com $1/\infty = 0$).
+Com a Hipótese de Besov, $\norm{\theta^{*}_{\cv\md,\lev\cdot}}_{\pi} \le
+C_{g}2^{-\lev(s+1/2-1/\pi)}$, e o expoente resultante é
+$\lev(1-1/\pi) - \lev(s+1/2-1/\pi) = \lev(1/2-s)$: o $\pi$ desaparece. Somar
+sobre $\lev < J$ e sobre os $pq$ blocos dá a segunda afirmação, com a soma
+geométrica nos três regimes. \qed
+
+\subsection*{Teorema~\ref{thm:oraculo}}
+
+\emph{Passo 1 (desigualdade básica).} Pelo Lema~\ref{lem:perfil}(i),
+$\thetahat$ minimiza $\normn{\widetilde{\bY} - \Btil\btheta}^{2} +
+2\pen\norm{\btheta}_{1}$; comparando com $\thetastar$,
+\[
+  \normn{\widetilde{\bY} - \Btil\thetahat}^{2} + 2\pen\norm{\thetahat}_{1}
+  \;\le\; \normn{\widetilde{\bY} - \Btil\thetastar}^{2} + 2\pen\norm{\thetastar}_{1}.
+\]
+Como $\bY = \Amat\bc + \Bmat\thetastar + \bb + \bveps$ e $\MA\Amat = 0$, vale
+$\widetilde{\bY} = \Btil\thetastar + \MA(\bb+\bveps)$; escrevendo
+$r = \MA(\bb+\bveps)$ e $v = \thetahat - \thetastar$, tem-se
+$\widetilde{\bY} - \Btil\thetahat = r - \Btil v$ e
+$\widetilde{\bY} - \Btil\thetastar = r$, donde
+\begin{equation}
+  \label{eq:basica}
+  \normn{\Btil v}^{2} + 2\pen\norm{\thetahat}_{1}
+  \;\le\; 2\inner{r}{\Btil v}_{n} + 2\pen\norm{\thetastar}_{1}.
+\end{equation}
+
+\emph{Passo 2 (os dois ruídos).} Como $\MA\Btil = \Btil$ e $\MA$ é simétrica,
+$\inner{r}{\Btil v}_{n} = \inner{\bb + \bveps}{\Btil v}_{n}$. O termo
+estocástico é tratado por dualidade: em $\mathcal{T}$,
+\[
+  2\bigl|\inner{\bveps}{\Btil v}_{n}\bigr|
+  \;\le\; 2\bigl\lVert\Btil\T\bveps/n\bigr\rVert_{\infty}\norm{v}_{1}
+  \;\le\; \pen\norm{v}_{1}.
+\]
+O termo determinístico é tratado por Cauchy--Schwarz e Young, e não por
+dualidade, porque $\bb$ não é pequeno em $\ell_{\infty}$ coordenada a
+coordenada:
+\[
+  2\bigl|\inner{\bb}{\Btil v}_{n}\bigr|
+  = 2\bigl|\inner{\MA\bb}{\Btil v}_{n}\bigr|
+  \;\le\; 2\normn{\MA\bb}\,\normn{\Btil v}
+  \;\le\; 2\normn{\bb}\,\normn{\Btil v}
+  \;\le\; \tfrac12\normn{\Btil v}^{2} + 2\normn{\bb}^{2}.
+\]
+Levando as duas a \eqref{eq:basica},
+\begin{equation}
+  \label{eq:basica2}
+  \tfrac12\normn{\Btil v}^{2} + 2\pen\norm{\thetahat}_{1}
+  \;\le\; \pen\norm{v}_{1} + 2\pen\norm{\thetastar}_{1} + 2\normn{\bb}^{2}.
+\end{equation}
+
+\emph{Passo 3 (taxa lenta).} $\norm{v}_{1} \le \norm{\thetahat}_{1} +
+\norm{\thetastar}_{1}$ em \eqref{eq:basica2} dá (i) diretamente. Nenhuma
+propriedade de $\Gramhat$ foi usada.
+
+\emph{Passo 4 (cone).} Como $\thetastar_{\Szero^{c}} = 0$,
+$\norm{\thetahat}_{1} = \lVert\thetahat_{\Szero}\rVert_{1} +
+\lVert v_{\Szero^{c}}\rVert_{1} \ge \norm{\thetastar}_{1} -
+\lVert v_{\Szero}\rVert_{1} + \lVert v_{\Szero^{c}}\rVert_{1}$, e
+$\norm{v}_{1} = \lVert v_{\Szero}\rVert_{1} + \lVert v_{\Szero^{c}}\rVert_{1}$.
+Substituindo em \eqref{eq:basica2} e cancelando $2\pen\norm{\thetastar}_{1}$,
+\begin{equation}
+  \label{eq:cone}
+  \tfrac12\normn{\Btil v}^{2} + \pen\lVert v_{\Szero^{c}}\rVert_{1}
+  \;\le\; 3\pen\lVert v_{\Szero}\rVert_{1} + 2\normn{\bb}^{2}.
+\end{equation}
+
+\emph{Passo 5 (os dois casos).} \textbf{Caso 1:}
+$2\normn{\bb}^{2} \le \pen\lVert v_{\Szero}\rVert_{1}$. Então \eqref{eq:cone}
+dá $\tfrac12\normn{\Btil v}^{2} + \pen\lVert v_{\Szero^{c}}\rVert_{1} \le
+4\pen\lVert v_{\Szero}\rVert_{1}$. Por Cauchy--Schwarz e
+\eqref{eq:schur}, $\lVert v_{\Szero}\rVert_{1} \le \sqrt{s_{0}}\norm{v}_{2}
+\le \sqrt{s_{0}}\,\normn{\Btil v}/\sqrt{\gtil}$, logo
+\[
+  \tfrac12\normn{\Btil v}^{2} \le 4\pen\sqrt{s_{0}}\,\normn{\Btil v}/\sqrt{\gtil}
+  \;\Longrightarrow\;
+  \normn{\Btil v} \le 8\pen\sqrt{s_{0}/\gtil}
+  \;\Longrightarrow\;
+  \normn{\Btil v}^{2} \le 64\pen^{2}s_{0}/\gtil .
+\]
+Do mesmo display, $\lVert v_{\Szero^{c}}\rVert_{1} \le 4\lVert v_{\Szero}\rVert_{1}$,
+donde $\norm{v}_{1} \le 5\lVert v_{\Szero}\rVert_{1} \le
+5\sqrt{s_{0}}\normn{\Btil v}/\sqrt{\gtil} \le 40\pen s_{0}/\gtil$; e
+$\norm{v}_{2}^{2} \le \normn{\Btil v}^{2}/\gtil \le 64\pen^{2}s_{0}/\gtil^{2}$.
+
+\textbf{Caso 2:} $2\normn{\bb}^{2} > \pen\lVert v_{\Szero}\rVert_{1}$. Então
+\eqref{eq:cone} dá $\tfrac12\normn{\Btil v}^{2} \le 3\pen\lVert
+v_{\Szero}\rVert_{1} + 2\normn{\bb}^{2} < 8\normn{\bb}^{2}$, isto é
+$\normn{\Btil v}^{2} < 16\normn{\bb}^{2}$; também
+$\pen\lVert v_{\Szero^{c}}\rVert_{1} < 8\normn{\bb}^{2}$ e
+$\pen\lVert v_{\Szero}\rVert_{1} < 2\normn{\bb}^{2}$, donde
+$\norm{v}_{1} < 10\normn{\bb}^{2}/\pen$; e
+$\norm{v}_{2}^{2} \le \normn{\Btil v}^{2}/\gtil < 16\normn{\bb}^{2}/\gtil$.
+Como cada quantidade é majorada pelo máximo dos dois casos, e o máximo pela
+soma, sai (ii).
+
+\emph{Passo 6 (erro de predição).} Por \eqref{eq:decomp-fit},
+$\widehat{f} - f = \Btil v + \PA(\bb+\bveps) - \bb$, e como $\PA$ é uma
+projeção, $\normn{\PA\bb} \le \normn{\bb}$; a desigualdade triangular dá a
+primeira parte de (iii), e $(x+y+z)^{2} \le 3(x^{2}+y^{2}+z^{2})$ a segunda.
+Para a última, condicionalmente em $(\bX,\bU)$ os $\varepsilon_{i}$ são
+independentes, centrados e de variância no máximo $\sigma^{2}$, logo
+\[
+  \E\bigl[\normn{\PA\bveps}^{2} \mid \bX,\bU\bigr]
+  = \tfrac1n\operatorname{tr}\bigl(\PA\operatorname{Cov}(\bveps\mid\bX,\bU)\bigr)
+  = \tfrac1n\sum_{i}(\PA)_{ii}\operatorname{Var}(\varepsilon_{i}\mid\bX,\bU)
+  \le \frac{\sigma^{2}}{n}\operatorname{tr}(\PA) \le \frac{\sigma^{2}p}{n},
+\]
+usando $(\PA)_{ii} \ge 0$ e $\operatorname{tr}(\PA) = \operatorname{rank}(\Amat)
+\le p$. Markov fecha. \qed
+
+\subsection*{Corolários~\ref{cor:taxas} e~\ref{cor:componentes}}
+
+Para o Corolário~\ref{cor:taxas}, intersecte quatro eventos: $\mathcal{T}$
+(Lema~\ref{lem:calib}, probabilidade $\ge 1-\alpha$); $\{\smax^{2} \le
+2B_{X}^{2}C_{U}\}$ (Lema~\ref{lem:colunas}), que torna a $\pen$ do enunciado
+admissível, isto é $\pen \ge 2\pen_{0}$; $\{\lmin(\Gramhat) \ge \gamma/2\}$
+(Proposição~\ref{prop:gram-E14}), que com \eqref{eq:schur} dá
+$\gtil \ge \kappa_{1}c_{U}/2$; e
+$\{\normn{\bb}^{2} \le \mathcal{B}_{J}^{2}/\alpha'\}$, que é Markov aplicado a
+$\E\normn{\bb}^{2} = \norm{f-f_{J}}_{L_{2}(P)}^{2} \le \mathcal{B}_{J}^{2}$
+(Corolário~\ref{cor:vies-E13}, primeira cota) --- a identidade vale porque os
+$(\bX_{i},\bU_{i})$ são i.i.d.\ com lei $P$. Substituir em (ii) e (iii) do
+Teorema~\ref{thm:oraculo} dá o enunciado. A versão lenta é a mesma conta com
+(i) e o Lema~\ref{lem:l1besov}.
+
+Para o Corolário~\ref{cor:componentes}, dentro de cada bloco $(\cv,\md)$ as
+$\wav{\lev}{\tsl}$, $\lev < J$, são ortonormais em $L_{2}[0,1]$, logo
+$\lVert\widehat{g}_{\cv\md} - \PiJ\gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}^{2} =
+\sum_{\lev\tsl}v_{\cv\md,\lev\tsl}^{2}$; somar sobre os $pq$ blocos dá
+$\norm{v}_{2}^{2}$. A segunda afirmação é $(x+y)^{2} \le 2x^{2}+2y^{2}$ com o
+Lema~1 de E1.3 em cada bloco. \qed
+
+\section{O que foi transposto e o que é novo}
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Transposto de Bühlmann e van de Geer (2011), Seção~6.2:} a
+    desigualdade básica; a dualidade $|\inner{\bveps}{\Btil v}_{n}| \le
+    \lVert\Btil\T\bveps/n\rVert_{\infty}\norm{v}_{1}$; a calibração
+    $\pen \ge 2\pen_{0}$; o argumento de cone do Passo~4; a conversão
+    $\lVert v_{\Szero}\rVert_{1} \le \sqrt{s_{0}}\norm{v}_{2}$ e a constante de
+    compatibilidade à \emph{primeira} potência em predição.
+  \item \textbf{Transposto do WALL teórico:} a organização em passos
+    (básica, calibração, $\ell_{1}$ do oráculo, cota a priori) do Apêndice
+    ``Slow-Rate Track''; a observação de que a calibração sub-gaussiana não
+    sofre inflação logarítmica (Passo~3a do Lemma ``LASSO prediction
+    consistency''); a separação entre o enunciado incondicional (taxa lenta,
+    sem esparsidade) e o condicional (taxa rápida).
+  \item \textbf{Novo:} a perfilagem dos níveis não penalizados com
+    \eqref{eq:schur}, que substitui a condição de cone com coordenadas não
+    penalizadas pela forma consumível de E1.4 e faz a constante não depender
+    de $\Szero$; o tratamento do viés por Young com a análise em dois casos do
+    Passo~5, que mantém o enunciado não assintótico e válido também quando o
+    viés domina; o termo $\sigma^{2}p/n$ explícito; e o
+    Lema~\ref{lem:l1besov}, cuja conclusão não depende de $\pi$ --- é o que
+    permite enunciar a taxa lenta em Besov geral, e não só em
+    $\Besov{s}{2}{\infty}$ como no WALL.
+  \item \textbf{Diferença de perda:} o WALL trabalha com a perda logística e
+    precisa de uma etapa de localização (margem local) que a perda quadrática
+    dispensa, porque a curvatura é constante. Em compensação, a perda
+    quadrática com erro não limitado exige a Hipótese~\ref{ass:subg}, que o
+    WALL não precisa ($Y \in \{0,1\}$).
+\end{itemize}
+
+\section{O que isto não cobre}
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{A norma populacional.} Tudo aqui é em $\normn{\cdot}$, a norma
+    empírica. A passagem a $\norm{\widehat{f}-f}_{L_{2}(P)}$ exige concentração
+    uniforme sobre a classe do sieve e fica em E1.6.
+  \item \textbf{A escolha de $J_{n}$ e de $\pen_{n}$.} O Corolário~\ref{cor:taxas}
+    é não assintótico e vale para qualquer $J$; equilibrar
+    $s_{0}\log(pq\NJ)/n$ contra $2^{-2J\seff}$, e obter
+    $n^{-2\seff/(2\seff+1)}$, é E1.6.
+  \item \textbf{O regime comprimível.} Sob a Hipótese de Besov o oráculo em
+    geral tem $s_{0} = d$, e a taxa rápida como está não ajuda; o corolário de
+    compressibilidade (weak-$\ell_{\tau}$) que troca $s_{0}$ por uma dimensão
+    efetiva é E1.6. O que este arquivo garante sem hipótese extra é a taxa
+    lenta (i).
+  \item \textbf{$\sigma$ desconhecido e $\pen$ aleatório.} A calibração supõe
+    $\sigma$ conhecido e $\pen$ determinístico. Validação cruzada, BIC/EBIC e
+    o \emph{quantile universal threshold} são E2.3; o square-root LASSO, que
+    dispensa $\sigma$, não está coberto.
+  \item \textbf{O $1/\alpha'$ de Markov} no termo de viés e no termo
+    $\sigma^{2}p/n$. Com a cota uniforme do Corolário~\ref{cor:vies-E13}
+    (que exige $s > 1/\pi$) o termo de viés vira determinístico, ao preço da
+    taxa pior $2^{-2J(s-1/\pi)}$; uma versão com $\log(1/\alpha')$ exigiria
+    Bernstein para $(f-f_{J})^{2}$ e Hanson--Wright para $\normn{\PA\bveps}^{2}$.
+  \item \textbf{Seleção de suporte.} Nada aqui diz que
+    $\operatorname{supp}(\thetahat) = \Szero$; é E1.7, e sob a Hipótese de
+    Besov a pergunta sequer é a certa (o WALL faz o mesmo registro).
+  \item \textbf{$\Amat$ de posto deficiente.} A perfilagem supõe posto $p$, o
+    que a Proposição~\ref{prop:gram-E14} garante com probabilidade alta mas não
+    quase certamente. Em amostra finita, se $\Amat$ degenerar o estimador
+    continua definido e o teorema simplesmente não se aplica.
+  \item \textbf{A base do intervalo} (\texttt{boundary = "interval"}), pela
+    mesma razão de E1.4: a constante deixa de ser uma coluna isolada.
+  \item \textbf{Heterocedasticidade e dependência.} A Hipótese~\ref{ass:subg} é
+    condicional e uniforme, e a amostra é i.i.d.
+\end{itemize}
+
+\section{Conferência numérica}
+
+\texttt{check/04-oraculo.R} (imprime \texttt{OK}; cerca de 16~s). Desenho de
+E1.4: Daublets com filtro 8, $J = 3$, $p = 2$ com $X_{1}\equiv 1$ e
+$X_{2} = 1/2+\eta$, $q = 2$, $\bU$ uniforme em $[0,1]^{2}$ (logo
+$c_{U} = C_{U} = 1$, $\gamma = \kappa_{1}c_{U} = 0.25$), $d = 28$, $D = 30$,
+erro gaussiano com $\sigma = 0.5$, $\pen = 2\sigma\smax\sqrt{2\log(2d/\alpha)/n}$
+e $\alpha = 0.05$. O que saiu em 2026-09-19:
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Armadilha de implementação, registrada para E2.1.} O
+    \texttt{glmnet} descarta colunas de variância zero, e a coluna não
+    penalizada $X_{1}\equiv 1$ é uma delas: passada dentro de $\bZ$ com
+    \texttt{penalty.factor = 0} ela sai do ajuste e $\Amat\T r$ não zera
+    ($\max|\Amat\T r/n| = 6.6\times10^{-1}$ na primeira tentativa). As duas
+    saídas corretas são resolver o problema residualizado (a perfilagem do
+    Lema~\ref{lem:perfil}) ou deixar a constante com o intercepto do
+    \texttt{glmnet}. As duas dão o mesmo minimizador a $1.7\times10^{-8}$, e
+    a solução satisfaz as condições KKT de \eqref{eq:estimador}:
+    $\max|\Amat\T r/n| = 8.9\times10^{-16}$,
+    $\max(\lVert\Bmat\T r/n\rVert_{\infty} - \pen) = 2.8\times10^{-9}$, e
+    igualdade com sinal no suporte ativo a $5.2\times10^{-8}$.
+  \item \textbf{Lema~\ref{lem:perfil}(iii).} $\gtil \ge \lmin(\Gramhat)$ em
+    todas as réplicas; em $n = 400$, mediana $\lmin(\Gramhat) = 0.1411$ e
+    mediana $\gtil = 0.1458$. A cadeia que o teorema consome,
+    $\gtil \ge \lmin(\Gramhat) \ge \gamma/2 = 0.125$, vale em $90\%$ das
+    réplicas em $n = 400$ (E1.4 já registrava que a razão
+    $\lmin(\Gramhat)/\lmin(\Gram)$ é $0.40$ em $n = 200$ e $0.84$ em
+    $n = 3200$).
+  \item \textbf{Lema~\ref{lem:colunas} e Observação~\ref{rem:calib}.} $\smax$
+    é $1.085$, $1.042$, $1.026$ em $n = 200, 800, 3200$, contra a cota
+    $B_{X}\sqrt{C_{U}} = 1.5$; em $J = 2,\dots,6$ com $n = 4000$, $\smax$ vai
+    de $1.02$ a $1.14$ enquanto $\max_{i,a}|Z_{ia}|$ vai de $3.04$ a $11.47$.
+  \item \textbf{Lema~\ref{lem:calib}.} A cobertura de $\mathcal{T}$ é $1.000$
+    em $n = 200$ e em $n = 1600$ sobre $400$ réplicas, contra o nominal
+    $0.95$: a cota sub-gaussiana é conservadora por um fator $2$
+    ($\pen_{0}$ mediano $0.1437$ contra
+    $\lVert\Btil\T\bveps/n\rVert_{\infty}$ mediano $0.0717$ em $n = 200$).
+  \item \textbf{Lema~\ref{lem:l1besov}.} A desigualdade de Hölder por nível é
+    saturada no pior caso ($\max = 1.0000$ sobre
+    $\pi \in \{1, 1.5, 2, 4, \infty\}$ e $\lev = 2,\dots,8$); em sequências de
+    Besov construídas com $s = 0.3, 0.5, 1.5$, $\norm{\thetastar}_{1}$ é
+    $12.39$, $10.80$, $6.56$ contra as cotas $13.87$, $12.00$, $7.00$.
+  \item \textbf{Taxa lenta.} $\normn{\Btil v}^{2} \le 6\pen\norm{\thetastar}_{1}
+    + 4\normn{\bb}^{2}$ em todas as réplicas, com $\thetastar$ esparso
+    (folga mínima $23.0\times$) e com $\thetastar$ denso de Besov
+    (folga mínima $12.6\times$).
+  \item \textbf{Taxa rápida, com $s_{0} = 4$ e sem viés.} Nenhuma violação da
+    cota $64\pen^{2}s_{0}/\gtil$ em $6 \times 60$ ajustes; a folga cai de
+    $371\times$ em $n = 200$ a $187\times$ em $n = 6400$ (as constantes de
+    Bühlmann e van de Geer são grosseiras, como se espera). O que a etapa
+    pedia medir:
+    \[
+      \frac{\normn{\widehat{f}-f}^{2}}{\pen^{2}s_{0}}
+      = 1.566,\; 1.617,\; 1.573,\; 1.541,\; 1.548,\; 1.557
+      \qquad (n = 200 \to 6400),
+    \]
+    razão máxima sobre mínima $1.05$ ao variar $n$ por um fator $32$; e
+    $n\normn{\widehat{f}-f}^{2}$ entre $90.4$ e $106.9$, isto é, a taxa é
+    $1/n$ com $J$ fixo. As cotas de $\norm{v}_{1}$ e $\norm{v}_{2}^{2}$ do
+    Teorema~\ref{thm:oraculo}(ii) valem, com folga de duas ordens.
+  \item \textbf{Observação~\ref{rem:pn}.} $\E\normn{\PA\bveps}^{2}$ contra
+    $\sigma^{2}p/n$: razão $1.19$, $0.93$, $0.90$ em $n = 200, 800, 3200$.
+  \item \textbf{Com viés.} $\gcomp{1}{1} = \sin(2\pi u)$, cuja projeção em
+    $\WJ$ com $J = 3$ deixa $\norm{g - \PiJ g}_{L_{2}[0,1]} = 0.0058$. A
+    desigualdade rápida e a de predição valem em todas as réplicas, e
+    $\normn{\bb}^{2}$ concentra no valor populacional
+    $\norm{f-f_{J}}_{L_{2}(P)}^{2}$ a menos de $25\%$, que é o passo de Markov
+    do Corolário~\ref{cor:taxas}.
+\end{itemize}
+
+\section*{Referências}
+\sloppy
+
+Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item Bühlmann, P.\ e van de Geer, S. (2011). \emph{Statistics for
+    High-Dimensional Data}. Springer. (\texttt{buhlmann2011statistics},
+    verificada em L1.) Seção~6.2: Teorema~6.1 (taxa lenta), Teorema~6.2 (taxa
+    rápida sob compatibilidade), Seção~6.2.3 (coordenadas não penalizadas).
+    \textsc{[verificar numeração]}
+  \item Klopp, O.\ e Pensky, M. (2015). Sparse high-dimensional varying
+    coefficient model: nonasymptotic minimax study. \emph{The Annals of
+    Statistics} 43(3), 1273--1299. (\texttt{Klopp-Pensky-2015}, verificada em
+    L1.) Eq.~(1.8), Lema~1 e Teorema~2 são o vizinho do caso $q = 1$ com
+    $\bX \perp \bU$.
+  \item Tropp, J.~A. (2012). User-friendly tail bounds for sums of random
+    matrices. \emph{Foundations of Computational Mathematics} 12, 389--434.
+    (\texttt{tropp2012user} na bibliografia do WALL; ainda não está no
+    \texttt{.bib} verificado.) Usada por E1.4, citada aqui só pela
+    Proposição~\ref{prop:gram-E14}.
+\end{itemize}
+
+\end{document}
