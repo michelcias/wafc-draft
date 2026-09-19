@@ -173,16 +173,21 @@ a curva `2^{−J s'}`.
 
 ### E1.4 `03-desenho-produtos.tex`
 
-O resultado novo. Gram populacional `Σ = E[Z Z']` do desenho de produtos.
-(i) Caso `X ⊥ U`: `Σ` fatora como `E[XX'] ⊗ Σ_ψ`, e a compatibilidade do
-WALL (só em `ψ(U)`) se transfere com constante `λ_min(E[XX'])`. (ii) Caso
-geral: sob `λ_min(E[XX' | U]) ≥ κ_1` q.c. e a densidade de `U` limitada
-por baixo, autovalor restrito de `Σ` no cone `‖θ_{S^c}‖_1 ≤ 3‖θ_S‖_1`
-afastado de zero. (iii) Versão empírica: `Σ̂` herda a condição com
-probabilidade alta quando `s_0 log(p q N_J) · (algo)/n → 0` (concentração
-com colunas limitadas por `‖X‖_∞ · 2^{J/2}`). Conferência: `λ_min` de `Σ̂`
-restrita ao cone (ou a compatibilidade) em `n = 200`, `J = 3`, para `X ⊥ U`
-e para `X` dependente de `U`.
+**Fechada em 2026-09-19; o texto abaixo é o que ela virou depois de L2
+(proposta L2b, ratificada).** (i) O caso `X ⊥ U`, em que `Σ` fatora como
+`E(XX') ⊗ Σ_ψ`, **não é novo**: é a eq. (1.8) e o Lema 1 de Klopp & Pensky
+(2015), a recordar e citar, não a provar. (ii) O conteúdo novo é o termo
+cruzado entre moduladoras, `E{X_ℓ X_{ℓ'} ψ_{jk}(U_m) ψ_{j'k'}(U_{m'})}` com
+`m ≠ m'`, que não é produto de Kronecker, e o caso geral sob
+`λ_min(E(XX' | U)) ≥ κ_1` q.c. com a densidade conjunta de `U` limitada por
+baixo, que saiu **mais forte do que o previsto**: autovalor mínimo cheio,
+`λ_min(Σ) ≥ κ_1 c_U`, sem condição de cone. (iii) Versão empírica por
+concentração, com `p q 2^J log(p q 2^J)/n → 0`. Conferência feita em
+`n = 200`, `J = 3`, nos dois casos.
+
+Sob D23, a margem do reescalonamento muda a constante para
+`c_U λ_min(G_eps)`, com `G_eps` a Gram da base restrita ao suporte; a
+emenda é E1.3b e a medida é de E2.4.
 
 ### E1.5 `04-oraculo.tex`
 
@@ -242,13 +247,25 @@ Comparar as três regras nos cenários de E2.1 em `n ∈ {250, 1000}`.
 
 ### E2.4 Piloto
 
-`R/competitors.R` e `scripts/02-pilot.R`: WAFC (LASSO; grupos) contra `mgcv::gam`
-com `s(u_k, by = x_j)`, B-splines + group LASSO (`grpreg`), regressão linear
-oráculo. Cenários: (a) todas `g_{jk}` suaves; (b) `g_{jk}` não homogêneas
-(bumps, blocks, heavisine); (c) mistura com metade das `g_{jk}` nulas
-(`p = 4`, `q = 4`). `n ∈ {250, 500, 1000}`; `p q` até 16 no piloto. Métricas:
-ISE de cada `ĝ_{jk}` no interior `[ε, 1−ε]`, RMSE de predição fora da
-amostra, taxa de acerto de suporte por `(j,k)`, segundos. 50 réplicas.
+`R/competitors.R` e `scripts/04-pilot.R`: WAFC (LASSO; grupos) contra os
+**concorrentes mínimos de L2d** (proposta ratificada): `mgcv::gam` com
+`s(u_m, by = x_ℓ)`; B-splines mais group LASSO (`grpreg`); o **spline
+adaptativo** de Wang, Jiang & Liu (2024), que é o concorrente que adapta
+localmente; o **block LASSO de Klopp & Pensky** no mesmo desenho, que sai
+com `grpreg`/`gglasso` e é a pergunta que o posicionamento D18 convida; o
+**VCBART**, não aditivo e com várias moduladoras; e a regressão linear
+oráculo. Cenários: (a) todas `g_{ℓm}` suaves; (b) não homogêneas, com as
+funções de teste de **Donoho & Johnstone** (bumps, blocks, heavisine) e
+SNR 3, como em Sardy & Ma; (c) mistura com metade das `g_{ℓm}` nulas
+(`p = 4`, `q = 4`). `n ∈ {250, 500, 1000}`; `p q` até 16 no piloto.
+Métricas: ISE de cada `ĝ_{ℓm}` no interior, RMSE de predição fora da
+amostra, acerto de estrutura por bloco `(ℓ,m)`, segundos. 50 réplicas.
+
+Além disso, e vindo das rodadas de 2026-09-19: medir **`λ_min(G_eps)` e o
+ISE contra `eps`** (D23, com `eps ∈ {0, 2^{−J−1}, 1.9^{−J}}`), que é o que
+decide o padrão da margem e conserta o `eps` que hoje varia com `J`; e
+incluir o **QUT** de Giacobino et al. (2017) como regra de `λ` sem `σ`
+(proposta L2c, ratificada), ao lado das cinco regras que E2.3 já compara.
 
 ### E2.5 Go/no-go e variante principal
 
@@ -314,7 +331,7 @@ cache por unidade retomável, semente mestra única, `INSTRUCTIONS.md` e
 | `(p, q)` | (2, 2), (4, 4), (10, 5) |
 | dependência `X`–`U` | independentes; correlacionados |
 | ruído | dois níveis de razão sinal-ruído |
-| métodos | WAFC (variante de E2.5); `mgcv`; B-splines + group LASSO; linear oráculo |
+| métodos | WAFC (variante de E2.5); `mgcv`; B-splines + group LASSO; spline adaptativo (Wang, Jiang & Liu 2024); block LASSO de Klopp & Pensky no mesmo desenho; VCBART; linear oráculo (L2d) |
 | réplicas | fixadas pelo piloto (E4.3) |
 
 Métricas: ISE por função e total; RMSE de predição; suporte; tempo. A

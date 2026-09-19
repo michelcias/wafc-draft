@@ -140,10 +140,18 @@ e deixar como observação), e o caso `p` crescendo mais rápido que `n`.
   suavidade global (Hölder) e não adaptam a regularidade local.
 - Zhou & You (2004) usam wavelets em coeficientes variáveis, mas sem
   estrutura aditiva, sem LASSO e com uma só moduladora.
-- Sardy & Tseng (2004) e Sardy & Ma (2024) fazem modelos aditivos esparsos com
-  wavelets e penalidade `‖·‖_1`, mas **sem o `X_ℓ` multiplicando**: o desenho
-  é `ψ(U_m)`, não `X_ℓ ψ(U_m)`, e as condições de desenho e a
-  identificabilidade mudam. É o trabalho mais próximo e o que o referee vai citar.
+- **O mais próximo na teoria é Klopp & Pensky (2015)** (L2, `busca-novidade.md`
+  §1): para uma moduladora e `X ⊥ U`, eles já têm o desenho de produtos com
+  Gram de Kronecker, a concentração da Gram empírica restrita, a desigualdade
+  oráculo não assintótica, a taxa adaptativa em Besov e a cota inferior
+  minimax. O artigo se apresenta como extensão deles (D18).
+- **No método, os mais próximos são Sardy & Ma (2024) e Amato et al. (2022)**:
+  aditivos esparsos com wavelets e penalidade `‖·‖_1`, mas **sem o `X_ℓ`
+  multiplicando**; o desenho é `ψ(U_m)`, não `X_ℓ ψ(U_m)`. A teoria de Sardy &
+  Ma é de otimização, não estatística.
+- **Montoril, Morettin & Chiann (2018)** estimam coeficientes funcionais com
+  wavelets, sem penalização e com uma moduladora: precursor do próprio grupo,
+  obrigatório citar.
 - Wei, Huang & Li (2011) e Xue & Qu (2012) fazem seleção em coeficientes
   variáveis por group LASSO com B-splines, com uma moduladora.
 
