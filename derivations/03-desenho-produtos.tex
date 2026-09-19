@@ -159,7 +159,7 @@ Part (iv) transfers the full smallest eigenvalue, which is what the sieve regime
 $2^{J_n} \asymp n^{1/(2\seff+1)}$ of E1.6 makes available at no cost: there $p q 2^{J}\log(pq2^{J})/n \to 0$
 as soon as $p q$ grows slower than $n^{2\seff/(2\seff+1)}$ up to logarithms. If $pq$ were larger, the
 compatibility constant alone can still be transferred through the entrywise deviation: by Bühlmann and van de
-Geer (2011, Corollary~6.8 [VERIFICAR numeração]), $\norm{\Gramhat - \Gram}_\infty \le \compat^2(S;\Gram)/(32 s_0)$
+Geer (2011, Corollary~6.8, Section~6.12), $\norm{\Gramhat - \Gram}_\infty \le \compat^2(S;\Gram)/(32 s_0)$
 implies $\compat^2(S; \Gramhat) \ge \compat^2(S; \Gram)/2$, and a union bound over the $D^2$ entries, each
 bounded by $B_X^2 C_\psi' 2^{J}$ with variance at most $B_X^4 C_U C_\psi' 2^{J}$, gives
 $\norm{\Gramhat - \Gram}_\infty = O_p\bigl(2^{J/2}\sqrt{\log D/n} + 2^{J}\log D/n\bigr)$; the requirement becomes
@@ -317,12 +317,14 @@ eigenvalues over $u_1 \in [0,1]$); scenario C has $X_2 = U_1 - 1/2$, so $\kappa_
 
 \begin{itemize}[leftmargin=*]
     \item Bühlmann, P. and van de Geer, S. (2011). \emph{Statistics for High-Dimensional Data}. Springer.
-    (\texttt{buhlmann2011statistics}, verified in L1.)
+    (\texttt{buhlmann2011statistics}, verified in L1.) The numbering was checked in L3: Corollary~6.8 is on
+    p.~152, in Section~6.12, and states that $32\,s\,\lVert\Sigma_1-\Sigma_0\rVert_\infty/\compat^2(S;\Sigma_0) \le 1$
+    transfers the compatibility condition from $\Sigma_0$ to $\Sigma_1$.
     \item Cohen, A., Daubechies, I. and Vial, P. (1993). Wavelets on the interval and fast wavelet transforms.
     \emph{Applied and Computational Harmonic Analysis} 1, 54--81. (\texttt{cohen1993wavelets}, verified in L1.)
     \item Tropp, J. A. (2012). User-friendly tail bounds for sums of random matrices. \emph{Foundations of
-    Computational Mathematics} 12, 389--434. (\texttt{tropp2012user} in the WALL bibliography; not yet in
-    \texttt{referencias-verificadas.bib}.)
+    Computational Mathematics} 12, 389--434. (\texttt{tropp2012user}, copied from the WALL bibliography and
+    verified in L3.)
 \end{itemize}
 
 \end{document}

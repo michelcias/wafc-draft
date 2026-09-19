@@ -149,14 +149,16 @@ Lebesgue.
 e `ψ^{per}_{jk}(u) = Σ_{l∈ℤ} 2^{j/2} ψ(2^j (u + l) − k)`, somas finitas em
 cada `u` porque os suportes são compactos. A primeira é a partição da
 unidade `Σ_l φ(x − l) ≡ 1`, válida para toda função de escala ortonormal de
-suporte compacto com `∫ φ = 1` (Daubechies 1992, cap. 5 e §9.3
-`[VERIFICAR]`); o `wbasis()` devolve essa coluna igual a `1` até a última
+suporte compacto com `∫ φ = 1` (a periodização de `φ` é a §9.3 de Daubechies
+1992, "Wavelets for `L^p([0,1])`", p. 304; a identidade em si não aparece
+enunciada lá, e L3 não achou fonte verificada para ela — item do handoff);
+o `wbasis()` devolve essa coluna igual a `1` até a última
 casa decimal (§7). Para a segunda, trocando soma e integral (soma finita),
 `∫_0^1 ψ^{per}_{jk} = ∫_ℝ 2^{j/2} ψ(2^j t − k) dt = 2^{−j/2} ∫_ℝ ψ = 0` pelo
 momento nulo de ordem zero. Que `{1} ∪ {ψ^{per}_{jk}}` seja base ortonormal
 de `L_2[0,1]` é a construção padrão da análise de multirresolução
 periodizada (Daubechies 1992, §9.3; Härdle, Kerkyacharian, Picard &
-Tsybakov 1998 `[VERIFICAR]`), e é o que o WALL assume (`ms_theo_1.tex`,
+Tsybakov 1998), e é o que o WALL assume (`ms_theo_1.tex`,
 §2.2). Como `dim V_J = 2^J` e as `2^J − 1` wavelets de nível `< J` são
 ortogonais a `1`, `W_J` é exatamente o complemento das constantes em `V_J`,
 e toda `g ∈ W_J` tem integral zero. ∎
@@ -254,7 +256,7 @@ E2, não de identificabilidade.
   (A1) permite dependência entre `X` e `U`, desde que reste variação
   condicional: com `X_1 ≡ 1` e `p = 2`, `det E[XX' | U] = Var(X_2 | U)`.
 - **Unicidade da solução do LASSO** (`Σ̂` singular ou não) é outra
-  questão, de posição geral das colunas (Tibshirani 2013 `[VERIFICAR]`);
+  questão, de posição geral das colunas (R. J. Tibshirani 2013);
   E1.5 não precisa dela.
 - **O reescalonamento empírico de `U`** para `[ε, 1 − ε]` (computação, fora
   da teoria por D11) é uma bijeção monótona por coordenada; preserva a
@@ -308,10 +310,16 @@ Sinal para E1.4 e E2: a `λ_min` empírica do desenho de intervalo no menor
 
 ## Referências citadas
 
+Todas estão em `docs/referencias-verificadas.bib` desde L3 (2026-09-19):
 `cohen1993wavelets` (Cohen, Daubechies & Vial 1993) e `Xue-Yang-2006`
-(origem do modelo de coeficientes aditivos) estão em
-`docs/referencias-verificadas.bib`. Marcadas `[VERIFICAR]` até entrarem lá:
-Daubechies (1992), *Ten Lectures on Wavelets*, SIAM; Härdle, Kerkyacharian,
-Picard & Tsybakov (1998), *Wavelets, Approximation, and Statistical
-Applications*, Springer (o WALL cita como `hardle1998wavelets`); Tibshirani
-(2013), "The lasso problem and uniqueness", *Electron. J. Statist.* 7.
+(origem do modelo de coeficientes aditivos), já de L1, mais `Daubechies-1992`
+(*Ten Lectures on Wavelets*, CBMS-NSF 61, SIAM), `hardle1998wavelets`
+(Härdle, Kerkyacharian, Picard & Tsybakov 1998, copiada do WALL) e
+`Tibshirani-2013` (Ryan J. Tibshirani, "The lasso problem and uniqueness",
+*Electron. J. Statist.* 7, 1456–1490 — **Ryan**, não Robert).
+
+O que L3 não conseguiu conferir: a partição da unidade `Σ_l φ(x − l) ≡ 1`
+atribuída ao cap. 5 de Daubechies (1992). A expressão "partition of unity"
+não ocorre no livro (busca de texto integral no Google Books), e a §9.3, que
+constrói a base periodizada, não a enuncia. A âncora ficou provisória e está
+no handoff de L3.

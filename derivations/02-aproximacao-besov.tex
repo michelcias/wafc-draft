@@ -53,8 +53,8 @@ $N = L/2$. A base periodizada em $[0,1]$ é
 \]
 e o sistema $\{\mathbf{1}\} \cup \{\wav{\lev}{\tsl}\}$ é uma base ortonormal
 de $L_{2}[0,1]$ com a medida de Lebesgue, com $\int_{0}^{1}\wav{\lev}{\tsl} = 0$
-para toda wavelet (Meyer, 1992, cap.~III, \S 11; Daubechies, 1992, \S 9.3
-\textsc{[verificar]}). É a base que o \texttt{wbasis()} devolve com
+para toda wavelet (Daubechies, 1992, \S 9.3, ``Wavelets for $L^{p}([0,1])$'',
+p.~304). É a base que o \texttt{wbasis()} devolve com
 \texttt{boundary = "periodic"} e $\jzero = 0$: a primeira coluna é
 $\phi_{00} \equiv 1$, descartada (D2), e as demais são as $\wav{\lev}{\tsl}$,
 $\lev = 0, \dots, J-1$.
@@ -84,7 +84,8 @@ coeficientes de $g$ na base periodizada é
 \]
 com a modificação usual para $r = \infty$ (supremo em $\lev$) e para
 $\pi = \infty$ (máximo em $\tsl$). É a norma de Donoho e Johnstone (1998,
-\S 2) e de Härdle et al.\ (1998, cap.~9 \textsc{[verificar]}). A
+\S 2) e de Härdle et al.\ (1998, cap.~9, ``Wavelets and Besov Spaces'',
+pp.~101--124). A
 regularidade efetiva em $L_{2}$ é $\seff = s - (1/\pi - 1/2)_{+}$.
 
 \section{Hipóteses}
@@ -119,8 +120,9 @@ qualquer $r$. (iii) Quais funções a satisfazem: se $\psi$ tem $N > s$
 momentos nulos e regularidade Hölder maior que $s$, a norma de sequência na
 base periodizada é equivalente à norma do espaço de Besov \emph{periódico}
 $\Besov{s}{\pi}{r}(\mathbb{T})$, o das funções de $[0,1]$ cuja extensão
-$1$-periódica está em $\Besov{s}{\pi}{r}$ localmente (Meyer, 1992, cap.~VI;
-Cohen, 2003, cap.~3 \textsc{[verificar]}). A implicação de que a prova
+$1$-periódica está em $\Besov{s}{\pi}{r}$ localmente (Meyer, 1992, cap.~6, ``Wavelets and spaces of
+functions and distributions''; Cohen, 2003, \S 3.6, ``Characterization of
+smoothness classes''). A implicação de que a prova
 precisa, função em Besov implica decaimento dos coeficientes, usa só os $N > s$
 momentos nulos e a limitação de $\psi$; a regularidade de $\psi$ entra só na
 recíproca. Uma função de $\Besov{s}{\pi}{r}[0,1]$ que não emenda em $0 \equiv 1$
@@ -333,7 +335,8 @@ nível.
 \emph{Interiores.} Nelas $\theta_{\lev\tsl} = \inner{Eg}{\psi_{\lev\tsl}}_{\R}$
 para qualquer extensão $Eg$ de $g$ a $\R$. Tomando $E$ o operador de
 extensão limitado de $\Besov{s}{\pi}{r}[0,1]$ em $\Besov{s}{\pi}{r}(\R)$
-(Triebel, 1983; Cohen, 2003, cap.~3 \textsc{[verificar]}) e usando a
+(Triebel, 1983, cap.~3, ``Function Spaces on Domains'', pp.~188--211;
+Cohen, 2003, \S 3.9, ``Bounded domains'') e usando a
 caracterização de $\Besov{s}{\pi}{r}(\R)$ pelos coeficientes de wavelet, que
 para a implicação função $\Rightarrow$ sequência exige só $N > s$ momentos
 nulos, obtém-se $\norm{(\theta_{\lev\tsl})_{\tsl\ \mathrm{int}}}_{\pi} \le
@@ -368,7 +371,7 @@ O que isso muda para o WAFC:
   \item Com \texttt{boundary = "interval"} (Cohen, Daubechies e Vial, 1993),
     o espaço $\VJ$ do intervalo reproduz polinômios de grau $< N$ e a sua
     base caracteriza $\Besov{s}{\pi}{r}[0,1]$ sem periodicidade (Cohen,
-    2003, cap.~3 \textsc{[verificar]}); o Lema~\ref{lem:L2} vale então com
+    2003, \S 3.9); o Lema~\ref{lem:L2} vale então com
     $\Besov{s}{\pi}{r}[0,1]$ no lugar do espaço periódico e a mesma prova,
     pois $\mathbf{1} \in V_{\jzero}$ e a projeção de uma função de média
     zero em $\VJ$ é ortogonal a $\mathbf{1}$. O preço é numérico e
@@ -463,32 +466,43 @@ que saiu:
 \section*{Referências}
 \sloppy
 
-Referências fora de \texttt{docs/referencias-verificadas.bib} estão marcadas
-\textsc{[verificar]} e vão ao handoff.
+Todas as referências deste arquivo foram conferidas em L3 (2026-09-19) e
+estão em \texttt{docs/referencias-verificadas.bib}. A única localização que a
+rodada não conseguiu confirmar está anotada abaixo, em Meyer (1992).
 
 \begin{itemize}[nosep]
   \item Cohen, A. (2003). \emph{Numerical Analysis of Wavelet Methods}.
     Studies in Mathematics and its Applications 32. Elsevier.
-    \textsc{[verificar]}
+    (\texttt{Cohen-2003}.) O cap.~3 é ``Approximation and smoothness''; a
+    caracterização das classes de suavidade é a \S 3.6 e os domínios
+    limitados, com a extensão, são a \S 3.9.
   \item Cohen, A., Daubechies, I. e Vial, P. (1993). Wavelets on the
     interval and fast wavelet transforms. \emph{Applied and Computational
     Harmonic Analysis} 1, 54--81. (\texttt{cohen1993wavelets})
-  \item Daubechies, I. (1992). \emph{Ten Lectures on Wavelets}. SIAM.
-    \textsc{[verificar]}
+  \item Daubechies, I. (1992). \emph{Ten Lectures on Wavelets}. CBMS-NSF
+    Regional Conference Series in Applied Mathematics 61. SIAM.
+    (\texttt{Daubechies-1992}.) As wavelets periodizadas são a \S 9.3,
+    ``Wavelets for $L^{p}([0,1])$'', p.~304.
   \item Donoho, D. L. e Johnstone, I. M. (1998). Minimax estimation via
     wavelet shrinkage. \emph{The Annals of Statistics} 26, 879--921.
     (\texttt{Donoho-Johnstone-1998})
   \item Härdle, W., Kerkyacharian, G., Picard, D. e Tsybakov, A. (1998).
     \emph{Wavelets, Approximation, and Statistical Applications}. Lecture
-    Notes in Statistics 129. Springer. (\texttt{hardle1998wavelets} no WALL;
-    não está no \texttt{.bib} verificado) \textsc{[verificar]}
-  \item Meyer, Y. (1992). \emph{Wavelets and Operators}. Cambridge Studies in
-    Advanced Mathematics 37. Cambridge University Press. \textsc{[verificar]}
+    Notes in Statistics 129. Springer. (\texttt{hardle1998wavelets},
+    copiada do WALL.) O cap.~9 é ``Wavelets and Besov Spaces'', pp.~101--124.
+  \item Meyer, Y. (1992). \emph{Wavelets and Operators}, volume~1. Cambridge
+    Studies in Advanced Mathematics 37. Cambridge University Press.
+    (\texttt{Meyer-1992}.) O cap.~6 é ``Wavelets and spaces of functions and
+    distributions'', pp.~163--207. A citação original deste arquivo trazia
+    ``cap.~III, \S 11'' para a base periodizada; L3 não conseguiu conferir as
+    seções internas dos capítulos (sem acesso ao volume) e trocou aquela
+    citação por Daubechies (1992, \S 9.3), que foi conferida.
   \item Montoril, M. H., Pinheiro, A. e Vidakovic, B. (2019). Wavelet-based
     estimators for mixture regression. \emph{Scandinavian Journal of
     Statistics} 46, 215--234. (\texttt{Montoril-Pinheiro-Vidakovic-2019})
-  \item Triebel, H. (1983). \emph{Theory of Function Spaces}. Birkhäuser.
-    \textsc{[verificar]}
+  \item Triebel, H. (1983). \emph{Theory of Function Spaces}. Monographs in
+    Mathematics 78. Birkhäuser, Basel. (\texttt{Triebel-1983}.) O cap.~3 é
+    ``Function Spaces on Domains'', pp.~188--211.
 \end{itemize}
 
 \end{document}

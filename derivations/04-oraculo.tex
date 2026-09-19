@@ -1,5 +1,5 @@
 % E1.5 -- desigualdade oráculo para o LASSO no desenho de produtos.
-% Molde: Bühlmann & van de Geer (2011), Seção 6.2 (Teoremas 6.1 e 6.2), com
+% Molde: Bühlmann & van de Geer (2011), Seção 6.2 (Corolário 6.1, Teoremas 6.1 e 6.2), com
 % três diferenças: os p níveis c_l não são penalizados, o modelo é mal
 % especificado dentro do sieve (o viés de E1.3 entra no lado direito), e a
 % constante de desenho vem de E1.4 na forma de autovalor cheio, o que dispensa
@@ -381,7 +381,8 @@ com $\widehat{g}_{\cv\md} = \sum_{\lev<J,\tsl}\coef{\cv}{\md}{\lev}{\tsl}
 
 \begin{remark}[por que não há cone]\label{rem:cone}
 O tratamento usual de coordenadas não penalizadas (Bühlmann e van de Geer,
-2011, Seção~6.2.3) as coloca dentro do suporte $S$ e exige a compatibilidade
+2011, Seção~6.9, pp.~139--141, onde os pesos da LASSO ponderada são
+$w_{1} = \dots = w_{r} = 0$) as coloca dentro do suporte $S$ e exige a compatibilidade
 $\compat^{2}(S;\Gramhat)$ no cone $\norm{\delta_{S^{c}}}_{1} \le
 3\norm{\delta_{S}}_{1}$. Aqui a perfilagem do Lema~\ref{lem:perfil} as remove
 do problema, e \eqref{eq:schur} transfere o autovalor cheio de $\Gramhat$ ao
@@ -779,9 +780,16 @@ Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
 \begin{itemize}[nosep, leftmargin=*]
   \item Bühlmann, P.\ e van de Geer, S. (2011). \emph{Statistics for
     High-Dimensional Data}. Springer. (\texttt{buhlmann2011statistics},
-    verificada em L1.) Seção~6.2: Teorema~6.1 (taxa lenta), Teorema~6.2 (taxa
-    rápida sob compatibilidade), Seção~6.2.3 (coordenadas não penalizadas).
-    \textsc{[verificar numeração]}
+    verificada em L1; numeração conferida em L3.) A taxa lenta é o
+    \emph{Corolário}~6.1, ``Consistency of the Lasso'' (p.~104, Seção~6.2.2),
+    e não o Teorema~6.1; o Teorema~6.1 (p.~106, mesma seção) já é a taxa
+    rápida sob compatibilidade com $\beta^{*} = \beta^{0}$; o Teorema~6.2
+    (p.~111) está na Seção~6.2.3, ``Linear approximation of the truth'', e é a
+    versão com viés de aproximação, que é a transposta aqui. As coordenadas
+    não penalizadas são tratadas na Seção~6.9, ``The weighted Lasso''
+    (pp.~139--141), não na Seção~6.2.3. O Corolário~6.8 (p.~152, Seção~6.12),
+    usado por E1.4, é a transferência da compatibilidade da Gram populacional
+    para a empírica.
   \item Klopp, O.\ e Pensky, M. (2015). Sparse high-dimensional varying
     coefficient model: nonasymptotic minimax study. \emph{The Annals of
     Statistics} 43(3), 1273--1299. (\texttt{Klopp-Pensky-2015}, verificada em
@@ -789,8 +797,8 @@ Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
     $\bX \perp \bU$.
   \item Tropp, J.~A. (2012). User-friendly tail bounds for sums of random
     matrices. \emph{Foundations of Computational Mathematics} 12, 389--434.
-    (\texttt{tropp2012user} na bibliografia do WALL; ainda não está no
-    \texttt{.bib} verificado.) Usada por E1.4, citada aqui só pela
+    (\texttt{tropp2012user}, copiada da bibliografia do WALL e verificada em
+    L3.) Usada por E1.4, citada aqui só pela
     Proposição~\ref{prop:gram-E14}.
 \end{itemize}
 

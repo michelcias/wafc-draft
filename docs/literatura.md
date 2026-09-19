@@ -10,7 +10,7 @@ Legenda de status: `web` (dados bibliográficos vistos em busca na web em
 `note = {[L1: confirmar]}`), `resumo` (só o resumo foi lido), `lido` (o PDF
 foi lido neste projeto), `no wall` (já está no `references_theo_1.bib` do
 `wall-manuscript`, verificado lá; copiar de lá), `verificado` (conferido em
-L1), `[VERIFICAR]` (citado de memória; nada de `.bib` até L1).
+L1), `[VERIFICAR]` (citado de memória; nada de `.bib` até L1). **A segunda rodada (L3, 2026-09-19) fechou os pendentes**: nenhuma linha abaixo continua com status `resumo` ou `[VERIFICAR]`, e onde a conferência mudou um dado (ano, autor, páginas) a mudança está anotada na própria linha.
 
 ---
 
@@ -30,10 +30,10 @@ L1), `[VERIFICAR]` (citado de memória; nada de `.bib` até L1).
 | Wang & Xia (2009), *JASA* 104(486) 747–757, "Shrinkage estimation of the varying coefficient model" (KLASSO) | kernel + LASSO | idem | `verificado` (`Wang-Xia-2009`) |
 | Wang, Li & Huang (2008), *JASA* 103(484) 1556–1569, "Variable selection in nonparametric varying-coefficient models for analysis of repeated measurements" | SCAD em grupos, medidas repetidas | idem | `verificado` (`Wang-Li-Huang-2008`) |
 
-| Ma, Carroll, Liang & Xu (2015), *Ann. Statist.* 43(5) 2102–2131, "Estimation and inference in generalized additive coefficient models for nonlinear interactions with high-dimensional covariates" (DOI 10.1214/15-AOS1344) | GACM em alta dimensão: penalização em grupos, identificação de estrutura consistente, bandas de confiança simultâneas, splines em dois passos | splines; sem wavelets; sem adaptatividade | `resumo` (L2; DOI no Crossref) |
-| Wang, Jiang & Liu (2024), *JCGS* 33(2), "Varying coefficient model via adaptive spline fitting" (DOI 10.1080/10618600.2023.2267616; arXiv 2201.10063) | splines com nós adaptativos por coeficiente; programação dinâmica; EQM menor que nós equiespaçados | uma moduladora; sem teoria; sem esparsidade; é o concorrente adaptativo para E4 | `resumo` (L2); páginas `[VERIFICAR]` |
-| Tibshirani & Friedman (2020), *JCGS* 29(1) 215–225, "A pliable lasso" (DOI 10.1080/10618600.2019.1648271) | LASSO com coeficientes modificados linearmente por variáveis modificadoras | modificação linear; sem wavelets | `resumo` (L2; DOI no Crossref) |
-| Deshpande, Bai, Balocchi, Starling & Weiss (2024), *Bayesian Anal.*, "VCBART: Bayesian trees for varying coefficients" (DOI 10.1214/24-BA1470) | coeficientes variáveis em várias moduladoras por árvores bayesianas; adaptativo sem aditividade | sem wavelets; sem teoria de taxa; concorrente não aditivo para E4 | `resumo` (L2); autores, volume e páginas `[VERIFICAR]` |
+| Ma, Carroll, Liang & Xu (2015), *Ann. Statist.* 43(5) 2102–2131, "Estimation and inference in generalized additive coefficient models for nonlinear interactions with high-dimensional covariates" (DOI 10.1214/15-AOS1344) | GACM em alta dimensão: penalização em grupos, identificação de estrutura consistente, bandas de confiança simultâneas, splines em dois passos | splines; sem wavelets; sem adaptatividade | `verificado` (`Ma-Carroll-Liang-Xu-2015`; páginas 2102–2131 conferidas no Project Euclid) |
+| Wang, Jiang & Liu (2024), *JCGS* 33(2), "Varying coefficient model via adaptive spline fitting" (DOI 10.1080/10618600.2023.2267616; arXiv 2201.10063) | splines com nós adaptativos por coeficiente; programação dinâmica; EQM menor que nós equiespaçados | uma moduladora; sem teoria; sem esparsidade; é o concorrente adaptativo para E4 | `verificado` (`Wang-Jiang-Liu-2024`; páginas 614–624; on-line em 2023, fascículo 33(2) em 2024) |
+| Tibshirani & Friedman (2020), *JCGS* 29(1) 215–225, "A pliable lasso" (DOI 10.1080/10618600.2019.1648271) | LASSO com coeficientes modificados linearmente por variáveis modificadoras | modificação linear; sem wavelets | `verificado` (`Tibshirani-Friedman-2020`) |
+| Deshpande, Bai, Balocchi, Starling & Weiss (2026), *Bayesian Anal.* 21(1) 281–308, "VCBART: Bayesian trees for varying coefficients" (DOI 10.1214/24-BA1470) | coeficientes variáveis em várias moduladoras por árvores bayesianas; adaptativo sem aditividade | sem wavelets; sem teoria de taxa; concorrente não aditivo para E4 | `verificado` (`Deshpande-Bai-Balocchi-Starling-Weiss-2026`; **o ano é 2026, não 2024**: o `24` do DOI é o ano de aceitação e o fascículo saiu em março de 2026) |
 
 ## Wavelets em regressão e em coeficientes variáveis
 
@@ -48,10 +48,10 @@ L1), `[VERIFICAR]` (citado de memória; nada de `.bib` até L1).
 | Haris, Simon & Shojaie (2018), *NeurIPS* 31, 8987–8997, "Wavelet regression and additive models for irregularly spaced data" (arXiv 1903.04631); o candidato de Amato, Antoniadis, De Feis & Gijbels é (2022), *Stat. Comput.* 32(1) art. 11, "Wavelet-based robust estimation and variable selection in nonparametric additive models" | aditivo com wavelets e desenho irregular | sem `X_j` | `verificado` (`Haris-Simon-Shojaie-2018`, `Amato-Antoniadis-DeFeis-Gijbels-2022`; o arXiv citado é de Haris et al., não de Amato et al.) |
 | Zhang & Wong (2003), *Ann. Statist.* 31(1) 152–173, "Wavelet threshold estimation for additive regression models" | limiarização em modelos aditivos | | `verificado` (`Zhang-Wong-2003`) |
 
-| **Montoril, Morettin & Chiann (2018)**, *Int. J. Wavelets Multiresolut. Inf. Process.* 16(1) 1850004, "Wavelet estimation of functional coefficient regression models" (DOI 10.1142/S0219691318500042) | wavelets clássicas e *warped* em coeficientes funcionais de séries temporais; taxas; AIC/BIC para os níveis; previsão | uma moduladora; mínimos quadrados sem penalização; sem aditividade; precursor do grupo, obrigatório citar | `resumo` (L2; DOI no Crossref) |
-| Zhou, Xu & Lin (2016), *Statist. Probab. Lett.* 122, 179–189 (DOI 10.1016/j.spl.2016.11.009); Zhou, Xu & Lin (2018), *Comm. Statist. Theory Methods* 47(10) 2504–2519 (DOI 10.1080/03610926.2017.1339801); Zhou, Ni & Zhu (2019), *Lith. Math. J.* 59(2) 276–293 (DOI 10.1007/s10986-019-09440-1); Zhou, Yang & Yu (2022), *Mathematics* 10(13) 2321 (DOI 10.3390/math10132321) | estimadores lineares por núcleo de wavelet em coeficientes variáveis no tempo: censura, erro de medida, α-mixing, quantis; normalidade assintótica | uma moduladora; sem limiarização nem penalização; sem aditividade | `resumo` (L2; escolher uma ou duas para citar) |
-| Zhao, Ogden & Reiss (2012), *JCGS* 21(3) 600–617, "Wavelet-based LASSO in functional linear regression" (DOI 10.1080/10618600.2012.679241); Yu, Zhang, Mizera, Jiang & Kong (2019), *Comput. Statist. Data Anal.* 136, 12–29, "Sparse wavelet estimation in quantile regression with multiple functional predictors" (DOI 10.1016/j.csda.2018.12.002) | função-coeficiente de regressão funcional em wavelets com LASSO (2012) e sparse group LASSO por preditor (2019) | outro modelo (escalar sobre curva); sem coeficientes variáveis | `resumo` (L2; DOI no Crossref) |
-| Schnaidt Grez & Vidakovic (2018), arXiv 1803.04558 e 1804.03015 | mínimos quadrados com wavelets periódicas em aditivos com desenho aleatório; consistência e taxas | sem `X_ℓ`; sem LASSO; sem veículo | `resumo` (L2); só se a lista de aditivos com wavelets tiver de ser completa |
+| **Montoril, Morettin & Chiann (2018)**, *Int. J. Wavelets Multiresolut. Inf. Process.* 16(1) 1850004, "Wavelet estimation of functional coefficient regression models" (DOI 10.1142/S0219691318500042) | wavelets clássicas e *warped* em coeficientes funcionais de séries temporais; taxas; AIC/BIC para os níveis; previsão | uma moduladora; mínimos quadrados sem penalização; sem aditividade; precursor do grupo, obrigatório citar | `verificado` (`Montoril-Morettin-Chiann-2018`) |
+| Zhou, Xu & Lin (2017), *Statist. Probab. Lett.* 122, 179–189 (DOI 10.1016/j.spl.2016.11.009); Zhou, Xu & Lin (2018), *Comm. Statist. Theory Methods* 47(10) 2504–2519 (DOI 10.1080/03610926.2017.1339801); Zhou, Ni & Zhu (2019), *Lith. Math. J.* 59(2) 276–293 (DOI 10.1007/s10986-019-09440-1); Zhou, Yang & Xiang (2022), *Mathematics* 10(13) 2321 (DOI 10.3390/math10132321) | estimadores lineares por núcleo de wavelet em coeficientes variáveis no tempo: censura, erro de medida, α-mixing, quantis; normalidade assintótica | uma moduladora; sem limiarização nem penalização; sem aditividade | `verificado` (`Zhou-Xu-Lin-2017`, `Zhou-Xu-Lin-2018`, `Zhou-Ni-Zhu-2019`, `Zhou-Yang-Xiang-2022`; **o primeiro é de 2017**, não 2016, porque o fascículo 122 é de março de 2017; **o terceiro autor do de 2022 é Yu Xiang**, não "Yu"); escolher uma ou duas para citar |
+| Zhao, Ogden & Reiss (2012), *JCGS* 21(3) 600–617, "Wavelet-based LASSO in functional linear regression" (DOI 10.1080/10618600.2012.679241); Yu, Zhang, Mizera, Jiang & Kong (2019), *Comput. Statist. Data Anal.* 136, 12–29, "Sparse wavelet estimation in quantile regression with multiple functional predictors" (DOI 10.1016/j.csda.2018.12.002) | função-coeficiente de regressão funcional em wavelets com LASSO (2012) e sparse group LASSO por preditor (2019) | outro modelo (escalar sobre curva); sem coeficientes variáveis | `verificado` (`Zhao-Ogden-Reiss-2012`, `Yu-Zhang-Mizera-Jiang-Kong-2019`) |
+| Schnaidt Grez & Vidakovic (2018), arXiv 1803.04558 e 1804.03015 | mínimos quadrados com wavelets periódicas em aditivos com desenho aleatório; consistência e taxas | sem `X_ℓ`; sem LASSO; sem veículo | `verificado` (`SchnaidtGrez-Vidakovic-2018a`, `SchnaidtGrez-Vidakovic-2018b`; **continuam sem veículo** em 2026-09-19: a API do arXiv não registra `journal_ref` nem DOI para nenhum dos dois); só se a lista de aditivos com wavelets tiver de ser completa |
 
 ## Modelos aditivos esparsos e LASSO com bases
 
@@ -69,8 +69,8 @@ L1), `[VERIFICAR]` (citado de memória; nada de `.bib` até L1).
 | Lounici, Pontil, van de Geer & Tsybakov (2011), *Ann. Statist.* 39(4) 2164–2204, "Oracle inequalities and optimal inference under group sparsity" | oráculo para group LASSO | | `verificado` (`Lounici-Pontil-vandeGeer-Tsybakov-2011`) |
 | **Klopp & Pensky (2015)**, *Ann. Statist.* 43(3) 1273–1299, "Sparse high-dimensional varying coefficient model: nonasymptotic minimax study" (arXiv 1312.4087) | desenho de produtos com Gram `Ω ⊗ Φ`, concentração da Gram empírica restrita, block LASSO, oráculo não assintótico, taxa adaptativa em Besov com `ν < 2` e cota inferior minimax | uma moduladora; `W ⊥ t`; penalidade em blocos; sem aditividade, software, simulação ou aplicação | `lido` (L2, arXiv 1312.4087v2); `verificado` (`Klopp-Pensky-2015`). **É o trabalho mais próximo na teoria**; detalhe em [`busca-novidade.md`](busca-novidade.md) §1 |
 
-| Dalalyan, Ingster & Tsybakov (2014), *Probab. Theory Related Fields* 158, "Statistical inference in compound functional models" (arXiv 1208.6402) | minimax não assintótico em modelos compostos, inclusive aditivos esparsos | sem coeficientes variáveis | `resumo` (L2); volume, número e páginas `[VERIFICAR]` |
-| Giacobino, Sardy, Diaz-Rodriguez & Hengartner (2017), *Electron. J. Statist.* 11, "Quantile universal threshold" | a regra QUT de `λ` (pivotal, sem `σ`) que Sardy & Ma usam; candidata para E2.3 | | `[VERIFICAR]` (citado a partir de Sardy & Ma) |
+| Dalalyan, Ingster & Tsybakov (2014), *Probab. Theory Related Fields* 158(3–4) 513–532, "Statistical inference in compound functional models" (arXiv 1208.6402) | minimax não assintótico em modelos compostos, inclusive aditivos esparsos | sem coeficientes variáveis | `verificado` (`Dalalyan-Ingster-Tsybakov-2014`; DOI 10.1007/s00440-013-0487-y) |
+| Giacobino, Sardy, Diaz-Rodriguez & Hengartner (2017), *Electron. J. Statist.* 11(2) 4701–4722, "Quantile universal threshold" | a regra QUT de `λ` (pivotal, sem `σ`) que Sardy & Ma usam; candidata para E2.3 | | `verificado` (`Giacobino-Sardy-DiazRodriguez-Hengartner-2017`; DOI 10.1214/17-EJS1366) |
 
 ## O próprio grupo
 
@@ -92,6 +92,9 @@ várias moduladoras, wavelets e LASSO; o trabalho mais próximo na teoria é
 Klopp & Pensky (2015), e no método são Sardy & Ma (2024) e Amato et al.
 (2022).
 
-As linhas que L2 acrescentou acima estão com status `resumo` ou
-`[VERIFICAR]`: **não entram no `.bib` antes de uma passada de verificação**
-como a de L1.
+As linhas que L2 acrescentou acima foram conferidas em L3 (2026-09-19),
+como as de L1, e estão em
+[`referencias-verificadas.bib`](referencias-verificadas.bib). A rodada
+corrigiu três dados que L2 trazia errados: o ano de Deshpande et al. (2026,
+não 2024), o ano de Zhou, Xu & Lin (2017, não 2016) e o terceiro autor de
+Zhou, Yang & Xiang (2022).
