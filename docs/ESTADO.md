@@ -577,7 +577,7 @@ L2f continua em aberto e é a única que muda o escopo do artigo.
 | ~~L2c~~ | **cumprida em 09-19**, com uma correção: o QUT não é um `type.measure`, é outra regra de `λ`, e por isso entra em **E2.4**, não em E2.3 | `plano-projeto.md` E2.4 |
 | ~~L2d~~ | **cumprida em 09-19:** concorrentes mínimos de E2.4/E4: `mgcv`, spline adaptativo (Wang, Jiang & Liu 2024), block LASSO de K&P no mesmo desenho, VCBART; cenário não homogêneo com as funções de Donoho-Johnstone | `plano-projeto.md` E2.4, E4 |
 | ~~L2e~~ | **cumprida em 09-19** | `proposta-metodo.md` §5 |
-| L2f | E1.7 fica opcional ou vira variante sem teorema de seleção: a ideia já existe em splines (Antoniadis et al. 2014; Ma et al. 2015) e em wavelets sem `X_ℓ` (Amato et al. 2022) | `plano-projeto.md` E1.7 |
+| L2f | **em aberto, com as três saídas escritas em [`selecao-estrutura.md`](selecao-estrutura.md)** (2026-09-19): (a) propriedade oráculo para a variante em grupos, que pede irrepresentabilidade no desenho de produtos; (b) variante sem teorema; (c) seleção por limiarização como corolário do Corolário 4 mais uma hipótese de separação, que é a recomendação do assistente | `plano-projeto.md` E1.7 |
 
 **Nenhuma decisão adiada.** D5 e D8, que estavam pendentes desde
 2026-09-18, foram ratificadas em 2026-09-19 e estão na tabela acima.
