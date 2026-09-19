@@ -535,6 +535,7 @@ amostra, que nenhuma regra enxerga).
 | D8 | 09-19 | **O método se chama WAFC**, *wavelet additive functional coefficients* | ratificada pelo autor; é a sigla do repositório, ecoa o WALL e cabe no título. As alternativas "WAVC" e "wavelet additive coefficient LASSO" ficam descartadas |
 | D21 | 09-19 | **A decisão sobre o teto de páginas fica para o fim**: E5b escreve sem contar, e quando o corpo estiver completo mede-se o compilado e decide-se entre resumir mais e mandar conteúdo ao suplemento | decisão do autor; a saída mais barata (tabelas ao suplemento) é a que a revista prefere e não exige reescrever prosa, desde que **E5b escreva cada tabela num `\input{}` próprio**, o que torna a mudança de lugar uma linha |
 | D22 | 09-19 | **Centralização de Lebesgue:** a restrição de identificabilidade é `∫_0^1 g_{ℓm}(u) du = 0`, e não `E[g_{ℓm}(U_m)] = 0` como o `notacao.md` escrevia; a versão centrada em `P` sai pelo deslocamento `c_ℓ ↦ c_ℓ + Σ_m E{g_{ℓm}(U_m)}` e fica como observação | é o que a base impõe de graça (Lema 1 de E1.2) e o que o estimador estima; K&P (A1) usam base ortonormal em Lebesgue sem centralização, o WALL adota Lebesgue, e Xue & Yang centralizam em `P` mas recentralizam **empiricamente** na (3.4) deles. Adotar `P` obrigaria a mudar o alvo do Corolário 4 de E1.6, que hoje mede `‖ĝ − g‖_{L_2}` |
+| D23 | 09-19 | **A margem `eps` do reescalonamento tem função declarada:** periodizar a base num intervalo maior que o suporte dos dados, o que permite trocar `g` por uma extensão que emende em `0 ≡ 1`. Com isso a hipótese não é "densidade limitada por baixo em todo `[0,1]`" e sim sobre o **suporte**, e a constante de E1.4 passa a ser `c_U λ_min(G_eps)`, com `G_eps` a Gram da base restrita ao suporte. `rescale = TRUE` continua padrão e `boundary = "interval"` entra no `wafc()`, mas fica fora do manuscrito por enquanto | argumento do autor em 2026-09-19: tomar `[0,1]` é sem perda de generalidade sobre a escala, não sobre o suporte. O ganho é que a Proposição 2 de E1.3 (periodização trava a taxa em `2^{−J/2}`) deixa de se aplicar quando `eps > 0`; a emenda é E1.3b, e E2.4 mede `λ_min(G_eps)` e o ISE contra `eps` |
 | D19 | 09-19 | **Interface de `cv.wafc()` e `wafc_tune()`** (E2.3): dobras fixas para toda a grade de `J`, expostas em `foldid`; desenho e caminho de `λ` por candidato construídos na amostra inteira, com as dobras reaproveitando as colunas; empate resolvido pelo menor `J`; `df` do BIC e do EBIC igual a não nulos mais os `p` níveis; `wafc_tune(rule)` como entrada única das cinco regras | segue o `cv.wall()` e é o que torna duas regras comparáveis na mesma réplica; **a ratificar** |
 | D20 | 09-19 | **O padrão de sintonia do WAFC é `cv.min`**, com `lambda.1se` como variante de estrutura e o BIC como alternativa barata; o EBIC não serve para escolher resolução neste desenho | custo de 1.00 a 1.04 sobre o oráculo da grade contra 1.05 a 1.67 das demais; **a ratificar** |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
@@ -592,10 +593,12 @@ Ordenadas pelo que bloqueia mais.
    na base do intervalo (CDV), sem periodicidade, pagando `p q (2^{j_0} − 1)`
    parâmetros não penalizados; (c) as duas, teoria em (a) e `boundary` como
    opção do código. Proposta de E1.3: **(c)**, que é o que o `wall()` faz.
-6. **`boundary = "interval"` no `wafc()` de E2.1:** entra com a
-   reparametrização `Φ Q` (colunas de escala não penalizadas) ou fica de
-   fora da primeira versão? Com o filtro padrão do `wall()` a opção exige
-   `j_0 ≥ 6`, o que são `63 p q` parâmetros não penalizados.
+6. **~~`boundary = "interval"`~~ decidido (D23):** entra no `wafc()`, com a
+   reparametrização `Φ Q`, e **fica fora do manuscrito** por enquanto.
+   Continua em aberto só o padrão de `eps` no caso periódico: `1.9^{−J}`
+   herdado do `wall()` ou uma margem fixa, desacoplada de `J`. A margem
+   variável faz cada candidato de `cv.wafc()` estimar um alvo ligeiramente
+   diferente e quebra em `J = 1`; E2.4 mede e o número decide.
 7. **~~Posicionamento diante de Klopp & Pensky~~ decidido (D18):**
    extensão deles. O parágrafo aprovado e a lista de contribuições reescrita
    estão em `alvo-revista.md` §4, e L2a está cumprida.
@@ -609,10 +612,10 @@ Ordenadas pelo que bloqueia mais.
    derivações** (traduzir só quando E5a montar o manuscrito), e alinhar o
    `03`. Se aceita, entra uma correção de uma linha por ambiente no
    `macros.tex`, que hoje imprime "Lemma 4" enquanto a prosa diz "Lema 4".
-10. **`rescale = TRUE` como padrão do `wafc_design()`?** É o que o `wall()`
-   faz e o que a prática exige, mas desloca a centralização (item acima).
-   Alternativa proposta por E2.1: manter o padrão e avisar quando a
-   amplitude amostral já estiver dentro de `[0,1]`.
+10. **~~`rescale = TRUE` como padrão~~ decidido (D23):** continua padrão, e
+   agora com razão declarada, não herdada. O deslocamento de centralização
+   que ele causa é um nível, e a leitura correta é que a componente é
+   identificada no suporte.
 11. **~~Quem escolhe `J`~~ não era pergunta:** o plano sempre disse
    `cv.wafc()` sobre `(J, λ)`, como o `cv.wall()` (`plano-projeto.md` E2.3);
    o handoff de E1.6 leu o plano como se ele só falasse de `λ`. O que fica
@@ -682,6 +685,11 @@ Ordenadas pelo que bloqueia mais.
 
 (a) e (b) correm em paralelo; (c) espera E1.2.
 
+- (a0) **Conserto pendente em `wafc/R/design.R`**, que nenhuma tarefa podia
+  tocar e que nenhuma tarefa aberta cobre: `eps = 1.9^{−J}` cai fora de
+  `[0, 0.5)` em `J = 1`, e a margem variando com `J` faz os candidatos de
+  `cv.wafc()` estimarem alvos diferentes. Entra no catálogo de E2.4 ou numa
+  correção curta antes dela.
 - (a) **Autor:** o quartil da SS no SCImago (o que resta de E0.3);
   ratificar D17 e as propostas L2b a L2f, que são baratas; responder a
   pergunta 2 se já tiver a base da aplicação, que é o que E6 precisa cedo.
