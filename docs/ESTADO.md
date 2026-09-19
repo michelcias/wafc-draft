@@ -1,12 +1,11 @@
 # Estado do trabalho, handoff de continuidade
 
 **Última atualização:** 2026-09-19.
-**Etapa corrente:** **E1 fechada** (E1.7 é condicional a E2.5) e L1, L2 e
-L3 fechadas; de E2 falta E2.3 em diante. E0 deve só a ratificação de D5.
-Liberada para chat de tarefa: E2.3. Nenhum chat de tarefa em curso. Duas
-decisões do autor adiadas (D5, D8), seis propostas de L2 e duas decisões
-novas (D16, D17) a ratificar, e doze perguntas na §4. **E5a está a um passo:
-depende só de D5 e D8.**
+**Etapa corrente:** **E0 e E1 fechadas** (E1.7 é condicional a E2.5), mais
+L1, L2 e L3; de E2 falta E2.3 em diante. Liberadas para chats de tarefa:
+**E2.3 e E5a**, que é o nascimento do manuscrito. Nenhum chat de tarefa em
+curso. A ratificar: D17 e as propostas L2b a L2f. Doze perguntas na §4,
+nenhuma bloqueando.
 **Versão viva do manuscrito:** nenhuma (nasce em E5a como `k = 1`).
 **Cor da rodada corrente:** `colR1` (entra em uso quando existir `k = 2`).
 
@@ -452,8 +451,11 @@ pendente. O que ela corrigiu, e que teria ido para o manuscrito errado:
 | D13 | 09-18 | **A teoria assume o caso geral** `λ_min(E[XX' \| U]) ≥ κ_1 > 0` q.c.; `X ⊥ U` vira observação (a fatoração de Kronecker) | E1.4 fechou o caso geral com `λ_min(Σ) ≥ κ_1 c_U`, conferido a 10% da verdade; assumir independência custaria generalidade sem comprar constante |
 | D14 | 09-18 | **D11 é sobre a densidade conjunta** de `U` em `[0,1]^q`, não sobre as marginais | `U_2 = U_1` tem marginais uniformes e `Σ_Ψ` singular; a prova de E1.4 usa `c_U` da conjunta, e é daí que sai a "não colinearidade entre moduladoras" |
 | D15 | 09-19 | Padrões do `wafc_design()`, ratificados do handoff de E2.1: `filter.size = 8` (contra os 20 do `wall()`), nomes de coluna `x2:u1:psi3.5` e de bloco `x2:u1`, erro informativo em `j0 != 0` e `boundary = "interval"`, e cenários com `β_1` aditivo em duas moduladoras, `β_2` em uma e `β_ℓ` constante para `ℓ ≥ 3` | o filtro 8 é o das três conferências de `derivations/check/`; o erro em vez da implementação mantém a pergunta 6 aberta sem código morto; o cenário tem de exibir o termo cruzado, que L2 apontou como o eixo do artigo |
-| D16 | 09-19 | **O enunciado principal do artigo é o Corolário 5 de E1.6** (taxa `n^{−2s/(2s+1)}` a menos de logaritmos, sob a mesma hipótese de Besov de E1.3), com o Teorema 2 como a taxa do sieve e a Proposição 4 como enunciado incondicional | o Lema 9(i) mostra que a compressibilidade não custa hipótese, e é a única das três taxas ótima para `π < 2`; **a ratificar, junto com a pergunta 7** |
+| D16 | 09-19 | **O enunciado principal do artigo é o Corolário 5 de E1.6** (taxa `n^{−2s/(2s+1)}` a menos de logaritmos, sob a mesma hipótese de Besov de E1.3), com o Teorema 2 como a taxa do sieve e a Proposição 4 como enunciado incondicional | ratificada pelo autor em 09-19 junto com D18: sob o posicionamento escolhido, o Corolário 5 é o paralelo direto do Teorema 2 de Klopp & Pensky |
+| D18 | 09-19 | **O artigo se apresenta como extensão de Klopp & Pensky (2015)** a coeficientes aditivos em várias moduladoras e a desenho dependente; o parágrafo de posicionamento está escrito e aprovado em `alvo-revista.md` §4, e E5a o usa como está | decisão do autor, escolhendo entre os dois parágrafos redigidos; é a leitura honesta da literatura e a que o referee provável reconhece, ao custo de expor a falta da cota inferior para `q ≥ 2` |
 | D17 | 09-19 | **Interface de `wafc()`** (E2.2): o `λ` do objeto é o do objetivo, não o do motor; `intercept` resolvido por presença de covariável constante, com erro informativo nos casos ambíguos; `coef()` dobra o intercepto no nível e `predict()` usa os coeficientes crus; mínimo quadrado escrito no ponto nulo do caminho; `wafc_kkt()` e `wafc_blocks()` públicas | a escala de `λ` é o que liga o código à teoria de E1.5, e as outras quatro saem dos defeitos de motor medidos; **a ratificar** |
+| D5 | 09-19 | **Alvo primário: *Statistica Sinica***; reserva: *Electronic Journal of Statistics* | ratificada pelo autor; a linhagem do modelo está lá (Xue & Yang 2006; Wei, Huang & Li 2011) e o teto de 40 páginas em espaço duplo é folgado para a estrutura de ~29 planejada. O manuscrito nasce no template da revista (`manuscript/ss-template/`), com provas no suplementar |
+| D8 | 09-19 | **O método se chama WAFC**, *wavelet additive functional coefficients* | ratificada pelo autor; é a sigla do repositório, ecoa o WALL e cabe no título. As alternativas "WAVC" e "wavelet additive coefficient LASSO" ficam descartadas |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
 | D7 | 09-18 | Compêndio de simulação e aplicação em repositório próprio, `wafc-studies`, nos moldes do `wall` | o `wall` já resolveu cache, `renv` por commit e proveniência |
 
@@ -462,19 +464,15 @@ E1.4; todas mudam documento, não resultado.
 
 | # | Proposta | Onde |
 |---|---|---|
-| L2a | Frase-tese e contribuição 1 reescritas como extensão de Klopp & Pensky a coeficientes aditivos em várias moduladoras e desenho dependente; "Why not block LASSO?" entra nas perguntas do referee | `alvo-revista.md` §4 |
+| ~~L2a~~ | **cumprida em 09-19** (D18): frase-tese e contribuições reescritas, "Why not block LASSO?" na lista do referee | `alvo-revista.md` §4 |
 | L2b | E1.4 (i) vira "recordar K&P (eq. 1.8, Lema 1) e estender ao desenho aditivo"; o entregável central passa a ser o termo cruzado entre moduladoras e a parte (ii) | `plano-projeto.md` E1.4 |
 | L2c | O QUT (Giacobino et al. 2017), que Sardy & Ma usam, entra em E2.3 como regra de `λ` sem `σ`, ao lado de BIC/EBIC | `plano-projeto.md` E2.3 |
 | L2d | Concorrentes mínimos de E2.4/E4: `mgcv`, spline adaptativo (Wang, Jiang & Liu 2024), block LASSO de K&P no mesmo desenho, VCBART; cenário não homogêneo com as funções de Donoho-Johnstone | `plano-projeto.md` E2.4, E4 |
 | L2e | "O mais próximo na teoria é Klopp & Pensky; no método, Sardy & Ma e Amato et al."; citar Montoril, Morettin & Chiann (2018) | `proposta-metodo.md` §5 |
 | L2f | E1.7 fica opcional ou vira variante sem teorema de seleção: a ideia já existe em splines (Antoniadis et al. 2014; Ma et al. 2015) e em wavelets sem `X_ℓ` (Amato et al. 2022) | `plano-projeto.md` E1.7 |
 
-**Adiadas pelo autor ("cobre-me depois", 2026-09-18); propostas do assistente:**
-
-| # | Proposta | Razão | Alternativa |
-|---|---|---|---|
-| D5 | Alvo primário **Statistica Sinica**; reserva EJS | `alvo-revista.md` §2 | EJS como primário se a teoria pesar mais que a aplicação |
-| D8 | Nome do método **WAFC** (*wavelet additive functional coefficients*) | curto, ecoa o WALL, e a sigla é a do repositório | "WAVC" (varying coefficients); "wavelet additive coefficient LASSO" |
+**Nenhuma decisão adiada.** D5 e D8, que estavam pendentes desde
+2026-09-18, foram ratificadas em 2026-09-19 e estão na tabela acima.
 
 ---
 
@@ -495,8 +493,8 @@ E1.4; todas mudam documento, não resultado.
 
 Ordenadas pelo que bloqueia mais.
 
-1. **D5 e D8** (tabela acima), adiadas. E1.1 fechou, que era o marco para
-   cobrá-las: D5 fixa o formato de E5a e D8 é o nome que vai no título.
+1. **~~D5 e D8~~ ratificadas em 2026-09-19.** O alvo é a *Statistica
+   Sinica* e o método se chama WAFC; **E5a está destravada**.
 2. **Aplicação (E6.1):** o autor tem uma base em mente? Os candidatos de
    `plano-projeto.md` E6.1 são genéricos. Decidir cedo evita desenhar a
    simulação longe do caso real.
@@ -521,12 +519,9 @@ Ordenadas pelo que bloqueia mais.
    reparametrização `Φ Q` (colunas de escala não penalizadas) ou fica de
    fora da primeira versão? Com o filtro padrão do `wall()` a opção exige
    `j_0 ≥ 6`, o que são `63 p q` parâmetros não penalizados.
-7. **Como o artigo se posiciona diante de Klopp & Pensky** (a mais
-   importante desta rodada): o WAFC se apresenta como extensão deles
-   (honesto, e o referee da SS reconhece) ou como modelo diferente, com K&P
-   citado como caso particular? A primeira muda a frase-tese de
-   `alvo-revista.md` §4; a segunda obriga a Seção 2 a mostrar que o desenho
-   aditivo não é o deles. Decide-se antes de E5a; E1.4 não depende.
+7. **~~Posicionamento diante de Klopp & Pensky~~ decidido (D18):**
+   extensão deles. O parágrafo aprovado e a lista de contribuições reescrita
+   estão em `alvo-revista.md` §4, e L2a está cumprida.
 8. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
 9. **Idioma do código e das derivações.** E2.1 escreveu o Roxygen e os
@@ -549,8 +544,9 @@ Ordenadas pelo que bloqueia mais.
    realizado em toda a varredura, ao custo de 5% a 11% de erro, e as
    escolhas de `J_n` e de `c` dependem de `s'` e `τ`, que ninguém conhece.
    E2.3 compara a regra teórica com a validação cruzada.
-12. **Cota inferior.** Não existe aqui, e Klopp & Pensky têm a deles para
-   `q = 1` com `X ⊥ U`. Três saídas: (a) citar K&P e dizer que a cota
+12. **Cota inferior** (mais visível depois de D18, porque o artigo se
+   declara extensão de quem tem a dele). Não existe aqui, e Klopp & Pensky
+   têm a deles para `q = 1` com `X ⊥ U`. Três saídas: (a) citar K&P e dizer que a cota
    superior atinge a referência do modelo de sequência, que é o que o
    `05-taxas.tex` faz hoje; (b) abrir E1.8 e construir a cota para `q ≥ 2`,
    trabalho do porte de E1.4 mais E1.5; (c) restringir a afirmação de
@@ -592,10 +588,15 @@ Ordenadas pelo que bloqueia mais.
 
 (a) e (b) correm em paralelo; (c) espera E1.2.
 
-- (a) **Autor:** ratificar D5 e D8 (a notação já não depende disso);
-  responder a pergunta 2 se já tiver a base da aplicação.
-- (b) **Chat de tarefa, pode abrir já:** E2.3 (sintonia), catalogada com
-  a comparação entre a regra teórica de `J_n` e a validação cruzada.
+- (a) **Autor:** o quartil da SS no SCImago (o que resta de E0.3);
+  ratificar D17 e as propostas L2b a L2f, que são baratas; responder a
+  pergunta 2 se já tiver a base da aplicação, que é o que E6 precisa cedo.
+  O cluster de centralização e borda (perguntas 4, 5, 6 e 10) deve ser
+  resolvido antes de a Seção 2 de E5a ser escrita e antes de E2.4.
+- (b) **Chats de tarefa, podem abrir já e em paralelo:** E2.3 (sintonia,
+  com a comparação entre a regra teórica de `J_n` e a validação cruzada) e
+  **E5a** (Seções 1 a 4 do manuscrito, no template da SS, com o parágrafo de
+  posicionamento de `alvo-revista.md` §4 e o nome WAFC).
 - (b') **L3 fechada.** Quando o autor ratificar as propostas de L2, entram
   as edições de `alvo-revista.md` e `plano-projeto.md` da §6 de
   `busca-novidade.md`, que são do chat principal.
@@ -611,6 +612,7 @@ Ordenadas pelo que bloqueia mais.
 |---|---|
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
+| 2026-09-19 | D18 decidida (o artigo é extensão de Klopp & Pensky) com o parágrafo de posicionamento escrito; D16, D5 e D8 ratificadas; E5a catalogada e destravada |
 | 2026-09-19 | E1.6, E2.2 e L3 fechadas e integradas: **E1 inteira**, com a compressibilidade saindo de graça da hipótese de Besov (D16); `wafc()` com as duas penalidades e KKT fechando no caminho inteiro (D17); `.bib` com 57 entradas e duas citações de teorema corrigidas |
 | 2026-09-19 | E1.5 e E2.1 fechadas em dois chats de tarefa e integradas: desigualdade oráculo sem cone, com a razão `‖f̂−f‖²_n/(λ²s_0)` estável a 5% em `n` de 200 a 6400; `wafc/` nasce com 103 testes passando; D15 |
 | 2026-09-18 | E1.2, E1.3 e E1.4 fechadas em três chats de tarefa e integradas; as três conferências rodam e imprimem `OK` aqui; D13 e D14; a numeração global dos resultados fixada |

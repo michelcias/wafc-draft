@@ -85,38 +85,81 @@ Template versionado em `manuscript/ejs-template/` (clonado em 2026-09-18,
 
 ## 4. Como o artigo se posiciona
 
-**Frase-tese provisória:** em modelos de regressão com coeficientes
-funcionais aditivos, expandir cada componente em wavelets e estimar todos os
-coeficientes por LASSO produz um estimador que (i) adapta à regularidade
-local de cada componente, com taxa quase minimax em espaços de Besov sem
-suavidade global; (ii) é um único problema convexo resolvido pelo `glmnet`
-em segundos; e (iii) seleciona, via a variante em grupos, quais moduladoras
-afetam quais coeficientes.
+**Decidido em 2026-09-19 (D18):** o artigo se apresenta como **extensão de
+Klopp & Pensky (2015)**, e não como modelo diferente com eles citados de
+passagem. O parágrafo de posicionamento foi escrito e aprovado; E5a o usa
+como está, ajustando só o nome do método (D8) e os números dos resultados:
 
-**Contribuições a defender (em ordem de força, provisória):**
+```
+Klopp and Pensky (2015) study the varying coefficient model in which a
+single index modulates every coefficient. They expand each coefficient
+function in an orthonormal basis, estimate the resulting array by a block
+LASSO, and obtain a nonasymptotic oracle inequality, a Besov rate that
+adapts to inhomogeneous smoothness, and a matching minimax lower bound,
+under the assumption that the covariates are independent of the index. The
+present paper carries that programme to the situation an applied problem
+usually presents, in which several variables modulate a coefficient at once.
+We let each coefficient be additive in the modulators, which keeps the
+estimator free of the curse of dimensionality in their number, we allow the
+covariates to depend on the modulators, and we penalize coefficient by
+coefficient rather than in blocks, leaving the levels of the coefficients
+unpenalized. Each of these costs something. Additivity produces cross terms
+between distinct modulators, so the population Gram matrix no longer
+factorizes as a Kronecker product and has to be bounded directly; dependence
+between the covariates and the modulators replaces a marginal second moment
+by a conditional one; and the unpenalized levels leave a term in the risk
+that block penalization does not incur. Our main result, Corollary 5, states
+that the estimator attains the rate of nonlinear wavelet approximation up to
+a logarithmic factor, under the same Besov assumption that governs the
+linear sieve, and it reduces to the rate of Klopp and Pensky when a single
+modulator is present.
+```
 
-1. O estimador e sua teoria: desigualdade oráculo no desenho de produtos
-   `X_j ψ(U_k)`, taxas em Besov e o corolário de adaptação por
-   compressibilidade (E1.3 a E1.6).
-2. A condição de desenho para produtos (E1.4), que é o que distingue este
-   problema do modelo aditivo com wavelets de Sardy & Ma (2024).
-3. Evidência numérica de que a adaptatividade se materializa: contra
-   splines (Xue & Yang; `mgcv`) em funções não homogêneas, sem perder muito
-   nas suaves (E4).
+**Frase-tese:** estender o modelo de coeficientes variáveis esparso de Klopp
+& Pensky a coeficientes **aditivos em várias moduladoras** e a desenho
+**dependente** produz um estimador que (i) atinge a taxa de aproximação não
+linear em wavelets a menos de um fator logarítmico, sob a mesma hipótese de
+Besov que governa o sieve linear (Corolário 5, D16); (ii) é um único
+problema convexo resolvido pelo `glmnet` em segundos; e (iii) seleciona,
+pela variante em grupos, quais moduladoras afetam quais coeficientes.
+
+**Contribuições a defender (em ordem de força):**
+
+1. A teoria no desenho aditivo de produtos `X_ℓ ψ_{jk}(U_m)`: a condição de
+   desenho com termo cruzado entre moduladoras e sem independência (E1.4), a
+   desigualdade oráculo sem condição de cone (E1.5) e a taxa por
+   compressibilidade (E1.6). O que Klopp & Pensky já têm para `q = 1` com
+   `X ⊥ U` é citado, não reprovado.
+2. A leitura de que **a compressibilidade não custa hipótese**: a hipótese de
+   Besov já implica weak-`ℓ_τ` (Lema 9), e é isso que separa a taxa da do
+   sieve linear quando `π < 2`.
+3. Evidência numérica de que a adaptatividade se materializa: contra splines
+   (Xue & Yang; `mgcv`), contra o spline adaptativo de Wang, Jiang & Liu
+   (2024) e contra o block LASSO de K&P no mesmo desenho (E4).
 4. Software: o código de `wafc/`, com a mesma interface do `wall()`, na
    forma de distribuição decidida em E3.3.
 
 **O que o referee vai perguntar:**
 
-- "Por que wavelets e não splines?" A resposta é o cenário não homogêneo em
-  E4 mais a taxa em Besov com `π < 2`. Se E4 não mostrar ganho, o artigo não
-  tem razão de ser.
-- "Isso não é Sardy & Ma com um `X_j` multiplicando?" A resposta tem de estar
-  na Seção 2 (identificabilidade e desenho de produtos) e na E1.4.
-- "Como escolhe `J`?" Validação cruzada, e a teoria diz qual ordem; E2.3 mede
-  se BIC/EBIC serve.
-- "E a seleção de estrutura?" Ou a variante em grupos entra com resultado
-  (E1.7), ou o artigo diz explicitamente que seleção não é o objetivo.
+- **"Why not block LASSO, as in Klopp and Pensky?"** É a pergunta que o
+  posicionamento escolhido convida. A resposta: a penalidade coordenada é um
+  único problema do `glmnet`, dá o corolário de compressibilidade sem
+  restringir `τ`, e a comparação numérica contra os blocos está em E4. A
+  variante em grupos existe em `wafc()` para quem quiser estrutura (E2.2).
+- **"Onde está a cota inferior para `q ≥ 2`?"** Não existe (pergunta 12 da
+  §4 do `ESTADO.md`), e sob este posicionamento ela fica mais visível: o
+  artigo cita a de K&P e afirma otimalidade só onde ela vale. É o risco
+  assumido da escolha.
+- "Por que wavelets e não splines?" O cenário não homogêneo em E4 mais a
+  taxa com `π < 2`. Se E4 não mostrar ganho, o artigo não tem razão de ser.
+- "Isso não é Sardy & Ma com um `X_ℓ` multiplicando?" Não: a teoria deles é
+  de otimização (L2, `busca-novidade.md` §3). A resposta fica na Seção 2.
+- "Como escolhe `J`?" Validação cruzada conjunta com `λ` (E2.3), e a teoria
+  diz a ordem; a regra teórica ficou dois níveis acima do melhor `J`
+  empírico na conferência de E1.6, e E2.3 mede o custo disso.
+- "E a seleção de estrutura?" A variante em grupos zera os blocos nulos
+  (E2.2, com número); ou entra com resultado (E1.7) ou o artigo diz que
+  seleção não é o objetivo.
 - "Aplicação real?" E6, com efeito que varia com covariáveis e interpretação.
 
 ## 5. Estrutura-alvo do manuscrito (40 páginas, SS)

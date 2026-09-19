@@ -49,7 +49,8 @@ que ler antes está aqui e no plano.
 | L3 bibliografia, 2ª rodada | **fechada** (2026-09-19): 57 entradas verificadas; duas citações de teorema corrigidas | `referencias-verificadas.bib`, `literatura.md` |
 | **E1** | **fechada** (E1.7 é condicional a E2.5) | `derivations/` |
 | E2.3 sintonia | não aberta; **pode abrir já** | catálogo da §3 |
-| E1.7, E2.4, E2.5, E3 a E7 | não abertas | |
+| E5a manuscrito, Seções 1 a 4 | não aberta; **pode abrir já** (D5, D8, D16 e D18 decididas) | catálogo da §3 |
+| E1.7, E2.4, E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
 
@@ -66,10 +67,22 @@ tarefa pode criar ou editar**.
 | E0.3 (autor) | só falta o quartil 2024 da SS conferido no SCImago e anotado em `alvo-revista.md` §1; a transcrição e o template estão feitos | nada | `docs/alvo-revista.md` (§1), `docs/handoff-E0.3.md` |
 
 | E2.3 | `wafc/R/tune.R`, `wafc/tests/test-tune.R`: `cv.wafc()` sobre `(J, λ)` nos moldes do `cv.wall()` (dobras fixas, caminho de `λ` por `J`, `lambda.min` e `lambda.1se`), mais BIC e EBIC com graus de liberdade = número de coeficientes não nulos; as três regras comparadas nos três cenários de E2.1 em `n ∈ {250, 1000}`, com erro de predição fora da amostra e ISE por bloco. **Acrescentar uma quarta coluna à comparação: a regra teórica `J_n = min{J : 2^J ≥ (n/log n)^{1/(2s'+1)}}` do Teorema 2 de E1.6**, que na conferência daquela etapa ficou dois níveis acima do `J` de menor erro realizado, ao custo de 5% a 11%; medir quanto isso custa nos cenários. O `λ` de todo objeto é o do objetivo, não o do motor (D17), e `wafc_kkt()` confere | E2.2, fechada; `wafc()` e `wafc_blocks()` como estão | `wafc/R/tune.R`, `wafc/tests/test-tune.R`, `wafc/README.md` (só a tabela), `docs/handoff-E2.3.md` |
+| E5a | `manuscript/ms_1.tex`, `manuscript/supp_1.tex` e `manuscript/references_1.bib`: o manuscrito nasce em `k = 1`, no template da *Statistica Sinica* (D5; copiar `manuscript/ss-template/SS-template-bib.tex` e `supp-temp_20240820.tex`, que compilam), com as Seções 1 a 4 de `alvo-revista.md` §5, isto é Introduction, Model and wavelet sieve, Theory (só enunciados; as provas vão ao `supp_1.tex`) e Computation and tuning. O método se chama **WAFC** (D8). A Introduction usa **como está** o parágrafo de posicionamento aprovado em `alvo-revista.md` §4 (D18: o artigo é extensão de Klopp & Pensky), e a Seção 3 abre pelo **Corolário 5** de `05-taxas.tex` (D16), com o Teorema 2 como taxa do sieve e a Proposição 4 como enunciado incondicional. Os enunciados são os de `derivations/01` a `05`, na numeração global da §5 deste arquivo, renumerados por rótulo do LaTeX; a notação é a de `notacao.md`, congelada; `references_1.bib` sai de `docs/referencias-verificadas.bib` (57 entradas verificadas), copiando só o que for citado. Critério de saída: `latexmk -pdf` limpo nos dois, dentro das 40 páginas em espaço duplo com referências, e toda afirmação de taxa ou de condição com o resultado correspondente citado | E1 fechada; L2 e L3 fechadas; D5, D8, D16, D18 | `manuscript/ms_1.tex`, `manuscript/supp_1.tex`, `manuscript/references_1.bib`, os `.pdf` correspondentes, `docs/handoff-E5a.md` |
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
+
+**Quem abrir E5a** lê antes a §4 e a §5 de
+[`alvo-revista.md`](alvo-revista.md) e a §3 de
+[`ss-instrucoes-autores.md`](ss-instrucoes-autores.md), e obedece às regras
+de escrita da §4 de [`instrucoes.md`](instrucoes.md): inglês americano, sem
+negrito no corpo, sem em-dash. Três coisas que a rodada de 2026-09-19 deixou
+prontas e que não se reabrem: o posicionamento (D18) com o parágrafo já
+escrito, o enunciado de entrada (D16) e o nome (D8). Quatro perguntas da §4
+do `ESTADO.md` ainda tocam a Seção 2 (centralização, periodicidade,
+`boundary`, reescalonamento): enquanto não forem respondidas, escrever o que
+não depende delas e levar as alternativas ao handoff, sem decidir.
 
 **Quem abrir E2.3** não toca `fit.R` nem `design.R`; trabalha com
 `wafc()` como está. Duas coisas da rodada de 2026-09-19 a governam: o `λ` de
