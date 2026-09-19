@@ -53,7 +53,7 @@ decisão em E3.3.
 | `latexmk`, `pdflatex`, `bibtex` | `derivations/*.tex`, templates, manuscrito | `latexmk --version` |
 | `gh` autenticado como `michelcias` (opcional) | criar repositórios, CI | `gh auth status` |
 | pacotes R: `glmnet`, `Matrix`, `mgcv`, `grpreg`, `gglasso`, `bench`, `testthat`, `devtools`, `roxygen2`, `remotes`, `renv` | protótipo, competidores, pacote | comando abaixo |
-| `sparsegl` | sparse group LASSO (E2.2), se a variante for adotada | `install.packages("sparsegl")` |
+| `sparsegl` | exigido por `wafc(penalty = "sglasso")`; o resto de `wafc/` roda sem ele, e os testes pulam os blocos de grupo se faltar | `install.packages("sparsegl")` |
 | `quadprog` | constante de compatibilidade exata em `check/03-desenho-produtos.R` (E1.4) | `install.packages("quadprog")` |
 | o próprio `WaveBased`, instalado de `../../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
 
@@ -82,12 +82,13 @@ Rscript derivations/check/01-identificabilidade.R   # ~7 s
 Rscript derivations/check/03-desenho-produtos.R     # ~9 s, precisa de quadprog
 Rscript derivations/check/04-oraculo.R              # ~16 s, precisa de glmnet
 Rscript derivations/check/02-aproximacao-besov.R    # ~53 s
+Rscript derivations/check/05-taxas.R                # ~7 min
 ```
 
 E o código do método, que já existe:
 
 ```bash
-Rscript -e 'testthat::test_dir("wafc/tests")'   # 103 passam, ~5 s
+Rscript -e 'testthat::test_dir("wafc/tests")'   # 231 passam, ~14 s
 Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
 ```
 
@@ -100,13 +101,16 @@ Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
   O tipo de revisão da revista não consta da página oficial.
 - **Notação congelada** (E1.1, D9 a D12): `ψ_{jk}`, `X_ℓ`, `U_m`,
   `θ_{ℓm,jk}`, `U ∈ [0,1]^q`; `derivations/macros.tex` implementa e compila.
-- **Teoria: E1.2 a E1.5 fechadas**, com conferência numérica rodando; de E1
-  só falta E1.6 (taxas e compressibilidade).
-- **Código: E2.1 fechada.** `wafc/R/` tem o carregador, os cenários e
-  `wafc_design()`; 103 testes passam. Falta `wafc()` (E2.2). **Nada de
-  manuscrito ainda.**
-- **Tarefas que podem abrir agora em chats de tarefa:** E1.6 e E2.2
-  (catálogo em `TAREFA.md`).
+- **Teoria: E1 fechada** (E1.2 a E1.6; E1.7 é condicional a E2.5), com as
+  cinco conferências numéricas rodando. O enunciado principal é o
+  Corolário 5 de `05-taxas.tex` (D16, a ratificar).
+- **Código: E2.1 e E2.2 fechadas.** `wafc/R/` tem o carregador, os cenários,
+  `wafc_design()` e `wafc()` com as duas penalidades; 231 testes passam.
+  Falta a sintonia (E2.3). **Nada de manuscrito ainda.**
+- **Bibliografia:** 57 entradas verificadas (L1 e L3); nada pendente.
+- **Nenhuma tarefa aberta no catálogo.** A próxima é E2.3 (sintonia), que
+  espera a resposta de quem escolhe `J` (pergunta 11 do `ESTADO.md`). E5a
+  (manuscrito) depende só de D5 e D8.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
   `instrucoes.md`.
