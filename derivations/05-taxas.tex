@@ -1,0 +1,845 @@
+% E1.6 -- taxas de convergência do LASSO no desenho de produtos.
+% Consome o Teorema 1 e os Corolários 2 e 3 de E1.5 (04-oraculo.tex) e o
+% Lema 7 (norma ell_1 do oráculo em Besov); a condição de desenho vem de
+% E1.4 (03-desenho-produtos.tex) e o viés de E1.3 (02-aproximacao-besov.tex).
+% Molde: a trilha rápida do WALL teórico (ms_theo_1.tex, Corollary
+% "Adaptivity to an effective dimension under compressible coefficients" e
+% Appendix "Fast-Rate Track"), adaptada da perda logística para a quadrática:
+% a perda quadrática tem curvatura constante e dispensa a localização, o que
+% remove as duas restrições (tau < 2/3 e o piso de regularidade do estimador
+% não modificado) que o WALL precisa impor.
+% Conferência numérica: check/05-taxas.R (imprime OK; ~7 min).
+% Notação: docs/notacao.md (congelada em E1.1). Macros: derivations/macros.tex.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black]{hyperref}
+\input{macros}
+
+% --- atalhos locais deste arquivo (macros.tex é o único lugar das macros do
+% --- projeto; estes símbolos existem só aqui, como em 03 e 04)
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\MA}{M_{\Amat}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betahat}{\widehat{\bbeta}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\thbar}{\bar{\btheta}}
+\newcommand{\bbar}{\bar{\bb}}
+\newcommand{\Mstar}{M^{\star}}
+\newcommand{\thstarM}[1]{\btheta^{*,(#1)}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+
+% Numeração global dos resultados (docs/TAREFA.md, §5): E1.2 usou Proposição 1
+% e Lema 1; E1.3 usou Lema 2, Lema 3, Corolário 1 e Proposição 2; E1.4 usou
+% Proposição 3; E1.5 usou Lemas 4 a 7, Teorema 1 e Corolários 2 e 3. Os
+% contadores abaixo fazem o número impresso JÁ SER o número global, como em
+% 04-oraculo.tex.
+\setcounter{lemma}{7}
+\setcounter{proposition}{3}
+\setcounter{corollary}{3}
+\setcounter{theorem}{1}
+
+\title{E1.6. Taxas de convergência e dimensão efetiva}
+\author{wafc-draft, \texttt{derivations/05-taxas.tex}}
+\date{2026-09-19}
+
+\begin{document}
+\maketitle
+
+\section*{Onde este resultado entra}
+
+E1.5 entregou uma desigualdade oráculo não assintótica em três termos:
+estimação ($\pen^{2}s_{0}/\gtil$), viés ($\normn{\bb}^{2}$) e o preço dos
+níveis não penalizados ($\sigma^{2}p/n$). Este arquivo escolhe $J = J_{n}$,
+equilibra os três e produz as taxas. São três enunciados, em ordem crescente
+de hipótese:
+
+\begin{enumerate}[label=(\alph*), leftmargin=*, nosep]
+  \item \textbf{Sem nenhuma condição de desenho} (Proposição~\ref{prop:lenta}):
+    a taxa lenta $\pen_{n}\norm{\thetastar}_{1} + \mathcal{B}_{J_{n}}^{2}$, com
+    $\norm{\thetastar}_{1}$ vindo do Lema~7 de E1.5, que não depende de $\pi$.
+  \item \textbf{Com a condição de desenho de E1.4} (Teorema~\ref{thm:taxa}):
+    com $J_{n} \asymp \log_{2}n/(2\seff+1)$, a taxa de predição
+    $(\log n/n)^{2\seff/(2\seff+1)}$, e, pelo Corolário~3 de E1.5, a mesma
+    taxa para cada componente $\gcomp{\cv}{\md}$
+    (Corolário~\ref{cor:componentes-taxa}).
+  \item \textbf{Trocando $s_{0}$ por dimensão efetiva}
+    (Corolário~\ref{cor:compressivel}): sob coeficientes comprimíveis em
+    weak-$\ell_{\tau}$, a taxa $(\log n/n)^{(2-\tau)/2}$, governada por
+    $\Mstar_{n} \asymp (n/\log n)^{\tau/2} \ll d_{n}$.
+\end{enumerate}
+
+Os três são necessários porque, \emph{sob a Hipótese de Besov de E1.3, o
+oráculo do sieve é genericamente denso}: os $\coefs{\cv}{\md}{\lev}{\tsl}$
+decaem mas não se anulam, e $s_{0} = |\Szero| = d$. Lido no oráculo com
+$s_{0} = d$, o Teorema~1(ii) de E1.5 dá a taxa do sieve de (b); a única
+afirmação que não usa condição alguma de desenho é a de (a); e o que troca
+$d$ por uma dimensão efetiva muito menor é (c). O Lema~\ref{lem:weak}(i)
+mostra que a compressibilidade de (c) \emph{não é hipótese nova}: ela já
+está contida na Hipótese de Besov, com $\tau = (s+1/2)^{-1}$. É essa
+observação que faz o Corolário~\ref{cor:compressivel} recuperar a taxa de
+aproximação não linear $n^{-2s/(2s+1)}$ onde o sieve linear só alcança
+$n^{-2\seff/(2\seff+1)}$, exatamente a diferença que E1.3 registrou em ``o
+que isto não cobre''.
+
+\paragraph{Diante de Klopp e Pensky (2015).} Para $q = 1$ e
+$\bX \perp \bU$, a taxa adaptativa em Besov com o índice de esparsidade
+$\nu < 2$ (o nosso $\tau$) já está publicada, com cota inferior minimax
+(\texttt{docs/busca-novidade.md}, §1). O que é novo aqui é o mesmo que em
+E1.4 e E1.5: $q \ge 2$ moduladoras com o termo cruzado, $\bX$ dependente de
+$\bU$, LASSO puro em vez de LASSO em blocos, e os níveis $\lvl{\cv}$ fora da
+penalidade. \emph{Não} se prova cota inferior aqui.
+
+\paragraph{Diante do WALL.} A trilha rápida do WALL precisa localizar o
+estimador não modificado em torno de uma referência esparsa, o que lhe custa
+duas condições: $(\Mstar)^{2}J2^{J} = o(n)$, que restringe $\tau < 2/3$, e um
+piso de regularidade $s > (2-\tau)/\{4(1-\tau)\}$. Nenhuma das duas aparece
+aqui: a perda quadrática tem curvatura constante, o Teorema~1 de E1.5 já vale
+para um comparador arbitrário (Lema~\ref{lem:comparador}) e a única condição
+que sobra é a de viés, $c \ge (2-\tau)/(4\seff)$, que é o piso que o WALL só
+obtém para o seu \emph{estimador restrito}. O intervalo de $\tau$ é
+$(0,2)$ inteiro.
+
+\section{Objetos}
+
+Mantém-se tudo de E1.5, \texttt{04-oraculo.tex}, §1: o modelo, a amostra
+i.i.d., a partição $\bZ = [\Amat\;\Bmat]$ na ordem de D12 com
+$d = pq\NJ$ e $\NJ = 2^{J}-1$, o estimador
+\[
+  \betahat = (\chat, \thetahat)
+  \;\in\; \operatorname*{arg\,min}_{(\bc,\btheta)}
+  \bigl\{ \normn{\bY - \Amat\bc - \Bmat\btheta}^{2} + 2\pen\norm{\btheta}_{1}\bigr\},
+  \qquad \widehat{f} = \Amat\chat + \Bmat\thetahat,
+\]
+o oráculo do sieve $\betastar = (\bc,\thetastar)$ com
+$\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$, o
+resíduo determinístico $\bb = f - f_{J}$, a perfilagem
+$\Btil = \MA\Bmat$ com $\gtil = \lmin(\Btil\T\Btil/n)$, e a norma empírica
+máxima de coluna $\smax$. Escrevemos ainda
+\[
+  \pen_{0} = \sigma\smax\sqrt{\tfrac{2\log(2d/\alpha)}{n}},
+  \qquad
+  \mathcal{T} = \bigl\{\lVert\Btil\T\bveps/n\rVert_{\infty} \le \pen/2\bigr\},
+  \qquad
+  \gamma = \kappa_{1}c_{U},
+  \qquad
+  \Lambda = \kappa_{2}C_{U} + \gamma/2 ,
+\]
+e $\mathcal{B}_{J}^{2} = (pq)^{2}C_{X}^{2}C_{U}C_{g}^{2}(1-2^{-2\seff})^{-1}
+2^{-2J\seff}$ para a cota de viés do Corolário~1 de E1.3.
+
+\paragraph{Melhor aproximação com $M$ termos.} Para $\btheta \in \R^{d}$ e
+$1 \le M \le d$, $\btheta^{(M)}$ é o vetor que retém as $M$ coordenadas de
+maior módulo de $\btheta$ (empates desfeitos de qualquer modo fixo) e anula as
+demais; $\theta_{(1)} \ge \theta_{(2)} \ge \cdots \ge \theta_{(d)} \ge 0$ é o
+rearranjo não crescente dos módulos. A letra $M$ é usada para o número de
+termos retidos e $\Mstar$ para a dimensão efetiva, para não colidir com o $s$
+da regularidade de Besov.
+
+\section{Hipóteses}
+
+Além das hipóteses de E1.3 (base, Besov, densidade das moduladoras, $\bX$
+limitada), de E1.4 (moduladoras, covariáveis lineares, base) e de E1.5
+(amostra i.i.d., erro sub-gaussiano), que são citadas onde entram, este
+arquivo usa uma, que só existe para dar sentido às afirmações assintóticas. O
+contador de hipóteses é local ao arquivo, como em E1.5.
+
+\begin{assumption}[regime assintótico]\label{ass:regime}
+Considera-se uma sequência de problemas indexada por $n$, na qual
+$p$, $q$, $\sigma$, $B_{X}$, $C_{X}$, $c_{U}$, $C_{U}$, $\kappa_{1}$,
+$\kappa_{2}$, $C_{g}$, $s$, $\pi$ e $r$ são fixos, $\alpha \in (0,1)$ é fixo, e
+$J = J_{n} \to \infty$, de modo que $d_{n} = pq(2^{J_{n}}-1)$ e
+$L_{n} := \log(2d_{n}/\alpha) \asymp J_{n}$. O nível de penalização é o do
+Corolário~2 de E1.5,
+\begin{equation}
+  \label{eq:lambda-n}
+  \pen_{n} \;=\; 2\sigma B_{X}\sqrt{2C_{U}}\;\sqrt{\frac{2L_{n}}{n}}
+  \;\asymp\; \sigma B_{X}\sqrt{C_{U}}\;\sqrt{\frac{J_{n}}{n}} .
+\end{equation}
+\end{assumption}
+
+Duas observações. (i) $p$ e $q$ fixos é o que o plano prevê ($n \le 2000$ na
+simulação, $p$ e $q$ pequenos); o caso $p = p_{n}$ está em ``o que isto não
+cobre''. (ii) $\alpha$ fixo basta para enunciados $O_{p}$: as constantes das
+cotas dependem dos níveis de confiança só por $1/\alpha'$ e $1/\alpha''$
+(passos de Markov do Teorema~1(iii) e do Corolário~2 de E1.5), de modo que
+tomar $\alpha' = \alpha'' = \epsilon/3$ dá, para cada $\epsilon > 0$, uma
+constante $M_{\epsilon}$ com
+$\Prob(\normn{\widehat f - f}^{2} > M_{\epsilon}r_{n}) < \epsilon$, que é a
+definição de $O_{p}(r_{n})$.
+
+\section{Os dois lemas}
+
+O primeiro é uma releitura de E1.5, e não consome passo novo: a prova do
+Teorema~1 usa o oráculo $\thetastar$ apenas por meio da decomposição
+$\bY = \Amat\bc + \Bmat\thetastar + \bb + \bveps$ e do seu suporte, de modo
+que vale com qualquer comparador no lugar dele. É essa liberdade que permite
+comparar o estimador com uma referência \emph{esparsa}, e é toda a mecânica de
+que o Corolário~\ref{cor:compressivel} precisa.
+
+\begin{lemma}[Teorema~1 com comparador arbitrário]\label{lem:comparador}
+Sob as Hipóteses~1 e~2 de E1.5, suponha $\Amat$ de posto $p$ e
+$\pen \ge 2\pen_{0}$. Então, no evento $\mathcal{T}$, vale
+\emph{simultaneamente para todo} $\bar\bbeta = (\bar\bc, \thbar) \in
+\R^{p}\times\R^{d}$, com
+\[
+  \bbar = f - \bZ\bar\bbeta \in \R^{n},
+  \qquad
+  \bar S = \operatorname{supp}(\thbar),
+  \qquad
+  \bar M = |\bar S|,
+  \qquad
+  \bar v = \thetahat - \thbar :
+\]
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
+  \item $\tfrac12\normn{\Btil\bar v}^{2} + \pen\norm{\thetahat}_{1}
+    \le 3\pen\norm{\thbar}_{1} + 2\normn{\bbar}^{2}$;
+  \item se $\gtil > 0$,
+    \[
+      \normn{\Btil\bar v}^{2} \le \frac{64\pen^{2}\bar M}{\gtil} + 16\normn{\bbar}^{2},
+      \qquad
+      \norm{\bar v}_{2}^{2} \le \frac{64\pen^{2}\bar M}{\gtil^{2}}
+      + \frac{16\normn{\bbar}^{2}}{\gtil};
+    \]
+  \item $\normn{\widehat f - f} \le \normn{\Btil\bar v} + 2\normn{\bbar}
+    + \normn{\PA\bveps}$, e portanto
+    \begin{equation}
+      \label{eq:oraculo-min}
+      \normn{\widehat f - f}^{2}
+      \;\le\; 3\min_{\bar\bbeta}\Bigl\{\frac{64\pen^{2}\bar M}{\gtil}
+      + 20\normn{\bbar}^{2}\Bigr\} \;+\; 3\normn{\PA\bveps}^{2}.
+    \end{equation}
+\end{enumerate}
+\end{lemma}
+
+O segundo lema é a peça nova de aproximação: ele diz que a Hipótese de Besov
+de E1.3, que é uma condição \emph{por nível} na norma $\ell_{\pi}$, implica uma
+condição \emph{global} de compressibilidade sobre a sequência inteira, e
+quantifica a cauda da melhor aproximação com $M$ termos.
+
+\begin{lemma}[Besov implica weak-$\ell_{\tau}$; cauda da aproximação com $M$ termos]
+\label{lem:weak}
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item Sob as Hipóteses de base e de Besov de E1.3, com
+    $\pi(s + 1/2) > 1$ --- que é exatamente $\seff > 0$ quando $\pi < 2$, e é
+    automático quando $\pi \ge 2$ ---, o oráculo do sieve
+    $\thetastar \in \R^{d}$ satisfaz, para todo $J$ e todo $k \ge 1$,
+    \begin{equation}
+      \label{eq:weak}
+      \theta^{*}_{(k)} \;\le\; C_{\tau}\,k^{-1/\tau},
+      \qquad
+      \tau = \frac{1}{s + 1/2},
+      \qquad
+      C_{\tau} = C_{g}\,(pq\,A_{s,\pi})^{s+1/2},
+      \qquad
+      A_{s,\pi} = 1 + \frac{1}{1 - 2^{1-\pi(s+1/2)}} .
+    \end{equation}
+    As constantes não dependem de $J$, e $\tau \in (0,2)$ para todo $s > 0$.
+  \item Se $\btheta \in \R^{d}$ satisfaz $\theta_{(k)} \le C_{\tau}k^{-1/\tau}$
+    com $\tau \in (0,2)$, então, para todo inteiro $1 \le M \le d$,
+    \[
+      \norm{\btheta - \btheta^{(M)}}_{2}^{2}
+      \;=\; \sum_{k > M}\theta_{(k)}^{2}
+      \;\le\; \frac{\tau}{2-\tau}\,C_{\tau}^{2}\,M^{1 - 2/\tau}.
+    \]
+  \item Consequentemente
+    $\normn{\Bmat(\btheta - \btheta^{(M)})}^{2} \le \lmaxx(\Gramhat)\,
+    \norm{\btheta-\btheta^{(M)}}_{2}^{2}$, e no evento da
+    Proposição~3(iv) de E1.4 com $t = \gamma/2$ vale
+    $\lmaxx(\Gramhat) \le \Lambda = \kappa_{2}C_{U} + \gamma/2$.
+\end{enumerate}
+\end{lemma}
+
+\section{As taxas}
+
+\subsection*{Sem condição de desenho}
+
+\begin{proposition}[taxa lenta incondicional]\label{prop:lenta}
+Sob as Hipóteses~1 e~2 de E1.5, as Hipóteses de E1.3, a
+Hipótese~\ref{ass:regime} e $\Amat$ de posto $p$, com $\pen_{n}$ de
+\eqref{eq:lambda-n},
+\[
+  \normn{\widehat f - f}^{2}
+  \;=\; O_{p}\Bigl(\pen_{n}\norm{\thetastar}_{1} + \mathcal{B}_{J_{n}}^{2}
+  + \tfrac{p}{n}\Bigr),
+\]
+com $\norm{\thetastar}_{1}$ dado pelo Lema~7 de E1.5, sem dependência de
+$\pi$. Em particular:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
+  \item se $s > 1/2$, então $\norm{\thetastar}_{1} = O(1)$ e, para qualquer
+    $J_{n} \ge \log_{2}n/(4\seff)$,
+    $\normn{\widehat f - f}^{2} = O_{p}\bigl((J_{n}/n)^{1/2}\bigr)$;
+  \item se $s < 1/2$, então $\norm{\thetastar}_{1} \asymp 2^{J_{n}(1/2-s)}$ e a
+    escolha $2^{J_{n}} \asymp (n/J_{n})^{1/(1-2s+4\seff)}$ dá
+    $\normn{\widehat f - f}^{2} =
+    O_{p}\bigl((J_{n}/n)^{2\seff/(1-2s+4\seff)}\bigr)$; quando $\pi \ge 2$
+    (isto é $\seff = s$) esse expoente é $2s/(2s+1)$, \emph{a mesma taxa do
+    Teorema~\ref{thm:taxa}, obtida sem nenhuma condição de desenho}.
+\end{enumerate}
+\end{proposition}
+
+\subsection*{Com a condição de desenho de E1.4}
+
+\begin{theorem}[taxa de predição do sieve]\label{thm:taxa}
+Acrescente as hipóteses de E1.4 e tome
+\begin{equation}
+  \label{eq:Jn}
+  J_{n} \;=\; \min\Bigl\{J \in \mathbb{N} :\;
+  2^{J} \ge (n/\log n)^{1/(2\seff+1)}\Bigr\},
+  \qquad\text{de modo que}\qquad
+  J_{n} = \frac{\log_{2}n}{2\seff+1} + O(\log\log n).
+\end{equation}
+Então:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(a condição de desenho vale ao longo de $J_{n}$)}
+    \[
+      \frac{pq\,2^{J_{n}}\log(pq\,2^{J_{n}})}{n}
+      \;\asymp\; \Bigl(\frac{\log n}{n}\Bigr)^{2\seff/(2\seff+1)}
+      \;\longrightarrow\; 0 ,
+    \]
+    de modo que $\Prob(\lmin(\Gramhat) \ge \gamma/2) \to 1$ pela
+    Proposição~3(iv) de E1.4 e, pelo Lema~4(iii) de E1.5,
+    $\gtil \ge \gamma/2$ com probabilidade que tende a $1$. A condição de
+    desenho é, ela própria, exatamente da ordem da taxa.
+  \item \textup{(taxa)} Com $\pen_{n}$ de \eqref{eq:lambda-n},
+    \[
+      \normn{\widehat f - f}^{2}
+      \;=\; O_{p}\!\left(\Bigl(\frac{J_{n}}{n}\Bigr)^{2\seff/(2\seff+1)}\right)
+      \;=\; O_{p}\!\left(\Bigl(\frac{\log n}{n}\Bigr)^{2\seff/(2\seff+1)}\right),
+    \]
+    isto é, $n^{-2\seff/(2\seff+1)}$ a menos de um fator logarítmico.
+  \item \textup{(o balanço)} Nessa escolha, o termo de estimação
+    $\sigma^{2}B_{X}^{2}C_{U}(\kappa_{1}c_{U})^{-1}d_{n}L_{n}/n$ e o termo de
+    viés $\mathcal{B}_{J_{n}}^{2}$ têm a mesma ordem, e o termo dos níveis,
+    $\sigma^{2}p/n$, é de ordem estritamente menor, porque
+    $2\seff/(2\seff+1) < 1$.
+\end{enumerate}
+\end{theorem}
+
+\begin{corollary}[erro $L_{2}$ das componentes e do coeficiente funcional]
+\label{cor:componentes-taxa}
+Nas condições do Teorema~\ref{thm:taxa}, com
+$\widehat g_{\cv\md} = \sum_{\lev<J_{n},\tsl}
+\widehat{\theta}_{\cv\md,\lev\tsl}\wav{\lev}{\tsl}$,
+\[
+  \sum_{\cv,\md}\bigl\lVert \widehat g_{\cv\md} - \gcomp{\cv}{\md}
+  \bigr\rVert_{L_{2}[0,1]}^{2}
+  \;=\; O_{p}\!\left(\Bigl(\frac{J_{n}}{n}\Bigr)^{2\seff/(2\seff+1)}\right),
+  \qquad\text{logo}\qquad
+  \bigl\lVert \widehat g_{\cv\md} - \gcomp{\cv}{\md}\bigr\rVert_{L_{2}[0,1]}
+  = O_{p}\!\left(\Bigl(\tfrac{J_{n}}{n}\Bigr)^{\seff/(2\seff+1)}\right)
+\]
+para cada $(\cv,\md)$. Além disso
+$\norm{\chat - \bc}_{2} = O_{p}\bigl((J_{n}/n)^{\seff/(2\seff+1)}\bigr)$ e, com
+$\widehat{\fcoef{\cv}}(u) = \widehat{c}_{\cv} + \sum_{\md}\widehat g_{\cv\md}(u_{\md})$,
+\[
+  \bigl\lVert\widehat{\fcoef{\cv}} - \fcoef{\cv}\bigr\rVert_{L_{2}([0,1]^{q})}
+  \;=\; O_{p}\!\left(\Bigl(\frac{J_{n}}{n}\Bigr)^{\seff/(2\seff+1)}\right),
+  \qquad \cv = 1,\dots,p .
+\]
+\end{corollary}
+
+\subsection*{Trocando $s_{0}$ por dimensão efetiva}
+
+\begin{corollary}[compressibilidade e dimensão efetiva]\label{cor:compressivel}
+Suponha, além das hipóteses do Teorema~\ref{thm:taxa} (menos a escolha
+\eqref{eq:Jn} de $J_{n}$), que $\thetastar$ é comprimível, isto é
+$\theta^{*}_{(k)} \le C_{\tau}k^{-1/\tau}$ para algum $\tau \in (0,2)$ e algum
+$C_{\tau} < \infty$ que não dependem de $J$. Então:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(não assintótico)} No evento $\mathcal{T}$ interseção com
+    $\{\lmin(\Gramhat)\ge\gamma/2\}$,
+    \[
+      \normn{\widehat f - f}^{2}
+      \;\le\; 3\min_{1\le M\le d}h(M) + 120\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2},
+      \qquad
+      h(M) = \frac{64\pen^{2}}{\gtil}M
+      + \frac{40\,\Lambda\,C_{\tau}^{2}\,\tau}{2-\tau}\,M^{1-2/\tau},
+    \]
+    e o minimizador de $h$ em $(0,\infty)$ e o seu valor são
+    \[
+      \Mstar = \Bigl(\frac{5\,\Lambda\,C_{\tau}^{2}\,\gtil}{8\,\pen^{2}}\Bigr)^{\tau/2},
+      \qquad
+      h(\Mstar) = \frac{2}{2-\tau}\cdot\frac{64\pen^{2}}{\gtil}\,\Mstar
+      \;\asymp\; \pen^{\,2-\tau}\,\bigl(\Lambda C_{\tau}^{2}\gtil\bigr)^{\tau/2}
+      \gtil^{-1},
+    \]
+    com $h(\lceil\Mstar\rceil) \le 2h(\Mstar)$ sempre que $\Mstar \ge 1$.
+  \item \textup{(a resolução)} Tome $J_{n} = \lceil c\log_{2}n\rceil$ com $c$
+    na janela
+    \begin{equation}
+      \label{eq:janela}
+      \max\Bigl\{\frac{\tau}{2},\;\frac{2-\tau}{4\seff}\Bigr\}
+      \;\le\; c \;<\; 1 ,
+    \end{equation}
+    não vazia se e só se $\seff > (2-\tau)/4$. As três desigualdades são,
+    nessa ordem: $\Mstar_{n} \le d_{n}$ (o mínimo em $M$ é interior);
+    $2^{-2J_{n}\seff} = O\bigl((J_{n}/n)^{(2-\tau)/2}\bigr)$ (o viés do sieve
+    não domina); e a condição empírica de E1.4. Fixado um tal $c$,
+    \[
+      \Mstar_{n} \;\asymp\; \Bigl(\frac{n}{J_{n}}\Bigr)^{\tau/2}
+      \;\ll\; d_{n} \asymp pq\,2^{J_{n}},
+      \qquad
+      \normn{\widehat f - f}^{2}
+      \;=\; O_{p}\!\left(\Bigl(\frac{J_{n}}{n}\Bigr)^{(2-\tau)/2}\right),
+    \]
+    e a mesma taxa vale para $\sum_{\cv\md}\lVert\widehat g_{\cv\md} -
+    \gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}^{2}$.
+  \item \textup{(sob Besov, de graça)} Pelo Lema~\ref{lem:weak}(i) a hipótese
+    de (i) vale sempre, com $\tau = (s+1/2)^{-1}$; então
+    $(2-\tau)/2 = 2s/(2s+1)$, o piso $\seff > (2-\tau)/4$ é
+    $\seff > s/(2s+1)$, e
+    \[
+      \normn{\widehat f - f}^{2}
+      \;=\; O_{p}\!\left(\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\right),
+    \]
+    estritamente melhor que a taxa $(\log n/n)^{2\seff/(2\seff+1)}$ do
+    Teorema~\ref{thm:taxa} sempre que $\pi < 2$, e igual a ela quando
+    $\pi \ge 2$. Para $\pi \ge 2$ o piso vale para todo $s > 0$; para
+    $\pi < 2$ ele é $2s^{2}/(2s+1) > 1/\pi - 1/2$.
+\end{enumerate}
+\end{corollary}
+
+\begin{remark}[a leitura das três taxas]\label{rem:tres}
+$\seff = s - (1/\pi - 1/2)_{+}$ é a regularidade que o \emph{sieve linear}
+enxerga (E1.3, Lema~2); $s$ é a que a \emph{aproximação não linear} enxerga.
+O Teorema~\ref{thm:taxa} é a taxa do sieve; o Corolário~\ref{cor:compressivel}
+é a do LASSO, que escolhe os termos. Para $\pi \ge 2$ as duas coincidem, e é
+por isso que nesse regime estimadores lineares já são ótimos; para $\pi < 2$
+elas se separam, e é exatamente aí que a penalidade $\norm{\btheta}_{1}$ paga
+por si. A taxa $(\log n/n)^{2s/(2s+1)}$ é a referência minimax do modelo de
+sequência gaussiana sobre bolas weak-$\ell_{\tau}$ com ruído por coordenada
+$\pen_{n}$, que é de ordem $\pen_{n}^{2-\tau}$ (Donoho e Johnstone, 1998);
+o fator logarítmico é o preço da escolha única e não adaptativa
+$\pen_{n} \asymp \sqrt{J_{n}/n}$, isto é, da união sobre as $d_{n}$ colunas.
+\end{remark}
+
+\begin{remark}[por que $s_{0} = d$ não é um defeito do Teorema~1]\label{rem:s0}
+Lido no oráculo, o Teorema~1(ii) de E1.5 tem $s_{0} = d$ e entrega a taxa do
+sieve do Teorema~\ref{thm:taxa}; lido num comparador esparso, pelo
+Lema~\ref{lem:comparador}, entrega a taxa comprimível. É a mesma desigualdade
+nos dois casos. O que a compressibilidade compra não é uma afirmação sobre
+$\operatorname{supp}(\thetahat)$ --- nada aqui diz que o LASSO seleciona
+$\Mstar_{n}$ coordenadas, e nenhuma condição de $\beta$-mínimo ou de
+irrepresentabilidade é usada --- mas uma \emph{taxa de estimação} governada
+por $\Mstar_{n}$ em vez de $d_{n}$. A distinção é a mesma que o WALL faz.
+\end{remark}
+
+\section{Provas}
+
+\subsection*{Lema~\ref{lem:comparador}}
+
+Percorra a prova do Teorema~1 em \texttt{04-oraculo.tex} substituindo
+$(\bc,\thetastar,\bb,\Szero,s_{0},v)$ por
+$(\bar\bc,\thbar,\bbar,\bar S,\bar M,\bar v)$. Cada passo continua válido:
+
+\emph{Passo~1.} O Lema~4(i) de E1.5 não menciona comparador; a desigualdade
+básica compara o objetivo residualizado em $\thetahat$ com o seu valor em
+$\thbar$, e $\bY = \Amat\bar\bc + \Bmat\thbar + \bbar + \bveps$ é a definição
+de $\bbar$. Como $\MA\Amat = 0$, vale
+$\widetilde\bY = \Btil\thbar + \MA(\bbar+\bveps)$, que é o que o passo usa.
+
+\emph{Passo~2.} A dualidade usa só $\mathcal{T}$, que não depende do
+comparador; o passo de Young usa só $\normn{\MA\bbar} \le \normn{\bbar}$, que
+vale para qualquer vetor.
+
+\emph{Passos~3 a~5.} São álgebra com $\bar S$ no lugar de $\Szero$: o
+Passo~4 usa $\thbar_{\bar S^{c}} = 0$, verdadeiro por definição de $\bar S$;
+o Passo~5 usa $\lVert\bar v_{\bar S}\rVert_{1} \le \sqrt{\bar M}
+\norm{\bar v}_{2}$ e a desigualdade (iii) do Lema~4 de E1.5, que não envolvem o comparador.
+
+\emph{Passo~6.} O Lema~4(ii) de E1.5 dá
+$\widehat f - \bZ\bar\bbeta = \Btil\bar v + \PA(\bbar + \bveps)$ pela mesma
+conta, logo $\widehat f - f = \Btil\bar v + \PA(\bbar+\bveps) - \bbar$, e
+$\normn{\PA\bbar} \le \normn{\bbar}$.
+
+Como $\mathcal{T}$, $\gtil$ e a condição $\pen \ge 2\pen_{0}$ não dependem de
+$\bar\bbeta$, as desigualdades valem simultaneamente para todos os
+comparadores no mesmo evento, e pode-se tomar o mínimo. Para
+\eqref{eq:oraculo-min}, $(x+y+z)^{2}\le 3(x^{2}+y^{2}+z^{2})$ e (ii) dão
+$\normn{\widehat f - f}^{2} \le 3(64\pen^{2}\bar M/\gtil + 16\normn{\bbar}^{2}
++ 4\normn{\bbar}^{2} + \normn{\PA\bveps}^{2})$. \qed
+
+\subsection*{Lema~\ref{lem:weak}}
+
+\emph{(i).} Fixe $\varepsilon > 0$ e conte
+$N(\varepsilon) = \#\{a : |\theta^{*}_{a}| > \varepsilon\}$. Em um bloco
+$(\cv,\md)$ e num nível $\lev$, a desigualdade de Markov na norma
+$\ell_{\pi}$ dá
+$\#\{\tsl : |\coefs{\cv}{\md}{\lev}{\tsl}| > \varepsilon\} \le
+\varepsilon^{-\pi}\norm{\theta^{*}_{\cv\md,\lev\cdot}}_{\pi}^{\pi}$, e a
+Hipótese de Besov dá
+$\norm{\theta^{*}_{\cv\md,\lev\cdot}}_{\pi}^{\pi} \le C_{g}^{\pi}
+2^{-\lev\pi(s+1/2-1/\pi)} = C_{g}^{\pi}2^{\lev(1-a)}$ com
+$a := \pi(s+1/2) > 1$. Como há $2^{\lev}$ coordenadas no nível,
+\[
+  N_{\cv\md}(\varepsilon)
+  \;\le\; \sum_{\lev \ge 0}\min\bigl\{2^{\lev},\;
+  C_{g}^{\pi}\varepsilon^{-\pi}2^{\lev(1-a)}\bigr\}.
+\]
+Os dois argumentos do mínimo se igualam em $2^{\lev_{\varepsilon}a} =
+(C_{g}/\varepsilon)^{\pi}$, isto é
+$2^{\lev_{\varepsilon}} = (C_{g}/\varepsilon)^{\pi/a} =
+(C_{g}/\varepsilon)^{\tau}$, já que $\pi/a = (s+1/2)^{-1} = \tau$. Abaixo de
+$\lev_{\varepsilon}$ o mínimo é $2^{\lev}$ e a soma é no máximo
+$2^{\lev_{\varepsilon}}$; acima, o mínimo é o segundo termo, que decresce
+geometricamente de razão $2^{1-a} < 1$, e a soma vale
+$C_{g}^{\pi}\varepsilon^{-\pi}2^{\lev_{\varepsilon}(1-a)}/(1-2^{1-a}) =
+2^{\lev_{\varepsilon}}/(1-2^{1-a})$, porque
+$C_{g}^{\pi}\varepsilon^{-\pi}2^{-\lev_{\varepsilon}a} = 1$ por definição de
+$\lev_{\varepsilon}$. Somando as duas partes e os $pq$ blocos,
+$N(\varepsilon) \le pq\,A_{s,\pi}(C_{g}/\varepsilon)^{\tau}$. Truncar em
+$\lev < J$ só diminui a contagem, de modo que a cota vale para $\thetastar$ em
+qualquer $J$. Finalmente, se $\varepsilon < \theta^{*}_{(k)}$ então
+$N(\varepsilon) \ge k$, donde
+$\varepsilon \le C_{g}(pqA_{s,\pi}/k)^{1/\tau}$; fazendo
+$\varepsilon \uparrow \theta^{*}_{(k)}$ obtém-se \eqref{eq:weak}. Por fim,
+$\tau = (s+1/2)^{-1} < 2$ para todo $s > 0$.
+
+\emph{(ii).} $\sum_{k>M}\theta_{(k)}^{2} \le C_{\tau}^{2}\sum_{k>M}k^{-2/\tau}
+\le C_{\tau}^{2}\int_{M}^{\infty}x^{-2/\tau}dx =
+C_{\tau}^{2}M^{1-2/\tau}/(2/\tau - 1)$, e $2/\tau - 1 = (2-\tau)/\tau$. A
+primeira desigualdade usa $2/\tau > 1$, isto é $\tau < 2$.
+
+\emph{(iii).} $\normn{\Bmat\delta}^{2} = \delta\T(\Bmat\T\Bmat/n)\delta \le
+\lmaxx(\Bmat\T\Bmat/n)\norm{\delta}_{2}^{2}$ e $\Bmat\T\Bmat/n$ é submatriz
+principal de $\Gramhat$, logo $\lmaxx(\Bmat\T\Bmat/n) \le \lmaxx(\Gramhat)$.
+No evento da Proposição~3(iv) de E1.4 com $t = \gamma/2$ vale
+$\opnorm{\Gramhat - \Gram} \le \gamma/2$, e a parte (iii) daquela proposição dá
+$\lmaxx(\Gram) \le \kappa_{2}C_{U}$; por Weyl,
+$\lmaxx(\Gramhat) \le \kappa_{2}C_{U}+\gamma/2 = \Lambda$. \qed
+
+\subsection*{Proposição~\ref{prop:lenta}}
+
+Pelo Teorema~1(i) e (iii) de E1.5, no evento $\mathcal{T}$,
+$\normn{\Btil v}^{2} \le 6\pen\norm{\thetastar}_{1} + 4\normn{\bb}^{2}$ e
+$\normn{\widehat f - f}^{2} \le 3(\normn{\Btil v}^{2} + 4\normn{\bb}^{2}
++ \normn{\PA\bveps}^{2})$. Nenhuma propriedade de $\Gramhat$ entra. O
+Lema~6 de E1.5 torna $\pen_{n}$ de \eqref{eq:lambda-n} admissível
+($\pen_{n} \ge 2\pen_{0}$) com probabilidade que tende a $1$, porque
+$2^{J_{n}}\log d_{n}/n \to 0$ em todos os regimes considerados; Markov aplicado
+a $\E\normn{\bb}^{2} \le \mathcal{B}_{J_{n}}^{2}$ (Corolário~1 de E1.3) e a
+$\E[\normn{\PA\bveps}^{2}\mid\bX,\bU] \le \sigma^{2}p/n$ fecha o enunciado
+geral, na forma $O_{p}$ da Hipótese~\ref{ass:regime}.
+
+\emph{(i).} Com $s > 1/2$ o Lema~7 de E1.5 dá
+$\norm{\thetastar}_{1} \le pqC_{g}(1-2^{-(s-1/2)})^{-1} = O(1)$, logo
+$\pen_{n}\norm{\thetastar}_{1} \asymp (J_{n}/n)^{1/2}$. Basta então que o viés
+não domine: $2^{-2J_{n}\seff} \le (J_{n}/n)^{1/2}$ vale para
+$J_{n} \ge \log_{2}(n/J_{n})/(4\seff)$, e $p/n$ é de ordem menor.
+
+\emph{(ii).} Com $s < 1/2$, $\norm{\thetastar}_{1} \asymp
+pqC_{g}(2^{1/2-s}-1)^{-1}2^{J_{n}(1/2-s)}$, de modo que os dois termos são
+$(J_{n}/n)^{1/2}2^{J_{n}(1/2-s)}$ e $2^{-2J_{n}\seff}$. Igualá-los dá
+$2^{J_{n}(1/2-s+2\seff)} \asymp (n/J_{n})^{1/2}$, isto é
+$2^{J_{n}} \asymp (n/J_{n})^{1/(1-2s+4\seff)}$, e o valor comum é
+$2^{-2J_{n}\seff} \asymp (J_{n}/n)^{2\seff/(1-2s+4\seff)}$. Quando
+$\seff = s$, $1-2s+4s = 1+2s$. \qed
+
+\subsection*{Teorema~\ref{thm:taxa}}
+
+\emph{(i).} Por \eqref{eq:Jn}, $(n/\log n)^{1/(2\seff+1)} \le 2^{J_{n}} <
+2(n/\log n)^{1/(2\seff+1)}$, e $J_{n} \asymp \log n$. Logo
+\[
+  \frac{pq2^{J_{n}}\log(pq2^{J_{n}})}{n}
+  \;\asymp\; \frac{(n/\log n)^{1/(2\seff+1)}\log n}{n}
+  \;=\; \Bigl(\frac{\log n}{n}\Bigr)^{1 - 1/(2\seff+1)}
+  \;=\; \Bigl(\frac{\log n}{n}\Bigr)^{2\seff/(2\seff+1)},
+\]
+que tende a zero porque $2\seff/(2\seff+1) > 0$. A Proposição~3(iv) de E1.4 é
+exatamente a condição $pq2^{J}\log(pq2^{J})/n \to 0$; o Lema~4(iii) de E1.5
+transfere o autovalor ao bloco residualizado.
+
+\emph{(ii) e (iii).} No evento da Proposição~3(iv) tem-se
+$\gtil \ge \gamma/2$, e o Corolário~2 de E1.5 com $s_{0} \le d_{n}$ dá
+\[
+  \normn{\widehat f - f}^{2}
+  \;\lesssim\; \frac{\sigma^{2}B_{X}^{2}C_{U}}{\kappa_{1}c_{U}}
+  \frac{d_{n}L_{n}}{n}
+  \;+\; \frac{\mathcal{B}_{J_{n}}^{2}}{\alpha'}
+  \;+\; \frac{\sigma^{2}p}{n\alpha''} .
+\]
+Com $d_{n} \asymp pq2^{J_{n}}$ e $L_{n} \asymp J_{n} \asymp \log n$, o primeiro
+termo é o display de (i), isto é $(\log n/n)^{2\seff/(2\seff+1)}$; o segundo é
+$\mathcal{B}_{J_{n}}^{2} \asymp 2^{-2J_{n}\seff} \le
+(\log n/n)^{2\seff/(2\seff+1)}$ pela cota inferior de $2^{J_{n}}$ em
+\eqref{eq:Jn}; o terceiro é $O(1/n)$, de ordem estritamente menor porque
+$2\seff/(2\seff+1) < 1$. A forma $O_{p}$ é a da
+Hipótese~\ref{ass:regime}(ii). \qed
+
+\subsection*{Corolário~\ref{cor:componentes-taxa}}
+
+O Corolário~3 de E1.5 dá
+$\sum_{\cv\md}\lVert\widehat g_{\cv\md} - \gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}^{2}
+\le 2\norm{v}_{2}^{2} + 2pqC_{g}^{2}(1-2^{-2\seff})^{-1}2^{-2J_{n}\seff}$, e o
+Teorema~1(ii) de E1.5 dá
+$\norm{v}_{2}^{2} \le 64\pen_{n}^{2}d_{n}/\gtil^{2} +
+16\normn{\bb}^{2}/\gtil$. No evento de (i) do Teorema~\ref{thm:taxa},
+$\gtil \ge \gamma/2$ é limitado inferiormente por uma constante, de modo que as
+duas parcelas têm a mesma ordem das do Teorema~\ref{thm:taxa}(ii); a única
+diferença é a constante, que aqui tem $\gamma^{-2}$ em vez de $\gamma^{-1}$. É
+aqui que a condição de desenho de E1.4 paga a segunda vez: a norma de predição
+sozinha não controla componente a componente, e é $\lmin$ que faz a passagem.
+
+Para $\chat$: pelo Lema~4(ii) de E1.5,
+$\Amat(\chat - \bc) = \PA(\bb+\bveps) - \PA\Bmat v$, logo
+$\normn{\Amat(\chat-\bc)} \le \normn{\bb} + \normn{\PA\bveps} +
+\normn{\Bmat v} \le \normn{\bb} + \normn{\PA\bveps} +
+\sqrt{\lmaxx(\Gramhat)}\norm{v}_{2}$, usando que $\PA$ é projeção. Como
+$\Amat\T\Amat/n$ é submatriz principal de $\Gramhat$,
+$\lmin(\Amat\T\Amat/n) \ge \lmin(\Gramhat) \ge \gamma/2$ e
+$\norm{\chat-\bc}_{2}^{2} \le \normn{\Amat(\chat-\bc)}^{2}/(\gamma/2)$. Os
+três termos do lado direito são $O_{p}$ da raiz da taxa. Por fim, a base
+$\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$ é ortonormal em $L_{2}[0,1]$ e as
+componentes de $\fcoef{\cv}$ dependem de coordenadas distintas de $u$, logo
+$\lVert\widehat{\fcoef{\cv}}-\fcoef{\cv}\rVert_{L_{2}([0,1]^{q})} \le
+|\widehat c_{\cv}-\lvl{\cv}| + \sum_{\md}\lVert\widehat g_{\cv\md} -
+\gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}$, e $q$ é fixo. \qed
+
+\subsection*{Corolário~\ref{cor:compressivel}}
+
+\emph{(i).} Aplique o Lema~\ref{lem:comparador} com
+$\bar\bbeta = (\bc, \thstarM{M})$. Então $\bar M \le M$ e
+$\bbar = \bb + \Bmat(\thetastar - \thstarM{M})$, de modo que, por
+Cauchy--Schwarz e pelo Lema~\ref{lem:weak}(ii)--(iii),
+\[
+  \normn{\bbar}^{2} \;\le\; 2\normn{\bb}^{2}
+  + 2\lmaxx(\Gramhat)\norm{\thetastar-\thstarM{M}}_{2}^{2}
+  \;\le\; 2\normn{\bb}^{2}
+  + \frac{2\Lambda C_{\tau}^{2}\tau}{2-\tau}M^{1-2/\tau} .
+\]
+Levando a \eqref{eq:oraculo-min}, $3\cdot 20\cdot 2 = 120$ no termo
+$\normn{\bb}^{2}$ e $3h(M)$ no resto, com o $h$ do enunciado. Para o
+minimizador, $h'(M) = 64\pen^{2}/\gtil - (2/\tau-1)\,
+40\Lambda C_{\tau}^{2}\tau(2-\tau)^{-1}M^{-2/\tau}$, que se anula em
+$M^{2/\tau} = 40\Lambda C_{\tau}^{2}\gtil/(64\pen^{2})$, isto é no $\Mstar$ do
+enunciado; $h$ é estritamente convexa em $(0,\infty)$ porque $1-2/\tau < 0$.
+No mínimo, $40\Lambda C_{\tau}^{2}\tau(2-\tau)^{-1}(\Mstar)^{1-2/\tau} =
+(64\pen^{2}/\gtil)\Mstar\,\tau/(2-\tau)$, donde
+$h(\Mstar) = (64\pen^{2}/\gtil)\Mstar\{1 + \tau/(2-\tau)\} =
+2(64\pen^{2}/\gtil)\Mstar/(2-\tau)$. Para o arredondamento,
+$h(\lceil\Mstar\rceil) \le h(\Mstar) + 64\pen^{2}/\gtil \le
+h(\Mstar)\{1 + (2-\tau)/(2\Mstar)\} \le 2h(\Mstar)$ quando $\Mstar \ge 1$,
+porque $(2-\tau)/2 < 1$.
+
+\emph{(ii).} Com $\pen_{n}^{2} \asymp \sigma^{2}B_{X}^{2}C_{U}J_{n}/n$,
+$\gtil \in [\gamma/2, \Lambda]$ e $\Lambda$, $C_{\tau}$, $\tau$ fixos,
+$\Mstar_{n} \asymp \pen_{n}^{-\tau} \asymp (n/J_{n})^{\tau/2}$ e
+$h(\Mstar_{n}) \asymp \pen_{n}^{2}\Mstar_{n} \asymp
+(J_{n}/n)^{1-\tau/2} = (J_{n}/n)^{(2-\tau)/2}$. Com
+$J_{n} = \lceil c\log_{2}n\rceil$, isto é $2^{J_{n}} \asymp n^{c}$:
+\begin{itemize}[nosep, leftmargin=*]
+  \item $\Mstar_{n} \le d_{n}$ pede $(n/J_{n})^{\tau/2} \lesssim pq\,n^{c}$,
+    isto é $c \ge \tau/2$ (a menos de logaritmos);
+  \item o viés pede $2^{-2J_{n}\seff} = n^{-2c\seff} \lesssim
+    (J_{n}/n)^{(2-\tau)/2}$, isto é $2c\seff \ge (2-\tau)/2$, ou
+    $c \ge (2-\tau)/(4\seff)$;
+  \item a condição empírica de E1.4 pede $2^{J_{n}}\log(2^{J_{n}})/n =
+    n^{c-1}\log n \to 0$, isto é $c < 1$;
+  \item o termo $\sigma^{2}p/n$ é de ordem menor porque $(2-\tau)/2 < 1$.
+\end{itemize}
+A janela \eqref{eq:janela} é não vazia se e só se $\tau/2 < 1$ (verdadeiro) e
+$(2-\tau)/(4\seff) < 1$, isto é $\seff > (2-\tau)/4$. A versão para as
+componentes é a mesma conta com
+$\norm{\thetahat-\thetastar}_{2} \le \norm{\bar v}_{2} +
+\norm{\thetastar-\thstarM{M}}_{2}$, o Lema~\ref{lem:comparador}(ii) e o
+Corolário~3 de E1.5; a única diferença é um fator $\gtil^{-1}$ extra no
+primeiro termo, que não muda a ordem.
+
+\emph{(iii).} $\tau = (s+1/2)^{-1}$ dá $2-\tau = 4s/(2s+1)$, logo
+$(2-\tau)/2 = 2s/(2s+1)$ e $(2-\tau)/4 = s/(2s+1)$. Para $\pi \ge 2$,
+$\seff = s > s/(2s+1)$ para todo $s > 0$; para $\pi < 2$, a condição
+$s - (1/\pi-1/2) > s/(2s+1)$ é $s\{1 - (2s+1)^{-1}\} > 1/\pi - 1/2$, isto é
+$2s^{2}/(2s+1) > 1/\pi - 1/2$. Que $2s/(2s+1) \ge 2\seff/(2\seff+1)$, com
+igualdade só quando $\seff = s$, segue da monotonia de $x \mapsto 2x/(2x+1)$
+e de $\seff \le s$. \qed
+
+\section{O que foi transposto e o que é novo}
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Transposto do WALL teórico} (Corolário de compressibilidade e
+    Apêndice ``Fast-Rate Track''): a ideia de localizar o estimador não
+    modificado numa referência esparsa; a definição de dimensão efetiva
+    $\Mstar_{n} \asymp (n/J_{n})^{\tau/2}$; a janela de resoluções admissíveis
+    e a sua leitura como interseção de três exigências; a insistência em que o
+    resultado é de \emph{taxa}, não de recuperação de suporte
+    (Observação~\ref{rem:s0}); e a referência minimax do modelo de sequência
+    (Observação~\ref{rem:tres}).
+  \item \textbf{Simplificado em relação ao WALL:} a perda quadrática tem
+    curvatura constante, de modo que a referência esparsa entra pelo
+    Lema~\ref{lem:comparador} --- que é a prova de E1.5 lida com outro
+    comparador, sem passo novo --- em vez de por um \emph{bootstrap} de
+    localização. Caem com isso a condição $(\Mstar)^{2}J2^{J} = o(n)$ e a
+    restrição $\tau < 2/3$, e o piso de regularidade fica
+    $\seff > (2-\tau)/4$, que é o que o WALL só consegue para o seu estimador
+    restrito.
+  \item \textbf{Novo:} o Lema~\ref{lem:weak}(i), que deriva a
+    compressibilidade weak-$\ell_{\tau}$ \emph{da própria} Hipótese de Besov,
+    com $\tau = (s+1/2)^{-1}$ e constante explícita. É ele que transforma o
+    Corolário~\ref{cor:compressivel} de ``hipótese adicional'' em ``leitura
+    mais fina da mesma hipótese'', e que faz aparecer a separação
+    $s$ contra $\seff$ que só existe para $\pi < 2$ --- regime que o WALL, que
+    trabalha em $\Besov{s}{2}{\infty}$, não enxerga.
+  \item \textbf{Novo:} a Proposição~\ref{prop:lenta}(ii), que mostra que para
+    $\pi \ge 2$ e $s < 1/2$ a trilha lenta, balanceada, atinge a mesma taxa
+    $(J_{n}/n)^{2s/(2s+1)}$ do sieve \emph{sem nenhuma condição de desenho}.
+  \item \textbf{Novo:} o Teorema~\ref{thm:taxa}(i), que observa que a condição
+    empírica de E1.4 é, na resolução \eqref{eq:Jn}, exatamente da ordem da
+    própria taxa; e o Corolário~\ref{cor:componentes-taxa}, que fecha a cadeia
+    até $\widehat{\fcoef{\cv}}$ usando o autovalor de E1.4 duas vezes.
+\end{itemize}
+
+\section{O que isto não cobre}
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Cota inferior.} Nada aqui diz que as taxas são minimax no
+    desenho do WAFC. Klopp e Pensky (2015) têm a cota inferior para $q = 1$ com
+    $\bX \perp \bU$; a construção para $q \ge 2$ com desenho aditivo e $\bX$
+    dependente de $\bU$ não é feita. A comparação da
+    Observação~\ref{rem:tres} é contra a referência do modelo de sequência, e
+    é uma comparação de cota superior.
+  \item \textbf{A norma populacional.} Tudo continua em $\normn{\cdot}$; a
+    passagem a $\norm{\widehat f - f}_{L_{2}(P)}$ exige concentração uniforme
+    sobre a classe do sieve e não é feita nem aqui nem em E1.5. Para as
+    componentes, o Corolário~\ref{cor:componentes-taxa} \emph{é} em
+    $L_{2}[0,1]$ (medida de Lebesgue), porque a ortonormalidade da base o dá
+    de graça; a versão em $L_{2}(P_{U_{\md}})$ custaria a densidade $C_{U}$ em
+    um sentido e $c_{U}$ no outro.
+  \item \textbf{$\seff$ e $\tau$ conhecidos.} As escolhas \eqref{eq:Jn} e
+    \eqref{eq:janela} dependem de $\seff$ (e a janela, de $\tau$). Não há aqui
+    adaptação a $s$ nem a $\pi$: o que o estimador adapta, sem conhecer $\tau$,
+    é a dimensão efetiva dentro de um $J_{n}$ fixado. Escolher $J_{n}$ por
+    validação cruzada ou por um critério é matéria de E2.3, e a teoria da
+    escolha adaptativa de $J$ não está feita.
+  \item \textbf{Regularidade heterogênea.} $(s,\pi,C_{g})$ são comuns a todos
+    os blocos; a versão com $(s_{\cv\md},\pi_{\cv\md})$ é a mesma prova com
+    $\min_{\cv\md}$ nas taxas, e com $\tau = \max_{\cv\md}\tau_{\cv\md}$ no
+    Lema~\ref{lem:weak}(i).
+  \item \textbf{$p = p_{n}$ crescente.} A Hipótese~\ref{ass:regime} fixa $p$ e
+    $q$. Com $p$ crescente, o termo $\sigma^{2}p/n$ deixa de ser de ordem
+    menor, as constantes $(pq)^{2}$ de E1.3 e $R_{J} = pB_{X}^{2}(1+qC_{\psi}
+    2^{J})$ de E1.4 entram nas taxas, e a janela \eqref{eq:janela} estreita.
+  \item \textbf{$\sigma$ desconhecido e $\pen$ aleatório}, e a base do
+    intervalo, pelas mesmas razões de E1.5.
+  \item \textbf{O regime pré-assintótico.} A conferência mostra que, na grade
+    $n \le 12800$ com $\seff = 1/4$, a cadeia
+    $\lmin(\Gramhat) \ge \kappa_{1}c_{U}/2$ da Proposição~3(iv) de E1.4 só é
+    atingida no maior $n$, e que a resolução \eqref{eq:Jn} fica dois níveis
+    acima da que minimiza o erro realizado. As taxas são assintóticas; a
+    Seção~5 do artigo é que tem de discutir esse regime.
+\end{itemize}
+
+\section{Conferência numérica}
+
+\texttt{check/05-taxas.R} (imprime \texttt{OK}; cerca de 7~min). Desenho de
+E1.4 e E1.5: Daublets com filtro 8, $p = 2$ com $X_{1}\equiv 1$ e
+$X_{2} = 1/2+\eta$, $q = 2$, $\bU$ uniforme em $[0,1]^{2}$ (logo
+$c_{U} = C_{U} = 1$ e $\gamma = \kappa_{1}c_{U} = 0.25$), erro gaussiano com
+$\sigma = 0.5$, $\pen = 2\sigma\smax\sqrt{2\log(2d/\alpha)/n}$, $\alpha = 0.05$
+e $n$ variando de $200$ a $12800$. A função verdadeira é a soma finita dos
+níveis $\lev < 10$ com $\norm{\theta_{\cv\md,\lev\cdot}}_{\pi}$ saturando a
+Hipótese de Besov em todo nível, de modo que o viés do sieve é exato. O que
+saiu em 2026-09-19 está registrado em \texttt{docs/handoff-E1.6.md}; os
+números que importam:
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Lema~\ref{lem:weak}(i).} O envelope
+    $\theta^{*}_{(k)} \le C_{\tau}k^{-1/\tau}$ e a contagem
+    $N(\varepsilon) \le pqA_{s,\pi}(C_{g}/\varepsilon)^{\tau}$ valem em
+    $15$ pares $(s,\pi)$ com $s \in \{0.4,0.8,1.5,3\}$ e
+    $\pi \in \{1,1.5,2,4\}$, em duas construções por nível (direção aleatória
+    e massa espalhada). A cota é justa: a razão ao envelope chega a $0.999$ no
+    caso mais liso.
+  \item \textbf{Lema~\ref{lem:weak}(ii).} A cauda
+    $\sum_{k>M}\theta_{(k)}^{2}$ fica sob
+    $C_{\tau}^{2}\tau(2-\tau)^{-1}M^{1-2/\tau}$ em
+    $M = 1,4,\dots,1024$ nos mesmos $15$ pares.
+  \item \textbf{Álgebra do Corolário~\ref{cor:compressivel}(i).} A forma
+    fechada de $\Mstar$ e de $h(\Mstar) = 2aM^{\star}/(2-\tau)$ bate com a
+    minimização numérica em $30$ combinações de $(\tau,a,b)$, e
+    $h(\lceil\Mstar\rceil) \le 2h(\Mstar)$.
+  \item \textbf{Balanço do Teorema~\ref{thm:taxa}.} Com
+    $2^{J} = (n/\log n)^{1/(2\seff+1)}$, os termos de estimação, de viés e (em
+    $s < 1/2$) a cota lenta coincidem com $(\log n/n)^{2\seff/(2\seff+1)}$ a
+    menos de $10^{-15}$. A janela \eqref{eq:janela} é não vazia exatamente
+    quando $\seff > (2-\tau)/4$, e $(2-\tau)/4 = s/(2s+1)$.
+  \item \textbf{Predição (Teorema~\ref{thm:taxa}(ii)), $\pi = 2$ e
+    $s = \seff = 1/4$.} A razão
+    $\normn{\widehat f - f}^{2}/(J_{n}/n)^{2\seff/(2\seff+1)}$ vai de
+    $2.95$ a $3.70$ com $n$ variando por um fator $64$ (máximo sobre mínimo
+    $1.25$), e a inclinação de $\log(\text{erro})$ contra o logaritmo do alvo
+    é $0.82$. Nenhuma violação da cota em nenhuma réplica.
+  \item \textbf{Componentes (Corolário~\ref{cor:componentes-taxa}).}
+    $\sum_{\cv\md}\lVert\widehat g_{\cv\md}-\gcomp{\cv}{\md}\rVert^{2}_{L_{2}}$
+    segue o mesmo alvo (razão de $4.08$ a $7.01$, máximo sobre mínimo $1.72$),
+    sem violação da cota.
+  \item \textbf{Lema~\ref{lem:comparador}.} A desigualdade rápida com
+    comparador $\thstarM{M}$ vale para \emph{todo} $M$ testado
+    ($1, 2, \dots, 256, d$) em todas as réplicas e todos os $n$: é a
+    verificação direta de que a prova de E1.5 não depende do comparador.
+  \item \textbf{Dimensão efetiva (Corolário~\ref{cor:compressivel}), $\pi = 1$
+    e $s = 1.2$ ($\seff = 0.7$, $\tau = 0.588$).} O minimizador
+    $\Mstar_{n}$ da cota é sempre interior e a cota nele é de $51$ a $103$
+    vezes menor que a leitura densa $M = d$. A inclinação log-log de
+    $\Mstar_{n}$ em $n$ é $0.39$, contra o alvo $\tau/2 = 0.29$; a de
+    $h(\Mstar)$ em $\pen$ é $1.65$, contra o alvo $2-\tau = 1.41$.
+  \item \textbf{O que a conferência \emph{não} separa.} Os expoentes denso
+    ($0.583$) e comprimível ($0.706$) distam $0.12$; com $n$ variando por um
+    fator $64$ isso é um fator $1.6$, comparável à deriva das razões
+    medidas, de modo que o erro \emph{realizado} não distingue os dois. O que
+    a conferência decide é a cota e a sua dimensão efetiva, não o realizado.
+  \item \textbf{Pré-assintótico, registrado.} Com $\seff = 1/4$ a regra
+    \eqref{eq:Jn} leva $J_{n}$ a $7$ em $n = 12800$ ($d = 508$), e aí a
+    fração de réplicas com $\lmin(\Gramhat) \ge \gamma/2$ é $0.95$, contra no
+    máximo $0.10$ em $n \le 6400$. A $J$ fixo a convergência é clara
+    (em $J = 4$, $\lmin(\Gramhat)$ vai de $0.088$ em $n = 400$ a $0.220$ em
+    $n = 12800$, contra $\lmin(\Gram) = 0.25$), e $\gtil \ge \lmin(\Gramhat)$ vale em todas as
+    réplicas. A resolução \eqref{eq:Jn} fica dois níveis acima do
+    minimizador empírico do erro em todos os $n$ varridos, e custa entre $5\%$
+    e $11\%$ de erro a mais que esse minimizador.
+\end{itemize}
+
+\section*{Referências}
+\sloppy
+
+Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item Bühlmann, P.\ e van de Geer, S. (2011). \emph{Statistics for
+    High-Dimensional Data}. Springer. (\texttt{buhlmann2011statistics},
+    verificada em L1.) Usada só por meio de E1.5.
+  \item Donoho, D.~L.\ e Johnstone, I.~M. (1998). Minimax estimation via
+    wavelet shrinkage. \emph{The Annals of Statistics} 26, 879--921.
+    (\texttt{Donoho-Johnstone-1998}, verificada em L1.) Referência do risco
+    minimax sobre bolas weak-$\ell_{\tau}$ no modelo de sequência, citada na
+    Observação~\ref{rem:tres}. \textsc{[verificar numeração do resultado]}
+  \item Donoho, D.~L.\ e Johnstone, I.~M. (1994). Ideal spatial adaptation by
+    wavelet shrinkage. \emph{Biometrika} 81, 425--455.
+    (\texttt{Donoho-Johnstone-1994}, verificada em L1.) A mesma referência,
+    na forma original. \textsc{[verificar numeração do resultado]}
+  \item Klopp, O.\ e Pensky, M. (2015). Sparse high-dimensional varying
+    coefficient model: nonasymptotic minimax study. \emph{The Annals of
+    Statistics} 43(3), 1273--1299. (\texttt{Klopp-Pensky-2015}, verificada em
+    L1.) Teoremas 1 e 2 e Corolário 1: cota inferior minimax e taxa adaptativa
+    em Besov com $\nu < 2$ para $q = 1$ e $\bX \perp \bU$.
+  \item Johnstone, I.~M. \emph{Gaussian Estimation: Sequence and Wavelet
+    Models}. Citada pelo WALL como
+    \texttt{johnstone2019gaussian} para o mesmo risco minimax; não está no
+    \texttt{.bib} verificado. \textsc{[verificar]}
+\end{itemize}
+
+\end{document}
