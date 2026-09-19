@@ -6,8 +6,10 @@ exemplos, ou outro de alto nível "que tenha mais a cara da proposta". Este
 documento compara os candidatos, propõe um alvo e registra o que ele pede.
 A proposta é **decisão D5, a ratificar** (`ESTADO.md`).
 
-**Estado da verificação (2026-09-18):** as páginas do SCImago devolveram 403,
-e o SJR da *Statistica Sinica* continua vindo de busca na web, a confirmar. As
+**Estado da verificação:** o autor confirmou em 2026-09-19, no próprio
+SCImago, que a *Statistica Sinica* é **Q1** em Statistics and Probability,
+o que fecha o que restava de E0.3; as páginas do SCImago devolviam 403 desta
+máquina. As
 páginas da IMS sobre a EJS foram lidas. As instruções da *Statistica Sinica*
 foram capturadas pelo autor e estão transcritas em
 [`ss-instrucoes-autores.md`](ss-instrucoes-autores.md): **o teto é de 40
@@ -21,7 +23,7 @@ consta em lugar nenhum da página oficial.
 
 | Revista | SJR Q (Stat. & Prob.) | Formato típico | Por que sim | Por que não |
 |---|---|---|---|---|
-| **Statistica Sinica** | Q1 em 2024 (uma fonte diz Q2; confirmar) | método + teoria + simulação + aplicação; teto de **40 páginas em espaço duplo**, referências incluídas; suplementar para provas | é onde a linhagem do modelo mora: Xue & Yang (2006) e Wei, Huang & Li (2011) saíram lá; o leitor conhece additive coefficient models e group LASSO; o padrão de artigo é exatamente o que o plano produz | triagem dura (só ~40% passa dos co-editores); exige aplicação real convincente; a revista prefere provas e detalhes de simulação no suplementar |
+| **Statistica Sinica** | **Q1** (confirmado pelo autor no SCImago, 2026-09-19) | método + teoria + simulação + aplicação; teto de **40 páginas em espaço duplo**, referências incluídas; suplementar para provas | é onde a linhagem do modelo mora: Xue & Yang (2006) e Wei, Huang & Li (2011) saíram lá; o leitor conhece additive coefficient models e group LASSO; o padrão de artigo é exatamente o que o plano produz | triagem dura (só ~40% passa dos co-editores); exige aplicação real convincente; a revista prefere provas e detalhes de simulação no suplementar |
 | **Electronic Journal of Statistics** | Q1 em 2024 | sem teto de páginas; open access sem taxa (IMS e Bernoulli); "same standard as other IMS journals" | cabe a teoria completa no corpo; sem custo; a revisão tende a ser mais rápida; template `imsart` já versionado aqui | a expectativa de teoria é maior (uma desigualdade oráculo "transposta do WALL" pode parecer pouco); menos peso para o pacote e a aplicação |
 | Scandinavian Journal of Statistics | Q2 (2024/2025, a confirmar) | teoria + simulação | é onde Sardy & Ma (2024) e o próprio autor (Montoril, Pinheiro & Vidakovic 2019) publicaram; leitor natural | não atende ao pedido de Q1 |
 | Journal of Computational and Graphical Statistics | Q1 (a confirmar) | método computacional + software | o pacote e a comparação numérica são fortes | a teoria ficaria em segundo plano; o WALL aplicado já mira lá, e dois artigos do mesmo grupo no mesmo veículo com o mesmo motor pedem diferenciação |

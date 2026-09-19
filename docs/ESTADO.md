@@ -703,8 +703,7 @@ Ordenadas pelo que bloqueia mais.
   `[0, 0.5)` em `J = 1`, e a margem variando com `J` faz os candidatos de
   `cv.wafc()` estimarem alvos diferentes. Entra no catálogo de E2.4 ou numa
   correção curta antes dela.
-- (a) **Autor:** o quartil da SS no SCImago (o que resta de E0.3);
-  ratificar D17 e as propostas L2b a L2f, que são baratas; responder a
+- (a) **Autor:** ratificar D17 e as propostas L2b a L2f, que são baratas; responder a
   pergunta 2 se já tiver a base da aplicação, que é o que E6 precisa cedo.
   O cluster de centralização e borda (perguntas 4, 5, 6 e 10) deve ser
   resolvido antes de a Seção 2 de E5a ser escrita e antes de E2.4.
@@ -728,6 +727,7 @@ Ordenadas pelo que bloqueia mais.
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
 | 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
+| 2026-09-19 | E0.3 fechada de vez: o autor confirmou no SCImago que a *Statistica Sinica* é Q1 em Statistics and Probability |
 | 2026-09-19 | D18 decidida (o artigo é extensão de Klopp & Pensky) com o parágrafo de posicionamento escrito; D16, D5 e D8 ratificadas; E5a catalogada e destravada |
 | 2026-09-19 | E1.6, E2.2 e L3 fechadas e integradas: **E1 inteira**, com a compressibilidade saindo de graça da hipótese de Besov (D16); `wafc()` com as duas penalidades e KKT fechando no caminho inteiro (D17); `.bib` com 57 entradas e duas citações de teorema corrigidas |
 | 2026-09-19 | E1.5 e E2.1 fechadas em dois chats de tarefa e integradas: desigualdade oráculo sem cone, com a razão `‖f̂−f‖²_n/(λ²s_0)` estável a 5% em `n` de 200 a 6400; `wafc/` nasce com 103 testes passando; D15 |
