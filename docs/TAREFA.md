@@ -42,8 +42,10 @@ que ler antes está aqui e no plano.
 | E1.2 identificabilidade | **fechada** (2026-09-18): Proposição 1 e Lema 1; conferência `OK` | `derivations/01-identificabilidade.md` |
 | E1.3 aproximação em Besov | **fechada** (2026-09-18): dois lemas, corolário e o custo da periodização; conferência `OK` | `derivations/02-aproximacao-besov.tex` |
 | E1.4 desenho de produtos | **fechada** (2026-09-18): autovalor mínimo cheio no caso geral (D13); conferência `OK` | `derivations/03-desenho-produtos.tex` |
-| E1.5, E2.1 | não abertas; **podem abrir já** | catálogo da §3 |
-| E1.6, E1.7, E2.2 a E2.5, E3 a E7 | não abertas; E1.6 abre quando E1.5 fechar | |
+| E1.5 oráculo | **fechada** (2026-09-19): Lemas 4 a 7, Teorema 1, Corolários 2 e 3; conferência `OK` | `derivations/04-oraculo.tex` |
+| E2.1 desenho e cenários | **fechada** (2026-09-19): `wafc_design()`, cenários, 103 testes passando | `wafc/R/`, `wafc/tests/`, `wafc/scripts/` |
+| E1.6, E2.2 | não abertas; **podem abrir já** | catálogo da §3 |
+| E1.7, E2.3 a E2.5, E3 a E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
 
@@ -58,26 +60,25 @@ tarefa pode criar ou editar**.
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
 | E0.3 (autor) | só falta o quartil 2024 da SS conferido no SCImago e anotado em `alvo-revista.md` §1; a transcrição e o template estão feitos | nada | `docs/alvo-revista.md` (§1), `docs/handoff-E0.3.md` |
-| E1.5 | `derivations/04-oraculo.tex` (+ `.pdf`): desigualdade oráculo para o LASSO com perda quadrática e erro sub-gaussiano, `c_ℓ` não penalizados, `λ ≍ σ ‖Z‖_max sqrt(log(p q N_J)/n)`, taxa lenta (sem condição de desenho) e taxa rápida (com E1.4); o viés entra pelo Corolário 1 de E1.3, e a constante de compatibilidade pela forma consumível de E1.4 (`φ_0²(S; Σ̂) ≥ κ_1 c_U / 2`, sem cone); `check/04-oraculo.R` medindo o erro de predição contra `λ² s_0` ao variar `n`, com `s_0` pequeno | E1.3 e E1.4, fechadas; segue Bühlmann & van de Geer (2011), Teoremas 6.1 e 6.2 | `derivations/04-oraculo.tex`, `derivations/04-oraculo.pdf`, `derivations/check/04-oraculo.R`, `docs/handoff-E1.5.md` |
-| E2.1 | `wafc/R/load.R` (carrega `R/*.R`, declara dependências), `wafc/R/dgp.R` (cenários suave, não homogêneo, nulo; `simulate_wafc()`), `wafc/R/design.R` (`wafc_design()` sobre `wbasis()` do `WaveBased`, blocos `X_j ⊙ ψ(U_k)`, colunas nomeadas, `penalty.factor`, versão esparsa), `wafc/tests/test-design.R` (com `θ*` na base e sem ruído, `glmnet` com `λ → 0` recupera `θ*`; posto cheio; nomes das colunas) e `wafc/scripts/01-smoke.R` | o enunciado de E1.2 (a hipótese de identificabilidade fixa o que o desenho descarta); a ordem das colunas é D12 | `wafc/R/load.R`, `wafc/R/dgp.R`, `wafc/R/design.R`, `wafc/tests/test-design.R`, `wafc/scripts/01-smoke.R`, `wafc/README.md` (só a tabela), `docs/handoff-E2.1.md` |
 
+| E1.6 | `derivations/05-taxas.tex` (+ `.pdf`): com `J_n ≍ log_2 n/(2s'+1)`, taxa de predição `n^{−2s'/(2s'+1)}` a menos de logaritmos; erro `L_2` de cada `ĝ_{ℓm}` pelo Corolário 3 de E1.5; corolário de compressibilidade em weak-`ℓ_τ`, que é o que troca `s_0` por dimensão efetiva (sob Besov genérico `s_0 = d`, e sem ele o enunciado incondicional é só a taxa lenta); transposto da trilha rápida do WALL. `check/05-taxas.R` medindo o erro de predição contra `n^{−2s'/(2s'+1)}` ao variar `n`, e a dimensão efetiva sob coeficientes compressíveis | E1.5, fechada (Corolários 2 e 3, Lema 7); o regime de `J_n` tem de satisfazer a condição empírica de E1.4 | `derivations/05-taxas.tex`, `derivations/05-taxas.pdf`, `derivations/check/05-taxas.R`, `docs/handoff-E1.6.md` |
+| E2.2 | `wafc/R/fit.R`, `wafc/R/reconstruct.R`, `wafc/tests/test-fit.R`: `wafc()` com LASSO (`glmnet`, gaussiano) e a variante sparse group LASSO (`sparsegl`; grupo = bloco `(ℓ, m)`, que é o que D12 deixa contíguo); `predict`, `coef`, reconstrução de `ĝ_{ℓm}` e `β̂_ℓ` pelo `spec` de `wafc_design()`. **Ajustar com `intercept = TRUE` e somar o intercepto ao nível da covariável constante** (o `glmnet` descarta colunas de variância zero; `wafc_design()` devolve `constant` com os índices), e conferir por KKT em vez de confiar no `penalty.factor`, que o `glmnet` reescala para somar `nvars` | E2.1, fechada; o pacote da variante em grupos vai ao `CONTINUAR.md` na mesma rodada | `wafc/R/fit.R`, `wafc/R/reconstruct.R`, `wafc/tests/test-fit.R`, `wafc/README.md` (só a tabela), `docs/handoff-E2.2.md` |
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**Quem abrir E1.5** lê antes o Corolário 1 de
-`derivations/02-aproximacao-besov.tex` e a Proposição de
-`derivations/03-desenho-produtos.tex`, além da §1 de
-[`busca-novidade.md`](busca-novidade.md): a desigualdade oráculo de Klopp &
-Pensky (2015) cobre o caso `q = 1` com `X ⊥ U`, e o que é novo aqui é o
-desenho aditivo.
+**Quem abrir E1.6** lê antes o Teorema 1 e os Corolários 2 e 3 de
+`derivations/04-oraculo.tex`, e a §1 de
+[`busca-novidade.md`](busca-novidade.md): a taxa adaptativa em Besov de
+Klopp & Pensky (2015) cobre `q = 1` com `X ⊥ U`, inclusive com cota
+inferior, e o que é novo aqui é o desenho aditivo. Atenção à calibração:
+`‖Z‖_max` é `max_a sqrt(Σ̂_aa)`, que é `O_p(1)`, e não `max_{i,a}|Z_{ia}|`,
+que é de ordem `2^{J/2}` e destruiria a taxa.
 
-**Quem abrir E2.1** implementa a ordem de colunas de D12 e descarta o que
-E1.2 manda descartar: no periódico com `j_0 = 0`, a coluna `φ_{00}` do
-`wbasis()` e nada mais. A construção `Z = (X ⊗ Ψ(U))[, perm]` do
-`check/03-desenho-produtos.R` (`kron_rows()`, `perm_D12()`) serve de teste
-de referência.
+**Quem abrir E2.2** parte de `wafc_design()` como está e não mexe nele; os
+dois achados que economizam meio dia estão no catálogo acima (coluna
+constante e `penalty.factor`).
 
 Tarefa que não está no catálogo: pedir ao chat principal para catalogá-la
 antes de abrir. E1.5, E1.6, E2.2 a E2.5 e E3 entram no catálogo quando as
@@ -114,10 +115,13 @@ pelo chat principal, com o mapa abaixo.
 | `01-identificabilidade.md` (E1.2) | Proposição 1, Lema 1 |
 | `02-aproximacao-besov.tex` (E1.3) | Lema 2, Lema 3, Corolário 1, Proposição 2 |
 | `03-desenho-produtos.tex` (E1.4) | Proposição 3 |
+| `04-oraculo.tex` (E1.5) | Lema 4, Lema 5, Lema 6, Lema 7, Teorema 1, Corolário 2, Corolário 3 |
 
-Os arquivos mantêm os contadores locais do LaTeX; **este mapa é a
-autoridade**, e é ele que E5a usa ao montar o manuscrito. O próximo
-resultado numera a partir de Proposição 3, Lema 3 e Corolário 1.
+**Este mapa é a autoridade**, e é ele que E5a usa ao montar o manuscrito. O
+`04-oraculo.tex` já imprime o número global (via `\setcounter` no
+preâmbulo), prática adotada daqui em diante; `02` e `03` ainda imprimem o
+contador local. O próximo resultado numera a partir de Proposição 3, Lema 7,
+Teorema 1 e Corolário 3.
 
 A notação está congelada (E1.1): `ψ_{jk}` com nível `j` e translação `k`,
 covariável linear `X_ℓ`, moduladora `U_m`, coeficiente `θ_{ℓm,jk}`. As

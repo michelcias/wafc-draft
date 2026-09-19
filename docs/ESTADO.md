@@ -1,10 +1,11 @@
 # Estado do trabalho, handoff de continuidade
 
-**Última atualização:** 2026-09-18.
+**Última atualização:** 2026-09-19.
 **Etapa corrente:** E0 fechada, menos a ratificação de D5; E1.1, L1, L2,
-E1.2, E1.3 e E1.4 fechadas. Liberadas para chats de tarefa: E1.5 e E2.1.
-Nenhum chat de tarefa em curso. Duas decisões do autor adiadas (D5, D8),
-seis propostas de L2 a ratificar e sete perguntas na §4.
+E1.2 a E1.5 e E2.1 fechadas. **E1 só deve E1.6**; o código do método nasceu.
+Liberadas para chats de tarefa: E1.6 e E2.2. Nenhum chat de tarefa em curso.
+Duas decisões do autor adiadas (D5, D8), seis propostas de L2 a ratificar e
+onze perguntas na §4.
 **Versão viva do manuscrito:** nenhuma (nasce em E5a como `k = 1`).
 **Cor da rodada corrente:** `colR1` (entra em uso quando existir `k = 2`).
 
@@ -288,6 +289,74 @@ com Proposição 1 e Lema 1; E1.3 com Lema 2, Lema 3, Corolário 1 e
 Proposição 2; E1.4 com Proposição 3. Os arquivos mantêm os contadores
 locais; o mapa é a autoridade quando E5a montar o manuscrito.
 
+### 2026-09-19: E1.5 e E2.1 fechadas (o oráculo e o primeiro código)
+
+Dois chats de tarefa, integrados aqui. Conferências rodadas nesta máquina
+antes de integrar: `04-oraculo.R` imprime `OK` em 16 s;
+`testthat::test_dir("wafc/tests")` dá **103 passam, 0 falham** em 4,6 s;
+`wafc/scripts/01-smoke.R` imprime `OK` em 2,8 s; o `.pdf` de E1.5 tem
+9 páginas.
+
+**E1.5, desigualdade oráculo** (`derivations/04-oraculo.tex`). Lemas 4 a 7,
+Teorema 1 e Corolários 2 e 3. A estrutura da prova evita a condição de cone
+por **perfilagem**: com `B̃ = (I − Π_A)B`, o estimador resolve o problema
+residualizado e `λ_min(B̃'B̃/n) ≥ λ_min(Σ̂)`, que é a forma consumível de
+E1.4. Números: com `s_0 = 4` e sem viés, a razão `‖f̂ − f‖²_n/(λ² s_0)` fica
+entre `1.541` e `1.617` ao variar `n` de `200` a `6400` (máximo sobre
+mínimo `1.05`), que é exatamente a escala que o plano mandava medir; nenhuma
+violação da cota rápida em 360 ajustes, com folga de `371×` a `187×`.
+
+- **D13 pagou aqui:** é o autovalor cheio de E1.4 que dispensa o cone e dá
+  constante que **não depende de `S_0`**.
+- **Um termo que Klopp & Pensky não têm: `σ² p / n`**, preço de deixar os
+  `c_ℓ` fora da penalidade (D3), já que K&P penalizam a constante. A
+  diferença para eles não é só de generalidade, aparece no enunciado.
+- **Calibração de `λ`:** a leitura certa de `‖Z‖_max` no plano é
+  `σ̂_max = max_a sqrt(Σ̂_aa)`, que é `O_p(1)`; a leitura literal
+  `max_{i,a}|Z_{ia}|` é de ordem `2^{J/2}` e **destruiria a taxa de E1.6**.
+  Medido: `σ̂_max` vai de `1.02` a `1.14` em `J = 2..6` enquanto
+  `max|Z_{ia}|` vai de `3.04` a `11.47`.
+- **O Lema 7 dá `‖θ*‖_1` sem dependência de `π`**, o que permite enunciar a
+  taxa lenta em `B^s_{π,r}` geral, e não só em `B^s_{2,∞}` como o WALL.
+- **Sob Besov, em geral `s_0 = d`:** o enunciado incondicional é a taxa
+  lenta, e trocar `s_0` por dimensão efetiva é o corolário de
+  compressibilidade de E1.6.
+
+**E2.1, desenho e cenários** (`wafc/R/load.R`, `dgp.R`, `design.R`,
+`tests/test-design.R`, `scripts/01-smoke.R`). `wafc_design()` implementa a
+ordem de D12 e descarta só o que E1.2 manda (a coluna `φ_{00}` de cada
+bloco); a ordem bate com a construção de referência de
+`check/03-desenho-produtos.R` a `1e-12`; mínimos quadrados sem ruído com
+erro `1.1e-15` e `glmnet` com `λ → 0` a `4.3e-06`. No piloto de fumaça, o
+cenário nulo zera as 90 colunas penalizadas (RMSE `0.045` contra
+`σ = 0.62`): o desenho não inventa estrutura.
+
+- **Achado que fixa E2.2:** o `glmnet` **descarta colunas de variância
+  zero** mesmo com `standardize = FALSE`, logo `X_1 ≡ 1` sai do ajuste. Com
+  `intercept = FALSE` perde-se `c_1` inteiro; com `intercept = TRUE` o
+  intercepto carrega `c_1` exatamente (`1.00000025` contra `1`). `wafc()`
+  ajusta com `intercept = TRUE` e soma o intercepto ao nível da covariável
+  constante; `wafc_design()` já devolve `constant` com esses índices. E1.5
+  chegou ao mesmo achado por outro caminho e acrescentou uma terceira rota
+  conferida (resolver o problema residualizado), além de duas notas: o
+  `glmnet` **reescala `penalty.factor` para somar `nvars`**, e `thresh` está
+  obsoleto na versão 5.0 (vai em `control`).
+- **`lambda.min` deixa lixo nos blocos nulos** (3 e 8 coeficientes nos dois
+  blocos de `β_3`, ISE `0.0010` e `0.0080`), e `lambda.1se` reduz sem zerar.
+  É o argumento numérico a favor da variante em grupos de E2.2.
+- **O reescalonamento herdado do `wall()`** (`eps = 1.9^{−J}`, isto é
+  `[0.077, 0.923]` em `J = 4`) faz a componente estimada integrar zero na
+  amplitude reescalada, não em `[0,1]`. É deslocamento de nível, não de
+  forma, e é matéria da seção de computação.
+- **Lição de ferramenta:** `Matrix::cbind2` só aceita dois argumentos, e
+  `do.call(Matrix::cbind2, lista)` devolve em silêncio o `cbind` dos dois
+  primeiros; usar `Reduce`.
+
+**Numeração global** (mapa na §5 do `TAREFA.md`): E1.5 ficou com Lemas 4 a
+7, Teorema 1 e Corolários 2 e 3, e **passou a imprimir o número global** via
+`\setcounter`. Adotei a prática; `02` e `03` continuam com contador local e
+o mapa é a autoridade até alguém alinhá-los.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -302,6 +371,7 @@ locais; o mapa é a autoridade quando E5a montar o manuscrito.
 | D12 | 09-18 | Ordem das colunas de `Z`: não penalizados, depois blocos `(ℓ, m)` lexicográficos, dentro do bloco `j` e `k` crescentes | fixa a interface de `wafc_design()` em E2.1 |
 | D13 | 09-18 | **A teoria assume o caso geral** `λ_min(E[XX' \| U]) ≥ κ_1 > 0` q.c.; `X ⊥ U` vira observação (a fatoração de Kronecker) | E1.4 fechou o caso geral com `λ_min(Σ) ≥ κ_1 c_U`, conferido a 10% da verdade; assumir independência custaria generalidade sem comprar constante |
 | D14 | 09-18 | **D11 é sobre a densidade conjunta** de `U` em `[0,1]^q`, não sobre as marginais | `U_2 = U_1` tem marginais uniformes e `Σ_Ψ` singular; a prova de E1.4 usa `c_U` da conjunta, e é daí que sai a "não colinearidade entre moduladoras" |
+| D15 | 09-19 | Padrões do `wafc_design()`, ratificados do handoff de E2.1: `filter.size = 8` (contra os 20 do `wall()`), nomes de coluna `x2:u1:psi3.5` e de bloco `x2:u1`, erro informativo em `j0 != 0` e `boundary = "interval"`, e cenários com `β_1` aditivo em duas moduladoras, `β_2` em uma e `β_ℓ` constante para `ℓ ≥ 3` | o filtro 8 é o das três conferências de `derivations/check/`; o erro em vez da implementação mantém a pergunta 6 aberta sem código morto; o cenário tem de exibir o termo cruzado, que L2 apontou como o eixo do artigo |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
 | D7 | 09-18 | Compêndio de simulação e aplicação em repositório próprio, `wafc-studies`, nos moldes do `wall` | o `wall` já resolveu cache, `renv` por commit e proveniência |
 
@@ -376,7 +446,19 @@ Ordenadas pelo que bloqueia mais.
    aditivo não é o deles. Decide-se antes de E5a; E1.4 não depende.
 8. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
-9. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+9. **Idioma do código e das derivações.** E2.1 escreveu o Roxygen e os
+   comentários de `wafc/` em inglês (é o que vira pacote em E3.3, e o
+   `wall.R` é todo em inglês); os `derivations/` estão misturados, `02` e
+   `04` em português e `03` em inglês. D6 fala de documentos e manuscrito,
+   não de código. Proposta: **inglês no código**, **português nas
+   derivações** (traduzir só quando E5a montar o manuscrito), e alinhar o
+   `03`. Se aceita, entra uma correção de uma linha por ambiente no
+   `macros.tex`, que hoje imprime "Lemma 4" enquanto a prosa diz "Lema 4".
+10. **`rescale = TRUE` como padrão do `wafc_design()`?** É o que o `wall()`
+   faz e o que a prática exige, mas desloca a centralização (item acima).
+   Alternativa proposta por E2.1: manter o padrão e avisar quando a
+   amplitude amostral já estiver dentro de `[0,1]`.
+11. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
@@ -400,10 +482,10 @@ Ordenadas pelo que bloqueia mais.
 
 - (a) **Autor:** ratificar D5 e D8 (a notação já não depende disso);
   responder a pergunta 2 se já tiver a base da aplicação.
-- (b) **Chats de tarefa, em paralelo desde já:** E1.5 (oráculo; consome o
-  Corolário de E1.3 e `φ_0²(S; Σ̂) ≥ κ_1 c_U/2` de E1.4) e E2.1 (desenho em
-  `wafc/`, com a ordem de colunas de D12 e o que E1.2 manda descartar).
-  Os dois tocam arquivos distintos.
+- (b) **Chats de tarefa, em paralelo desde já:** E1.6 (taxas e
+  compressibilidade; consome os Corolários 2 e 3 e o Lema 7 de E1.5) e E2.2
+  (`wafc()` com LASSO e a variante em grupos, já sabendo como o `glmnet`
+  trata a coluna constante). Os dois tocam arquivos distintos.
 - (b') **A catalogar:** uma L1 de segunda rodada, que tem trabalho de
   três fontes: as linhas novas de `literatura.md` (L2, status `resumo`), as
   referências que E1.3 e E1.4 citam e que não estão no `.bib`
@@ -424,6 +506,7 @@ Ordenadas pelo que bloqueia mais.
 |---|---|
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
+| 2026-09-19 | E1.5 e E2.1 fechadas em dois chats de tarefa e integradas: desigualdade oráculo sem cone, com a razão `‖f̂−f‖²_n/(λ²s_0)` estável a 5% em `n` de 200 a 6400; `wafc/` nasce com 103 testes passando; D15 |
 | 2026-09-18 | E1.2, E1.3 e E1.4 fechadas em três chats de tarefa e integradas; as três conferências rodam e imprimem `OK` aqui; D13 e D14; a numeração global dos resultados fixada |
 | 2026-09-18 | L2 fechada em chat de tarefa e integrada: novidade central confirmada (interseção zero na SS e na EJS), mas Klopp & Pensky (2015) cobre E1.4 (i), E1.5 e E1.6 para `q = 1` e `X ⊥ U`; seis propostas de mudança de rumo a ratificar |
 | 2026-09-18 | L1 fechada em chat de tarefa e integrada: 35 referências verificadas, quatro correções de atribuição, dois trabalhos novos para L2 olhar |

@@ -80,11 +80,16 @@ máquina):
 ```bash
 Rscript derivations/check/01-identificabilidade.R   # ~7 s
 Rscript derivations/check/03-desenho-produtos.R     # ~9 s, precisa de quadprog
+Rscript derivations/check/04-oraculo.R              # ~16 s, precisa de glmnet
 Rscript derivations/check/02-aproximacao-besov.R    # ~53 s
 ```
 
-Quando existirem: `Rscript -e 'testthat::test_dir("wafc/tests")'`;
-`Rscript wafc/scripts/01-smoke.R`.
+E o código do método, que já existe:
+
+```bash
+Rscript -e 'testthat::test_dir("wafc/tests")'   # 103 passam, ~5 s
+Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
+```
 
 ## 3. Onde o trabalho está (resumo de 2026-09-18; o `ESTADO.md` manda)
 
@@ -95,11 +100,12 @@ Quando existirem: `Rscript -e 'testthat::test_dir("wafc/tests")'`;
   O tipo de revisão da revista não consta da página oficial.
 - **Notação congelada** (E1.1, D9 a D12): `ψ_{jk}`, `X_ℓ`, `U_m`,
   `θ_{ℓm,jk}`, `U ∈ [0,1]^q`; `derivations/macros.tex` implementa e compila.
-- **Teoria: E1.2, E1.3 e E1.4 fechadas**, com conferência numérica rodando.
-  Falta E1.5 (oráculo) e E1.6 (taxas). **Nada de protótipo nem de
-  manuscrito ainda**: `wafc/` está vazio e E2.1 é a primeira tarefa de
-  código.
-- **Tarefas que podem abrir agora em chats de tarefa:** E1.5 e E2.1
+- **Teoria: E1.2 a E1.5 fechadas**, com conferência numérica rodando; de E1
+  só falta E1.6 (taxas e compressibilidade).
+- **Código: E2.1 fechada.** `wafc/R/` tem o carregador, os cenários e
+  `wafc_design()`; 103 testes passam. Falta `wafc()` (E2.2). **Nada de
+  manuscrito ainda.**
+- **Tarefas que podem abrir agora em chats de tarefa:** E1.6 e E2.2
   (catálogo em `TAREFA.md`).
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
