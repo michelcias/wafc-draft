@@ -72,6 +72,7 @@ Conferência de que tudo roda (da raiz de `wafc-draft`):
 Rscript -e 'library(WaveBased); w <- wbasis(sort(runif(64)), j0 = 0, J = 3); cat(dim(w), "\n")'   # 64 8
 cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd -   # compila
 cd manuscript/ss-template && latexmk -pdf SS-template.tex && latexmk -c && cd -   # compila (9 páginas)
+cd manuscript && latexmk -pdf ms_1.tex && latexmk -pdf supp_1.tex && latexmk -c && cd -   # 28 e 26 páginas, sem indefinida
 ```
 
 As conferências das derivações, que devem imprimir `OK` (tempos desta
@@ -88,8 +89,10 @@ Rscript derivations/check/05-taxas.R                # ~7 min
 E o código do método, que já existe:
 
 ```bash
-Rscript -e 'testthat::test_dir("wafc/tests")'   # 231 passam, ~14 s
+Rscript -e 'testthat::test_dir("wafc/tests")'   # 402 passam, ~25 s
 Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
+Rscript wafc/scripts/03-tune-decomp.R           # ~2 min
+Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 min
 ```
 
 ## 3. Onde o trabalho está (resumo de 2026-09-18; o `ESTADO.md` manda)
@@ -104,13 +107,16 @@ Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
 - **Teoria: E1 fechada** (E1.2 a E1.6; E1.7 é condicional a E2.5), com as
   cinco conferências numéricas rodando. O enunciado principal é o
   Corolário 5 de `05-taxas.tex` (D16, a ratificar).
-- **Código: E2.1 e E2.2 fechadas.** `wafc/R/` tem o carregador, os cenários,
-  `wafc_design()` e `wafc()` com as duas penalidades; 231 testes passam.
-  Falta a sintonia (E2.3). **Nada de manuscrito ainda.**
+- **Código: E2.1 a E2.3 fechadas.** `wafc/R/` tem o carregador, os cenários,
+  `wafc_design()`, `wafc()` com as duas penalidades e a sintonia
+  (`cv.wafc()`, BIC, EBIC, regra da teoria); 402 testes passam. Faltam o
+  piloto e o go/no-go (E2.4, E2.5).
+- **Manuscrito vivo em `k = 1`:** `manuscript/ms_1.tex` e `supp_1.tex`
+  compilam limpos, em 28 e 26 páginas. Alterar pede decidir antes se nasce
+  `k = 2`.
 - **Bibliografia:** 57 entradas verificadas (L1 e L3); nada pendente.
-- **Nenhuma tarefa aberta no catálogo.** A próxima é E2.3 (sintonia), que
-  espera a resposta de quem escolhe `J` (pergunta 11 do `ESTADO.md`). E5a
-  (manuscrito) depende só de D5 e D8.
+- **Nenhuma tarefa aberta no catálogo.** A próxima é E2.4 (piloto), que
+  espera a ratificação de D19 e D20.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
   `instrucoes.md`.

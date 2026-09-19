@@ -1,12 +1,14 @@
 # Estado do trabalho, handoff de continuidade
 
 **Última atualização:** 2026-09-19.
-**Etapa corrente:** **E0 e E1 fechadas** (E1.7 é condicional a E2.5), mais
-L1, L2 e L3; de E2 falta E2.3 em diante. Liberadas para chats de tarefa:
-**E2.3 e E5a**, que é o nascimento do manuscrito. Nenhum chat de tarefa em
-curso. A ratificar: D17 e as propostas L2b a L2f. Doze perguntas na §4,
-nenhuma bloqueando.
-**Versão viva do manuscrito:** nenhuma (nasce em E5a como `k = 1`).
+**Etapa corrente:** **E0, E1, E5a e E2.1 a E2.3 fechadas**, mais L1, L2 e
+L3. Faltam E2.4 e E2.5 (piloto e go/no-go) para fechar E2. Nenhum chat de
+tarefa em curso e nenhuma tarefa catalogada. A ratificar: D17, as propostas
+L2b a L2f, as duas propostas de E2.3 (D19, D20) e as sete decisões de
+redação de E5a. **O teto de páginas é a decisão que trava E5b.**
+**Versão viva do manuscrito:** `k = 1` (`manuscript/ms_1.tex`,
+`supp_1.tex`, `references_1.bib`); a próxima alteração pergunta se cria
+`k = 2`.
 **Cor da rodada corrente:** `colR1` (entra em uso quando existir `k = 2`).
 
 Este documento é o ponto de partida de cada sessão. Ele diz onde o trabalho
@@ -436,6 +438,81 @@ pendente. O que ela corrigiu, e que teria ido para o manuscrito errado:
 - Sobra uma única marca `verificar` nos `derivations/`, e é **matemática**,
   não bibliográfica: o esboço da prova da extensão na Proposição 2 de E1.3.
 
+### 2026-09-19: E2.3 e E5a fechadas; o manuscrito existe
+
+Dois chats de tarefa, integrados aqui. Conferido nesta máquina: a bateria de
+`wafc/` dá **402 passam, 0 falham** em 25 s; `ms_1.tex` e `supp_1.tex`
+compilam com `latexmk` **sem nenhuma referência ou citação indefinida**, em
+28 e 26 páginas.
+
+**E5a, o manuscrito nasce** (`manuscript/ms_1.tex`, `supp_1.tex`,
+`references_1.bib` com 30 das 57 entradas verificadas). As Seções 1 a 4
+estão escritas no template da SS, a Introduction usa o parágrafo de D18 como
+está, e a Seção 3 abre pelo Corolário 5 de E1.6, que no manuscrito é o
+`Theorem 1` (D16). O mapa completo da numeração global para os rótulos do
+LaTeX está no `ms_1.tex` e é o que E5b precisa.
+
+- **O teto virou a decisão urgente.** Corpo em 24 páginas mais 4 de
+  referências, contra as 14,5 que `alvo-revista.md` §5 previa para as
+  Seções 1 a 4. Com as 11 planejadas para E5b e as referências crescendo
+  para ~6, o total projetado é **39 a 41 páginas**, isto é, no teto ou
+  acima. As três saídas estão na §2 do handoff, e a barata é escrever as
+  Seções 5 a 7 em menos de 11 páginas, com tabelas ao suplemento, que é o
+  que a revista prefere.
+- **Sete decisões de redação** foram tomadas para o texto existir, todas
+  reversíveis com uma linha e todas a ratificar: centralização de Lebesgue
+  na equação (2.2) (é a única que mexe em hipótese); teoria na base
+  periodizada com `interval` como opção de computação; reescalonamento
+  descrito sem fixar padrão; `E(·)` e `P(·)` em romano com parênteses e um
+  único `B_X` no lugar de `C_X` e `B_X`, exigidos pela §5 das instruções da
+  revista; macros copiadas para dentro dos `.tex` em vez de `\input`;
+  `\numberwithin{equation}{section}` para corrigir o contador do template;
+  e o título "Sparse wavelet estimation of additive functional
+  coefficients", com título corrente de 40 caracteres.
+- **O `chicago.bst` do template não obedece à própria revista:** abrevia em
+  "et al." a partir de três autores, e a §4 das instruções manda listar os
+  três. Contornado com `\citet*` onde deu; decidir antes da submissão se
+  ajusta o `.bst`.
+- **Cinco referências que faltam** e que por isso ficaram sem citação
+  (`glmnet` e `WaveBased` aparecem em `\texttt{}` sem `\cite`): Tibshirani
+  (1996), Friedman, Hastie & Tibshirani (2010), a citação do R, o
+  `sparsegl` e o Johnstone de modelos de sequência.
+
+**E2.3, sintonia** (`wafc/R/tune.R`, `tests/test-tune.R`, mais os dois
+drivers salvos aqui em `wafc/scripts/`). `cv.wafc()` sobre `(J, λ)` com
+dobras fixas, BIC, EBIC, a regra da teoria e `wafc_tune()` como entrada
+única. A comparação rodou nos três cenários, `n ∈ {250, 1000}`, 20 réplicas,
+contra o **oráculo da grade** (o par `(J, λ)` que minimiza o erro fora da
+amostra, que nenhuma regra enxerga).
+
+- **A validação cruzada em `lambda.min` é a melhor regra de predição**, com
+  custo de `1.00` a `1.04` sobre o oráculo, e acerta o `J` do oráculo em
+  20/20 réplicas com `n = 1000`. O preço é estrutura: liga os três blocos
+  nulos sempre, e no cenário nulo deixa 1 ou 2 coeficientes de lixo, onde
+  `lambda.1se`, BIC, EBIC e a regra da teoria zeram tudo.
+- **A regra da teoria não é utilizável como regra prática, e o culpado é o
+  `λ`, não o `J`:** `λ_n` do Corolário 2 é de **7 a 13 vezes** o `λ` que
+  minimiza o erro realizado; no cenário não homogêneo, `J_n` sozinho custa
+  2% e 18% enquanto `λ_n` sozinho custa 30% e 54%. É a distinção usual entre
+  otimizar a cota e otimizar o erro, e é dela que a seção de computação
+  vive.
+- **A direção do erro de `J_n` depende de `s'`**, e isso corrige a leitura
+  que E1.6 sugeriu: lá, com `s' = 1/4`, a regra ficava dois níveis *acima*;
+  aqui, com `s' = 3/2`, fica dois níveis *abaixo*. A frase para o artigo não
+  é "a regra fica acima" e sim **"a regra é muito sensível a `s'`, que não
+  se conhece"**. A frase de §4.3 do `ms_1.tex` que diz "pode ficar acima"
+  tem de virar número ou sair.
+- **O EBIC penaliza a resolução, não só o modelo** (`2γ log C(d,k)` cresce
+  com `d = pq(2^J − 1)`), e por isso erra o `J` sistematicamente quando `n`
+  cresce: fica em `J = 3` em 17/20 e 18/20 réplicas onde o oráculo está em
+  4 e 5. Se E2.4 quiser critério de informação, o BIC.
+- **`σ` estimado piora tudo mais um passo:** estimado em `J_n`, `σ̂` dá 1.65
+  a 1.82 vezes o `σ` verdadeiro, porque ali o viés do sieve está no resíduo.
+- **Achado que pede conserto em `design.R`** (nenhuma das duas tarefas podia
+  tocar): `wafc_design()` não constrói desenho em `J = 1` com os padrões,
+  porque `eps = 1.9^{−J} = 0.526` cai fora do `[0, 0.5)` que
+  `wafc_rescale()` exige. A grade de `cv.wafc()` começa em `J = 2` por isso.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -456,6 +533,8 @@ pendente. O que ela corrigiu, e que teria ido para o manuscrito errado:
 | D17 | 09-19 | **Interface de `wafc()`** (E2.2): o `λ` do objeto é o do objetivo, não o do motor; `intercept` resolvido por presença de covariável constante, com erro informativo nos casos ambíguos; `coef()` dobra o intercepto no nível e `predict()` usa os coeficientes crus; mínimo quadrado escrito no ponto nulo do caminho; `wafc_kkt()` e `wafc_blocks()` públicas | a escala de `λ` é o que liga o código à teoria de E1.5, e as outras quatro saem dos defeitos de motor medidos; **a ratificar** |
 | D5 | 09-19 | **Alvo primário: *Statistica Sinica***; reserva: *Electronic Journal of Statistics* | ratificada pelo autor; a linhagem do modelo está lá (Xue & Yang 2006; Wei, Huang & Li 2011) e o teto de 40 páginas em espaço duplo é folgado para a estrutura de ~29 planejada. O manuscrito nasce no template da revista (`manuscript/ss-template/`), com provas no suplementar |
 | D8 | 09-19 | **O método se chama WAFC**, *wavelet additive functional coefficients* | ratificada pelo autor; é a sigla do repositório, ecoa o WALL e cabe no título. As alternativas "WAVC" e "wavelet additive coefficient LASSO" ficam descartadas |
+| D19 | 09-19 | **Interface de `cv.wafc()` e `wafc_tune()`** (E2.3): dobras fixas para toda a grade de `J`, expostas em `foldid`; desenho e caminho de `λ` por candidato construídos na amostra inteira, com as dobras reaproveitando as colunas; empate resolvido pelo menor `J`; `df` do BIC e do EBIC igual a não nulos mais os `p` níveis; `wafc_tune(rule)` como entrada única das cinco regras | segue o `cv.wall()` e é o que torna duas regras comparáveis na mesma réplica; **a ratificar** |
+| D20 | 09-19 | **O padrão de sintonia do WAFC é `cv.min`**, com `lambda.1se` como variante de estrutura e o BIC como alternativa barata; o EBIC não serve para escolher resolução neste desenho | custo de 1.00 a 1.04 sobre o oráculo da grade contra 1.05 a 1.67 das demais; **a ratificar** |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
 | D7 | 09-18 | Compêndio de simulação e aplicação em repositório próprio, `wafc-studies`, nos moldes do `wall` | o `wall` já resolveu cache, `renv` por commit e proveniência |
 
@@ -566,7 +645,28 @@ Ordenadas pelo que bloqueia mais.
    o Crossref diz "Alexander" (uniformizar nos dois repositórios ou deixar?).
    Proposta: abrir uma frente curta só para a âncora da partição da unidade
    quando E5a precisar dela.
-15. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+15. **O teto de páginas** (a mais urgente desta rodada, e ela trava E5b):
+   corpo em 24 páginas mais 4 de referências, e o projetado com E5b é de 39
+   a 41 contra o teto de 40. Três saídas: cortar ~2 páginas de prosa
+   comentada da Seção 3; mandar a taxa lenta e o lema de weak-`ℓ_τ` ao
+   suplemento, o que custa a contribuição 2 e E5a não recomenda; ou escrever
+   as Seções 5 a 7 em menos de 11 páginas, com as tabelas ao suplemento, que
+   é o que a revista prefere. Decidir antes de abrir E5b, não depois.
+16. **Qual `s'` cada cenário declara.** E2.3 rodou a regra da teoria com
+   `s' = 3/2` no `smooth` (a quina da cúbica na extensão periódica) e
+   `s' = 1/2` no não homogêneo. Se o `smooth` for lido por `s' = 4` (o
+   limite dos `N = 4` momentos nulos) a conclusão não muda; se for `1/2`, a
+   regra sobe para `J = 3` e o custo cai. E2.4 e E4 precisam do número
+   declarado.
+17. **Cinco referências que o manuscrito precisa** e que não estão
+   verificadas, por isso hoje `glmnet` e `WaveBased` aparecem sem citação:
+   Tibshirani (1996), Friedman, Hastie & Tibshirani (2010), a citação do R,
+   o `sparsegl`, e o Johnstone de modelos de sequência. Frente curta nos
+   moldes de L1 e L3, antes de E5b.
+18. **O `chicago.bst` do template** abrevia em "et al." a partir de três
+   autores, e a §4 das instruções da revista manda listar os três. Aceitar o
+   `.bst` como está ou ajustá-lo? Decisão de antes da submissão.
+19. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
@@ -612,6 +712,7 @@ Ordenadas pelo que bloqueia mais.
 |---|---|
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
+| 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
 | 2026-09-19 | D18 decidida (o artigo é extensão de Klopp & Pensky) com o parágrafo de posicionamento escrito; D16, D5 e D8 ratificadas; E5a catalogada e destravada |
 | 2026-09-19 | E1.6, E2.2 e L3 fechadas e integradas: **E1 inteira**, com a compressibilidade saindo de graça da hipótese de Besov (D16); `wafc()` com as duas penalidades e KKT fechando no caminho inteiro (D17); `.bib` com 57 entradas e duas citações de teorema corrigidas |
 | 2026-09-19 | E1.5 e E2.1 fechadas em dois chats de tarefa e integradas: desigualdade oráculo sem cone, com a razão `‖f̂−f‖²_n/(λ²s_0)` estável a 5% em `n` de 200 a 6400; `wafc/` nasce com 103 testes passando; D15 |
