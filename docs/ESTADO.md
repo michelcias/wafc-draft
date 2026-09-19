@@ -537,6 +537,60 @@ o `glmnet`, o `sparsegl`, o `WaveBased` e o Johnstone.
   registra); vieram do `CITATION` dos pacotes instalados. O DOI do R não é
   de versão, então o ano é o da versão instalada e a versão vai na `note`.
 
+### 2026-09-19: E1.3b e E2.1b fechadas, e a margem mostra o seu preço
+
+Dois chats de tarefa. Conferido aqui: a bateria de `wafc/` dá **420 passam,
+0 falham**; `02-aproximacao-besov.tex` compila em 11 páginas sem referência
+indefinida.
+
+**E1.3b, o lema de extensão.** Hipótese 5 (margem fixa e Besov **no
+suporte**), Lema 10 em quatro itens e três observações. O que D23 propunha
+está provado: com margem, o viés volta a `O(2^{−2Js'})` e o termo `2^{−J}`
+da periodização some. Mas a emenda cobra dois preços que não estavam na
+conta:
+
+1. **O preço da margem é exato:** `C(eps) ≍ eps^{−(s−1/π)}`, com cota
+   superior provada e **cota inferior para qualquer extensão admissível**
+   (mergulho de Besov em Hölder). Não é artefato da construção. Medido: a
+   norma da extensão de `u − 1/2` vai de `0.92` a `46.7` quando `eps` cai
+   de `0.4` a `0.05`, com expoente convergindo para `s − 1/π`.
+2. **A margem não pode encolher com `J`.** Com `eps ∝ 2^{−J}` o ganho é
+   **zero** (medido: queda de `0.52` a `0.58` bit por nível, contra `0.50`
+   sem margem nenhuma); com o `1.9^{−J}` herdado do `wall()` o ganho é
+   parcial (`0.96` bit); só margem **fixa** compra a taxa cheia (`0.05` e
+   `0.10` dão de 4 a 13 bits por nível até o piso numérico).
+
+**A tensão que isso abre, e que é o achado mais importante da rodada.** A
+margem que compra a taxa é a mesma que degenera a Gram restrita:
+`λ_min(G_eps) = 0` assim que `V_J` contém função suportada na margem, isto
+é `2^J ≥ (L−1)/(2 eps)`. Medido: `λ_min(G_eps)` estabiliza em `0.213` com
+`eps = 2^{−(J+1)}` e em `0.0013` com `1.9^{−J}`, e desaba a `10^{−12}` em
+`J = 6` com `eps = 0.05`. Não é contradição — as direções que somem são
+wavelets invisíveis no suporte, cujas colunas de `Z` se anulam e que não
+afetam `f` ali —, mas **o que E1.5 consome é uma constante de
+compatibilidade sobre as direções estimáveis, e ela não existe hoje**.
+Enquanto não existir, a taxa de E1.6 sob a Hipótese 5 é **conjectura, não
+teorema**, e está escrita assim no arquivo. O manuscrito não é afetado: ele
+enuncia a teoria na base periodizada com `eps = 0` (D23 já mandava a margem
+para a computação).
+
+**E2.1b, o conserto do `eps`.** O padrão deixou de depender de `J`:
+`wafc_eps()` passou a receber `q` e `boundary`, e devolve `0` no caso
+`"interval"` e a constante fixa **`0.05`, declarada provisória**, no
+periódico. `J = 1` deixou de ser inalcançável e virou candidato que a
+validação cruzada descarta com número (`mse` `2.446` contra `0.669` em
+`J = 3`). Colunas identicamente nulas aparecem, como previsto, a partir de
+`J = 8` com `eps = 0.05` (12, 48, 136 colunas em `J = 8, 9, 10`), e nenhuma
+das duas penalidades quebra.
+
+**Três linhas de `wafc/R/tune.R` ficaram factualmente falsas** e nenhuma
+das duas tarefas podia tocá-las: o Roxygen de `cv.wafc(J = )` e o
+comentário de `wafc_J_grid()` justificam a grade começar em `J = 2` por uma
+razão que morreu, e a guarda da regra da teoria **para em erro** quando
+`J_n = 1`, o que já não é necessário. É conserto de uma linha cada, para
+E2.4 ou para uma correção curta. O `inventario-codigo.md:45` também
+documenta o padrão antigo.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -619,12 +673,12 @@ Ordenadas pelo que bloqueia mais.
    na base do intervalo (CDV), sem periodicidade, pagando `p q (2^{j_0} − 1)`
    parâmetros não penalizados; (c) as duas, teoria em (a) e `boundary` como
    opção do código. Proposta de E1.3: **(c)**, que é o que o `wall()` faz.
-6. **~~`boundary = "interval"`~~ decidido (D23):** entra no `wafc()`, com a
-   reparametrização `Φ Q`, e **fica fora do manuscrito** por enquanto.
-   Continua em aberto só o padrão de `eps` no caso periódico: `1.9^{−J}`
-   herdado do `wall()` ou uma margem fixa, desacoplada de `J`. A margem
-   variável faz cada candidato de `cv.wafc()` estimar um alvo ligeiramente
-   diferente e quebra em `J = 1`; E2.4 mede e o número decide.
+6. **~~`boundary = "interval"` e o tipo de margem~~ decididos (D23, E1.3b,
+   E2.1b).** A margem é **fixa**, porque só a fixa compra a taxa cheia, e já
+   está implementada. O que resta é estreito e é de E2.4: **qual valor
+   fixo**, medindo ISE e `λ_min(G_eps)` em
+   `eps ∈ {0, 2^{−(J+1)}, 1.9^{−J}, 0.02, 0.05, 0.10}`. O padrão atual,
+   `0.05`, está no código marcado como provisório.
 7. **~~Posicionamento diante de Klopp & Pensky~~ decidido (D18):**
    extensão deles. O parágrafo aprovado e a lista de contribuições reescrita
    estão em `alvo-revista.md` §4, e L2a está cumprida.
@@ -656,18 +710,27 @@ Ordenadas pelo que bloqueia mais.
    realizado em toda a varredura, ao custo de 5% a 11% de erro, e as
    escolhas de `J_n` e de `c` dependem de `s'` e `τ`, que ninguém conhece.
    E2.3 compara a regra teórica com a validação cruzada.
-13. **Cota inferior** (mais visível depois de D18, porque o artigo se
+13. **A compatibilidade sobre as direções estimáveis** (aberta por E1.3b, e
+   a mais séria desta rodada). Com margem fixa e `J` grande há wavelets
+   invisíveis no suporte, e `λ_min(G_eps) = 0`. A taxa de E1.6 sob a
+   Hipótese 5 fica conjectural até existir uma constante de compatibilidade
+   restrita às direções estimáveis. Três saídas: abrir uma subetapa
+   (E1.4b) e prová-la; deixar como limitação registrada, já que o
+   manuscrito enuncia a teoria em `eps = 0`; ou restringir a Hipótese 5 a
+   `2^J < (L−1)/(2 eps)`, que é a faixa em que o problema não existe e que
+   cobre todo `J` que a validação cruzada escolhe nos `n` do estudo.
+14. **Cota inferior** (mais visível depois de D18, porque o artigo se
    declara extensão de quem tem a dele). Não existe aqui, e Klopp & Pensky
    têm a deles para `q = 1` com `X ⊥ U`. Três saídas: (a) citar K&P e dizer que a cota
    superior atinge a referência do modelo de sequência, que é o que o
    `05-taxas.tex` faz hoje; (b) abrir E1.8 e construir a cota para `q ≥ 2`,
    trabalho do porte de E1.4 mais E1.5; (c) restringir a afirmação de
    otimalidade a `q = 1`. O referee da SS pode cobrar a (b).
-14. **`p` crescente com `n`.** A teoria fixa `p` e `q`. Se a aplicação de E6
+15. **`p` crescente com `n`.** A teoria fixa `p` e `q`. Se a aplicação de E6
    tiver `p` grande, o termo `σ² p / n` deixa de ser de ordem menor e a
    janela do Corolário 5 estreita; mudar isso mexe em E1.3 e E1.4, não só em
    E1.6.
-15. **Bibliografia, pontos de L3** (nenhum bloqueia): a identidade
+16. **Bibliografia, pontos de L3** (nenhum bloqueia): a identidade
    `Σ_l φ(x − l) ≡ 1`, usada na prova do Lema 1(i) de E1.2, ficou **sem
    âncora** — a expressão não ocorre em Daubechies (1992), a quem estava
    atribuída, e os candidatos a conferir são Härdle et al. (1998, cap. 5) e
@@ -678,16 +741,16 @@ Ordenadas pelo que bloqueia mais.
    o Crossref diz "Alexander" (uniformizar nos dois repositórios ou deixar?).
    Proposta: abrir uma frente curta só para a âncora da partição da unidade
    quando E5a precisar dela.
-16. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
+17. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
    sem contar, medir no fim e então decidir entre resumir mais e mandar
    coisa ao suplemento.
-17. **Qual `s'` cada cenário declara.** E2.3 rodou a regra da teoria com
+18. **Qual `s'` cada cenário declara.** E2.3 rodou a regra da teoria com
    `s' = 3/2` no `smooth` (a quina da cúbica na extensão periódica) e
    `s' = 1/2` no não homogêneo. Se o `smooth` for lido por `s' = 4` (o
    limite dos `N = 4` momentos nulos) a conclusão não muda; se for `1/2`, a
    regra sobe para `J = 3` e o custo cai. E2.4 e E4 precisam do número
    declarado.
-18. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
+19. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
    pequeno e vai junto com `k = 2`: copiar as seis chaves novas para
    `references_1.bib` e citá-las onde L4 propôs (o lasso na Introduction e
    na seção do estimador; `glmnet` e R na computação; `WaveBased` onde as
@@ -701,7 +764,7 @@ Ordenadas pelo que bloqueia mais.
    Tibshirani (1996), Friedman, Hastie & Tibshirani (2010), a citação do R,
    o `sparsegl`, e o Johnstone de modelos de sequência. Frente curta nos
    moldes de L1 e L3, antes de E5b.
-19. **Pendências de acabamento do manuscrito**, todas para a semana da
+20. **Pendências de acabamento do manuscrito**, todas para a semana da
    submissão e nenhuma bloqueando (estão no checklist de `alvo-revista.md`
    §6): (a) o `chicago.bst` do template abrevia em "et al." a partir de três
    autores, contra a §4 das instruções, e a correção é no `.bst`, não no
@@ -710,7 +773,7 @@ Ordenadas pelo que bloqueia mais.
    entre bloco copiado e arquivo de origem; (c) autores, afiliações, e-mails
    na última página e agradecimentos, que hoje são os marcadores do
    template.
-20. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+21. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
@@ -761,6 +824,7 @@ Ordenadas pelo que bloqueia mais.
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
 | 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
+| 2026-09-19 | E1.3b e E2.1b fechadas e integradas: a extensão fecha e o preço da margem é `eps^{−(s−1/π)}`, exato; só margem fixa compra a taxa, e ela degenera a Gram restrita a partir de `2^J ≥ (L−1)/(2eps)`, o que deixa a taxa sob a Hipótese 5 conjectural |
 | 2026-09-19 | L4 fechada e integrada: `.bib` com 63 entradas, e a entrada do Johnstone corrigida contra a que o WALL carrega |
 | 2026-09-19 | E0.3 fechada de vez: o autor confirmou no SCImago que a *Statistica Sinica* é Q1 em Statistics and Probability |
 | 2026-09-19 | D18 decidida (o artigo é extensão de Klopp & Pensky) com o parágrafo de posicionamento escrito; D16, D5 e D8 ratificadas; E5a catalogada e destravada |

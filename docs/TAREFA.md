@@ -50,8 +50,8 @@ que ler antes está aqui e no plano.
 | **E1** | **fechada** (E1.7 é condicional a E2.5) | `derivations/` |
 | E2.3 sintonia | **fechada** (2026-09-19): `cv.wafc()`, BIC, EBIC e a regra da teoria; 402 testes passam | `wafc/R/tune.R`, `wafc/scripts/02-tune.R` |
 | E5a manuscrito, Seções 1 a 4 | **fechada** (2026-09-19): `k = 1` compila limpo, 28 e 26 páginas | `manuscript/ms_1.tex`, `supp_1.tex` |
-| E1.3b emenda de extensão | **em curso** (aberta em 2026-09-19) | catálogo da §3 |
-| E2.1b conserto do `eps` | não aberta; **pode abrir já** | catálogo da §3 |
+| E1.3b emenda de extensão | **fechada** (2026-09-19): Lema 10 e três observações; conferência `OK` | `derivations/02-aproximacao-besov.tex` |
+| E2.1b conserto do `eps` | **fechada** (2026-09-19): margem fixa, `J = 1` acessível; 420 testes passam | `wafc/R/design.R` |
 | L4 referências de software | **fechada** (2026-09-19): `.bib` com 63 entradas | `referencias-verificadas.bib` |
 | E1.7, E2.4, E2.5, E3, E4, E5b, E6, E7 | não abertas; E2.4 espera a ratificação de D19 e D20 | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
@@ -68,15 +68,19 @@ tarefa pode criar ou editar**.
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
 
-| E1.3b | emenda a `derivations/02-aproximacao-besov.tex` (+ `.pdf`): um **lema de extensão** e a observação de que a Proposição 2 (o custo da periodização) é o caso `eps = 0`. O enunciado a provar: se `U_m` tem suporte em `[eps, 1 − eps]` com `eps > 0` e `g_{ℓm}` pertence à classe de Besov **no suporte**, então existe extensão `g̃` a `[0,1]` que emenda em `0 ≡ 1`, está na mesma classe com norma `≤ C(eps)‖g‖`, e o viés em `L_2(P_U)` volta a `O(2^{−2Js'})`, sem o termo `2^{−J}` da Proposição 2. O operador de extensão é o que o próprio arquivo já cita (Triebel 1983, cap. 3; Cohen 2003, §3.9); registrar como a constante degrada quando `eps → 0`, que é o preço da margem. Registrar também, em observação, que a mesma margem muda a constante de E1.4: com suporte próprio, `E[(a'ψ(U))²] ≥ c_U λ_min(G_eps)‖a‖²`, com `G_eps` a Gram da base **restrita ao suporte**, e não `c_U‖a‖²` — quem mede `λ_min(G_eps)` contra `eps` e `J` é E2.4. Numeração global: o lema novo é o **Lema 10**. `check/02-aproximacao-besov.R` ganha uma seção que mede, numa `g` que não emenda (`u − 1/2`, `e^u`), o erro de projeção **restrito a `[eps, 1−eps]`** contra o erro em `[0,1]`, em `eps ∈ {0, 2^{−J−1}, 1.9^{−J}}`, mostrando a taxa de `1/2` bit por nível virar a taxa cheia; e `λ_min(G_eps)` nos mesmos `eps` | E1.3 e E1.4, fechadas; a origem é a discussão de 2026-09-19 registrada em D23 | `derivations/02-aproximacao-besov.tex`, `derivations/02-aproximacao-besov.pdf`, `derivations/check/02-aproximacao-besov.R`, `docs/handoff-E1.3b.md` |
-| E2.1b | conserto em `wafc/R/design.R`, com os testes correspondentes: **desacoplar a margem `eps` do nível `J`**. Hoje `wafc_eps()` devolve `1.9^{−J}`, herdado do `wall()`, o que (i) quebra em `J = 1`, porque `0.526` cai fora do `[0, 0.5)` que `wafc_rescale()` exige, e por isso a grade de `cv.wafc()` começa em `J = 2`; (ii) faz cada candidato de `cv.wafc()` estimar um alvo ligeiramente diferente, já que o suporte reescalado muda com `J`; e (iii) põe a margem na ordem de uma célula da escala mais fina (`2^{−J}`), que é onde as wavelets de borda do nível mais fino perdem observação. O conserto: padrão **fixo**, não dependente de `J`, com `eps = 0` quando `boundary = "interval"` (não há periodização a evitar) e um valor fixo no caso periódico, mantido o argumento `eps` para quem quiser outro; erro informativo continua quando o valor pedido sai de `[0, 0.5)`. **Não escolher o valor fixo por conta própria**: deixar o padrão atual documentado como provisório e o número é de E2.4, que mede `λ_min(G_eps)` e o ISE contra `eps` (D23). Os testes existentes de E2.1 e E2.2 que fixam `eps` explicitamente têm de continuar passando; a bateria inteira (`testthat::test_dir("wafc/tests")`, 402 hoje) roda antes do handoff | E2.1 e E2.2, fechadas; a razão está em D23 | `wafc/R/design.R`, `wafc/tests/test-design.R`, `docs/handoff-E2.1b.md` |
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**Abertas agora: E1.3b (em curso) e E2.1b.** Não compartilham arquivo: E1.3b
-está em `derivations/`, E2.1b em `wafc/`. A próxima depois dela é E2.4 (piloto), que espera a
+**O catálogo está vazio.** A próxima é E2.4 (piloto), que precisa de duas
+respostas do chat principal antes de ser catalogada: qual `s'` cada cenário
+declara (pergunta 18) e o que fazer com a compatibilidade sobre as direções
+estimáveis (pergunta 13). Tarefa nova pede catalogação antes de abrir.
+
+Três linhas de `wafc/R/tune.R` e uma de `docs/inventario-codigo.md`
+descrevem o padrão antigo de `eps` e ficaram falsas com E2.1b; são conserto
+de uma linha cada e entram no catálogo de E2.4. A próxima depois dela é E2.4 (piloto), que espera a
 ratificação de D19 e D20 e a resposta sobre `s'` de cada cenário (pergunta
 16). Tarefa nova pede catalogação antes de abrir.
 
@@ -105,11 +109,12 @@ pelo chat principal, com o mapa abaixo.
 | `03-desenho-produtos.tex` (E1.4) | Proposição 3 |
 | `04-oraculo.tex` (E1.5) | Lema 4, Lema 5, Lema 6, Lema 7, Teorema 1, Corolário 2, Corolário 3 |
 | `05-taxas.tex` (E1.6) | Lema 8, Lema 9, Proposição 4, Teorema 2, Corolário 4, Corolário 5 |
+| `02-aproximacao-besov.tex` (emenda E1.3b) | Lema 10 |
 
 **Este mapa é a autoridade**, e é ele que E5a usa ao montar o manuscrito. O
 `04-oraculo.tex` já imprime o número global (via `\setcounter` no
 preâmbulo), prática adotada daqui em diante; `02` e `03` ainda imprimem o
-contador local. O próximo resultado numera a partir de Proposição 4, Lema 9,
+contador local. O próximo resultado numera a partir de Proposição 4, Lema 10,
 Teorema 2 e Corolário 5.
 
 **O enunciado que vai ao resumo do artigo é o Corolário 5** (D16, a

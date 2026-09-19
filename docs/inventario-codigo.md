@@ -41,8 +41,10 @@ artigo.
 empacotar dentro dele, esta tabela diz o que refatorar.
 
 **Padrões a reproduzir do `wall()` sem discutir:** `J` escalar ou por
-moduladora; `j0 = 0` periódico como padrão com `drop.phi`; `eps` padrão
-`1.9^{-J}`; `use.table = "auto"` por carga de trabalho; `sparse = "auto"`;
+moduladora; `j0 = 0` periódico como padrão com `drop.phi`; **`eps` não**: o padrão
+`1.9^{-J}` do `wall()` foi descartado em E2.1b, porque acopla a margem à
+resolução e só margem **fixa** compra a taxa cheia (Lema 10 de E1.3b, D23);
+o padrão do WAFC é fixo, provisoriamente `0.05`, e `0` na base do intervalo; `use.table = "auto"` por carga de trabalho; `sparse = "auto"`;
 `standardize = FALSE` por padrão (base ortonormal); erro informativo em
 argumento desconhecido (lição do 2.6-0).
 
