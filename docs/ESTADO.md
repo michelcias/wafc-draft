@@ -664,6 +664,7 @@ histórico; o commit fica, e esta é a integração que devia tê-lo precedido.
 | D22 | 09-19 | **Centralização de Lebesgue:** a restrição de identificabilidade é `∫_0^1 g_{ℓm}(u) du = 0`, e não `E[g_{ℓm}(U_m)] = 0` como o `notacao.md` escrevia; a versão centrada em `P` sai pelo deslocamento `c_ℓ ↦ c_ℓ + Σ_m E{g_{ℓm}(U_m)}` e fica como observação | é o que a base impõe de graça (Lema 1 de E1.2) e o que o estimador estima; K&P (A1) usam base ortonormal em Lebesgue sem centralização, o WALL adota Lebesgue, e Xue & Yang centralizam em `P` mas recentralizam **empiricamente** na (3.4) deles. Adotar `P` obrigaria a mudar o alvo do Corolário 4 de E1.6, que hoje mede `‖ĝ − g‖_{L_2}` |
 | D23 | 09-19 | **A margem `eps` do reescalonamento tem função declarada:** periodizar a base num intervalo maior que o suporte dos dados, o que permite trocar `g` por uma extensão que emende em `0 ≡ 1`. Com isso a hipótese não é "densidade limitada por baixo em todo `[0,1]`" e sim sobre o **suporte**, e a constante de E1.4 passa a ser `c_U λ_min(G_eps)`, com `G_eps` a Gram da base restrita ao suporte. `rescale = TRUE` continua padrão e `boundary = "interval"` entra no `wafc()`, mas fica fora do manuscrito por enquanto | argumento do autor em 2026-09-19: tomar `[0,1]` é sem perda de generalidade sobre a escala, não sobre o suporte. O ganho é que a Proposição 2 de E1.3 (periodização trava a taxa em `2^{−J/2}`) deixa de se aplicar quando `eps > 0`; a emenda é E1.3b, e E2.4 mede `λ_min(G_eps)` e o ISE contra `eps` |
 | D24 | 09-19 | **As exigências de estilo da revista valem também nas derivações:** `E(·)`, `P(·)` e `Var(·)` em romano e com parênteses (§5 das instruções da SS), e um único `B_X` no lugar de `C_X` (E1.3) e `B_X` (E1.4). O `macros.tex` é ajustado quando E1.3b fechar | decisão do autor; manter dois conjuntos de símbolos para as mesmas quantidades é o que a notação congelada existe para evitar, e a revista não é negociável no ponto |
+| D29 | 09-19 | **Idioma:** inglês no código de `wafc/` (Roxygen e comentários), português nas derivações e nos documentos de trabalho, inglês americano no manuscrito (D6). O `macros.tex` imprime os ambientes em português; o manuscrito não o usa, porque as macros estão copiadas para dentro dele e o template define os próprios ambientes | decisão do autor; `wafc/` vira pacote em E3.3 e documentação de usuário é em inglês, enquanto a derivação é documento de trabalho e revisar prova em português é mais rápido |
 | D28 | 09-19 | **Seleção de estrutura: tentar (a) e (c), com (c) garantida.** A seleção por limiarização (saída (c), corolário do Corolário 4 mais separação) entra no artigo de qualquer forma e cobre o LASSO puro; a propriedade oráculo em grupos (saída (a)) é tentada e entra se fechar. A ordem é sondagem antes de prova: E1.7a decide a viabilidade de (a) com álgebra sob `X ⊥ U` e verificação numérica, e E1.7c faz (c) em paralelo | decisão do autor; as duas não são exclusivas, e o valor de (a) é condicionado a E2.5 escolher a variante em grupos, o que os números de E2.2 e E2.3 não indicam |
 | D27 | 09-19 | **Os cenários declaram `s' = 3/2` (suave) e `s' = 1/2` (não homogêneo)**, que é o que E2.3 usou; o número entra em `dgp.R` como atributo do cenário, para E2.4 e E4 não o redescobrirem | a cúbica tem quina na extensão periódica e a teoria é em `eps = 0` (D26); `blocks` e `heavisine` saltam dentro do intervalo, onde base nenhuma ajuda |
 | D26 | 09-19 | **A teoria fica em `eps = 0`, na base periodizada; a margem é dispositivo de amostra finita.** O Lema 10 de E1.3b permanece nas derivações como justificativa da margem para `J` na faixa admissível, e não como enunciado de taxa. Ficam **registradas duas rotas de princípio**, para o caso de um referee pedir teoria sem periodicidade: (i) enunciar na base do intervalo (CDV), que dispensa periodicidade, extensão, margem e Gram restrita; (ii) provar a compatibilidade sobre as direções estimáveis, que é, em essência, refazer o trabalho que a CDV já faz | a margem não produz ganho assintótico (o cruzamento das duas exigências é exato); e o manuscrito já enuncia a teoria sem margem, então nada muda nele |
@@ -745,14 +746,12 @@ Ordenadas pelo que bloqueia mais.
    13 vezes o `λ` ótimo; sensível a `s'`, não sistematicamente acima); as
    citações de software que L4 trouxer; a observação de extensão de E1.3b; e
    a frase de reprodutibilidade no resumo ou na discussão.
-10. **Idioma do código e das derivações.** E2.1 escreveu o Roxygen e os
-   comentários de `wafc/` em inglês (é o que vira pacote em E3.3, e o
-   `wall.R` é todo em inglês); os `derivations/` estão misturados, `02` e
-   `04` em português e `03` em inglês. D6 fala de documentos e manuscrito,
-   não de código. Proposta: **inglês no código**, **português nas
-   derivações** (traduzir só quando E5a montar o manuscrito), e alinhar o
-   `03`. Se aceita, entra uma correção de uma linha por ambiente no
-   `macros.tex`, que hoje imprime "Lemma 4" enquanto a prosa diz "Lema 4".
+10. **~~Idioma do código e das derivações~~ decidido (D29):** inglês no
+   código, português nas derivações. O `macros.tex` já imprime os ambientes
+   em português e os quatro arquivos em português foram recompilados. Falta
+   alinhar o `03-desenho-produtos.tex`, que está em inglês e hoje imprime
+   cabeçalhos em português; é tradução, catalogada como E1.4c e de
+   prioridade baixa.
 11. **~~`rescale = TRUE` como padrão~~ decidido (D23):** continua padrão, e
    agora com razão declarada, não herdada. O deslocamento de centralização
    que ele causa é um nível, e a leitura correta é que a componente é
