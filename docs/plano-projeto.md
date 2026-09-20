@@ -403,7 +403,10 @@ principal é `ĝ_{ℓm}` sobreposta à verdade em bumps e blocks, WAFC contra
 ### E4.3 Piloto
 
 Réplicas, grade de `J` e de `λ`, e `nfolds` fixados por piloto **antes** da
-produção, registrados em `config/`.
+produção, registrados em `config/`. A **tabela de avaliação da base** também:
+uma por `(family, filter.size)`, construída com `WaveBased::wtable()` no
+início da corrida e passada em `wavelet.table`, para que nenhuma réplica caia
+na regra `auto` e todas usem o mesmo caminho de avaliação (D31).
 
 ### E4.4 Produção e agregação
 
