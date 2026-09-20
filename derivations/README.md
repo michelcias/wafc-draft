@@ -12,7 +12,7 @@ probabilidade em **romano**, como a revista exige.
 
 **A numeração dos resultados é global** e a tabela que manda está na §5 de
 [`../docs/TAREFA.md`](../docs/TAREFA.md), não nos contadores de cada
-arquivo: `02` e `03` ainda imprimem contador local, `04`, `05` e a emenda de
+arquivo: `02` e `03` ainda imprimem contador local; `04`, `05`, `07` e a emenda de
 `02` imprimem o número global. Compilar com `latexmk -pdf <arquivo>.tex`;
 o `.pdf` é versionado, os auxiliares não.
 

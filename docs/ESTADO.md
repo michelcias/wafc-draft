@@ -591,6 +591,55 @@ razão que morreu, e a guarda da regra da teoria **para em erro** quando
 E2.4 ou para uma correção curta. O `inventario-codigo.md:45` também
 documenta o padrão antigo.
 
+### 2026-09-19: E1.8 fechada (a rota do intervalo está escrita)
+
+Conferido aqui: `07-rota-intervalo.tex` compila em 11 páginas sem
+indefinida, e `check/07-rota-intervalo.R` imprime `OK` (2 min 11 s). O
+arquivo **não vai ao manuscrito** (D26); existe para estar pronto.
+
+- **A rota do intervalo fecha, e o preço é todo de amostra finita.** As
+  quatro peças transferem: aproximação com a mesma prova (some o operador
+  de extensão, o corte, a constante `C(eps)` e o termo `2^{−J}`);
+  identificabilidade, que já estava feita na §5 de E1.2; desenho, verbatim,
+  com `λ_min(Σ) ≥ κ_1 c_U` sem `λ_min(G_eps)`; oráculo e taxas, que
+  consomem só isso. O que é novo e foi provado: **Lema 11**, a cota pontual
+  `Σψ² ≤ C_ψ 2^J` na CDV, e **Proposição 5**, o efeito dos coeficientes de
+  escala não penalizados, que troca `σ²p/n` por `σ²p_0/n` com
+  `p_0 = p{1 + q(2^{j_0} − 1)}`, constante em `n`, de modo que as taxas não
+  mudam.
+- **O que ela cobra, medido:** `C_ψ^int ≈ 7.55` contra `1.30` na
+  periodizada (fator 5.6, que a condição empírica de E1.4(iv) paga em `n`);
+  `p_0 = 93` contra `3` com `p = 3`, `q = 2`, `j_0 = 4`, o que dá
+  `0.372 σ²` em `n = 250`; e `j_0 ≥ 4`, que tira `J ∈ {1,2,3,4}` da grade —
+  **exatamente a faixa que E2.3 achou ótima** nos `n` do piloto.
+- **O cruzamento da margem agora é teorema** (Proposição 6): as duas
+  exigências medem a mesma largura `(L−1)2^{−J}` e as faixas são disjuntas,
+  separadas por **um nível exato**. Manter a Gram viva com `J_n → ∞` obriga
+  `eps_n ≍ 2^{−J_n}`, onde o expoente é `1/2`, o mesmo de margem nenhuma. O
+  Corolário 7 diz qual enunciado é verdadeiro: amostra finita, `eps` fixo,
+  `J` na faixa admissível.
+- **Restrição prática para E2.4:** com `eps = 0.05` a faixa admissível
+  medida é `J ≤ 5`, e E2.3 achou o ótimo em `J = 3` a `5`. O padrão
+  provisório está dentro, mas por pouco: `eps = 0.10` limitaria a `J ≤ 4`.
+  É razão contra aumentar a margem.
+- **A análise de `s'` (Lema 12 e a tabela das seis componentes)** confirma
+  D27 e explica: das seis, só a cúbica paga periodização, e paga na
+  **derivada** (`g'(0) = 0.4` contra `g'(1) = 0.6`); as três de Donoho e
+  Johnstone são contínuas na emenda. Medido, `smooth` lê `3/2` no regime do
+  manuscrito e `4` com margem ou na CDV; `inhomogeneous` lê `1/2` nos três.
+  **Na CDV a cúbica é reproduzida exatamente** (grau `3 < N = 4`), com
+  coeficientes de wavelet em `1e-10`.
+- **Lição de ferramenta:** a base CDV do `wbasis()` perde precisão com o
+  nível — o piso de avaliação vai de `7e-08` em `j = 4` a `3e-04` em
+  `j = 12`, contra `1e-16` na periodizada. Medir decaimento na CDV acima de
+  `j ≈ 7` lê ruído, não coeficiente.
+
+**Registro de um erro meu no versionamento.** O commit `c911cf9`, que era
+de plano, foi feito com `git add -A` em vez de caminhos explícitos, contra a
+§4 do `instrucoes.md`. Ele levou junto os entregáveis de E1.8, ainda não
+integrados, e os de E2.4, **em curso e sem handoff**. Não houve reescrita de
+histórico; o commit fica, e esta é a integração que devia tê-lo precedido.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -771,9 +820,12 @@ Ordenadas pelo que bloqueia mais.
 17. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
    sem contar, medir no fim e então decidir entre resumir mais e mandar
    coisa ao suplemento.
-18. **A rota do intervalo, se ficarmos encurralados** (registro, não
-   pergunta aberta). Levantado em 2026-09-19: a base CDV garante os quatro
-   pilares sem negociação. Aproximação, porque caracteriza `B^s_{π,r}[0,1]`
+18. **~~A rota do intervalo~~ escrita e fechada em E1.8** (2026-09-19),
+   em `derivations/07-rota-intervalo.tex`. **É ela a resposta** a um referee
+   que peça teoria sem periodicidade, e não a rota (ii) de D26, que continua
+   sem existir. Levar a rota ao manuscrito é reescrever as provas de E1.3 a
+   E1.6 com a base trocada: redação, não matemática nova. O levantamento
+   original: a base CDV garante os quatro pilares sem negociação. Aproximação, porque caracteriza `B^s_{π,r}[0,1]`
    sem periodicidade, com a mesma prova e sem `C(eps)`. Identificabilidade,
    porque a reparametrização `[Φ Q | Ψ]` da §5 de `01-identificabilidade.md`
    dá colunas ortonormais em `L_2[0,1]` e de integral zero, e o bloco fica
@@ -866,6 +918,7 @@ Ordenadas pelo que bloqueia mais.
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
 | 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
+| 2026-09-19 | E1.8 fechada e integrada: a rota do intervalo está escrita e é a resposta a quem pedir teoria sem periodicidade; o cruzamento da margem virou teorema, com as faixas separadas por um nível exato |
 | 2026-09-19 | E1.3b e E2.1b fechadas e integradas: a extensão fecha e o preço da margem é `eps^{−(s−1/π)}`, exato; só margem fixa compra a taxa, e ela degenera a Gram restrita a partir de `2^J ≥ (L−1)/(2eps)`, o que deixa a taxa sob a Hipótese 5 conjectural |
 | 2026-09-19 | L4 fechada e integrada: `.bib` com 63 entradas, e a entrada do Johnstone corrigida contra a que o WALL carrega |
 | 2026-09-19 | E0.3 fechada de vez: o autor confirmou no SCImago que a *Statistica Sinica* é Q1 em Statistics and Probability |
