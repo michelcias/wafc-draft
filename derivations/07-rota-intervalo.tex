@@ -1,0 +1,861 @@
+% E1.8 -- a rota do intervalo (base de Cohen-Daubechies-Vial), o caso eps > 0
+% e a analise de s' dos cenarios de wafc/R/dgp.R.
+%
+% Este arquivo NAO vai ao manuscrito (D26): o artigo enuncia a teoria na base
+% periodizada com eps = 0. Ele existe por dois motivos: deixar pronta, e
+% escrita, a rota sem periodicidade para o dia em que um referee a pedir; e
+% guardar a analise de regularidade efetiva que E2.4 e E4 vao citar (D27).
+%
+% Numeracao global dos resultados (docs/TAREFA.md, §5): este arquivo continua
+% de Proposicao 4, Lema 10, Teorema 2 e Corolario 5, e imprime o numero global
+% via \setcounter, como 04 e 05.
+%
+% Conferencia numerica: derivations/check/07-rota-intervalo.R (imprime OK).
+% Notacao: docs/notacao.md (congelada em E1.1). Macros: derivations/macros.tex.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black]{hyperref}
+\input{macros}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\bPhi}{\boldsymbol{\Phi}}
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmax}{\lambda_{\max}}
+\newcommand{\Amat}{A}
+\newcommand{\Bmat}{B}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\Ieps}{I_{\eps}}
+\newcommand{\Cpsiint}{C_{\psi}^{\mathrm{int}}}
+\newcommand{\dint}{d^{\mathrm{int}}}
+\newcommand{\pzero}{p_{0}}
+\newcommand{\gtil}{\widetilde{\gamma}}   % como em 04-oraculo.tex
+
+% A numeracao global comeca depois de Proposicao 4, Lema 10, Teorema 2,
+% Corolario 5 (docs/TAREFA.md, §5).
+\setcounter{proposition}{4}
+\setcounter{lemma}{10}
+\setcounter{theorem}{2}
+\setcounter{corollary}{5}
+
+\title{E1.8. A rota do intervalo, o preço exato da margem e a regularidade
+efetiva dos cenários}
+\author{wafc-draft, \texttt{derivations/07-rota-intervalo.tex}}
+\date{2026-09-19}
+
+\begin{document}
+\maketitle
+
+\section*{Onde este arquivo entra}
+
+A decisão D26 fixou que a teoria do artigo fica na base periodizada com
+$\eps = 0$, e que a margem do reescalonamento é dispositivo de amostra
+finita. A mesma decisão registrou duas rotas de princípio para o caso de um
+referee pedir teoria sem periodicidade, e este arquivo escreve a primeira
+delas por inteiro, mais o que sobrou por escrever das outras duas frentes.
+São três partes independentes:
+
+\begin{description}[nosep]
+  \item[Parte A.] A rota do intervalo. O que transfere da base periodizada
+    para a base de Cohen, Daubechies e Vial (CDV), com o que é verbatim e o
+    que não é, e os dois pontos que não transferem de graça: a cota pontual
+    $\sum_{\lev\tsl}\wav{\lev}{\tsl}^{2}(u) \le C_{\psi}2^{J}$, que E1.4
+    conferiu só na base periódica, e o efeito dos $pq(2^{\jzero}-1)$
+    coeficientes de escala não penalizados no termo
+    $\sigma^{2}\times(\text{não penalizados})/n$ do Teorema~1.
+  \item[Parte B.] O caso $\eps > 0$, consolidando o Lema~10 e D26: o
+    cruzamento exato das duas exigências que a margem tem de satisfazer, por
+    que o ganho assintótico é exatamente zero, e qual enunciado é verdadeiro
+    (um resultado de amostra finita, e não um teorema de taxa).
+  \item[Parte C.] A regularidade efetiva $\seff$ de cada componente dos
+    cenários de \texttt{wafc/R/dgp.R}, nos três regimes, que é o que D27
+    declara e o que E2.4 e E4 vão citar.
+\end{description}
+
+Nada aqui altera o manuscrito, e nada aqui altera arquivo fechado de E1: as
+Partes A e B citam E1.2 a E1.6 e E1.3b sem mexer neles.
+
+\section*{Convenções}
+
+A notação é a de \texttt{docs/notacao.md}. $L$ é o comprimento do filtro
+(\texttt{filter.size}), $N = L/2$ o número de momentos nulos para Daublets e
+Symmlets, e $\operatorname{supp}\psi \subseteq [0, L-1]$. As constantes
+$B_{X}$, $c_{U}$, $C_{U}$, $\kappa_{1}$, $\kappa_{2}$ são as das Hipóteses de
+E1.3 e E1.4. Escrevemos $\seff = s - (1/\pi - 1/2)_{+}$, e ``queda por
+nível'' para $-\log_{2}\bigl(\norm{\theta_{\lev+1,\cdot}}_{2} /
+\norm{\theta_{\lev\cdot}}_{2}\bigr)$, que é $\seff$ quando
+$\norm{\theta_{\lev\cdot}}_{2} \asymp 2^{-\lev\seff}$: é a grandeza que as
+três conferências numéricas do projeto medem.
+
+Os três regimes de borda que a Parte~C compara, e que a Parte~B separa, são:
+
+\begin{description}[nosep]
+  \item[(a) periódico com $\eps = 0$.] A base é a periodizada de D2, a
+    moduladora vive em todo $[0,1]$, e a hipótese de regularidade é a
+    Hipótese~2 de E1.3, em forma de sequência. É o regime do manuscrito.
+  \item[(b) periódico com margem e extensão.] A base é a mesma, mas
+    $\operatorname{supp}P_{U_{\md}} \subseteq \Ieps = [\eps, 1-\eps]$ e a
+    componente é trocada pela extensão do Lema~10 (D23). É o regime em que o
+    código roda, com \texttt{rescale = TRUE} e $\eps$ fixo.
+  \item[(c) intervalo.] A base é a CDV, não há periodicidade, não há margem e
+    não há extensão. É a rota da Parte~A.
+\end{description}
+
+\part*{Parte A. A rota do intervalo}
+\addcontentsline{toc}{part}{Parte A}
+
+\section{A base CDV e a reparametrização}
+
+A base de Cohen, Daubechies e Vial (1993) mantém, em cada nível $\lev$, os
+$2^{\lev} - L$ transladados interiores $\wav{\lev}{\tsl}(u) =
+2^{\lev/2}\psi(2^{\lev}u - \tsl)$ e os completa com $L/2$ funções de borda em
+cada extremo, corrigidas de modo que $V_{J}$ reproduza os polinômios de grau
+$< N$ em $[0,1]$ e que o sistema
+$\{\phi^{\mathrm{int}}_{\jzero\tsl}\}_{\tsl<2^{\jzero}} \cup
+\{\psi^{\mathrm{int}}_{\lev\tsl}\}_{\jzero\le\lev<J}$ seja ortonormal em
+$L_{2}[0,1]$ com a medida de Lebesgue. A construção exige
+$2^{\jzero}\gtrsim 2L$ para que as duas zonas de borda não se toquem; o
+\texttt{wbasis()} impõe $\jzero \gtrsim \log_{2}(5L)$, isto é
+$\jzero \ge 4$ com $L = 8$ e $\jzero \ge 6$ com o $L = 20$ do \texttt{wall()}.
+
+Duas diferenças em relação ao caso periódico organizam tudo o que segue.
+Primeira: a constante pertence a $V_{\jzero}$, mas não é uma coluna. Como
+$\mathbf{1}$ é polinômio de grau zero, $\mathbf{1} = \sum_{\tsl}\mu_{\tsl}
+\phi^{\mathrm{int}}_{\jzero\tsl}$ com $\mu_{\tsl} =
+\int_{0}^{1}\phi^{\mathrm{int}}_{\jzero\tsl}$ e $\norm{\mu}_{2} = 1$; não há
+uma única coluna a descartar, como em D2. Segunda: as wavelets continuam
+centradas, porque $\psi^{\mathrm{int}}_{\lev\tsl} \perp V_{\jzero} \ni
+\mathbf{1}$, mas as funções de escala não.
+
+A §5 de \texttt{01-identificabilidade.md} já resolveu isso, e a solução é a
+que este arquivo usa em toda a Parte~A. Seja $Q \in
+\R^{2^{\jzero}\times(2^{\jzero}-1)}$ uma base ortonormal de
+$\{\alpha : \mu\T\alpha = 0\}$ e $\bPhi(u) =
+(\phi^{\mathrm{int}}_{\jzero\tsl}(u))_{\tsl}$. O bloco $(\cv,\md)$ passa a
+ter as colunas
+\begin{equation}
+  \label{eq:bloco}
+  \bigl[\,X_{\cv}\,\bPhi(U_{\md})\T Q \;\bigm|\;
+  X_{\cv}\,\bPsi^{\mathrm{int}}(U_{\md})\T\,\bigr],
+\end{equation}
+com $2^{\jzero}-1$ colunas de escala, \emph{não penalizadas}, e
+$2^{J} - 2^{\jzero}$ wavelets, penalizadas; o total, $2^{J}-1$, é o mesmo
+$\NJ$ do caso periódico. O que importa para tudo o que segue é que as colunas
+de $\bPhi\T Q$ são ortonormais em $L_{2}[0,1]$ ($Q\T Q = I$) e têm integral
+zero ($\mu\T Q = 0$). Escrevemos
+\[
+  \dint = pq\,(2^{J} - 2^{\jzero}), \qquad
+  \pzero = p\bigl\{1 + q\,(2^{\jzero}-1)\bigr\}
+\]
+para a dimensão penalizada e para o número de colunas não penalizadas,
+e $\Amat^{\mathrm{int}}$, $\Bmat^{\mathrm{int}}$ para os dois blocos da
+matriz de desenho, na partição do Lema~4 de E1.5.
+
+\section{O que transfere verbatim}
+
+\paragraph{Aproximação (E1.3).} O Lema~2, o Lema~3 e o Corolário~1 valem com
+$\Besov{s}{\pi}{r}[0,1]$, o espaço de Besov do intervalo \emph{sem condição de
+periodicidade}, no lugar da classe periódica, e com a mesma prova. A razão é
+que a base CDV caracteriza $\Besov{s}{\pi}{r}[0,1]$ pelos coeficientes (Cohen,
+2003, \S 3.9), de modo que a Hipótese~2 de E1.3, em forma de sequência, passa
+a ser consequência de pertencimento a $\Besov{s}{\pi}{r}[0,1]$, e não uma
+hipótese periódica disfarçada. Os quatro passos da prova do Lema~2 são
+insensíveis à troca: o Passo~1 usa completude e Parseval, o Passo~2 é a
+desigualdade de Hölder dentro do nível, o Passo~3 é a soma geométrica e o
+Passo~4 é a densidade limitada. O Lema~3 usa a sobreposição limitada, que vale
+com a constante ajustada (Lema~\ref{lem:pontual} abaixo). E a projeção de uma
+função de média zero em $V_{J}$ continua ortogonal a $\mathbf{1}$, porque
+$\mathbf{1}\in V_{\jzero}\subseteq V_{J}$.
+
+O que desaparece é o que E1.3b teve de construir: não há operador de
+extensão, não há corte $\chi_{\eps}$, não há a constante
+$\tilde C_{g} \asymp \eps^{-(s-1/\pi)}$ e não há o termo $2^{-J}$ da
+Proposição~2. A Proposição~2 simplesmente não tem análogo aqui, porque a
+emenda $0 \equiv 1$ não existe.
+
+\paragraph{Identificabilidade (E1.2).} Já está feita, na §5 de
+\texttt{01-identificabilidade.md}. A Proposição~1 não toca na base. O Lema~1
+vale literalmente com $[\bPhi Q \mid \bPsi^{\mathrm{int}}]$ no lugar de
+$\bPsi$, porque a prova do Lema~1(ii) usa exatamente duas propriedades das
+colunas do bloco, ortonormalidade em $L_{2}[0,1]$ e integral zero, e a
+reparametrização \eqref{eq:bloco} entrega as duas. Manter as $2^{\jzero}$
+colunas de escala sem a restrição repete a constante em cada bloco e deixa
+$\Gram$ singular com nulidade $pq$, que é o que o \texttt{wall()} faz hoje com
+\texttt{boundary = "interval"}.
+
+\paragraph{Desenho (E1.4).} A Proposição~3 vale verbatim, com $\Cpsiint$ no
+lugar de $C_{\psi}$. A prova da parte~(i), que é onde a base entra, usa
+apenas que $\{\mathbf{1}\}\cup\{\text{colunas do bloco}\}$ é ortonormal em
+$L_{2}([0,1]^{q}, du)$: dentro de uma coordenada isso é a ortonormalidade da
+base CDV mais $Q\T Q = I$; entre coordenadas, é o fato de toda coluna do
+bloco ter integral zero, que é $\mu\T Q = 0$ para as de escala e
+$\psi^{\mathrm{int}}\perp\mathbf{1}$ para as wavelets. Logo
+$\int_{[0,1]^{q}}h_{a}(u)^{2}du = \norm{a}_{2}^{2}$ e
+\[
+  c_{U}\le\lmin(\Gram_{\bPsi})\le\lmax(\Gram_{\bPsi})\le C_{U},
+  \qquad
+  \kappa_{1}c_{U} \;\le\; \lmin(\Gram) \;\le\; \lmax(\Gram) \;\le\;
+  \kappa_{2}C_{U},
+\]
+sem $\lmin(G_{\eps})$ e sem hipótese de suporte próprio. As partes (ii) e
+(iii) não mencionam a base; a parte (iv) precisa de
+$R_{J}^{\mathrm{int}} = pB_{X}^{2}(1 + q\Cpsiint 2^{J})$, e é o
+Lema~\ref{lem:pontual} que a sustenta.
+
+\paragraph{Oráculo e taxas (E1.5, E1.6).} Consomem só essas peças. O Lema~4
+(perfilagem) é álgebra de projeção e não conhece a base; exige apenas que
+$\Amat^{\mathrm{int}}$ tenha posto $\pzero$. O Lema~5 (calibração) é a
+desigualdade máxima sub-gaussiana sobre as $\dint$ colunas penalizadas. O
+Lema~6 usa $|X_{\cv}|\le B_{X}$ e a densidade marginal limitada, e vale com
+$\norm{\psi}_{\infty}$ trocado pelo máximo entre $\norm{\psi}_{\infty}$ e as
+normas das $L$ funções de borda. O Lema~7 é a Hipótese de Besov e a soma
+geométrica, agora de $\lev = \jzero$ a $J-1$, o que só pode diminuir
+$\norm{\thetastar}_{1}$. O Teorema~1 sai desses quatro. E o Teorema~2, a
+Proposição~4 e os Corolários~4 e~5 de E1.6 consomem o Teorema~1 e a
+Proposição~3.
+
+\section{O que não transfere de graça}
+
+\subsection*{A cota pontual}
+
+A Hipótese~3 de E1.4 pede uma constante $C_{\psi}$ com
+$\sup_{u}\sum_{\lev<J}\sum_{\tsl}\wav{\lev}{\tsl}(u)^{2} \le C_{\psi}2^{J}$, e
+a justificativa dada lá (no máximo $L$ wavelets periodizadas não nulas em cada
+$u$, cada uma de norma $2^{\lev/2}\norm{\psi}_{\infty}$) é específica da base
+periódica: na CDV as funções de borda não são transladadas de $\psi$.
+
+\begin{lemma}[cota pontual na base do intervalo]\label{lem:pontual}
+Seja a base CDV de $V_{J}$ em $[0,1]$, com $\jzero$ admissível e $L$ o
+comprimento do filtro, e seja $W(u) \in \R^{2^{J}}$ o vetor de todas as suas
+funções avaliadas em $u$. Então existe $\Cpsiint < \infty$, que depende apenas
+da família de wavelets e de $\jzero$, tal que
+\[
+  \sup_{u\in[0,1]}\norm{W(u)}_{2}^{2}
+  \;=\; \sup_{u}\Bigl\{\sum_{\tsl}\phi^{\mathrm{int}}_{\jzero\tsl}(u)^{2}
+  + \sum_{\lev=\jzero}^{J-1}\sum_{\tsl}\psi^{\mathrm{int}}_{\lev\tsl}(u)^{2}
+  \Bigr\}
+  \;\le\; \Cpsiint\,2^{J}
+  \qquad\text{para todo } J > \jzero .
+\]
+A mesma cota, com a mesma constante, vale para o bloco reparametrizado
+$[\bPhi Q \mid \bPsi^{\mathrm{int}}]$ de \eqref{eq:bloco}.
+\end{lemma}
+
+\begin{proof}
+Fixe $\lev \ge \jzero$. As funções do nível $\lev$ são de três tipos. As
+$2^{\lev}-L$ \emph{interiores} são $2^{\lev/2}\psi(2^{\lev}u - \tsl)$; como
+$\operatorname{supp}\psi\subseteq[0,L-1]$, no máximo $L-1$ delas são não nulas
+em cada $u$, e cada uma é $\le 2^{\lev/2}\norm{\psi}_{\infty}$. As $L/2$
+\emph{de borda à esquerda} são $2^{\lev/2}\psi^{\mathrm{esq}}_{r}(2^{\lev}u)$,
+$r < L/2$, com $\psi^{\mathrm{esq}}_{r}$ um conjunto \emph{fixo} de funções
+limitadas de suporte compacto em $[0, C_{L}]$, independentes de $\lev$ e de
+$J$ (é a construção de Cohen, Daubechies e Vial, que corrige as wavelets da
+borda uma vez e as dilata depois); as de borda à direita são a imagem delas
+por $u\mapsto 1-u$. Em cada $u$, no máximo $L/2$ de cada lado são não nulas.
+Logo
+\[
+  \sum_{\tsl}\psi^{\mathrm{int}}_{\lev\tsl}(u)^{2}
+  \;\le\; \Bigl\{(L-1)\norm{\psi}_{\infty}^{2}
+  + L\max_{r}\norm{\psi^{\mathrm{esq}}_{r}}_{\infty}^{2}\Bigr\}\,2^{\lev}
+  \;=:\; c_{1}\,2^{\lev},
+\]
+e $\sum_{\lev=\jzero}^{J-1}c_{1}2^{\lev} \le c_{1}2^{J}$. O bloco de escala
+obedece ao mesmo argumento com $\phi$ e as suas funções de borda, dando
+$\sum_{\tsl}\phi^{\mathrm{int}}_{\jzero\tsl}(u)^{2} \le c_{2}2^{\jzero} \le
+c_{2}2^{J}$. Tome $\Cpsiint = c_{1} + c_{2}$.
+
+Para o bloco reparametrizado, escreva $\widetilde W(u) = (Q\T\bPhi(u),
+\bPsi^{\mathrm{int}}(u))$. Como $QQ\T$ é a projeção ortogonal sobre
+$\{\mu\}^{\perp}$, $\norm{Q\T\bPhi(u)}_{2}^{2} \le \norm{\bPhi(u)}_{2}^{2}$, e
+portanto $\norm{\widetilde W(u)}_{2}^{2}\le\norm{W(u)}_{2}^{2}$.
+\end{proof}
+
+A conferência numérica mede $\Cpsiint$ e encontra $7{,}55$ (estável em
+$J = 4,\dots,9$, com leve decrescimento até $6{,}85$), contra $1{,}30$ a
+$1{,}36$ na base periódica: um fator $5{,}6$. A constante entra linearmente em
+$R_{J}$, logo entra linearmente na condição empírica de E1.4(iv): a rota do
+intervalo exige, para a mesma probabilidade, cerca de seis vezes o $n$ que a
+periódica exige. É um preço de constante, não de taxa.
+
+\subsection*{Os coeficientes de escala não penalizados}
+
+\begin{proposition}[a rota do intervalo, enunciada]\label{prop:cdv}
+Considere o desenho \eqref{eq:bloco} com a base CDV de nível inicial
+$\jzero$, valendo as Hipóteses~1 e~2 de E1.5, as Hipóteses de E1.4 com
+$\Cpsiint$ do Lema~\ref{lem:pontual} no lugar de $C_{\psi}$, e a Hipótese de
+Besov de E1.3 lida em $\Besov{s}{\pi}{r}[0,1]$, \emph{sem periodicidade,
+sem margem e sem extensão}. Suponha $\Amat^{\mathrm{int}}$ de posto $\pzero$.
+Então:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item a Proposição~3 de E1.4 vale como está, com
+    $\lmin(\Gram) \ge \kappa_{1}c_{U}$,
+    $\lmax(\Gram) \le \kappa_{2}C_{U}$ e
+    $R_{J}^{\mathrm{int}} = pB_{X}^{2}(1+q\Cpsiint 2^{J})$;
+  \item o Corolário~1 de E1.3 vale com a mesma cota de viés
+    $\mathcal{B}_{J}^{2}\asymp (pq)^{2}B_{X}^{2}C_{U}C_{g}^{2}2^{-2J\seff}$,
+    sem o termo $2^{-J}$ e sem o fator $\eps^{-2(s-1/\pi)}$;
+  \item o Teorema~1 de E1.5 vale com $\Amat$ trocado por
+    $\Amat^{\mathrm{int}}$, $s_{0}$ contado entre as $\dint$ colunas
+    penalizadas, e o termo dos níveis trocado por
+    \[
+      \E\bigl[\normn{\PA\bveps}^{2}\bigm|\bX,\bU\bigr]
+      \;\le\; \frac{\sigma^{2}\,\pzero}{n}
+      \;=\; \frac{\sigma^{2}\,p\{1+q(2^{\jzero}-1)\}}{n};
+    \]
+  \item o Teorema~2 e os Corolários~4 e~5 de E1.6 valem com as mesmas taxas,
+    porque $\pzero$ não depende de $n$ e $\sigma^{2}\pzero/n$ é de ordem
+    estritamente menor que $(J_{n}/n)^{2\seff/(2\seff+1)}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) é a §2 acima mais o Lema~\ref{lem:pontual}: a parte~(i) da Proposição~3 só
+usa ortonormalidade em $L_{2}([0,1]^{q},du)$, que \eqref{eq:bloco} entrega, e
+a parte~(iv) só usa $\norm{\bZ_{i}}_{2}^{2}\le R_{J}$, que o
+Lema~\ref{lem:pontual} dá. (ii) é a §2, parágrafo de aproximação. (iii): a
+prova do Teorema~1 nunca usa o número de colunas de $\Amat$ além de dois
+lugares, o posto (Lema~4) e a cota
+$\E[\normn{\PA\bveps}^{2}\mid\bX,\bU] = \sigma^{2}\operatorname{rank}
+(\Amat)/n$ da parte~(iii); trocar $p$ por $\pzero$ é trocar o posto. Note que
+as colunas de escala entram em $\Amat^{\mathrm{int}}$, e não em
+$\Bmat^{\mathrm{int}}$, porque não são penalizadas; a perfilagem do Lema~4 as
+remove do problema exatamente como remove os $\lvl{\cv}$, e
+$\gtil \ge \lmin(\Gramhat)$ continua valendo pelo complemento de Schur.
+(iv): no Teorema~2, $2\seff/(2\seff+1) < 1$, e $\pzero$ é constante em $n$.
+\end{proof}
+
+\begin{corollary}[as taxas sem periodicidade]\label{cor:taxa-cdv}
+Nas condições da Proposição~\ref{prop:cdv}, com
+$\penn$ e $J_{n}$ do Teorema~2 de E1.6,
+\[
+  \normn{\widehat f - f}^{2}
+  \;=\; O_{p}\!\left(\Bigl(\frac{\log n}{n}\Bigr)^{2\seff/(2\seff+1)}\right),
+  \qquad\text{e, pelo Corolário~5,}\qquad
+  O_{p}\!\left(\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\right),
+\]
+com $\gcomp{\cv}{\md}\in\Besov{s}{\pi}{r}[0,1]$ e nenhuma hipótese de
+periodicidade, de margem ou de suporte próprio.
+\end{corollary}
+
+\subsection*{O que a rota custa}
+
+O preço é inteiramente de amostra finita, e é de dois tipos.
+
+\begin{center}
+\begin{tabular}{lll}
+  \toprule
+  & periódica (D2) & intervalo (CDV) \\
+  \midrule
+  nível inicial $\jzero$ & $0$ & $\ge 4$ ($L=8$), $\ge 6$ ($L=20$) \\
+  colunas não penalizadas $\pzero$ & $p$ & $p\{1+q(2^{\jzero}-1)\}$ \\
+  \quad com $p=3$, $q=2$, $L=8$ & $3$ & $93$ \\
+  constante pontual $C_{\psi}$ & $1{,}30$ a $1{,}36$ & $\approx 7{,}55$ \\
+  $J$ acessíveis & todos & $J > \jzero$ \\
+  hipótese de regularidade & periódica & $\Besov{s}{\pi}{r}[0,1]$ \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+O termo $\sigma^{2}\pzero/n$ é $0{,}093\,\sigma^{2}$ em $n = 1000$ e
+$0{,}372\,\sigma^{2}$ em $n = 250$, contra $0{,}003\,\sigma^{2}$ e
+$0{,}012\,\sigma^{2}$ no desenho periódico. A conferência numérica mede
+$\E\normn{\PA\bveps}^{2} = 0{,}0922$ contra os $0{,}0930$ previstos em
+$n = 1000$, $\sigma = 1$: a cota é exata em média, como a Observação do
+Teorema~1 já dizia. Nos $n$ de E2.4 a rota do intervalo gasta, só em
+coeficientes de escala, uma fração não desprezível do orçamento de erro; é
+por isso que ela é a saída de recurso e não o padrão, ainda que
+assintoticamente não custe nada. O segundo tipo de preço, $\jzero \ge 4$,
+tira $J \in \{1,2,3,4\}$ da grade de \texttt{cv.wafc()}, isto é, exatamente
+a faixa que E2.3 encontrou como ótima nos $n$ do piloto.
+
+\part*{Parte B. O caso $\eps > 0$}
+\addcontentsline{toc}{part}{Parte B}
+
+\section{As duas exigências, e por que não se encontram}
+
+Sob a Hipótese~5 de E1.3b a moduladora vive em $\Ieps = [\eps, 1-\eps]$ e a
+base é periodizada no intervalo maior. Duas coisas dependem de $\eps$ e de
+$J$ em direções opostas.
+
+\emph{A Gram restrita.} A Observação do Lema~10 sobre E1.4 mostra que a
+constante de desenho passa a ser $c_{U}\lmin(G_{\eps})$, com
+$G_{\eps} = \int_{\Ieps^{q}}\bPsi(u)\bPsi(u)\T du$, e que
+$\lmin(G_{\eps}) = 0$ assim que $\VJ$ contém função não nula suportada na
+margem.
+
+\emph{A faixa contaminada.} O que a margem compra é que as wavelets que
+atravessam a emenda $0\equiv 1$, que são as responsáveis pelo termo $2^{-J}$
+da Proposição~2, deixem de ver a função. Isso acontece quando o suporte delas
+cabe dentro da margem.
+
+As duas coisas são a mesma conta, na mesma escala, e é isso que as torna
+incompatíveis.
+
+\begin{proposition}[o cruzamento exato]\label{prop:cruzamento}
+Base periodizada de uma família de suporte $[0,L-1]$,
+$\operatorname{supp}P_{U_{\md}}\subseteq\Ieps$ com $\eps\in(0,1/4]$, e
+$T(\eps) = (L-1)/(2\eps)$. Na circunferência, a margem é um único arco de
+comprimento $2\eps$ centrado na emenda. Então:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(Gram)} se $2^{J} \ge T(\eps)$, então $\lmin(G_{\eps}) = 0$;
+    logo $\lmin(G_{\eps}) > 0$ \emph{exige} $2^{J} < T(\eps)$;
+  \item \textup{(faixa contaminada)} se $2^{J} \ge 2\,T(\eps)$, então toda
+    wavelet de todo nível $\lev\ge J$ cujo suporte contém a emenda está
+    contida na margem, e portanto tem coeficiente nulo contra qualquer função
+    suportada em $\Ieps$: a cauda $\lev\ge J$ fica livre do termo de
+    periodização \emph{sem invocar o Lema~10}, e portanto sem a constante
+    $\tilde C_{g}$;
+  \item \textup{(disjunção)} as faixas de (i) e (ii) são disjuntas e
+    separadas por exatamente um nível de resolução, pois
+    $2T(\eps) > T(\eps)$: nenhum par $(J,\eps)$ satisfaz as duas;
+  \item \textup{(assintótico)} manter $\lmin(G_{\eps}) > 0$ ao longo de uma
+    sequência $J_{n}\to\infty$ obriga $\eps_{n} < (L-1)2^{-J_{n}}/2$, isto é
+    $\eps_{n}\asymp 2^{-J_{n}}$; pela Observação do Lema~10 sobre margens que
+    encolhem, o expoente garantido nessa escala é $\seff - (s-1/\pi)$, que
+    para $\pi = 2$ é exatamente $1/2$, o mesmo que a Proposição~2 entrega
+    \emph{sem margem nenhuma}. O ganho assintótico da margem é exatamente
+    zero.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) $\VJ$ é gerado pelas funções de escala $\phi_{J\tsl}$, de suporte de
+comprimento $(L-1)2^{-J}$. Se $(L-1)2^{-J}\le 2\eps$, alguma delas cabe
+inteira no arco da margem, é não nula e está no núcleo de $G_{\eps}$, pois
+$G_{\eps}$ integra só sobre $\Ieps$. A condição é $2^{J}\ge(L-1)/(2\eps) =
+T(\eps)$.
+
+(ii) Uma wavelet de nível $\lev$ cujo suporte contém a emenda está suportada
+num arco de comprimento $(L-1)2^{-\lev}$ que contém o ponto de emenda; a
+margem se estende $\eps$ para cada lado dele. Qualquer que seja a fase, o
+arco está contido na margem desde que $(L-1)2^{-\lev}\le\eps$, isto é
+$2^{\lev}\ge(L-1)/\eps = 2T(\eps)$. Como $\lev\ge J$ e $2^{J}\ge 2T(\eps)$,
+vale em todo nível da cauda. Nessa situação o coeficiente contra uma função
+que se anula na margem é zero, e a separação entre interiores e borda feita na
+prova da Proposição~2 não tem segunda parcela.
+
+(iii) é $2T(\eps) > T(\eps)$.
+
+(iv) Por (i), $2^{J_{n}} < T(\eps_{n})$, isto é
+$\eps_{n} < (L-1)2^{-J_{n}}/2$. Escrevendo $\eps_{n} = 2^{-cJ_{n}}$, isso
+força $c \ge 1$ a menos de constante; a Observação do Lema~10 dá, para
+$\eps = 2^{-cJ}$, expoente garantido $\seff - c(s-1/\pi)$, que em $c = 1$ e
+$\pi = 2$ vale $s - (s-1/2) = 1/2$.
+\end{proof}
+
+\begin{remark}[por que o zero não é acidente]\label{rem:zero}
+As duas exigências medem a mesma largura, $(L-1)2^{-J}$, que é o diâmetro do
+suporte de uma função da base no nível mais fino. Excluir a região
+contaminada pede que a margem seja \emph{mais larga} que esse diâmetro;
+preservar a Gram pede que seja \emph{mais estreita} que ele. A margem teria de
+ser as duas coisas. O $1{,}9^{-J}$ herdado do \texttt{wall()} fica logo acima
+do cruzamento, e é por isso que E1.3b mediu ali um ganho \emph{parcial}, de
+$0{,}96$ bit por nível, e não zero nem a taxa cheia.
+
+A conferência numérica exibe o cruzamento na família
+$\eps = a\,(L-1)2^{-J}$, com $J = 5,\dots,9$ e $L - 1 = 7$. Em $a = 0{,}25$ a
+Gram vive, com $\lmin(G_{\eps}) = 3{,}5\times 10^{-4}$ estável em $J$, e a
+queda por nível do erro restrito é $0{,}50$, isto é, a mesma da periodização
+sem margem. Em $a = 0{,}5$ e $a = 1$, $\lmin(G_{\eps})$ é
+$1{,}3\times10^{-14}$ e nulo, e o erro restrito desaba para
+$1{,}3\times10^{-7}$ e $7{,}5\times10^{-8}$, contra
+$2{,}3\times10^{-2}$ em $\eps = 0$ e $2{,}3\times10^{-4}$ em $a = 0{,}25$
+(em $J = 9$). O ganho e a degenerescência são o mesmo fenômeno medido de
+dois lados: o que some do erro são as direções que somem da Gram.
+\end{remark}
+
+\section{Qual enunciado é verdadeiro}
+
+O que sobra depois da Proposição~\ref{prop:cruzamento} não é um teorema de
+taxa, é um resultado de amostra finita: fixa-se $\eps$, verifica-se que $J$
+está na faixa admissível, e tudo o que E1.5 entrega vale ali, com as
+constantes que $\eps$ produz.
+
+\begin{corollary}[o enunciado de amostra finita que a margem
+sustenta]\label{cor:amostra-finita}
+Fixe $\eps\in(0,1/4]$ e $J$ com $2^{J} < T(\eps)$ e $\lmin(G_{\eps}) > 0$.
+Sob as Hipóteses~1 e~5 de E1.3b, as de E1.4 e as de E1.5, o Teorema~1 e os
+Corolários~2 e~3 valem com
+\[
+  \gamma \;=\; \kappa_{1}\,c_{U}\,\lmin(G_{\eps})
+  \qquad\text{e}\qquad
+  \mathcal{B}_{J}^{2}\;\asymp\;(pq)^{2}B_{X}^{2}C_{U}\,\tilde C_{g}^{2}\,
+  2^{-2J\seff}, \quad
+  \tilde C_{g}\asymp\eps^{-(s-1/\pi)} ,
+\]
+$\tilde C_{g}$ do Lema~10(ii). Não há enunciado de taxa associado: para
+$\eps$ fixo a faixa admissível de $J$ é finita, e todo $J$ nela é $O(1)$ em
+$n$.
+\end{corollary}
+
+Três consequências práticas, que são o que E2.4 leva daqui.
+
+\begin{enumerate}[label=\textup{(\alph*)}, leftmargin=*]
+  \item \textbf{A faixa admissível é curta e depende de $\eps$.} Com $L = 8$,
+    o limiar suficiente de degenerescência é $2^{J}\ge T(\eps) = 7/(2\eps)$,
+    isto é $J \ge 8, 7, 6$ para $\eps = 0{,}02,\ 0{,}05,\ 0{,}10$. A
+    conferência mede o maior $J$ com $\lmin(G_{\eps})$ acima de $10^{-8}$ e
+    encontra $7$, $5$ e $4$: o limiar suficiente não é justo, e a
+    degenerescência chega até um nível antes dele.
+  \item \textbf{O padrão atual não é binding nos $n$ do piloto.} Com
+    $\eps = 0{,}05$ a faixa é $J\le 5$, e E2.3 encontrou o ótimo da validação
+    cruzada em $J = 3$ a $5$ para $n\le 1000$. A margem provisória de E2.1b
+    está, por sorte ou por escala, dentro da faixa; é isso que E2.4 tem de
+    confirmar ao varrer $\eps$, e é o que impede uma escolha de $\eps$ pequeno
+    demais de ser gratuita.
+  \item \textbf{A escolha de $\eps$ é um compromisso sem ótimo assintótico.}
+    Aumentar $\eps$ baixa o viés de borda e encurta a faixa de $J$; diminuir
+    $\eps$ alarga a faixa e devolve o viés. A família $a\,(L-1)2^{-J}$ com $a$
+    em torno de $1$, que a pergunta~6 do \texttt{ESTADO.md} manda medir, é
+    exatamente a que atravessa o cruzamento, e por isso é a família certa para
+    localizar o compromisso em ISE, ainda que nenhuma escolha dentro dela
+    compre taxa.
+\end{enumerate}
+
+\part*{Parte C. A regularidade efetiva dos cenários}
+\addcontentsline{toc}{part}{Parte C}
+
+\section{O que fixa $\seff$}
+
+A regularidade efetiva que o sieve linear enxerga é decidida por duas coisas,
+e só por elas: a singularidade mais forte que a função apresenta dentro da
+região que a base tem de representar, e o número $N$ de momentos nulos, que é
+um teto. O lema abaixo é a forma do primeiro fato que a Parte~C usa; o
+segundo é a observação que o segue.
+
+\begin{lemma}[a ordem da descontinuidade fixa a queda por
+nível]\label{lem:ordem}
+Seja $\psi$ limitada, de suporte $[0,L-1]$, com $N$ momentos nulos. Seja
+$h:\R\to\R$ que, numa vizinhança de $t$, é $C^{N}$ de cada lado, com
+$h^{(a)}(t^{+}) = h^{(a)}(t^{-})$ para $a = 0,\dots,r-1$ e
+$\Delta_{r} := h^{(r)}(t^{+}) - h^{(r)}(t^{-}) \ne 0$, para algum inteiro
+$0\le r< N$. Então, para $\lev$ grande:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
+  \item os coeficientes $\inner{h}{\psi_{\lev\tsl}}$ das $O(1)$ translações
+    cujo suporte contém $t$ são
+    \[
+      \inner{h}{\psi_{\lev\tsl}} \;=\;
+      \frac{\Delta_{r}}{r!}\,2^{-\lev(r+1/2)}\,
+      \Lambda_{r}(2^{\lev}t - \tsl) \;+\; O\bigl(2^{-\lev(r+3/2)}\bigr),
+      \qquad
+      \Lambda_{r}(\tau) = \int_{z>\tau}(z-\tau)^{r}\psi(z)\,dz,
+    \]
+    e $\Lambda_{r}$ não é identicamente nula em $[0,L-1]$;
+  \item os demais coeficientes do nível, dentro da vizinhança, são
+    $O(2^{-\lev(N+1/2)})$;
+  \item logo $\norm{\theta_{\lev\cdot}}_{2}\asymp 2^{-\lev(r+1/2)}$ e a
+    regularidade efetiva imposta pela singularidade é $\seff = r + 1/2$: um
+    salto de valor ($r = 0$) dá $1/2$, uma quina ($r = 1$) dá $3/2$.
+\end{enumerate}
+Se, ao contrário, $h$ é $C^{\infty}$ numa vizinhança de toda a região
+representada, então $\norm{\theta_{\lev\cdot}}_{2} = O(2^{-\lev N})$: são
+$2^{\lev}$ coeficientes de ordem $2^{-\lev(N+1/2)}$, e a queda por nível é
+$N$, o número de momentos nulos, e não a suavidade de $h$.
+\end{lemma}
+
+\begin{proof}
+Seja $h_{-}$ a extensão $C^{N}$ da peça à esquerda e $H = h - h_{-}$, que se
+anula à esquerda de $t$ e vale $(\Delta_{r}/r!)(y-t)^{r} + O((y-t)^{r+1})$ à
+direita. Para $h_{-}$, a fórmula de Taylor de ordem $N$ e os $N$ momentos
+nulos dão $\inner{h_{-}}{\psi_{\lev\tsl}} = O(2^{-\lev(N+1/2)})$, que é (ii) e
+a segunda parcela de (i). Para $H$, a mudança de variável $y = 2^{-\lev}(z +
+\tsl)$ dá
+\[
+  \int_{y>t}(y-t)^{r}\psi_{\lev\tsl}(y)\,dy
+  \;=\; 2^{-\lev(r+1/2)}\int_{z>\tau}(z-\tau)^{r}\psi(z)\,dz,
+  \qquad \tau = 2^{\lev}t - \tsl ,
+\]
+e o resto $O((y-t)^{r+1})$ contribui $O(2^{-\lev(r+3/2)})$. Se
+$\Lambda_{r}\equiv 0$ em $[0,L-1]$, então $\psi$ seria ortogonal a todas as
+potências truncadas $(z-\tau)_{+}^{r}$, o que derivando $r+1$ vezes em $\tau$
+dá $\psi \equiv 0$ no suporte. O número de $\tsl$ com $t$ no suporte de
+$\psi_{\lev\tsl}$ é no máximo $L-1$, o que é (iii) junto com (ii). No caso
+$C^{\infty}$, (ii) vale em todas as $2^{\lev}$ translações e
+$\norm{\theta_{\lev\cdot}}_{2}\le 2^{\lev/2}\max_{\tsl}|\theta_{\lev\tsl}| =
+O(2^{-\lev N})$.
+\end{proof}
+
+Duas leituras do lema, que é o que organiza a tabela da próxima seção. A
+primeira: na base periodizada, o ponto de emenda $0\equiv 1$ é um ponto
+interior da reta para a extensão $1$-periódica $\tilde g$, e
+$\Delta_{r} = g^{(r)}(0) - g^{(r)}(1)$. É por isso que uma função perfeitamente
+suave em $[0,1]$ pode ler $\seff = 1/2$: o que a base vê não é $g$, é
+$\tilde g$. A segunda: a margem com extensão (regime (b)) e a base do
+intervalo (regime (c)) removem esse ponto, a primeira porque troca $g$ por
+uma função que se anula perto da emenda, a segunda porque não tem emenda; e
+em ambos os casos o que resta é a pior singularidade \emph{interior}, que
+nenhuma escolha de borda alcança. O teto $N$ vale nos três regimes.
+
+\section{Os seis componentes de \texttt{dgp.R}}
+
+A conferência numérica mede o valor e a derivada de cada componente nos dois
+extremos, que é o que decide $r$ na emenda. O resultado, com
+$\Delta$ medido contra a escala da própria função:
+
+\begin{center}
+\begin{tabular}{lrrrrl}
+  \toprule
+  componente & $g(0)$ & $g(1)$ & $g'(0)$ & $g'(1)$ & singularidade que manda \\
+  \midrule
+  \texttt{sine} $\sin(2\pi u)$      & $0$ & $0$ & $2\pi$ & $2\pi$ & nenhuma: $1$-periódica e $C^{\infty}$ \\
+  \texttt{cosine} $\cos(4\pi u)$    & $1$ & $1$ & $0$ & $0$ & nenhuma: $1$-periódica e $C^{\infty}$ \\
+  \texttt{cubic} $u^{3}-1{,}4u^{2}+0{,}4u$ & $0$ & $0$ & $0{,}4$ & $0{,}6$ & quina na emenda, $r = 1$ \\
+  \texttt{bumps}     & $\approx 0$ & $\approx 0$ & $\approx 0$ & $\approx 0$ & $11$ quinas interiores, $r = 1$ \\
+  \texttt{blocks}    & $0$ & $0$ & $0$ & $0$ & $11$ saltos interiores, $r = 0$ \\
+  \texttt{heavisine} & $0$ & $0$ & $16\pi$ & $16\pi$ & $2$ saltos interiores, $r = 0$ \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+Daí e do Lema~\ref{lem:ordem} sai a tabela que este arquivo existe para
+registrar, com $N = 4$ (\texttt{filter.size = 8}, D15):
+
+\begin{center}
+\begin{tabular}{lccc}
+  \toprule
+  & (a) periódico, $\eps = 0$ & (b) margem e extensão & (c) intervalo (CDV) \\
+  \midrule
+  \texttt{sine}      & $4 = N$ & $4$ & $4$ \\
+  \texttt{cosine}    & $4 = N$ & $4$ & $4$ \\
+  \texttt{cubic}     & $\mathbf{3/2}$ & $4$ & $4$ (exato) \\
+  \texttt{bumps}     & $3/2$ & $3/2$ & $3/2$ \\
+  \texttt{blocks}    & $1/2$ & $1/2$ & $1/2$ \\
+  \texttt{heavisine} & $1/2$ & $1/2$ & $1/2$ \\
+  \midrule
+  cenário \texttt{smooth}        & $\mathbf{3/2}$ & $4$ & $4$ \\
+  cenário \texttt{inhomogeneous} & $1/2$ & $1/2$ & $1/2$ \\
+  \bottomrule
+\end{tabular}
+\end{center}
+
+O $\seff$ do cenário é o \emph{mínimo} sobre as suas componentes, porque o
+viés do Corolário~1 de E1.3 soma sobre os $pq$ blocos e a componente mais
+lenta domina a soma.
+
+\subsection*{Por que a cúbica lê $3/2$ num regime e $4$ nos outros dois}
+
+Os coeficientes de \texttt{cubic} foram escolhidos de modo que
+$g(0) = g(1) = 0$: $1 - 1{,}4 + 0{,}4 = 0$. A extensão $1$-periódica é
+portanto \emph{contínua}, e a Proposição~2 de E1.3, que mede o custo de um
+salto de valor, não se aplica. O que não casa é a derivada:
+$g'(u) = 3u^{2} - 2{,}8u + 0{,}4$ dá $g'(0) = 0{,}4$ e $g'(1) = 0{,}6$, um
+salto de $0{,}2$. Pelo Lema~\ref{lem:ordem} com $r = 1$, a queda por nível é
+$r + 1/2 = 3/2$. Esse é o regime~(a), o da teoria, e é a razão do número que
+D27 declara.
+
+Nos regimes (b) e (c) a emenda deixa de existir e sobra um polinômio de grau
+$3$, que é $C^{\infty}$; pelo teto do Lema~\ref{lem:ordem}, a queda é $N = 4$.
+No regime (c) há mais: grau $3 < N = 4$, e a base CDV reproduz exatamente os
+polinômios de grau $< N$ em $[0,1]$, de modo que \emph{todos} os coeficientes
+de wavelet se anulam e a componente inteira mora em $V_{\jzero}$, na parte não
+penalizada. A conferência encontra os coeficientes da cúbica na CDV abaixo do
+próprio piso de avaliação da base, em todos os níveis.
+
+\subsection*{Por que \texttt{blocks} e \texttt{heavisine} leem $1/2$ nos três}
+
+Porque o salto é interior, e nenhuma escolha de borda o alcança. Vale
+registrar que as três funções de Donoho e Johnstone, como
+\texttt{wafc\_component()} as escreve, \emph{também} não saltam na emenda: em
+\texttt{blocks} as alturas somam zero
+($4-5+3-4+5-4{,}2+2{,}1+4{,}3-3{,}1+2{,}1-4{,}2 = 0$), logo
+$g(0) = g(1) = 0$; em \texttt{heavisine} os dois termos de sinal se cancelam
+nos dois extremos e o seno tem período $1/4$; e em \texttt{bumps} os núcleos
+mais próximos das bordas já decaíram a $10^{-5}$ da amplitude. As seis
+componentes do \texttt{dgp.R} são, portanto, todas contínuas na emenda, e a
+única que paga alguma coisa por periodização é a cúbica, e paga na derivada.
+Isso não é acidente do projeto: são funções desenhadas para testes de wavelets
+em $[0,1]$.
+
+Daí a leitura correta do número de D27: o $1/2$ do cenário não homogêneo é
+\emph{independente de regime}, e o $3/2$ do cenário suave é
+\emph{inteiramente um artefato de periodização}, que sumiria se a teoria
+fosse enunciada com margem ou no intervalo.
+
+\subsection*{O que isso muda em E2.4 e em E4}
+
+\begin{enumerate}[label=\textup{(\alph*)}, leftmargin=*]
+  \item \textbf{A regra teórica de $J_{n}$ muda de um nível.} Com
+    $2^{J_{n}} \ge (n/\log n)^{1/(2\seff+1)}$ e $n = 1000$: $\seff = 3/2$ dá
+    $2^{J_{n}}\ge 3{,}47$, isto é $J_{n} = 2$; $\seff = 4$ dá
+    $2^{J_{n}}\ge 1{,}74$, isto é $J_{n} = 1$. E2.3 já mediu que a regra fica
+    dois níveis \emph{abaixo} do $J$ do oráculo da grade com $\seff = 3/2$;
+    declarar $\seff = 4$ a levaria a três. A conclusão de E2.3 (``a regra é
+    muito sensível a $\seff$, que não se conhece'') fica mais forte, porque
+    agora se vê que $\seff$ depende até da convenção de borda.
+  \item \textbf{Há uma discrepância declarada entre o que a teoria diz e o
+    que o código gera.} O atributo que D27 manda gravar em \texttt{dgp.R} é o
+    número do regime~(a), que é o regime do manuscrito. Mas o piloto roda com
+    \texttt{rescale = TRUE} e $\eps = 0{,}05$, isto é, no regime~(b), onde o
+    mesmo cenário suave é mais liso. A escolha continua defensável (o atributo
+    documenta a teoria enunciada, e a Parte~B mostra que a margem não compra
+    taxa), mas tem de ficar escrita, e é matéria do handoff.
+  \item \textbf{O teto é $N$, não a função.} Trocar \texttt{filter.size}
+    muda o $4$ da tabela: $L = 4$ daria $N = 2$ e o cenário suave leria $2$ em
+    (b) e (c), e continuaria em $3/2$ em (a). D15 fixou $L = 8$, e a tabela é
+    dele.
+\end{enumerate}
+
+\section{O que isto não cobre}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{A Parte~A é transferência, não reprova.} A
+    Proposição~\ref{prop:cdv} aponta, item a item, o passo da prova original
+    que sobrevive e por quê; o que se prova aqui de novo é o
+    Lema~\ref{lem:pontual} e a aritmética de $\pzero$. Quem levar a rota ao
+    manuscrito tem de reescrever as provas de E1.3 a E1.6 com a base trocada,
+    o que é trabalho de redação, não de matemática nova.
+  \item \textbf{A constante $\Cpsiint$ não é afirmada justa.} O
+    Lema~\ref{lem:pontual} dá uma cota, e a conferência mede
+    $\approx 7{,}55$ para Daublets de filtro 8; nada aqui diz que a
+    dependência em $\jzero$ seja a melhor possível.
+  \item \textbf{O limiar de degenerescência da
+    Proposição~\ref{prop:cruzamento}(i) é suficiente, não necessário.} A
+    conferência encontra a primeira direção nula até um nível antes dele,
+    porque uma combinação de funções de escala pode se anular fora da margem
+    sem que nenhuma delas caiba nela. A faixa admissível de $J$ é, portanto,
+    a medida, e não a do limiar.
+  \item \textbf{Nada aqui exibe a constante de compatibilidade sobre as
+    direções estimáveis} no caso $\eps > 0$. É a lacuna que E1.3b abriu e que
+    D26 decidiu não fechar: a rota do intervalo a contorna em vez de resolvê-la.
+  \item \textbf{A ordem exata do Lema~\ref{lem:ordem} é a menos da fase
+    diádica.} $\Lambda_{r}(\tau)$ oscila com $\tau = 2^{\lev}t - \tsl$, e uma
+    singularidade em ponto diádico pode dar coeficientes anomalamente pequenos
+    em alguns níveis. É por isso que as quedas medidas oscilam e que a
+    conferência lê médias sobre janelas de vários níveis, e não transições
+    isoladas.
+  \item \textbf{A Parte~C é sobre as componentes como \texttt{dgp.R} as
+    escreve.} Mudar uma constante de \texttt{cubic} para quebrar
+    $g(0) = g(1)$ faria o cenário suave cair de $3/2$ para $1/2$ no
+    regime~(a).
+  \item \textbf{O manuscrito não muda} (D26). Este arquivo é material de
+    reserva e de documentação dos cenários.
+\end{itemize}
+
+\section{Conferência numérica}
+
+\texttt{derivations/check/07-rota-intervalo.R} (Daublets, \texttt{filter.size
+= 8}, $\jzero = 4$ na CDV; grades de $2^{14}$ e $2^{15}$; imprime \texttt{OK}
+em cerca de $2$ minutos). O que ela mediu em 2026-09-19:
+
+\paragraph{Parte A.}
+\begin{itemize}[leftmargin=*, nosep]
+  \item (A1) A base CDV é ortonormal em $L_{2}[0,1]$ com a medida de Lebesgue:
+    $\max|G - I|$ vai de $1{,}8\times10^{-6}$ ($J = 4$) a
+    $3{,}9\times10^{-4}$ ($J = 8$) na grade de $2^{14}$, que é erro de
+    quadratura. É a única propriedade que a parte~(i) da Proposição~3 de E1.4
+    usa.
+  \item (A2) A reparametrização \eqref{eq:bloco} em $J = 6$: $\mu\T\mu = 1$ a
+    $5\times10^{-6}$ (isto é $\norm{\mathbf{1}}_{L_{2}[0,1]} = 1$),
+    $\mu\T Q = 0$ a $10^{-10}$, $(\bPhi Q)\T(\bPhi Q) = I$ e $\bPhi Q$
+    ortogonal às wavelets a $5\times10^{-3}$, e $15 + 48 = 63 = 2^{6}-1$
+    colunas no bloco, como no periódico. Toda coluna tem integral zero.
+  \item (A3) $\sup_{u}\norm{W(u)}_{2}^{2}/2^{J}$ vale $7{,}55$, $7{,}55$,
+    $7{,}52$, $7{,}42$, $7{,}23$ e $6{,}85$ em $J = 4,\dots,9$ na CDV, contra
+    $1{,}30$ a $1{,}36$ na periódica: $\Cpsiint$ é finito e estável, e é
+    $5{,}6$ vezes o da base periódica. A reparametrização não aumenta a soma,
+    como o Lema~\ref{lem:pontual} prevê ($7{,}546$ contra $7{,}608$ em
+    $J = 4$).
+  \item (A4) Com $p = 3$, $q = 2$, $\jzero = 4$: $\pzero = 93$ contra $3$;
+    $\Amat^{\mathrm{int}}$ tem posto $93$ em $n = 1000$; e
+    $\E\normn{\PA\bveps}^{2}$ medido sobre $200$ réplicas é $0{,}0922$ contra
+    os $\sigma^{2}\pzero/n = 0{,}0930$ previstos, e $0{,}00295$ contra
+    $0{,}00300$ no desenho periódico.
+\end{itemize}
+
+\paragraph{Parte B.}
+\begin{itemize}[leftmargin=*, nosep]
+  \item (B1) Família $\eps = a(L-1)2^{-J}$, $J = 5,\dots,9$. $\lmin(G_{\eps})$:
+    $1$ em $a = 0$ (ortonormal), $3{,}5\times10^{-4}$ em $a = 0{,}25$
+    (estável em $J$), $1{,}3\times10^{-14}$ em $a = 0{,}5$ e nulo em $a = 1$.
+    Queda por nível do erro restrito de $\exp(u)$ em $[\eps, 1-\eps]$:
+    $0{,}50$, $0{,}50$, $0{,}08$ e $-0{,}39$. Nenhum $a$ dá ao mesmo tempo
+    Gram viva e queda acima de $1/2$ bit, que é a
+    Proposição~\ref{prop:cruzamento}(iii) medida; e onde a Gram morre o erro
+    restrito desaba de $2{,}3\times10^{-2}$ ($\eps = 0$) a
+    $10^{-7}$, que é a Observação~\ref{rem:zero}.
+  \item (B2) Com $\eps$ fixo, o maior $J$ com $\lmin(G_{\eps}) > 10^{-8}$ é
+    $7$, $5$ e $4$ para $\eps = 0{,}02,\ 0{,}05,\ 0{,}10$, contra o limiar
+    suficiente $\lfloor\log_{2}T(\eps)\rfloor = 7$, $6$ e $5$ e contra o
+    $\lceil\log_{2}2T(\eps)\rceil = 9$, $8$ e $7$ que excluiria a faixa
+    contaminada. As duas faixas não se encontram para nenhum $\eps$.
+\end{itemize}
+
+\paragraph{Parte C.}
+\begin{itemize}[leftmargin=*, nosep]
+  \item (C1) Nenhuma das seis salta na emenda: o salto relativo de $g$ é
+    $\le 2{,}5\times10^{-5}$ em todas (o máximo é \texttt{bumps}). O salto
+    relativo de $g'$ é $\le 1{,}3\times10^{-5}$ em cinco delas e
+    $0{,}334$ na cúbica, que é $0{,}2$ contra $\sup|g'| = 0{,}5996$.
+  \item (C2) Queda média por nível de $\norm{\theta_{\lev\cdot}}_{2}$, na
+    janela em que a medição é legítima:
+    \begin{center}
+    \begin{tabular}{lcccccc}
+      \toprule
+      & \texttt{sine} & \texttt{cosine} & \texttt{cubic} & \texttt{bumps} & \texttt{blocks} & \texttt{heavisine} \\
+      \midrule
+      (a) periódico $\eps = 0$ & $3{,}99$ & $3{,}95$ & $1{,}45$ & $1{,}37$ & $0{,}48$ & $0{,}51$ \\
+      (b) margem e extensão    & $3{,}85$ & $3{,}85$ & $3{,}85$ & $1{,}30$ & $0{,}49$ & $0{,}60$ \\
+      (c) intervalo (CDV)      & $5{,}11$ & $4{,}25$ & (no piso) & $1{,}37$ & $0{,}49$ & $0{,}58$ \\
+      \bottomrule
+    \end{tabular}
+    \end{center}
+    contra a tabela declarada. A janela começa onde $2^{-\lev}$ fica abaixo da
+    menor escala presente (a largura mínima em \texttt{bumps} é $0{,}005$,
+    isto é $2^{-7{,}6}$, e no regime (b) entra a largura da transição do corte,
+    $\eps/2 = 0{,}05$) e termina no último nível acima de dez vezes o piso de
+    avaliação da base, medido pela norma dos coeficientes que \emph{têm} de
+    ser exatamente nulos, $\inner{\mathbf{1}}{\psi_{\lev\tsl}}$. Esse piso é
+    $10^{-16}$ na base periódica e vai de $7\times10^{-8}$ a
+    $3\times10^{-4}$ na CDV, o que é o que impede medir a cúbica ali: os seus
+    coeficientes ficam em $10^{-10}$ a $5\times10^{-9}$, abaixo do piso em
+    todos os níveis, que é a reprodução exata.
+  \item (C3) O mínimo sobre as componentes dá $\seff = 3/2$ e $1/2$ nos dois
+    cenários no regime (a), que é D27, e $4$ e $1/2$ nos regimes (b) e (c).
+\end{itemize}
+
+\section*{Referências}
+\sloppy
+
+Todas as obras citadas aqui já estavam em
+\texttt{docs/referencias-verificadas.bib}, conferidas em L1 e L3; E1.8 não
+acrescenta nenhuma.
+
+\begin{itemize}[nosep]
+  \item Cohen, A. (2003). \emph{Numerical Analysis of Wavelet Methods}.
+    Studies in Mathematics and its Applications 32. Elsevier.
+    (\texttt{Cohen-2003}.) A \S 3.9, ``Bounded domains'', é a caracterização
+    de $\Besov{s}{\pi}{r}[0,1]$ pela base do intervalo que a Parte~A invoca.
+  \item Cohen, A., Daubechies, I. e Vial, P. (1993). Wavelets on the interval
+    and fast wavelet transforms. \emph{Applied and Computational Harmonic
+    Analysis} 1, 54--81. (\texttt{cohen1993wavelets}.) A construção da base,
+    as funções de borda e a reprodução de polinômios de grau $< N$.
+  \item Daubechies, I. (1992). \emph{Ten Lectures on Wavelets}. CBMS-NSF
+    Regional Conference Series in Applied Mathematics 61. SIAM.
+    (\texttt{Daubechies-1992}.) A base periodizada é a \S 9.3, p.~304.
+  \item Donoho, D. L. e Johnstone, I. M. (1994). Ideal spatial adaptation by
+    wavelet shrinkage. \emph{Biometrika} 81, 425--455.
+    (\texttt{Donoho-Johnstone-1994}.) As funções \texttt{bumps},
+    \texttt{blocks} e \texttt{heavisine} da Parte~C, na forma que
+    \texttt{wafc/R/dgp.R} usa.
+  \item Montoril, M. H., Pinheiro, A. e Vidakovic, B. (2019). Wavelet-based
+    estimators for mixture regression. \emph{Scandinavian Journal of
+    Statistics} 46, 215--234.
+    (\texttt{Montoril-Pinheiro-Vidakovic-2019}.) O reescalonamento
+    $\eps = 1{,}9^{-J}$ herdado pelo \texttt{wall()}, que a
+    Observação~\ref{rem:zero} situa logo acima do cruzamento.
+\end{itemize}
+
+Arquivos do próprio projeto citados sem repetir a prova:
+\texttt{derivations/01-identificabilidade.md} (§5, a reparametrização),
+\texttt{02-aproximacao-besov.tex} (Lemas 2 e 3, Corolário 1, Proposição 2,
+Lema 10 e as suas observações), \texttt{03-desenho-produtos.tex}
+(Proposição 3), \texttt{04-oraculo.tex} (Lemas 4 a 7, Teorema 1) e
+\texttt{05-taxas.tex} (Proposição 4, Teorema 2, Corolários 4 e 5).
+
+\end{document}

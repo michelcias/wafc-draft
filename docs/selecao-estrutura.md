@@ -93,7 +93,32 @@ Definir `Ŝ = {(ℓ, m) : ‖ĝ_{ℓm}‖_{L_2} > t_n}` e provar `P(Ŝ = S) → 
 | Responde ao referee | com teorema forte | com ressalva | com teorema condicional |
 | Depende de E2.5 escolher a variante em grupos | sim | não | não |
 
-**Recomendação do assistente:** (c). É a única que produz resultado sem
+## Decisão do autor (2026-09-19, D28)
+
+**Tentar as duas.** (c) entra de qualquer forma, porque é barata e cobre o
+estimador base; (a) é tentada, e entra no artigo se fechar. Se não fechar,
+fica só (c). A ordem é: uma **sondagem** de (a) antes da prova, porque a
+condição de irrepresentabilidade é computável e um veredito negativo custa
+dias em vez de semanas; (c) corre em paralelo, porque não depende dela.
+
+Duas razões de sequenciamento que entraram na decisão:
+
+- O valor de (a) é **condicionado a E2.5**: é um teorema sobre a variante em
+  grupos, e os números de E2.2 e E2.3 apontam para o LASSO puro como
+  estimador principal. (c) vale para o estimador base em qualquer cenário.
+- Sob `X ⊥ U` a Gram é `Ω ⊗ Σ_Ψ`, e há uma chance real de a condição de
+  irrepresentabilidade **se reduzir a uma condição sobre `Ω = E(XX')`
+  sozinha**, sem envolver as wavelets. É conjectura, é barata de testar, e é
+  o primeiro item da sondagem.
+
+As duas não são exclusivas: se (a) fechar, (c) continua valendo para o LASSO
+puro, e o artigo pode ter o teorema forte para a variante e o corolário para
+o estimador base. O que limita é página, e a conta de páginas ficou para o
+fim (D21).
+
+---
+
+**Recomendação do assistente, antes da decisão:** (c). É a única que produz resultado sem
 hipótese de desenho nova, cobre o estimador base em vez de só a variante, e
 transforma a comparação de E2.5 numa pergunta mais interessante. (a) fica
 registrada como extensão natural para um segundo artigo, se a seleção virar

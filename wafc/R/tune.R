@@ -49,9 +49,12 @@
 #' @param x,u,y The data, as in \code{\link{wafc}}.
 #' @param J The grid of candidate resolution levels. \code{NULL} (the
 #'   default) uses \code{2:max(2, ceiling(log2(n)/2))}, the rule of
-#'   \code{cv.wall} truncated below at \eqn{J = 2}: the default rescaling
-#'   constant \eqn{\epsilon = 1.9^{-J}} of \code{\link{wafc_design}} is
-#'   not admissible at \eqn{J = 1}.
+#'   \code{cv.wall} truncated below at \eqn{J = 2}: a block of a single
+#'   wavelet column is not a sieve, and step E2.4 measured that adding
+#'   \eqn{J = 1} to the grid changes neither the selected pair nor the
+#'   error. Since step E2.1b the margin no longer depends on \eqn{J}, so
+#'   \eqn{J = 1} is a design \code{\link{wafc_design}} can build and
+#'   passing \code{J = 1:Jmax} is allowed.
 #' @param penalty \code{"lasso"} or \code{"sglasso"}, as in
 #'   \code{\link{wafc}}.
 #' @param nfolds Number of folds, at least 3.
@@ -529,13 +532,11 @@ wafc_tune <- function(x, u, y,
 
   if (rule == "theory") {
     Jn <- wafc_J_theory(n, s = s)
-    if (Jn < 2L && is.null(list(...)[["eps"]])) {
-      stop("The rule of the theory gives J_n = ", Jn, " at n = ", n,
-           " with s' = ", s, ", and wafc_design() cannot build a design at ",
-           "J = 1 with its default rescaling constant eps = 1.9^{-J} = ",
-           signif(1.9^(-Jn), 3), ", which is outside [0, 0.5). Supply 'eps' ",
-           "or use a larger sample.", call. = FALSE)
-    }
+    ## J_n = 1 used to be unreachable, because the inherited margin
+    ## eps = 1.9^{-J} was 0.526 there, outside the [0, 0.5) that
+    ## wafc_rescale() requires. Since step E2.1b the margin is a fixed
+    ## constant and the design exists at every J > j0, so the rule is
+    ## followed wherever it leads and there is nothing to guard against.
     design <- wafc_design(x, u, J = Jn, ...)
     if (is.null(sigma)) {
       est <- wafc_sigma(design, y, alpha = alpha, nfolds = nfolds,
@@ -641,11 +642,12 @@ predict.wafc_tune <- function(object, newx, newu, ...) {
 ## ---------------------------------------------------------------------------
 
 ## Grid of candidate resolution levels: the rule of cv.wall, with j0 = 0,
-## starting at J = 2. It does not start at J = 1 for two reasons: the
-## default rescaling constant of wafc_design() is eps = 1.9^{-J}, which at
-## J = 1 is 0.526 and outside the admissible [0, 0.5), so the design cannot
-## be built with the defaults; and a block of a single wavelet column is not
-## a sieve. A user who wants J = 1 has to supply 'eps' as well.
+## starting at J = 2. Only one of the two reasons E2.3 gave survives step
+## E2.1b: a block of a single wavelet column is not a sieve. The other, that
+## the default margin eps = 1.9^{-J} was not admissible at J = 1, died with
+## the fixed margin, and J = 1 is now a design like any other; a user who
+## wants it only has to ask for it. Step E2.4 measured what carrying it
+## would buy and the answer was nothing, so the default is unchanged.
 wafc_J_grid <- function(J, n) {
   if (is.null(J)) return(seq(2L, max(2L, ceiling(log2(n) / 2))))
   if (!is.numeric(J) || length(J) == 0L || any(!is.finite(J)) ||
