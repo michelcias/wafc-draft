@@ -115,8 +115,9 @@ Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 mi
   (`cv.wafc()`, BIC, EBIC, regra da teoria); **420 testes passam**. E2.4
   (piloto) está aberta; falta o go/no-go (E2.5).
 - **Avaliação da base em estudo numérico:** tabela fixa (`wtable()` uma vez,
-  passada em `wavelet.table`), nunca a regra `auto` réplica a réplica (D31);
-  a exceção são as conferências de `derivations/check/`, que medem precisão
+  passada em `wavelet.table`), que é o caminho rápido; a regra `auto` não
+  dispara nos `n` do estudo e deixaria tudo no algoritmo lento (D31). A
+  exceção são as conferências de `derivations/check/`, que medem precisão
   fina.
 - **Manuscrito vivo em `k = 1`:** `manuscript/ms_1.tex` e `supp_1.tex`
   compilam limpos, em 28 e 26 páginas. Alterar pede decidir antes se nasce
