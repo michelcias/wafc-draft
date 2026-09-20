@@ -3,7 +3,9 @@
 Um resultado por arquivo, numerado na ordem de dependência do plano (E1):
 `01-identificabilidade.md`, `02-aproximacao-besov.tex` (com a emenda de
 E1.3b), `03-desenho-produtos.tex`, `04-oraculo.tex`, `05-taxas.tex`,
-`07-rota-intervalo.tex` (E1.8). Cada um com
+`06-selecao-limiar.tex` (E1.7c), `07-rota-intervalo.tex` (E1.8), mais a
+sondagem `06a-sondagem-irrepresentabilidade.md`, que é veredito e não
+resultado. Cada um com
 enunciado, hipóteses, prova, "o que isso não cobre" e o parágrafo da
 conferência numérica. Documentos `article` autônomos que fazem
 `\input{macros}`; `macros.tex` implementa `docs/notacao.md` e é o único
@@ -12,8 +14,8 @@ probabilidade em **romano**, como a revista exige.
 
 **A numeração dos resultados é global** e a tabela que manda está na §5 de
 [`../docs/TAREFA.md`](../docs/TAREFA.md), não nos contadores de cada
-arquivo: `02` e `03` ainda imprimem contador local; `04`, `05`, `07` e a emenda de
-`02` imprimem o número global. Compilar com `latexmk -pdf <arquivo>.tex`;
+arquivo: `02` e `03` ainda imprimem contador local; `04`, `05`, `06`, `07` e a emenda
+de `02` imprimem o número global. Compilar com `latexmk -pdf <arquivo>.tex`;
 o `.pdf` é versionado, os auxiliares não.
 
 `check/` guarda os scripts R de conferência numérica, com o mesmo número do

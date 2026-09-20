@@ -82,6 +82,8 @@ máquina):
 Rscript derivations/check/01-identificabilidade.R   # ~7 s
 Rscript derivations/check/03-desenho-produtos.R     # ~9 s, precisa de quadprog
 Rscript derivations/check/04-oraculo.R              # ~16 s, precisa de glmnet
+Rscript derivations/check/06a-irrepresentabilidade.R # ~4 min
+Rscript derivations/check/06-selecao-limiar.R       # ~7 min, precisa de glmnet e sparsegl
 Rscript derivations/check/02-aproximacao-besov.R    # ~72 s (com a emenda E1.3b)
 Rscript derivations/check/05-taxas.R                # ~7 min
 ```

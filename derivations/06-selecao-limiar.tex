@@ -1,0 +1,585 @@
+% E1.7c -- seleção de estrutura por limiarização: a saída (c) de
+% docs/selecao-estrutura.md, decidida em D28.
+%
+% Consome o Corolário 4 de E1.6 (05-taxas.tex) e NADA MAIS: não usa
+% irrepresentabilidade, não pede condição de desenho nova, e vale para o
+% LASSO puro, que é o estimador base (D3). A saída (a), a propriedade
+% oráculo da variante em grupos, é sondada em E1.7a e não é usada aqui.
+%
+% Numeração global dos resultados (docs/TAREFA.md, §5): este arquivo
+% continua de Proposição 6, Lema 12, Teorema 2 e Corolário 7, e imprime o
+% número global via \setcounter, como 04, 05 e 07.
+%
+% Conferência numérica: derivations/check/06-selecao-limiar.R (imprime OK).
+% Notação: docs/notacao.md (congelada em E1.1). Macros: derivations/macros.tex.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black]{hyperref}
+\input{macros}
+
+% --- atalhos locais deste arquivo -----------------------------------------
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betahat}{\widehat{\bbeta}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\ghat}[2]{\widehat{g}_{#1#2}}
+\newcommand{\Nhat}[2]{\widehat{N}_{#1#2}}
+\newcommand{\Ntrue}[2]{N_{#1#2}}
+\newcommand{\Shat}{\widehat{S}}
+\newcommand{\sepmin}{\delta}
+\newcommand{\rn}{\rho}
+
+% A numeração global começa depois de Proposição 6, Lema 12, Teorema 2 e
+% Corolário 7 (docs/TAREFA.md, §5; E1.8 usou o 6 e o 7).
+\setcounter{proposition}{6}
+\setcounter{lemma}{12}
+\setcounter{theorem}{2}
+\setcounter{corollary}{7}
+
+% A hipótese deste arquivo é a única, e ganha a letra S para não colidir com
+% a "Hipótese 1" de E1.6 (regime assintótico), que é citada ao lado dela.
+\renewcommand{\theassumption}{S}
+
+\title{E1.7c. Seleção de estrutura por limiarização}
+\author{wafc-draft, \texttt{derivations/06-selecao-limiar.tex}}
+\date{2026-09-20}
+
+\begin{document}
+\maketitle
+
+\section*{Onde este resultado entra}
+
+A pergunta ``quais moduladoras afetam quais coeficientes'' é a de identificar
+os blocos $(\cv,\md)$ com $\gcomp{\cv}{\md} \equiv 0$. A decisão D28 fixou
+duas frentes: a propriedade oráculo da variante em grupos, que pede uma
+condição de irrepresentabilidade no desenho de produtos e é sondada em E1.7a,
+e a \emph{limiarização}, que é este arquivo. As duas não competem; esta é a
+que entra no artigo de qualquer forma, por três razões.
+
+\begin{enumerate}[label=(\alph*), leftmargin=*, nosep]
+  \item Ela consome o Corolário~4 de E1.6 \emph{como está} e não introduz
+    hipótese de desenho nenhuma. A única hipótese nova é sobre o
+    \emph{alvo} --- os blocos ativos têm norma acima da taxa de estimação ---
+    e não sobre $(\bX,\bU)$.
+  \item Ela vale para o \emph{LASSO puro}, que é o estimador base do projeto
+    (D3) e o único que tem taxa provada aqui. A variante em grupos, que
+    zera blocos sozinha, não tem teoria neste projeto
+    (\texttt{docs/selecao-estrutura.md}).
+  \item A estatística que ela limiariza já existe no código:
+    $\norm{\thetahat_{\cv\md,\cdot}}_{2}$, que é o que
+    \texttt{wafc\_blocks()} devolve, é \emph{exatamente}
+    $\lVert\ghat{\cv}{\md}\rVert_{L_{2}[0,1]}$ pela ortonormalidade da base
+    (Observação~\ref{rem:codigo}).
+\end{enumerate}
+
+O enunciado é deliberadamente modesto, e o arquivo o diz com todas as letras:
+\emph{isto é estimação seguida de limiar, e não seleção pelo estimador}. Nada
+aqui afirma que o LASSO escolhe os blocos certos; o que se prova é que, tendo
+estimado bem cada componente, um corte na norma de bloco recupera a estrutura,
+desde que a estrutura seja detectável na resolução em que se estimou. A
+hipótese de separação aparece como hipótese, numerada, e a
+Observação~\ref{rem:exata} mostra que a janela de limiares do
+Lema~\ref{lem:sanduiche} é exata: quando a separação cai ao dobro do erro,
+existe configuração em que \emph{nenhum} limiar acerta.
+
+São dois enunciados. O Lema~\ref{lem:sanduiche} é determinístico e não sabe
+o que é um LASSO: dado qualquer estimador cujo erro por bloco seja dominado
+por $D$, ele sanduicha o conjunto limiarizado entre dois conjuntos de nível
+da verdade. O Corolário~\ref{cor:limiar} instala nele a taxa do Corolário~4 e
+produz $\Prob(\Shat = S) \to 1$.
+
+\section{Objetos}
+
+Mantém-se tudo de E1.6, \texttt{05-taxas.tex}, §1: o modelo, a amostra
+i.i.d., a partição $\bZ = [\Amat\;\Bmat]$ na ordem de D12 com
+$d = pq\NJ$, o estimador
+\[
+  \betahat = (\chat,\thetahat)
+  \;\in\; \operatorname*{arg\,min}_{(\bc,\btheta)}
+  \bigl\{\normn{\bY - \Amat\bc - \Bmat\btheta}^{2} + 2\pen\norm{\btheta}_{1}\bigr\},
+\]
+o resíduo determinístico $\bb = f - f_{J}$, a perfilagem
+$\gtil = \lmin(\Btil\T\Btil/n)$, $\gamma = \kappa_{1}c_{U}$ e
+$\mathcal{B}_{J}^{2} = (pq)^{2}C_{X}^{2}C_{U}C_{g}^{2}(1-2^{-2\seff})^{-1}
+2^{-2J\seff}$. A penalidade é a do Corolário~2 de E1.5,
+\[
+  \pen_{n} \;=\; 2\sigma B_{X}\sqrt{2C_{U}}\;\sqrt{\frac{2L_{n}}{n}},
+  \qquad L_{n} = \log(2d_{n}/\alpha),
+\]
+e a resolução é a do Teorema~2 de E1.6,
+$J_{n} = \min\{J : 2^{J}\ge(n/\log n)^{1/(2\seff+1)}\}$.
+
+Os objetos próprios deste arquivo são quatro. As componentes estimadas e as
+suas normas,
+\[
+  \ghat{\cv}{\md} \;=\; \sum_{\lev<J_{n},\,\tsl}
+  \widehat\theta_{\cv\md,\lev\tsl}\,\wav{\lev}{\tsl},
+  \qquad
+  \Nhat{\cv}{\md} \;=\; \bigl\lVert \ghat{\cv}{\md}\bigr\rVert_{L_{2}[0,1]},
+  \qquad
+  \Ntrue{\cv}{\md} \;=\; \bigl\lVert \gcomp{\cv}{\md}\bigr\rVert_{L_{2}[0,1]};
+\]
+a estrutura verdadeira e a estimada, esta indexada pelo limiar $t \ge 0$,
+\[
+  S \;=\; \bigl\{(\cv,\md) :\; \gcomp{\cv}{\md} \not\equiv 0
+  \text{ em } L_{2}[0,1]\bigr\}
+  \;=\; \bigl\{(\cv,\md) :\; \Ntrue{\cv}{\md} > 0 \bigr\},
+  \qquad
+  \Shat(t) \;=\; \bigl\{(\cv,\md) :\; \Nhat{\cv}{\md} > t \bigr\};
+\]
+o erro máximo por bloco e a separação,
+\[
+  \Delta \;=\; \max_{\cv,\md}
+  \bigl\lVert \ghat{\cv}{\md} - \gcomp{\cv}{\md}\bigr\rVert_{L_{2}[0,1]},
+  \qquad
+  \sepmin \;=\; \min_{(\cv,\md)\in S} \Ntrue{\cv}{\md};
+\]
+e a taxa por componente do Corolário~4 de E1.6,
+\begin{equation}
+  \label{eq:rho}
+  \rn_{n} \;=\; \Bigl(\frac{J_{n}}{n}\Bigr)^{\seff/(2\seff+1)}
+  \;\asymp\; \Bigl(\frac{\log n}{n}\Bigr)^{\seff/(2\seff+1)} .
+\end{equation}
+
+Duas convenções. A primeira é que $S$ é um conjunto de \emph{blocos}, não de
+coeficientes: $|S| \le pq$, e nada aqui diz respeito a quais
+$\wav{\lev}{\tsl}$ dentro de um bloco são não nulos. A segunda é que a
+desigualdade que define $\Shat(t)$ é estrita, o que só importa em empates de
+medida nula e é a convenção que a conferência numérica implementa.
+
+\section{Hipóteses}
+
+Além das hipóteses de E1.3 a E1.6, que são citadas onde entram, este arquivo
+usa uma, e ela é sobre o alvo, não sobre o desenho. O contador de hipóteses é
+local ao arquivo, como em E1.5 e E1.6.
+
+\begin{assumption}[separação em nível de bloco]\label{ass:sep}
+Na sequência de problemas da Hipótese~1 de E1.6, o alvo pode variar com $n$;
+escreva $S_{n}$ e $\sepmin_{n} = \min_{(\cv,\md)\in S_{n}}
+\lVert g^{(n)}_{\cv\md}\rVert_{L_{2}[0,1]}$, com $\sepmin_{n} = +\infty$ se
+$S_{n} = \emptyset$. Supõe-se
+\[
+  \frac{\sepmin_{n}}{\rn_{n}} \;\longrightarrow\; \infty ,
+\]
+com $\rn_{n}$ de \eqref{eq:rho}: \emph{o menor bloco ativo tem norma de ordem
+estritamente maior que a taxa por componente}.
+\end{assumption}
+
+Três leituras, que a Observação~\ref{rem:fixa} retoma. (i) Sob alvo fixo, e
+portanto sob a Hipótese~1 de E1.6 lida literalmente, $\sepmin_{n} = \sepmin$ é
+constante positiva e a hipótese é automática, porque $\rn_{n}\to 0$. (ii) Ela
+tem conteúdo em arranjo triangular, onde o menor bloco ativo pode encolher com
+$n$; aí ela diz exatamente quão devagar. (iii) Ela é hipótese sobre
+$\gcomp{\cv}{\md}$ e não sobre $(\bX,\bU)$: nenhuma condição de desenho nova
+entra neste arquivo, e em particular nenhuma irrepresentabilidade.
+
+\section{Os dois enunciados}
+
+\begin{lemma}[limiarização de um estimador com erro uniforme sobre blocos]
+\label{lem:sanduiche}
+Sejam $\{\gcomp{\cv}{\md}\}$ e $\{\ghat{\cv}{\md}\}$ famílias quaisquer de
+funções de $L_{2}[0,1]$ indexadas por $(\cv,\md)$, com $\Nhat{\cv}{\md}$,
+$\Ntrue{\cv}{\md}$, $S$, $\Shat(t)$, $\Delta$ e $\sepmin$ definidos a partir
+delas como na §1, e seja $D \ge \Delta$. Então, para todo $t \ge 0$,
+\begin{equation}
+  \label{eq:sanduiche}
+  \bigl\{(\cv,\md):\; \Ntrue{\cv}{\md} > t + D\bigr\}
+  \;\subseteq\; \Shat(t) \;\subseteq\;
+  \bigl\{(\cv,\md):\; \Ntrue{\cv}{\md} > t - D\bigr\} .
+\end{equation}
+Em particular:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
+  \item \textup{(sem falso positivo; não usa separação)} se $t \ge D$, então
+    $\Shat(t) \subseteq S$;
+  \item \textup{(sem falso negativo; usa separação)} se $t < \sepmin - D$,
+    então $S \subseteq \Shat(t)$;
+  \item \textup{(acerto exato)} se $D \le t < \sepmin - D$, então
+    $\Shat(t) = S$. Tal $t$ existe se e só se $\sepmin > 2D$.
+\end{enumerate}
+\end{lemma}
+
+O lema não usa nada do estimador além da cota $\Delta \le D$: vale para o
+LASSO, para a variante em grupos, para um estimador por splines, e é por isso
+que a única coisa que E1.6 precisa fornecer é a taxa por componente.
+
+\begin{corollary}[seleção de estrutura por limiarização]\label{cor:limiar}
+Nas condições do Teorema~2 de E1.6 (hipóteses de E1.3, E1.4 e E1.5, a
+Hipótese~1 de E1.6, o $\pen_{n}$ e o
+$J_{n}$ daquele arquivo):
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(não assintótico)} Sejam $\alpha,\alpha'\in(0,1)$ e
+    \begin{equation}
+      \label{eq:Dn}
+      D_{n}^{2}
+      \;=\; \frac{512\,\pen_{n}^{2}\,d_{n}}{\gamma^{2}}
+      \;+\; \frac{64\,\mathcal{B}_{J_{n}}^{2}}{\alpha'\gamma}
+      \;+\; \frac{2\,C_{g}^{2}}{1-2^{-2\seff}}\,2^{-2J_{n}\seff} .
+    \end{equation}
+    Então, num evento de probabilidade ao menos
+    $1-\alpha-\alpha'-\Prob\{\lmin(\Gramhat)<\gamma/2\}
+    -\Prob\{\smax^{2}>2B_{X}^{2}C_{U}\}$, vale $\Delta \le D_{n}$ e portanto,
+    pelo Lema~\ref{lem:sanduiche}(iii),
+    \[
+      \Shat(t) = S \qquad\text{para todo } t \text{ com }
+      D_{n} \le t < \sepmin - D_{n} ,
+    \]
+    janela não vazia sempre que $\sepmin > 2D_{n}$. As duas últimas
+    probabilidades tendem a zero pela Proposição~3(iv) de E1.4 e pelo Lema~6
+    de E1.5.
+  \item \textup{(triagem, sem hipótese de separação)} $\Delta = O_{p}(\rn_{n})$
+    e, para qualquer $t_{n}$ com $t_{n}/\rn_{n} \to \infty$,
+    \[
+      \Prob\bigl\{\Shat(t_{n}) \subseteq S\bigr\} \;\longrightarrow\; 1 .
+    \]
+    \emph{Nenhuma hipótese sobre $\sepmin_{n}$ é usada aqui}: eliminar os
+    blocos nulos é de graça.
+  \item \textup{(acerto exato)} Sob a Hipótese~\ref{ass:sep}, e para qualquer
+    $t_{n}$ com
+    \[
+      \frac{t_{n}}{\rn_{n}} \to \infty
+      \qquad\text{e}\qquad
+      \limsup_{n} \frac{t_{n}}{\sepmin_{n}} < 1 ,
+    \]
+    vale $\Prob\{\Shat(t_{n}) = S\} \to 1$. Tal $t_{n}$ existe sempre sob a
+    Hipótese~\ref{ass:sep}, e a escolha canônica é a média geométrica
+    $t_{n} = \sqrt{\rn_{n}\sepmin_{n}}$.
+\end{enumerate}
+\end{corollary}
+
+\section{Provas}
+
+\subsection*{Lema~\ref{lem:sanduiche}}
+
+Pela desigualdade triangular em $L_{2}[0,1]$,
+\begin{equation}
+  \label{eq:triangular}
+  \bigl|\Nhat{\cv}{\md} - \Ntrue{\cv}{\md}\bigr|
+  \;\le\; \bigl\lVert\ghat{\cv}{\md} - \gcomp{\cv}{\md}\bigr\rVert_{L_{2}[0,1]}
+  \;\le\; \Delta \;\le\; D
+  \qquad\text{para todo }(\cv,\md).
+\end{equation}
+Inclusão da esquerda de \eqref{eq:sanduiche}: se $\Ntrue{\cv}{\md} > t+D$,
+então $\Nhat{\cv}{\md} \ge \Ntrue{\cv}{\md} - D > t$, logo
+$(\cv,\md)\in\Shat(t)$. Inclusão da direita: se $(\cv,\md)\in\Shat(t)$, então
+$\Ntrue{\cv}{\md} \ge \Nhat{\cv}{\md} - D > t - D$.
+
+Para (i), tome $t \ge D$: a inclusão da direita dá
+$\Shat(t) \subseteq \{\Ntrue{\cv}{\md} > t - D\} \subseteq
+\{\Ntrue{\cv}{\md} > 0\} = S$, porque $t - D \ge 0$. Para (ii), tome
+$t < \sepmin - D$: todo $(\cv,\md)\in S$ tem
+$\Ntrue{\cv}{\md} \ge \sepmin > t + D$, e a inclusão da esquerda dá
+$(\cv,\md)\in\Shat(t)$. (iii) é a conjunção das duas, e o intervalo
+$[D,\sepmin-D)$ é não vazio se e só se $D < \sepmin - D$. \qed
+
+\subsection*{Corolário~\ref{cor:limiar}}
+
+\emph{(i).} Intersecte os quatro eventos da prova do Corolário~1 de E1.5:
+$\mathcal{T}$, de probabilidade ao menos $1-\alpha$;
+$\{\smax^{2}\le 2B_{X}^{2}C_{U}\}$, que torna $\pen_{n}$ admissível, isto é
+$\pen_{n}\ge 2\pen_{0}$; $\{\lmin(\Gramhat)\ge\gamma/2\}$, que com o
+complemento de Schur do Lema~4 de E1.5 dá $\gtil \ge \gamma/2$; e
+$\{\normn{\bb}^{2} \le \mathcal{B}_{J_{n}}^{2}/\alpha'\}$, que é Markov
+aplicado a $\E\normn{\bb}^{2} \le \mathcal{B}_{J_{n}}^{2}$ (Corolário~1 de
+E1.3). Nesse evento, o Teorema~1(ii) de E1.5 com $s_{0} \le d_{n}$ dá
+\[
+  \norm{v}_{2}^{2}
+  \;\le\; \frac{64\pen_{n}^{2}d_{n}}{\gtil^{2}} + \frac{16\normn{\bb}^{2}}{\gtil}
+  \;\le\; \frac{256\pen_{n}^{2}d_{n}}{\gamma^{2}}
+  + \frac{32\,\mathcal{B}_{J_{n}}^{2}}{\alpha'\gamma},
+  \qquad v = \thetahat - \thetastar .
+\]
+Fixe agora um bloco. Pela ortonormalidade das $\{\wav{\lev}{\tsl}\}_{\lev<J_{n}}$
+em $L_{2}[0,1]$,
+$\lVert\ghat{\cv}{\md} - \PiJ\gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}
+= \norm{v_{\cv\md,\cdot}}_{2} \le \norm{v}_{2}$, e o Lema~1 de E1.3 dá
+$\lVert\PiJ\gcomp{\cv}{\md} - \gcomp{\cv}{\md}\rVert^{2}_{L_{2}[0,1]}
+\le C_{g}^{2}(1-2^{-2\seff})^{-1}2^{-2J_{n}\seff}$. Por
+$(x+y)^{2}\le 2x^{2}+2y^{2}$,
+\[
+  \Delta^{2} \;\le\; 2\norm{v}_{2}^{2}
+  + \frac{2C_{g}^{2}}{1-2^{-2\seff}}2^{-2J_{n}\seff}
+  \;\le\; D_{n}^{2},
+\]
+que é \eqref{eq:Dn}. O Lema~\ref{lem:sanduiche}(iii) com $D = D_{n}$ fecha.
+
+\emph{(ii).} Na resolução $J_{n}$ do Teorema~2 de E1.6, as três parcelas de
+\eqref{eq:Dn} são da mesma ordem $\rn_{n}^{2}$: a primeira porque
+$\pen_{n}^{2}d_{n} \asymp (J_{n}/n)\,pq2^{J_{n}} \asymp (J_{n}/n)^{2\seff/(2\seff+1)}$
+pelo Teorema~2(iii) de E1.6, e a segunda e a terceira porque
+$2^{-2J_{n}\seff} \asymp (\log n/n)^{2\seff/(2\seff+1)}$ pela definição de
+$J_{n}$. Logo $D_{n} \le c(\alpha')\rn_{n}$ com $c(\alpha')<\infty$. Dado
+$\epsilon>0$, tome $\alpha = \alpha' = \epsilon/4$ e $n$ grande o bastante
+para que as duas probabilidades residuais de (i) somem menos de
+$\epsilon/2$; então $\Prob(\Delta > c(\epsilon/4)\rn_{n}) < \epsilon$, que é
+$\Delta = O_{p}(\rn_{n})$. Se $t_{n}/\rn_{n}\to\infty$, então
+$\Prob(t_{n} \ge \Delta) \to 1$, e nesse evento o
+Lema~\ref{lem:sanduiche}(i) dá $\Shat(t_{n})\subseteq S$.
+
+\emph{(iii).} Sob a Hipótese~\ref{ass:sep} e com
+$\limsup t_{n}/\sepmin_{n} < 1$, existem $\eta>0$ e $n_{0}$ tais que
+$\sepmin_{n} - t_{n} \ge \eta\,\sepmin_{n}$ para $n \ge n_{0}$, e portanto
+$(\sepmin_{n}-t_{n})/\rn_{n} \ge \eta\,\sepmin_{n}/\rn_{n} \to\infty$.
+Assim $\Prob(\Delta \le t_{n}) \to 1$ e
+$\Prob(\Delta < \sepmin_{n}-t_{n}) \to 1$; na interseção dos dois eventos,
+o Lema~\ref{lem:sanduiche}(iii) com $D = \Delta$ dá $\Shat(t_{n}) = S$.
+Quanto à existência: com $t_{n} = \sqrt{\rn_{n}\sepmin_{n}}$ tem-se
+$t_{n}/\rn_{n} = \sqrt{\sepmin_{n}/\rn_{n}} \to\infty$ e
+$t_{n}/\sepmin_{n} = \sqrt{\rn_{n}/\sepmin_{n}} \to 0$. \qed
+
+\section{Observações}
+
+\begin{remark}[a janela do Lema~\ref{lem:sanduiche} é exata]\label{rem:exata}
+A condição $\sepmin > 2D$ não é artefato da prova. Tome dois blocos, um ativo
+com $\Ntrue{1}{1} = 2D$ e um nulo com $\Ntrue{2}{1} = 0$, e estimativas
+$\Nhat{1}{1} = D$ e $\Nhat{2}{1} = D$, compatíveis com $\Delta \le D$. As
+duas estatísticas empatam, e nenhum $t$ separa. Isto diz que o \emph{argumento}
+não se estende abaixo de $\sepmin = 2D$; não diz que nenhum procedimento
+consegue, o que seria uma cota inferior e não é feito aqui nem em E1.6
+(``o que isto não cobre'' daquele arquivo).
+\end{remark}
+
+\begin{remark}[a hipótese de separação sob alvo fixo]\label{rem:fixa}
+A Hipótese~1 de E1.6 fixa $p$, $q$, $s$, $\pi$ e $C_{g}$, e se o alvo também
+for fixo então $S$ e $\sepmin$ não dependem de $n$; como $\rn_{n}\to 0$, a
+Hipótese~\ref{ass:sep} é automática e o
+Corolário~\ref{cor:limiar}(iii) vale para \emph{qualquer} $t_{n}\to 0$ com
+$t_{n}/\rn_{n}\to\infty$. É a leitura que a conferência numérica realiza, e é
+o enunciado que um leitor de simulação espera. A forma em arranjo triangular é
+a que carrega informação: ela diz que a fronteira da detecção é a taxa de
+estimação por componente, e é ela que torna a hipótese uma hipótese, e não uma
+formalidade.
+\end{remark}
+
+\begin{remark}[é estimação seguida de limiar, e não seleção pelo estimador]
+\label{rem:nao-selecao}
+Nada aqui afirma que o LASSO seleciona. O suporte de $\thetahat$ não tem
+relação com $S$: sob a Hipótese de Besov de E1.3 o oráculo do sieve é
+genericamente denso (E1.6, ``onde este resultado entra''), e na prática o
+LASSO deixa coeficientes não nulos em blocos nulos --- a conferência de E2.2
+mediu, com cerca de $99$ não nulos, \emph{zero} dos três blocos nulos zerados
+pelo LASSO contra três pelo sparse group LASSO. O que o
+Corolário~\ref{cor:limiar} diz é outra coisa: a \emph{norma} do bloco, e não o
+seu suporte, é pequena nos blocos nulos, e um corte na norma recupera $S$. O
+procedimento é, portanto, de dois passos, e o enunciado do artigo tem de
+dizê-lo.
+\end{remark}
+
+\begin{remark}[a estatística é a que o código já devolve]\label{rem:codigo}
+Como $\{\wav{\lev}{\tsl}\}_{\lev<J_{n}}$ é ortonormal em $L_{2}[0,1]$,
+\[
+  \Nhat{\cv}{\md}
+  \;=\; \Bigl\lVert \sum_{\lev<J_{n},\tsl}\widehat\theta_{\cv\md,\lev\tsl}
+  \wav{\lev}{\tsl}\Bigr\rVert_{L_{2}[0,1]}
+  \;=\; \norm{\thetahat_{\cv\md,\cdot}}_{2},
+\]
+que é a coluna \texttt{norm} de \texttt{wafc\_blocks()} (E2.2). A identidade é
+exata no regime da teoria, $\eps = 0$ (D26), e a conferência a verifica com
+erro relativo máximo de $1{,}4\times10^{-9}$ nos seis blocos. Com a margem do código
+(\texttt{rescale = TRUE}, $\eps$ hoje em $0{,}05$), a base é ortonormal na
+variável reescalada, de modo que $\norm{\thetahat_{\cv\md,\cdot}}_{2}$ é a
+norma de $\ghat{\cv}{\md}$ no intervalo \emph{alargado} dividida por
+$\sqrt{\text{scale}}$. O fator é comum a todos os blocos que compartilham
+$U_{\md}$ e portanto não muda a ordenação das estatísticas dentro de uma
+coluna $\md$; entre colunas com amplitudes amostrais diferentes, muda, e é
+ponto para E2.5 calibrar.
+\end{remark}
+
+\begin{remark}[o que muda se a variante em grupos ganhar taxa]\label{rem:grupos}
+O Lema~\ref{lem:sanduiche} é determinístico e cego ao estimador. Se E1.7a ou
+um trabalho posterior der uma taxa por componente para o sparse group LASSO,
+o Corolário~\ref{cor:limiar} vale para ele trocando $\rn_{n}$ pela taxa nova,
+sem reescrever uma linha da prova. O que \emph{não} se obtém assim é a
+propriedade oráculo de seleção da saída (a): esta continua sendo uma
+afirmação sobre um procedimento de dois passos, e aquela é sobre o estimador
+em um passo.
+\end{remark}
+
+\section{O que foi transposto e o que é novo}
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Transposto:} a ideia de ``estimar bem e limiarizar seleciona''
+    é clássica em LASSO, e a referência mais próxima em forma é van de Geer,
+    Bühlmann e Zhou (2011), que estudam o LASSO limiarizado exatamente como um
+    segundo passo sobre um estimador com taxa; em modelos aditivos, Huang,
+    Horowitz e Wei (2010) usam uma condição de separação em nível de
+    \emph{componente} no mesmo papel que a Hipótese~\ref{ass:sep} aqui.
+  \item \textbf{Novo, no sentido em que este projeto usa a palavra:} o
+    enunciado no \emph{desenho de produtos} $X_{\cv}\wav{\lev}{\tsl}(U_{\md})$
+    com $q\ge2$ moduladoras, em que a unidade limiarizada é o bloco
+    $(\cv,\md)$ --- isto é, a resposta à pergunta ``$U_{\md}$ modula
+    $\fcoef{\cv}$?'' --- e não uma variável nem uma componente aditiva
+    isolada. E o fato de valer para o \emph{LASSO puro}, sem
+    irrepresentabilidade e sem condição de desenho além das de E1.4, que já
+    estão pagas.
+  \item \textbf{Novo aqui:} a separação entre as duas metades do problema no
+    Corolário~\ref{cor:limiar}(ii) e (iii). Eliminar os blocos nulos não
+    custa hipótese nenhuma; toda a hipótese de separação é gasta em não
+    perder blocos ativos pequenos. A conferência mede as duas curvas
+    separadamente, e é essa assimetria que explica por que o acerto observado
+    é alto mesmo quando a janela do Lema~\ref{lem:sanduiche} é vazia.
+\end{itemize}
+
+\section{O que isto não cobre}
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{$t_{n}$ depende de constantes desconhecidas.} A janela de (i)
+    é escrita em $D_{n}$, que carrega $\sigma$, $\gamma = \kappa_{1}c_{U}$,
+    $C_{g}$, $\seff$ e $\mathcal{B}_{J_{n}}$; e a de (iii), em $\rn_{n}$ e
+    $\sepmin_{n}$. Nada aqui diz como escolher $t_{n}$ com os dados. A
+    escolha empírica é de E2.4 e E2.5, e a conferência desta etapa entrega
+    apenas a curva de acerto contra o limiar e uma regra invariante de escala
+    para servir de ponto de partida.
+  \item \textbf{Não é cota inferior.} A Observação~\ref{rem:exata} mostra que
+    o argumento para em $\sepmin = 2D$; não se prova que a separação seja
+    necessária para algum procedimento. A cota inferior para $q\ge2$ não
+    existe neste projeto (E1.9).
+  \item \textbf{Não é a propriedade oráculo da saída (a).} O estimador não
+    seleciona; o procedimento de dois passos seleciona
+    (Observação~\ref{rem:nao-selecao}). Se E1.7a fechar, os dois enunciados
+    coexistem, como D28 previu.
+  \item \textbf{Nada sobre o suporte dentro do bloco.} Quais
+    $\wav{\lev}{\tsl}$ são não nulos, e se o conjunto deles tem algum
+    significado, fica fora. A dimensão efetiva do Corolário~5 de E1.6 é uma
+    afirmação de taxa, não de recuperação de suporte, e continua sendo.
+  \item \textbf{O alvo limiarizado é $\PiJ\gcomp{\cv}{\md}$, não
+    $\gcomp{\cv}{\md}$.} A estatística vive na resolução $J_{n}$, e o viés do
+    sieve entra em $D_{n}$ pela terceira parcela de \eqref{eq:Dn}. Nas
+    resoluções que a regra $J_{n}$ prescreve para os $n$ do piloto essa
+    parcela \emph{domina} as outras duas, o que a conferência mede: a janela
+    do Lema~\ref{lem:sanduiche} chega a ser vazia enquanto o acerto observado
+    é 1, porque o viés encolhe todas as normas na mesma direção e não cria
+    falso positivo.
+  \item \textbf{$\sigma$ conhecido, $\pen$ determinístico, $\eps = 0$,
+    $p$ e $q$ fixos}, pelas mesmas razões de E1.5 e E1.6. Com $pq$ crescendo,
+    $\Delta \le \norm{v}_{2}$ continua valendo sem união sobre blocos, mas as
+    constantes de E1.3 e E1.4 carregam $pq$ e a janela estreita.
+  \item \textbf{A variante em grupos continua sem teoria} neste projeto
+    (Observação~\ref{rem:grupos}); a comparação numérica da conferência é
+    empírica e não sustenta enunciado.
+\end{itemize}
+
+\section{Conferência numérica}
+
+\texttt{check/06-selecao-limiar.R} (imprime \texttt{OK}; cerca de $7$~min
+com o padrão de $20$ réplicas). Cenários, desenho e estimador são os de
+\texttt{wafc/R/}, com $p = 3$, $q = 2$, Daublets de filtro $8$, \texttt{snr}
+$= 4$, \texttt{rescale = FALSE} (o regime $\eps = 0$ da teoria, D26) e a base
+avaliada por tabela fixa nas partes de simulação (D31), com avaliação exata
+na parte que mede a identidade de normas. As cinco partes e o que saiu em
+2026-09-20 estão em \texttt{docs/handoff-E1.7c.md}; os números que importam:
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Parte I, o Lema~\ref{lem:sanduiche}.} O sanduíche
+    \eqref{eq:sanduiche} e a janela de (iii) valem em $2000$ configurações
+    aleatórias de até $12$ blocos, com $21$ limiares em cada uma: zero
+    falhas nas duas afirmações. A configuração da Observação~\ref{rem:exata}
+    é construída e verificada: com $\sepmin = 2D$ as duas estatísticas
+    empatam em $D$ e nenhum dos $201$ limiares testados acerta.
+  \item \textbf{Parte II, a estatística.} Com \texttt{rescale = FALSE} e
+    avaliação exata da base, $\Nhat{\cv}{\md}$ calculada por quadratura e
+    $\norm{\thetahat_{\cv\md,\cdot}}_{2}$ coincidem nos seis blocos com erro
+    relativo máximo de $1{,}4\times10^{-9}$. Com a margem do código
+    ($\eps = 0{,}05$, \texttt{scale} $= 1{,}108$), a norma no intervalo
+    \emph{observado} é de $0{,}938$ a $0{,}998$ vezes a estatística do
+    código: a diferença é a energia que $\ghat{\cv}{\md}$ põe na margem.
+  \item \textbf{Parte III, a decomposição de $\Delta_{n}$.} Com
+    \texttt{cv.min}, a parcela de estimação vai de $0{,}184$ a $0{,}076$ no
+    cenário suave e de $0{,}409$ a $0{,}213$ no não homogêneo quando $n$ vai
+    de $250$ a $2000$, com inclinações log-log contra
+    $(\log n/n)^{\seff/(2\seff+1)}$ de $1{,}38$ e $1{,}56$: o erro realizado
+    cai \emph{mais rápido} que a cota, como em E1.6. A parcela de viés, em
+    $n = 2000$, é $0{,}033$ no suave e $0{,}635$ no não homogêneo, onde
+    \emph{domina} $\Delta_{n}$.
+  \item \textbf{Parte III, a janela e o acerto.} $\sepmin = 1$ nos dois
+    cenários por construção, mas a separação efetiva
+    $\min_{S}\lVert\PiJ\gcomp{\cv}{\md}\rVert$ é $0{,}999$ no suave e
+    $0{,}778$ no não homogêneo em $n = 2000$. A janela $\sepmin > 2\Delta_{n}$
+    existe em todas as células do cenário suave e em \emph{nenhuma} do não
+    homogêneo; ainda assim, $\Prob(\Shat = S)$ no melhor limiar da grade é
+    $1{,}00$ em todas as células com \texttt{cv.min} a partir de $n = 500$, e
+    a fração de réplicas em que \emph{algum} limiar acerta é $1{,}00$ (a
+    única exceção é $0{,}95$, em $n = 250$ no não homogêneo). É a assimetria
+    do Corolário~\ref{cor:limiar}(ii) contra (iii): o viés do sieve encolhe
+    todas as normas na mesma direção e não cria falso positivo.
+  \item \textbf{Parte III, a curva.} Em $n = 2000$ o platô de acerto é largo:
+    $\Prob(\Shat(t) = S) = 1$ para $t \in [0{,}062;\,0{,}590]$ no cenário
+    suave e $t \in [0{,}127;\,0{,}590]$ no não homogêneo. À esquerda do platô
+    entram os três blocos nulos, à direita saem os três ativos.
+  \item \textbf{Parte III, a regra da teoria.} O par $(J_{n},\pen_{n})$ do
+    Teorema~2 e do Corolário~2, com $\sigma$ conhecido, \emph{não} serve para
+    limiarizar nos $n$ do piloto: ele zera quase tudo, o melhor limiar é o
+    piso da grade ($0{,}002$), e em $n = 250$ no cenário não homogêneo o
+    acerto é $0$. É a mesma leitura pré-assintótica que E1.6 registrou em
+    taxa e E2.3 em sintonia, agora em seleção.
+  \item \textbf{Parte IV, a Hipótese~S medida.} Em $J = 4$ e $n = 1000$, onde
+    a parcela de viés é pequena, $\Delta_{n} \approx 0{,}10$ e quase não
+    depende de $\sepmin$. Fazendo $\sepmin$ percorrer $1$, $1/2$, $1/4$ e
+    $1/8$, a razão $\sepmin/\Delta_{n}$ cai de $9{,}00$ a $1{,}30$, a janela
+    $\sepmin > 2\Delta_{n}$ existe nos três primeiros e some no quarto, e o
+    acerto cai de $1{,}00$ a $0{,}85$. É a hipótese de separação vista
+    fechar.
+  \item \textbf{Parte V, contra a variante em grupos.} Em $n = 1000$,
+    $J = 4$, $10$ réplicas e as \emph{mesmas dobras}: o LASSO limiarizado
+    acerta a estrutura em $1{,}00$ das réplicas nos dois cenários com o
+    melhor limiar da grade, e em $1{,}00$ e $0{,}90$ com a regra invariante
+    de escala $t = 0{,}15\max_{\cv\md}\Nhat{\cv}{\md}$, que não é teoria e
+    serve só de ponto de partida para E2.4. O sparse group LASSO em
+    \texttt{lambda.min}, lido pelos blocos que ele zera, acerta em
+    \emph{zero} réplicas nos dois cenários. O RMSE fora da amostra é
+    $0{,}770$ contra $0{,}776$ no suave e $1{,}310$ contra $1{,}298$ no não
+    homogêneo, com $\sigma \approx 0{,}76$: a estrutura sai de graça em
+    predição. A comparação é empírica e não sustenta enunciado
+    (Observação~\ref{rem:grupos}); o que ela mostra é que a pergunta de E2.5
+    deixou de ser ``grupos ou nada''.
+\end{itemize}
+
+\section*{Referências}
+\sloppy
+
+Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item Bühlmann, P.\ e van de Geer, S. (2011). \emph{Statistics for
+    High-Dimensional Data}. Springer. (\texttt{buhlmann2011statistics},
+    verificada em L1.) Fonte do Teorema~1 de E1.5, que é tudo o que este
+    arquivo consome de LASSO. O tratamento do LASSO limiarizado está no
+    livro. \textsc{[verificar numeração da seção]}
+  \item van de Geer, S., Bühlmann, P.\ e Zhou, S. (2011). The adaptive and
+    the thresholded Lasso for potentially misspecified models (and a lower
+    bound for the Lasso). \emph{Electronic Journal of Statistics} 5.
+    \texttt{10.1214/11-EJS624}. Conferida no Crossref em 2026-09-20 (autores,
+    título, veículo, volume, ano e DOI); não está no \texttt{.bib} e o
+    intervalo de páginas não consta do registro
+    \textsc{[verificar páginas]}. Referência de forma do procedimento de
+    dois passos.
+  \item Huang, J., Horowitz, J.~L.\ e Wei, F. (2010). Variable selection in
+    nonparametric additive models. \emph{The Annals of Statistics} 38(4),
+    2282--2313. (\texttt{Huang-Horowitz-Wei-2010}, verificada em L1.)
+    Condição de separação em nível de componente no mesmo papel da
+    Hipótese~\ref{ass:sep}. \textsc{[verificar numeração do resultado]}
+  \item Wei, F., Huang, J.\ e Li, H. (2011). Variable selection and
+    estimation in high-dimensional varying-coefficient models.
+    \emph{Statistica Sinica} 21(4), 1515--1540.
+    (\texttt{Wei-Huang-Li-2011}, verificada em L1.) A rota da saída (a), que
+    este arquivo não segue.
+  \item Klopp, O.\ e Pensky, M. (2015). Sparse high-dimensional varying
+    coefficient model: nonasymptotic minimax study. \emph{The Annals of
+    Statistics} 43(3), 1273--1299. (\texttt{Klopp-Pensky-2015}, verificada em
+    L1.) O vizinho de E1.6; não trata de seleção de estrutura.
+\end{itemize}
+
+\end{document}

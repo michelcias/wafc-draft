@@ -93,6 +93,29 @@ Definir `Ŝ = {(ℓ, m) : ‖ĝ_{ℓm}‖_{L_2} > t_n}` e provar `P(Ŝ = S) → 
 | Responde ao referee | com teorema forte | com ressalva | com teorema condicional |
 | Depende de E2.5 escolher a variante em grupos | sim | não | não |
 
+## Resultado (2026-09-20)
+
+**(c) fechou** e é o Corolário 8 de `06-selecao-limiar.tex`: Lema 13
+determinístico mais a taxa do Corolário 4, sem condição de desenho nova. A
+separação entre **triagem** (eliminar bloco nulo, que não custa hipótese) e
+**recuperação** (não perder bloco ativo pequeno, que é onde a hipótese de
+separação é gasta) não estava prevista e é o que faz a limiarização acertar
+mesmo quando a janela do lema está vazia.
+
+**(a) ficou com veredito de escopo reduzido** (E1.7a, D32): a álgebra fecha
+— a condição em grupos não depende de `J` nem da base, só de `Ω` e do ângulo
+entre as componentes —, mas exige independência entre moduladoras e
+`E(XX'|U)` constante, que contraria D13, e o custo continua sendo o de E1.4
+mais E1.5. Se voltar depois de E2.5, volta pela rota de Wei & Huang (2010),
+que dispensa irrepresentabilidade e consome a condição de Riesz que E1.4 já
+provou.
+
+**O número que mudou a conversa:** com limiarização, o LASSO acerta a
+estrutura em 10 de 10 réplicas onde o sparse group LASSO, lido em
+`lambda.min`, acerta em 0 de 10, com a mesma predição.
+
+---
+
 ## Decisão do autor (2026-09-19, D28)
 
 **Tentar as duas.** (c) entra de qualquer forma, porque é barata e cobre o
