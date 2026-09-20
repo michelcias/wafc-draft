@@ -382,7 +382,7 @@ cache por unidade retomável, semente mestra única, `INSTRUCTIONS.md` e
 
 | Fator | Níveis |
 |---|---|
-| regularidade das `g_{ℓm}` | suaves (`s' = 3/2`); não homogêneas (`s' = 1/2`); mistura (D27) |
+| regularidade das `g_{ℓm}` | suaves (`s' = 3/2`); **suaves de curvatura desigual** (`C^∞`, dentro da hipótese de Xue & Yang, mas com escala variando: gaussiana estreita, `doppler` truncado — D30); não homogêneas (`s' = 1/2`); mistura (D27) |
 | esparsidade | todas ativas; metade nulas; esparso (`p q = 50`, 6 ativas) |
 | `n` | 250, 500, 1000, 2000 |
 | `(p, q)` | (2, 2), (4, 4), (10, 5) |
@@ -391,7 +391,11 @@ cache por unidade retomável, semente mestra única, `INSTRUCTIONS.md` e
 | métodos | WAFC (variante de E2.5); `mgcv`; B-splines + group LASSO; spline adaptativo (Wang, Jiang & Liu 2024); block LASSO de Klopp & Pensky no mesmo desenho; VCBART; linear oráculo (L2d) |
 | réplicas | fixadas pelo piloto (E4.3) |
 
-Métricas: ISE por função e total; RMSE de predição; suporte; tempo. A
+Métricas: ISE por função e total; RMSE de predição; suporte; tempo; **a
+predição e o ISE relatados em separado** (D30: ganhar em um e perder no
+outro é informação). Cada concorrente é sintonizado nos termos dele — o
+spline com número de nós por BIC, como em Xue & Yang, e o `mgcv` com REML —,
+senão um ganho do WAFC é sobre sintonia e não sobre método. A
 tabela principal do artigo é regularidade × método em `n = 1000`; a figura
 principal é `ĝ_{ℓm}` sobreposta à verdade em bumps e blocks, WAFC contra
 `mgcv`.
