@@ -767,6 +767,62 @@ Outros números da rodada:
   réplicas contra 3 das outras três juntas, e rodou com **15 réplicas**; as
   demais com as 50 do plano.
 
+### 2026-09-20: E6.1a fechada, com veredito negativo e uma lição que atinge E2.4
+
+**Nenhuma das três candidatas sustenta o argumento do artigo.** O detalhe
+está em [`aplicacao-candidatas.md`](aplicacao-candidatas.md); o essencial:
+
+| base | `n` | WAFC | `gam` `k = 10` | `gam` de **dimensão casada** |
+|---|---|---|---|---|
+| bike | 17 379 | 0.6219 | 0.6480 | **0.6209** |
+| beijing | 34 287 | 0.9010 | 0.9009 | **0.9007** |
+| housing | 20 640 | 0.2736 | 0.3151 | **0.2713** |
+
+**O ganho aparente era de dimensão, não de base.** Com `k = 10` o WAFC
+parecia ganhar de 6,6% a 15,2%; com `k = 2^J` ele empata, e o spline fica
+marginalmente à frente nas três. A maior diferença a favor do WAFC que
+sobreviveu a um desenho honesto foi **0,4%, numa partição só**.
+
+A estrutura diz o mesmo por outro caminho: a componente do WAFC é **duas
+vezes mais rugosa** que a do spline de mesma dimensão, com o **mesmo** erro
+de predição, e em bike e housing a energia por nível **não decai**
+(`ŝ'` mediano `−0.12` e `0.06`). Rugosidade que não paga em predição é ruído
+ajustado, não estrutura.
+
+**A lição que atinge E2.4 e E4, e que é maior que a tarefa.** A comparação
+com o spline tem de ser em **dimensão casada**, senão mede a coisa errada.
+E `wafc_fit_gam()` tem **`k = 10` como padrão**, que é o que o piloto usou:
+um spline de dimensão 10 contra um sieve com 31 funções por bloco em
+`J = 5`, ou 127 em `J = 7`. Portanto **a vitória do WAFC sobre o `gam` no
+cenário não homogêneo (1.006 a 1.178) é suspeita**, e a derrota no cenário
+suave (0.65 a 0.71) é, se algo, conservadora. Isso entra em E2.5 antes de
+qualquer veredito: é a segunda coisa, junto com a grade de `J`, que precisa
+ser remedida.
+
+- **`mgcv::bam` é duas ordens de grandeza mais rápido que `gam` nestes `n`**
+  (6,1 s contra 1453 s para oito suavizadores de `k = 23`). Um estudo que
+  sintonize o spline com `gam` vai, por custo, dar a ele base pequena demais
+  e medir a diferença errada. É acionável em E2.4b e em E4.2.
+- **Partição aleatória em série dependente inverte o veredito, e isso é
+  condição de validade, não refinamento.** Em bike, sob partição aleatória a
+  CV pedia `J = 8` e o WAFC parecia ganhar 0,8%; retendo **semanas
+  inteiras**, a curva ganha mínimo interior em `J = 4` e a diferença cai a
+  0,4%. O ganho vinha de o componente fino no índice do dia carregar o nível
+  do dia do treino para o teste. Vale para E6 e para qualquer tabela de E5b
+  com dado real estruturado no tempo ou no espaço.
+- **Moduladora discreta com poucos valores é incompatível com o argumento:**
+  com `hr` em 24 valores, o bloco tem posto no máximo 23 e não há onde
+  exibir regularidade heterogênea, por maior que seja `J`.
+- **O que a próxima busca tem de exigir antes de baixar dado:** razão
+  substantiva, documentada na literatura da área, para o efeito de `X_ℓ`
+  **saltar** num valor conhecido de `U_m`. As famílias que têm isso: limiar
+  administrativo (faixa de imposto, nota de corte, elegibilidade), limiar
+  regulatório em dose-resposta, e série com quebra datada.
+- **Dois diagnósticos que E4 vai querer:** a energia por nível com reajuste
+  sobre o suporte selecionado, e o índice de localização. Eles separam
+  "ajustou estrutura" de "ajustou ruído" **sem precisar da verdade**, que é o
+  que uma aplicação real nunca tem.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -840,9 +896,18 @@ Ordenadas pelo que bloqueia mais.
 
 1. **~~D5 e D8~~ ratificadas em 2026-09-19.** O alvo é a *Statistica
    Sinica* e o método se chama WAFC; **E5a está destravada**.
-2. **Aplicação (E6.1):** o autor tem uma base em mente? Os candidatos de
-   `plano-projeto.md` E6.1 são genéricos. Decidir cedo evita desenhar a
-   simulação longe do caso real.
+2. **Aplicação (E6.1), agora com sondagem feita e negativa.** Duas saídas,
+   e a escolha é do autor: **(a)** abrir uma quarta rodada de busca com o
+   critério do §3.3 de E6.1a (salto documentado na literatura da área:
+   limiar administrativo, limiar regulatório, quebra datada), o que atrasa
+   E6; **(b)** aceitar que a aplicação **empate** com o spline, escolher a
+   mais interpretável das três e mover o peso do artigo para a teoria de
+   adaptação e para a simulação. A (b) é mais rápida e mais honesta, e
+   enfraquece o "método + teoria + simulação + aplicação" que a revista
+   espera. Se for (b), housing é a mais forte no papel de aplicação neutra
+   (maior `R²`, componentes legíveis, um degrau na longitude da área da
+   baía), **mas tem licença não declarada no StatLib**, o que colide com a
+   exigência de reprodutibilidade; bike e beijing têm CC BY 4.0 e DOI.
 3. **~~Sparse group LASSO em `wafc()`~~ respondida por E2.2:** entrou como
    opção, com o número de seleção de estrutura (3 de 3 blocos nulos contra
    0 do LASSO) e o preço em predição. Qual das duas é a principal continua
@@ -868,32 +933,37 @@ Ordenadas pelo que bloqueia mais.
 7. **~~Posicionamento diante de Klopp & Pensky~~ decidido (D18):**
    extensão deles. O parágrafo aprovado e a lista de contribuições reescrita
    estão em `alvo-revista.md` §4, e L2a está cumprida.
-8. **P1, a grade de `J`** (a mais importante desta rodada): `cv.wafc()`
+8. **A comparação com o `gam` foi em dimensão casada?** Não: o piloto usou
+   o padrão `k = 10` de `wafc_fit_gam()`, e E6.1a mostrou que é isso que
+   separa "o WAFC ganha 6 a 15%" de "empata". **E2.5 tem de remedir o
+   cenário não homogêneo com `k` casado ao sieve** (e com `bam`, que torna
+   isso viável), junto com a grade larga de P1.
+9. **P1, a grade de `J`** (a mais importante desta rodada): `cv.wafc()`
    passa a ir até `⌈log_2 n⌉` em vez de `⌈log_2 n/2⌉`? A evidência é forte
    (17,6% de erro e 32% de ISE em 50 de 50 réplicas no cenário não
    homogêneo, e nada no suave), e o custo é tempo. É uma linha em
    `wafc_J_grid()`. **E2.5 precisa repetir `competitors` com ela antes de
    fixar o veredito.**
-9. **P2, a margem padrão:** `wafc_eps_periodic` passa de `0.05` para `0`? A
+10. **P2, a margem padrão:** `wafc_eps_periodic` passa de `0.05` para `0`? A
    tabela de E2.4 mostra o `0.05` dominado, e `eps = 0` é onde a teoria
    enuncia (D26). Uma linha em `design.R`.
-10. **Calibração do limiar `t_n`** (nova, de E1.7c): o Corolário 8 é
+11. **Calibração do limiar `t_n`** (nova, de E1.7c): o Corolário 8 é
    explícito em que `t_n` depende de constantes desconhecidas, e a regra
    grosseira `t = 0.15 max_{ℓm} ‖ĝ_{ℓm}‖` acertou 1.00 e 0.90 nos dois
    cenários em `n = 1000`. Calibrar é de E2.4/E2.5, com a curva de acerto
    contra o limiar como instrumento.
-11. **O cenário `smooth` de `dgp.R` fica como está?** `⟨sine, cubic⟩ = 0.969`
+12. **O cenário `smooth` de `dgp.R` fica como está?** `⟨sine, cubic⟩ = 0.969`
    (E1.7a): as duas componentes de `β_1` são quase proporcionais, o pior caso
    para medida de estrutura. Trocar o `cubic` por algo ortogonal ao `sine`
    tornaria o cenário menos adversário gratuito; manter deixa a medida
    conservadora. Decide-se junto com a componente suave de curvatura desigual
    que D30 já pediu.
-12. **(BD) vira hipótese nomeada?** Se a observação de E1.7a entrar no artigo,
+13. **(BD) vira hipótese nomeada?** Se a observação de E1.7a entrar no artigo,
    a independência entre moduladoras que ela exige é mais forte que D11 e
    precisa de nome e de uma frase dizendo o que exclui.
-13. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
+14. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
-14. **Edições acumuladas para `k = 2`** (decidido: não tocar em `ms_1`
+15. **Edições acumuladas para `k = 2`** (decidido: não tocar em `ms_1`
    avulso). Entram de uma vez, quando E1.3b e L4 fecharem: a frase de §4.3
    sobre a regra teórica, que vira número com o que E2.3 mediu (`λ_n` de 7 a
    13 vezes o `λ` ótimo; sensível a `s'`, não sistematicamente acima); as
@@ -1076,6 +1146,7 @@ Ordenadas pelo que bloqueia mais.
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
 | 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
+| 2026-09-20 | E6.1a fechada com veredito negativo: nenhuma das três bases sustenta o argumento, e o ganho aparente sobre o spline era de dimensão, não de base — o que põe em dúvida a comparação com o `gam` no piloto |
 | 2026-09-20 | E2.4 fechada: a grade de `J` do `cv.wall()` trunca o sieve no ótimo, e alargá-la corta 17,6% do erro e 32% do ISE no cenário não homogêneo, invertendo o veredito contra o VCBART; a margem `0.05` é dominada por `eps = 0` |
 | 2026-09-20 | E1.7c fecha a seleção de estrutura com teorema (Lema 13, Corolário 8) e o LASSO limiarizado vira 10 de 10 contra 0 de 10 da variante em grupos; E1.7a dá veredito de escopo reduzido para a saída (a); E1.4c traduz o `03` |
 | 2026-09-19 | E1.8 fechada e integrada: a rota do intervalo está escrita e é a resposta a quem pedir teoria sem periodicidade; o cruzamento da margem virou teorema, com as faixas separadas por um nível exato |
