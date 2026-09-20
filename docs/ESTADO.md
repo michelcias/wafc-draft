@@ -719,12 +719,11 @@ Ordenadas pelo que bloqueia mais.
 4. **~~Centralização das componentes~~ decidida (D22):** Lebesgue,
    `∫_0^1 g_{ℓm} = 0`. O `notacao.md` ganhou a §7 com a emenda e com o que
    as fontes fazem; o `ms_1.tex` já estava assim.
-5. **Periodicidade no enunciado:** (a) hipótese em forma de sequência na
-   base periodizada, como o WALL, com a proposição do custo da periodização
-   como justificativa do reescalonamento e da opção `interval`; (b) teoria
-   na base do intervalo (CDV), sem periodicidade, pagando `p q (2^{j_0} − 1)`
-   parâmetros não penalizados; (c) as duas, teoria em (a) e `boundary` como
-   opção do código. Proposta de E1.3: **(c)**, que é o que o `wall()` faz.
+5. **~~Periodicidade no enunciado~~ resolvida pelo caminho, e fecho aqui:**
+   a proposta (c) de E1.3 é o que está em vigor desde D23 e D26 — teoria na
+   base periodizada com `eps = 0`, `boundary` como opção do código —, o
+   `ms_1.tex` já foi escrito assim, e E1.8 escreveu a alternativa (b) por
+   inteiro, para o caso de ser cobrada.
 6. **~~`boundary = "interval"` e o tipo de margem~~ decididos (D23, E1.3b,
    E2.1b).** A margem é **fixa**, porque só a fixa compra a taxa cheia, e já
    está implementada. O que resta é estreito e é de E2.4: **qual valor
