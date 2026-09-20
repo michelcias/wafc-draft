@@ -707,6 +707,66 @@ páginas, com `babel` acrescentado e uma citação corrigida (a frase atribuída
 ao `proposta-metodo.md` era "no concurvity", e o documento diz "não
 colinearidade entre moduladoras").
 
+### 2026-09-20: E2.4 fechada, e o piloto achou um erro de grade
+
+Conferido aqui: **544 testes passam** (eram 420), `01-smoke.R` imprime `OK`,
+e uma passagem curta de `04-pilot.R` reproduz o padrão da tabela. O piloto
+completo levou ~3 h em 12 núcleos e não pôde ser repetido aqui.
+
+**O achado que decide E2.5: a grade de `J` herdada do `cv.wall()` trunca o
+sieve no ótimo.** O oráculo da grade escolhe o `J` do **topo** da grade em
+100% das réplicas de toda célula com componente. Alargando de
+`⌈log_2 n/2⌉` para `2:8`, no cenário não homogêneo em `n = 1000`, o erro de
+predição cai **17,6%** e o ISE **32%**, em **50 de 50 réplicas**; no cenário
+suave não muda nada, nem o `J`, nem o `λ`. A razão está em E1.3: `bumps` só
+resolve de `J = 9`. O preço é tempo (`5,3×` a `5,6×`).
+
+**Isso inverte o veredito contra os concorrentes.** Com a grade curta, o
+WAFC **não ganha** o cenário (b): fica atrás do block LASSO de Klopp &
+Pensky (0.96 a 0.98 em toda a faixa) e o **VCBART ganha dele em `n = 1000`
+em 50 de 50 réplicas** (0.899). Com a grade profunda, o WAFC passa a
+**0.839** contra `0.910` do VCBART, `0.997` do `klopp` e `1.189` do `gam`,
+isto é, 7,8% melhor que o melhor concorrente. **E2.5 tem de repetir a parte
+`competitors` com a grade larga antes de decidir**: o `jgrid` mediu o WAFC
+contra si mesmo.
+
+**No cenário (a) o `gam` ganha do WAFC por 2,2 a 2,6 em ISE** (1,41 a 1,54
+em `rmse_f`), acima do fator 1,5 que E2.5 propõe, e a grade profunda não
+muda isso. Mas o cenário suave medido é o **antigo**, de curvatura uniforme,
+que é o melhor caso do spline penalizado; a componente `C^∞` de **curvatura
+desigual** que D30 pede não existe em `dgp.R`, e é ela que testaria a
+afirmação de D30. Ordem proposta e que eu endosso: acrescentar a componente,
+repetir o cenário (a) com ela e com a grade larga, **e só então** fixar o
+fator do critério de saída.
+
+Outros números da rodada:
+
+- **O block LASSO de K&P, no mesmo desenho, prediz melhor que o LASSO puro
+  no cenário não homogêneo** (0.96 a 0.98) e pior no nulo (1.30 a 1.50),
+  onde penalizar os `c_ℓ` os encolhe. É a resposta numérica à pergunta que
+  D18 convida, e o artigo tem de escrevê-la.
+- **O QUT domina a regra da teoria uniformemente** e dispensa `σ` e `s'`;
+  nenhuma das duas serve como regra de predição (custo 1,3 a 5,0). Mas o
+  QUT é a **única regra que nunca liga um bloco falso**, em nenhuma célula:
+  é regra de estrutura, não de predição.
+- **D20 se sustenta:** `cv.min` custa 1.00 a 1.03 fora do cenário nulo e é a
+  melhor regra de predição em todas as células. E **nenhuma variante
+  seleciona estrutura com `cv.min`** — o que confirma E2.3 e é exatamente o
+  que a limiarização de E1.7c resolve.
+- **O padrão `wafc_eps_periodic = 0.05` é dominado:** custa 12% a 15% no
+  cenário suave (perdendo em 95% a 100% das réplicas) e não ganha nada no
+  não homogêneo (0.992 e 0.994). `eps = 0` ganha de todas as margens no
+  suave, perde no máximo 2,4% no não homogêneo, e é o único valor em que
+  `λ_min(G_eps) = 1`, isto é, em que a condição de E1.4 vale com a constante
+  que a teoria usa.
+- **`J = 1` não entra na grade:** escolhido em 0 de 50 réplicas em toda
+  célula com componente.
+- **D31 não muda conclusão nenhuma e vale 27% do tempo:** mesmo `(J, λ)`,
+  `mse` igual na oitava casa, `1.11e-05` de diferença máxima no desenho.
+- **Orçamento medido:** a célula `mixed` custa ~23 horas-núcleo para 50
+  réplicas contra 3 das outras três juntas, e rodou com **15 réplicas**; as
+  demais com as 50 do plano.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -808,39 +868,48 @@ Ordenadas pelo que bloqueia mais.
 7. **~~Posicionamento diante de Klopp & Pensky~~ decidido (D18):**
    extensão deles. O parágrafo aprovado e a lista de contribuições reescrita
    estão em `alvo-revista.md` §4, e L2a está cumprida.
-8. **Calibração do limiar `t_n`** (nova, de E1.7c): o Corolário 8 é
+8. **P1, a grade de `J`** (a mais importante desta rodada): `cv.wafc()`
+   passa a ir até `⌈log_2 n⌉` em vez de `⌈log_2 n/2⌉`? A evidência é forte
+   (17,6% de erro e 32% de ISE em 50 de 50 réplicas no cenário não
+   homogêneo, e nada no suave), e o custo é tempo. É uma linha em
+   `wafc_J_grid()`. **E2.5 precisa repetir `competitors` com ela antes de
+   fixar o veredito.**
+9. **P2, a margem padrão:** `wafc_eps_periodic` passa de `0.05` para `0`? A
+   tabela de E2.4 mostra o `0.05` dominado, e `eps = 0` é onde a teoria
+   enuncia (D26). Uma linha em `design.R`.
+10. **Calibração do limiar `t_n`** (nova, de E1.7c): o Corolário 8 é
    explícito em que `t_n` depende de constantes desconhecidas, e a regra
    grosseira `t = 0.15 max_{ℓm} ‖ĝ_{ℓm}‖` acertou 1.00 e 0.90 nos dois
    cenários em `n = 1000`. Calibrar é de E2.4/E2.5, com a curva de acerto
    contra o limiar como instrumento.
-9. **O cenário `smooth` de `dgp.R` fica como está?** `⟨sine, cubic⟩ = 0.969`
+11. **O cenário `smooth` de `dgp.R` fica como está?** `⟨sine, cubic⟩ = 0.969`
    (E1.7a): as duas componentes de `β_1` são quase proporcionais, o pior caso
    para medida de estrutura. Trocar o `cubic` por algo ortogonal ao `sine`
    tornaria o cenário menos adversário gratuito; manter deixa a medida
    conservadora. Decide-se junto com a componente suave de curvatura desigual
    que D30 já pediu.
-10. **(BD) vira hipótese nomeada?** Se a observação de E1.7a entrar no artigo,
+12. **(BD) vira hipótese nomeada?** Se a observação de E1.7a entrar no artigo,
    a independência entre moduladoras que ela exige é mais forte que D11 e
    precisa de nome e de uma frase dizendo o que exclui.
-11. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
+13. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
-12. **Edições acumuladas para `k = 2`** (decidido: não tocar em `ms_1`
+14. **Edições acumuladas para `k = 2`** (decidido: não tocar em `ms_1`
    avulso). Entram de uma vez, quando E1.3b e L4 fecharem: a frase de §4.3
    sobre a regra teórica, que vira número com o que E2.3 mediu (`λ_n` de 7 a
    13 vezes o `λ` ótimo; sensível a `s'`, não sistematicamente acima); as
    citações de software que L4 trouxer; a observação de extensão de E1.3b; e
    a frase de reprodutibilidade no resumo ou na discussão.
-13. **~~Idioma do código e das derivações~~ decidido (D29):** inglês no
+15. **~~Idioma do código e das derivações~~ decidido (D29):** inglês no
    código, português nas derivações. O `macros.tex` já imprime os ambientes
    em português e os quatro arquivos em português foram recompilados. Falta
    alinhar o `03-desenho-produtos.tex`, que está em inglês e hoje imprime
    cabeçalhos em português; é tradução, catalogada como E1.4c e de
    prioridade baixa.
-14. **~~`rescale = TRUE` como padrão~~ decidido (D23):** continua padrão, e
+16. **~~`rescale = TRUE` como padrão~~ decidido (D23):** continua padrão, e
    agora com razão declarada, não herdada. O deslocamento de centralização
    que ele causa é um nível, e a leitura correta é que a componente é
    identificada no suporte.
-15. **~~Quem escolhe `J`~~ não era pergunta:** o plano sempre disse
+17. **~~Quem escolhe `J`~~ não era pergunta:** o plano sempre disse
    `cv.wafc()` sobre `(J, λ)`, como o `cv.wall()` (`plano-projeto.md` E2.3);
    o handoff de E1.6 leu o plano como se ele só falasse de `λ`. O que fica
    de E1.6 é **matéria de medição para E2.3**, não bloqueio: a regra teórica
@@ -848,7 +917,7 @@ Ordenadas pelo que bloqueia mais.
    realizado em toda a varredura, ao custo de 5% a 11% de erro, e as
    escolhas de `J_n` e de `c` dependem de `s'` e `τ`, que ninguém conhece.
    E2.3 compara a regra teórica com a validação cruzada.
-16. **~~A compatibilidade sobre as direções estimáveis~~ resolvida por
+18. **~~A compatibilidade sobre as direções estimáveis~~ resolvida por
    decisão de rumo (2026-09-19), e o caminho está em D26.** Registro do que
    se aprendeu, porque é fácil reabrir por engano:
 
@@ -873,7 +942,7 @@ Ordenadas pelo que bloqueia mais.
      menos margem é necessária. É implicitamente o que motiva a construção
      de Cohen, Daubechies e Vial, que corrige as wavelets da borda em vez
      de negociar a largura da faixa.
-17. **Cota inferior, registrada como E1.9 no plano** (mais visível depois de
+19. **Cota inferior, registrada como E1.9 no plano** (mais visível depois de
    D18, porque o artigo se declara extensão de quem tem a dele). Não existe
    aqui, e Klopp & Pensky têm a deles para `q = 1` com `X ⊥ U`. **A decisão
    de abrir fica para depois dos resultados de E2.5 e E4**, por escolha do
@@ -884,11 +953,11 @@ Ordenadas pelo que bloqueia mais.
    `05-taxas.tex` faz hoje; (b) abrir E1.8 e construir a cota para `q ≥ 2`,
    trabalho do porte de E1.4 mais E1.5; (c) restringir a afirmação de
    otimalidade a `q = 1`. O referee da SS pode cobrar a (b).
-18. **`p` crescente com `n`.** A teoria fixa `p` e `q`. Se a aplicação de E6
+20. **`p` crescente com `n`.** A teoria fixa `p` e `q`. Se a aplicação de E6
    tiver `p` grande, o termo `σ² p / n` deixa de ser de ordem menor e a
    janela do Corolário 5 estreita; mudar isso mexe em E1.3 e E1.4, não só em
    E1.6.
-19. **Bibliografia, pontos de L3** (nenhum bloqueia): a identidade
+21. **Bibliografia, pontos de L3** (nenhum bloqueia): a identidade
    `Σ_l φ(x − l) ≡ 1`, usada na prova do Lema 1(i) de E1.2, ficou **sem
    âncora** — a expressão não ocorre em Daubechies (1992), a quem estava
    atribuída, e os candidatos a conferir são Härdle et al. (1998, cap. 5) e
@@ -899,10 +968,10 @@ Ordenadas pelo que bloqueia mais.
    o Crossref diz "Alexander" (uniformizar nos dois repositórios ou deixar?).
    Proposta: abrir uma frente curta só para a âncora da partição da unidade
    quando E5a precisar dela.
-20. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
+22. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
    sem contar, medir no fim e então decidir entre resumir mais e mandar
    coisa ao suplemento.
-21. **~~A rota do intervalo~~ escrita e fechada em E1.8** (2026-09-19),
+23. **~~A rota do intervalo~~ escrita e fechada em E1.8** (2026-09-19),
    em `derivations/07-rota-intervalo.tex`. **É ela a resposta** a um referee
    que peça teoria sem periodicidade, e não a rota (ii) de D26, que continua
    sem existir. Levar a rota ao manuscrito é reescrever as provas de E1.3 a
@@ -920,13 +989,13 @@ Ordenadas pelo que bloqueia mais.
    com filtro 20) e o `wbasis()` exige `j_0 ≳ log_2(5L)`, o que tira os `J`
    pequenos da grade; e a cota pontual `Σ ψ²_{jk} ≤ C_ψ 2^J`, que E1.4 usa,
    foi conferida na base periódica e **não** na CDV.
-22. **~~Qual `s'` cada cenário declara~~ confirmado pelo autor (D27):**
+24. **~~Qual `s'` cada cenário declara~~ confirmado pelo autor (D27):**
    `s' = 3/2` no `smooth` e `s' = 1/2` no não homogêneo, que é o que E2.3 já
    tinha usado. O `3/2` vale porque a teoria é enunciada em `eps = 0`
    (D26), onde a quina da cúbica na extensão periódica é real; com margem e
    extensão o mesmo cenário leria `s' = 4`, e é uma das coisas que a rota do
    intervalo (E1.8) tem de deixar escritas.
-23. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
+25. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
    pequeno e vai junto com `k = 2`: copiar as seis chaves novas para
    `references_1.bib` e citá-las onde L4 propôs (o lasso na Introduction e
    na seção do estimador; `glmnet` e R na computação; `WaveBased` onde as
@@ -940,7 +1009,7 @@ Ordenadas pelo que bloqueia mais.
    Tibshirani (1996), Friedman, Hastie & Tibshirani (2010), a citação do R,
    o `sparsegl`, e o Johnstone de modelos de sequência. Frente curta nos
    moldes de L1 e L3, antes de E5b.
-24. **Pendências de acabamento do manuscrito**, todas para a semana da
+26. **Pendências de acabamento do manuscrito**, todas para a semana da
    submissão e nenhuma bloqueando (estão no checklist de `alvo-revista.md`
    §6): (a) o `chicago.bst` do template abrevia em "et al." a partir de três
    autores, contra a §4 das instruções, e a correção é no `.bst`, não no
@@ -949,7 +1018,7 @@ Ordenadas pelo que bloqueia mais.
    entre bloco copiado e arquivo de origem; (c) autores, afiliações, e-mails
    na última página e agradecimentos, que hoje são os marcadores do
    template.
-25. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+27. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
@@ -1007,6 +1076,7 @@ Ordenadas pelo que bloqueia mais.
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
 | 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
+| 2026-09-20 | E2.4 fechada: a grade de `J` do `cv.wall()` trunca o sieve no ótimo, e alargá-la corta 17,6% do erro e 32% do ISE no cenário não homogêneo, invertendo o veredito contra o VCBART; a margem `0.05` é dominada por `eps = 0` |
 | 2026-09-20 | E1.7c fecha a seleção de estrutura com teorema (Lema 13, Corolário 8) e o LASSO limiarizado vira 10 de 10 contra 0 de 10 da variante em grupos; E1.7a dá veredito de escopo reduzido para a saída (a); E1.4c traduz o `03` |
 | 2026-09-19 | E1.8 fechada e integrada: a rota do intervalo está escrita e é a resposta a quem pedir teoria sem periodicidade; o cruzamento da margem virou teorema, com as faixas separadas por um nível exato |
 | 2026-09-19 | E1.3b e E2.1b fechadas e integradas: a extensão fecha e o preço da margem é `eps^{−(s−1/π)}`, exato; só margem fixa compra a taxa, e ela degenera a Gram restrita a partir de `2^J ≥ (L−1)/(2eps)`, o que deixa a taxa sob a Hipótese 5 conjectural |

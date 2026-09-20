@@ -18,14 +18,32 @@
 ##                eps = a (L-1) 2^(-J); it is what fixes wafc_eps_periodic,
 ##                provisional at 0.05;
 ##   j1           whether the grid of cv.wafc() should start at J = 1, now
-##                that the margin no longer depends on J (step E2.1b).
+##                that the margin no longer depends on J (step E2.1b);
+##   jgrid        what the grid of cv.wafc() costs at the other end. The
+##                part 'lambda' found the oracle of the grid sitting on the
+##                top of it in every replicate of every cell that has
+##                components to resolve, and E1.3 measured that the rate
+##                2^{-Js'} of bumps only appears from J = 9. This part
+##                cross-validates on 2:Jmax and on a grid twice as deep,
+##                and reads what the extra levels buy and cost.
 ##
 ## 'ns' and 'cells' are comma separated and restrict the sweep, which is
 ## how a part is rerun on one cell without rerunning the rest.
 ##
 ## Default: 50 replicates, every part, as many cores as the machine has
-## minus two. The two parts that answer a question about the code rather
-## than about the method, 'margin' and 'j1', are capped at 20 replicates:
+## minus two, with one exception that is measured and not guessed. The cell
+## "mixed" has p q = 16 blocks and up to 500 columns, and the cross-
+## validation of the WAFC over (J, lambda) costs there what a whole other
+## cell costs: at n = 250 one replicate of it spends 71.6 s on the sparse
+## group LASSO and 28.7 s on the LASSO, against 4.5 s on the B-spline group
+## LASSO and 6.9 s on the block LASSO, and about 27 minutes of processor
+## over the three sample sizes. Fifty replicates of that cell would be 23
+## processor-hours, against 3 for the other three together, so it carries
+## its own budget, the 'reps' field of the list below. The two cells that
+## carry the verdict of step E2.5 keep the 50 the plan asks for.
+##
+## The two parts that answer a question about the code rather than about
+## the method, 'margin' and 'j1', are capped at 20 replicates:
 ## what they measure is a ranking of margins and a frequency of selection,
 ## and 20 paired replicates settle both well inside the resolution of the
 ## decision they feed. The parts that resample write one RDS each into
@@ -48,12 +66,27 @@ R <- if (length(args) >= 1L && nzchar(args[1L])) as.integer(args[1L]) else 50L
 parts <- if (length(args) >= 2L && nzchar(args[2L])) {
   strsplit(args[2L], ",", fixed = TRUE)[[1L]]
 } else c("competitors", "lambda", "margin", "j1")
-if (identical(parts, "all")) parts <- c("competitors", "lambda", "margin", "j1")
+if (identical(parts, "all")) {
+  parts <- c("competitors", "lambda", "margin", "j1", "jgrid")
+}
 ncores <- if (length(args) >= 3L && nzchar(args[3L])) as.integer(args[3L]) else {
   max(1L, parallel::detectCores() - 2L)
 }
 out_dir <- Sys.getenv("WAFC_OUT", ".")
 seed0 <- 20260919L
+
+## Decision D31: in repeated numerical work the basis is fixed and evaluated
+## by table, built once, and not by the Daubechies-Lagarias algorithm at
+## every fit. The rule use.table = "auto" of wafc_design() only fires at
+## n q >= 2000 L, that is n q >= 16000 with the filter of size 8, so it
+## never fires at the sample sizes of this pilot: leaving it to decide
+## means paying the exact evaluation over the whole sweep. The table is
+## built here and passed to every design the script builds from scratch;
+## a design built with spec = takes it from the spec. The interpolation
+## error is 3.1e-06 (step E2.1), which is why the exception of D31, the
+## checks of derivations/check/, does not apply here.
+wafc_pilot_table <- WaveBased::wtable(family = "Daublets", filter.size = 8L,
+                                      prec.wavelet = 30L, check = FALSE)
 n_test <- 2000L
 n_grid <- 256L
 ns <- if (length(args) >= 4L && nzchar(args[4L])) {
@@ -84,7 +117,8 @@ cells <- list(
   list(name = "smooth", scenario = "smooth", p = 3L, q = 2L, snr = 4),
   list(name = "inhomogeneous", scenario = "inhomogeneous", p = 3L, q = 2L,
        snr = 3),
-  list(name = "mixed", scenario = "inhomogeneous", p = 4L, q = 4L, snr = 3),
+  list(name = "mixed", scenario = "inhomogeneous", p = 4L, q = 4L, snr = 3,
+       reps = 15L),
   list(name = "null", scenario = "null", p = 3L, q = 2L, sigma = 0.62)
 )
 
@@ -205,7 +239,8 @@ run_competitors <- function(cell, n, r) {
   for (pen in c("lasso", "sglasso")) {
     t0 <- proc.time()[["elapsed"]]
     cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], penalty = pen,
-                      foldid = foldid), silent = TRUE)
+                      foldid = foldid, wavelet.table = wafc_pilot_table),
+              silent = TRUE)
     if (inherits(cv, "try-error")) next
     el <- proc.time()[["elapsed"]] - t0
     f <- cv[["wafc.fit"]]
@@ -227,7 +262,8 @@ run_competitors <- function(cell, n, r) {
   for (mth in c("gam", "bsgl", "klopp", "aspline", "vcbart", "linear",
                 "oracle")) {
     f <- try(wafc_competitor(mth, dgp[["x"]], dgp[["u"]], dgp[["y"]],
-                             active = active, foldid = foldid), silent = TRUE)
+                             active = active, foldid = foldid,
+                             wavelet.table = wafc_pilot_table), silent = TRUE)
     if (inherits(f, "try-error")) next
     gh <- wafc_grid_components(f, grid)
     rows[[length(rows) + 1L]] <- one_row(
@@ -288,8 +324,8 @@ run_lambda <- function(cell, n, r) {
   for (rule in c("cv.min", "cv.1se", "bic", "ebic", "theory")) {
     t0 <- proc.time()[["elapsed"]]
     tn <- try(wafc_tune(dgp[["x"]], dgp[["u"]], dgp[["y"]], rule = rule,
-                        foldid = foldid, s = sp, sigma = dgp[["sigma"]]),
-              silent = TRUE)
+                        foldid = foldid, s = sp, sigma = dgp[["sigma"]],
+                        wavelet.table = wafc_pilot_table), silent = TRUE)
     if (inherits(tn, "try-error")) next
     el <- proc.time()[["elapsed"]] - t0
     rows[[length(rows) + 1L]] <- record(rule, tn[["fit"]], tn[["lambda"]], el,
@@ -299,8 +335,8 @@ run_lambda <- function(cell, n, r) {
   ## QUT: the resolution is not part of the rule, so it is taken from the
   ## same cross-validation the other rules use, and only lambda changes.
   t0 <- proc.time()[["elapsed"]]
-  cvq <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], foldid = foldid),
-             silent = TRUE)
+  cvq <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], foldid = foldid,
+                     wavelet.table = wafc_pilot_table), silent = TRUE)
   if (!inherits(cvq, "try-error")) {
     fq <- cvq[["wafc.fit"]]
     lq <- wafc_lambda_qut(fq[["design"]], dgp[["y"]], nsim = 200L,
@@ -315,7 +351,8 @@ run_lambda <- function(cell, n, r) {
   t0 <- proc.time()[["elapsed"]]
   best <- NULL
   for (Ji in wafc_J_grid(NULL, n)) {
-    fj <- wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = Ji)
+    fj <- wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = Ji,
+               wavelet.table = wafc_pilot_table)
     dd <- designs(fj)
     cfj <- wafc_raw_coef(fj)
     fh <- sweep(as.matrix(dd[["test"]][["Z"]] %*% cfj[-1L, , drop = FALSE]),
@@ -344,6 +381,8 @@ run_lambda <- function(cell, n, r) {
 ## check script is not a library.
 gram_restricted <- function(J, eps, filter.size = 8L, ngrid = 2^14) {
   uG <- (seq_len(ngrid) - 0.5) / ngrid
+  ## exact evaluation here, and not the table of D31: this is the
+  ## exception of that decision, a quantity read down to 1e-12
   W <- WaveBased::wbasis(uG, j0 = 0L, J = J, family = "Daublets",
                          filter.size = filter.size)
   idx <- which(uG >= eps & uG <= 1 - eps)
@@ -382,8 +421,8 @@ run_margin_fit <- function(cell, n, r) {
     for (en in names(eg)) {
       e <- eg[[en]]
       if (e >= 0.5) next
-      fit <- try(wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = J, eps = e),
-                 silent = TRUE)
+      fit <- try(wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = J, eps = e,
+                      wavelet.table = wafc_pilot_table), silent = TRUE)
       if (inherits(fit, "try-error")) next
       z <- wafc_cv_design(fit[["design"]], dgp[["y"]], fit, foldid,
                           function(v) v^2, "lasso")
@@ -429,7 +468,8 @@ run_j1 <- function(cell, n, r) {
   for (lo in 1:2) {
     t0 <- proc.time()[["elapsed"]]
     cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = lo:Jmax,
-                      foldid = foldid), silent = TRUE)
+                      foldid = foldid, wavelet.table = wafc_pilot_table),
+              silent = TRUE)
     if (inherits(cv, "try-error")) next
     el <- proc.time()[["elapsed"]] - t0
     f <- cv[["wafc.fit"]]
@@ -447,6 +487,56 @@ run_j1 <- function(cell, n, r) {
 }
 
 ## ---------------------------------------------------------------------------
+## Part "jgrid"
+## ---------------------------------------------------------------------------
+
+## The grid of cv.wall, 2:ceiling(log2(n)/2), against a grid that goes on
+## to 'deep' levels. The question is not academic: the oracle of the grid
+## of the part 'lambda' is at the top of the short grid in every replicate
+## of every cell with components, so the short grid is truncated exactly
+## where the choice is being made, and the resolution E1.3 says the
+## inhomogeneous components need is above it.
+run_jgrid <- function(cell, n, r, deep = 8L) {
+  seed <- seed0 + 600000L +
+    10000L * match(cell[["name"]], vapply(cells, `[[`, "", "name")) +
+    1000L * match(n, ns) + r
+  dgp <- draw_cell(cell, n, seed)
+  test <- test_for(cell, dgp, seed)
+  p <- cell[["p"]]
+  grid <- grid_of(dgp, n_grid)
+  active <- nzchar(dgp[["structure"]])
+  set.seed(seed + 77L)
+  foldid <- sample(rep_len(1:10, n))
+  Jshort <- max(wafc_J_grid(NULL, n))
+  rows <- list()
+  for (lab in c("short", "deep")) {
+    Jtop <- if (lab == "short") Jshort else deep
+    t0 <- proc.time()[["elapsed"]]
+    cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = 2:Jtop,
+                      foldid = foldid, wavelet.table = wafc_pilot_table),
+              silent = TRUE)
+    if (inherits(cv, "try-error")) next
+    el <- proc.time()[["elapsed"]] - t0
+    f <- cv[["wafc.fit"]]
+    lam <- cv[["lambda.min"]]
+    d_test <- wafc_design(test[["x"]], test[["u"]], spec = f[["design"]])
+    d_grid <- wafc_design(matrix(1, n_grid, p), grid, spec = f[["design"]])
+    cf <- wafc_raw_coef(f, s = lam)
+    fh <- as.numeric(d_test[["Z"]] %*% cf[-1L, 1L]) + cf[1L, 1L]
+    gh <- wafc_grid_components(f, grid, s = lam, design = d_grid)
+    ise <- ise_components(gh, dgp, grid)
+    rows[[length(rows) + 1L]] <- data.frame(
+      cell = cell[["name"]], n = n, rep = r, grid = lab, Jtop = Jtop,
+      J = cv[["J.min"]], lambda = lam, cvm = cv[["cvm.min"]],
+      rmse_f = sqrt(mean((fh - test[["f"]])^2)),
+      ise = sum(ise), ise_active = sum(ise[active]),
+      nzero = sum(cf[-1L, 1L][-f[["design"]][["unpenalized"]]] != 0),
+      time = el, stringsAsFactors = FALSE)
+  }
+  do.call(rbind, rows)
+}
+
+## ---------------------------------------------------------------------------
 ## Driver
 ## ---------------------------------------------------------------------------
 
@@ -454,8 +544,11 @@ sweep_part <- function(fun, label, cells_used = cells, ns_used = ns,
                        reps = R) {
   jobs <- list()
   for (cell in cells_used) {
+    ## a cell may carry its own budget, and then the smaller of the two
+    ## counts: the cap of a part still applies to it
+    nrep <- if (is.null(cell[["reps"]])) reps else min(reps, cell[["reps"]])
     for (n in ns_used) {
-      for (r in seq_len(reps)) {
+      for (r in seq_len(nrep)) {
         jobs[[length(jobs) + 1L]] <- list(cell = cell, n = n, r = r)
       }
     }
@@ -609,6 +702,36 @@ if ("j1" %in% parts) {
           worse = w[["rmse_f.1"]] > w[["rmse_f.2"]]) ~ cell + n,
     data = w, FUN = mean)
   print(tab[order(tab[["cell"]], tab[["n"]]), ], row.names = FALSE, digits = 3)
+}
+
+if ("jgrid" %in% parts) {
+  res <- sweep_part(run_jgrid, "depth of the grid of J",
+                    cells_used = cells[vapply(cells, `[[`, "", "name") %in%
+                                         c("smooth", "inhomogeneous")],
+                    reps = R_small)
+  saveRDS(res, file.path(out_dir, "e24-jgrid.rds"))
+  cat("\nmedians by cell, n and grid:\n")
+  print(med(res, c("Jtop", "J", "lambda", "nzero", "cvm", "rmse_f", "ise",
+                   "ise_active", "time"), c("cell", "n", "grid")),
+        row.names = FALSE, digits = 3)
+  w <- stats::reshape(res[c("cell", "n", "rep", "grid", "J", "rmse_f", "ise",
+                            "time")],
+                      idvar = c("cell", "n", "rep"), timevar = "grid",
+                      direction = "wide")
+  w[["r_rmse"]] <- w[["rmse_f.deep"]] / w[["rmse_f.short"]]
+  w[["r_ise"]] <- w[["ise.deep"]] / w[["ise.short"]]
+  w[["r_time"]] <- w[["time.deep"]] / w[["time.short"]]
+  cat("\nthe deep grid against the short one, paired, and how often the deep",
+      "grid goes past the top of the short one:\n")
+  tab <- stats::aggregate(
+    cbind(r_rmse, r_ise, r_time, past = J.deep > J.short,
+          same = J.deep == J.short) ~ cell + n, data = w,
+    FUN = function(v) stats::median(v))
+  print(tab[order(tab[["cell"]], tab[["n"]]), ], row.names = FALSE, digits = 3)
+  cat("\nfraction of replicates in which the deep grid wins:\n")
+  print(stats::aggregate(cbind(wins = r_rmse < 1, past = J.deep > J.short) ~
+                           cell + n, data = w, FUN = mean),
+        row.names = FALSE, digits = 3)
 }
 
 cat("\nOK\n")
