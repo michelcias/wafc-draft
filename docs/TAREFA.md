@@ -54,7 +54,7 @@ que ler antes está aqui e no plano.
 | E2.1b conserto do `eps` | **fechada** (2026-09-19): margem fixa, `J = 1` acessível; 420 testes passam | `wafc/R/design.R` |
 | L4 referências de software | **fechada** (2026-09-19): `.bib` com 63 entradas | `referencias-verificadas.bib` |
 | E1.8 rota do intervalo | **fechada** (2026-09-19): Lemas 11 e 12, Proposições 5 e 6, Corolários 6 e 7; conferência `OK` | `derivations/07-rota-intervalo.tex` |
-| E2.4 piloto | não aberta; **pode abrir já** (D27 fechou o que faltava) | catálogo da §3 |
+| E2.4 piloto | **em curso** (aberta em 2026-09-19) | catálogo da §3 |
 | E1.7a sondagem de irrepresentabilidade | não aberta; **pode abrir já** | catálogo da §3 |
 | E1.7c seleção por limiarização | não aberta; **pode abrir já** | catálogo da §3 |
 | E1.4c tradução do `03` | não aberta; **pode abrir já**, prioridade baixa | catálogo da §3 |
