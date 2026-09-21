@@ -1,4 +1,5 @@
-% E1.3 -- lema de aproximação em Besov pelo sieve de wavelets periodizadas.
+% E1.3 -- lema de aproximação em Besov no espaço gerado por wavelets
+% periodizadas.
 % Emenda E1.3b (2026-09-19): a seção "A margem" e o Lema 10 (extensão sob
 % suporte próprio), que registram a função da margem do reescalonamento (D23).
 % Transposição do Passo 1 do WALL teórico (ms_theo_1.tex, Lemma "Besov
@@ -13,7 +14,7 @@
 \usepackage{hyperref}
 \input{macros}
 
-\title{E1.3 e E1.3b. Aproximação em Besov pelo sieve de wavelets
+\title{E1.3 e E1.3b. Aproximação em Besov no espaço gerado por wavelets
 periodizadas, e a margem que compra a extensão}
 \author{wafc-draft, \texttt{derivations/02-aproximacao-besov.tex}}
 \date{2026-09-18; emenda E1.3b de 2026-09-19}
@@ -30,7 +31,7 @@ periodizada, e o erro correspondente na função de regressão
 $f(x,u) = \sum_{\cv} x_{\cv}\,\fcoef{\cv}(u)$. É a transposição do Passo~1
 do WALL teórico, com três diferenças: a regularidade é Besov geral
 $\Besov{s}{\pi}{r}$, e não $\Besov{s}{2}{\infty}$, para que a regularidade
-efetiva $\seff = s - (1/\pi - 1/2)_{+}$ apareça (é ela que separa o sieve
+efetiva $\seff = s - (1/\pi - 1/2)_{+}$ apareça (é ela que separa a aproximação
 linear do LASSO quando $\pi < 2$); a função de regressão tem o produto
 $X_{\cv}\,\gcomp{\cv}{\md}(U_{\md})$, o que troca o fator $p^{2}$ do WALL por
 $(pq)^{2}\,C_{X}^{2}$; e a diferença por periodização, que o WALL não trata,
@@ -67,8 +68,8 @@ p.~304). É a base que o \texttt{wbasis()} devolve com
 $\phi_{00} \equiv 1$, descartada (D2), e as demais são as $\wav{\lev}{\tsl}$,
 $\lev = 0, \dots, J-1$.
 
-\paragraph{Sieve e projeção.} $\WJ = \operatorname{span}\{\wav{\lev}{\tsl} :
-0 \le \lev < J\}$, de dimensão $\NJ = 2^{J} - 1$, é o complemento ortogonal
+\paragraph{Espaço de aproximação (\emph{sieve}) e projeção.}
+$\WJ = \operatorname{span}\{\wav{\lev}{\tsl} : 0 \le \lev < J\}$, de dimensão $\NJ = 2^{J} - 1$, é o complemento ortogonal
 das constantes dentro de $\VJ$. Para $g \in L_{2}[0,1]$ com $\int_{0}^{1} g = 0$,
 \[
   \PiJ g \;=\; \sum_{\lev = 0}^{J-1}\sum_{\tsl = 0}^{2^{\lev}-1}
@@ -267,12 +268,12 @@ Seja $f(x,u) = \sum_{\cv=1}^{p} x_{\cv}\bigl\{\lvl{\cv} +
   \;=\; \sum_{\cv} x_{\cv}\lvl{\cv} + \sum_{\cv,\md}\sum_{\lev<J}\sum_{\tsl}
   \coefs{\cv}{\md}{\lev}{\tsl}\; x_{\cv}\,\wav{\lev}{\tsl}(u_{\md})
 \]
-a sua aproximação no sieve, com $\coefs{\cv}{\md}{\lev}{\tsl} =
+a sua aproximação em $\WJ$, com $\coefs{\cv}{\md}{\lev}{\tsl} =
 \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$. O vetor $(\bc, \thetastar)$ é
 o oráculo de E1.5: $f_{J}(\bX_{i},\bU_{i}) = \bZ_{i}\T(\bc,\thetastar)$
 com a matriz de desenho da notação (ordem das colunas D12).
 
-\begin{corollary}[viés do sieve]\label{cor:vies}
+\begin{corollary}[viés de aproximação]\label{cor:vies}
 Sob as Hipóteses~\ref{ass:base} a~\ref{ass:X},
 \[
   \norm{f - f_{J}}_{L_{2}(P)}^{2}
@@ -393,7 +394,7 @@ O que isso muda para o WAFC:
     \texttt{wall()} ($\varepsilon = 1.9^{-J}$; Montoril, Pinheiro e
     Vidakovic, 2019) afasta os dados da zona onde a periodização deixa
     artefato, mas não entra na teoria (D11). Note que o termo de viés que
-    E1.5 usa é $\inf$ sobre o sieve da norma $L_{2}(P_{U})$, e não
+    E1.5 usa é $\inf$ sobre $\WJ$ da norma $L_{2}(P_{U})$, e não
     necessariamente $\PiJ g$: quando $P_{U}$ não visita a zona de borda, o
     melhor elemento de $\WJ$ em $L_{2}(P_{U})$ pode ser bem melhor que a
     projeção de Lebesgue. Isso fica como pergunta (handoff).
@@ -447,7 +448,7 @@ par $(\cv,\md)$ existe $\tilde g = \tilde g_{\cv\md} : [0,1] \to \R$ tal que:
       \;\le\; \frac{C_{U}\,\tilde C_{g}^{2}}{1 - 2^{-2\seff}}\;2^{-2J\seff},
     \]
     sem o termo $2^{-J}$ da Proposição~\ref{prop:periodizacao};
-  \item e o viés do sieve obedece à cota do Corolário~\ref{cor:vies} com
+  \item e o viés de aproximação obedece à cota do Corolário~\ref{cor:vies} com
     $C_{g}$ trocado por $\tilde C_{g}$,
     \[
       \inf_{(\bc,\btheta)} \norm{f - \bZ\T(\bc,\btheta)}_{L_{2}(P)}^{2}
@@ -712,11 +713,11 @@ e o ISE contra $\varepsilon$ e $J$ é E2.4.
 
 \begin{itemize}[nosep]
   \item A aproximação \emph{não linear}. Para $\pi < 2$ a melhor aproximação
-    com $M$ termos escolhidos livremente atinge $M^{-s}$, enquanto o sieve
-    linear atinge só $\NJ^{-\seff}$; é essa diferença que o LASSO explora e
-    que o corolário de compressibilidade (E1.6, weak-$\ell_{\tau}$ com
+    com $M$ termos escolhidos livremente atinge $M^{-s}$, enquanto a
+    aproximação linear atinge só $\NJ^{-\seff}$; é essa diferença que o LASSO
+    explora e que o corolário de compressibilidade (E1.6, weak-$\ell_{\tau}$ com
     $\tau = (s + 1/2)^{-1}$ no caso crítico) formaliza. O lema aqui é só o
-    viés do sieve cheio.
+    viés do espaço de aproximação cheio.
   \item A norma empírica $\normn{f - f_{J}}$ além da cota uniforme: a versão
     com probabilidade alta a partir de $\norm{f - f_{J}}_{L_{2}(P)}$ é
     concentração e fica em E1.5.
@@ -763,8 +764,8 @@ que saiu:
     $1.49, 1.35, 1.27$ bits em $\lev = 9 \to 12$ (média $1.37$; tolerância
     $1/4$). Abaixo de $\lev \approx 8$ a queda é menor que $1$ bit porque a
     largura mínima das protuberâncias é $0.005 \approx 2^{-7.6}$; é o regime
-    pré-assintótico, e é também a situação em que o LASSO ganha do sieve.
-    Uma quina periódica isolada, $|\sin\pi(u - 0.4)|$, dá quedas que oscilam
+    pré-assintótico, e é também a situação em que o LASSO ganha da
+    aproximação linear. Uma quina periódica isolada, $|\sin\pi(u - 0.4)|$, dá quedas que oscilam
     com a fase da quina na grade diádica ($2.66, 1.56, 0.13, 1.65, \dots$) e
     média de quatro níveis igual a $1.50$.
   \item Funções que não emendam ($u - 1/2$ e $e^{u}$ centrada) na base

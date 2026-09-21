@@ -1,9 +1,9 @@
 % E1.5 -- desigualdade oráculo para o LASSO no desenho de produtos.
 % Molde: Bühlmann & van de Geer (2011), Seção 6.2 (Corolário 6.1, Teoremas 6.1 e 6.2), com
 % três diferenças: os p níveis c_l não são penalizados, o modelo é mal
-% especificado dentro do sieve (o viés de E1.3 entra no lado direito), e a
-% constante de desenho vem de E1.4 na forma de autovalor cheio, o que dispensa
-% a condição de cone. Arquitetura de passos transposta do WALL teórico
+% especificado dentro do espaço de aproximação (o viés de E1.3 entra no lado
+% direito), e a constante de desenho vem de E1.4 na forma de autovalor cheio,
+% o que dispensa a condição de cone. Arquitetura de passos transposta do WALL teórico
 % (ms_theo_1.tex, Apêndice "Slow-Rate Track", Passo 3, e Lemma "LASSO
 % prediction consistency"), adaptada da perda logística para a quadrática.
 % Conferência numérica: check/04-oraculo.R (imprime OK; ~16 s).
@@ -57,7 +57,7 @@
 
 Este arquivo junta as duas peças já fechadas e produz a cota não assintótica
 que E1.6 transforma em taxa. De E1.3 vem o \emph{viés}: o erro de substituir
-$f$ pela sua aproximação $f_{J}$ no sieve (Corolário~\ref{cor:vies-E13} abaixo
+$f$ pela sua aproximação $f_{J}$ em $\WJ$ (Corolário~\ref{cor:vies-E13} abaixo
 é a citação do Corolário~1 daquele arquivo). De E1.4 vem a \emph{condição de
 desenho}, na forma consumível que aquele arquivo entregou, a saber
 $\lmin(\Gramhat) \ge \kappa_{1}c_{U}/2$ com probabilidade alta, que por
@@ -73,10 +73,10 @@ LASSO propriamente dito, com três desvios do molde de Bühlmann e van de Geer
     (Lema~\ref{lem:perfil}), e o complemento de Schur transfere o autovalor de
     $\Gramhat$ ao bloco penalizado residualizado. É o que faz a hipótese de
     E1.4 bastar sem cone.
-  \item o modelo é \textbf{mal especificado dentro do sieve}: $f \notin
-    \operatorname{span}$ das colunas de $\bZ$, e o resíduo determinístico
-    $\bb = f - f_{J}$ entra como um segundo termo de ruído, tratado por
-    Young em vez de por dualidade.
+  \item o modelo é \textbf{mal especificado dentro do espaço de
+    aproximação}: $f \notin \operatorname{span}$ das colunas de $\bZ$, e o
+    resíduo determinístico $\bb = f - f_{J}$ entra como um segundo termo de
+    ruído, tratado por Young em vez de por dualidade.
   \item a \textbf{calibração} de $\pen$ é feita pelas normas empíricas das
     colunas, e não pelo máximo de $\bZ$: a diferença é um fator $2^{J/2}$ na
     taxa (Lema~\ref{lem:colunas} e Observação~\ref{rem:calib}).
@@ -135,7 +135,7 @@ toca $\bc$: é D3.
 
 \paragraph{Oráculo e viés.} $\betastar = (\bc, \thetastar)$ é o vetor de E1.3,
 com $\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$
-para $\lev < J$, de modo que $f_{J} = \bZ\betastar$ é a aproximação no sieve.
+para $\lev < J$, de modo que $f_{J} = \bZ\betastar$ é a aproximação em $\WJ$.
 O resíduo determinístico é
 \[
   \bb \;=\; f - f_{J} \;\in\; \R^{n},
@@ -143,9 +143,9 @@ O resíduo determinístico é
   \normn{\bb}^{2} = \frac1n\sum_{i}\bigl(f - f_{J}\bigr)^{2}(\bX_{i},\bU_{i}).
 \]
 Escrevemos $\Szero = \operatorname{supp}(\thetastar)$ e $s_{0} = |\Szero|$.
-Note que $s_{0}$ é a esparsidade \emph{do oráculo do sieve}, não uma hipótese
-sobre o modelo: sob a Hipótese de Besov de E1.3 os $\coefs{\cv}{\md}{\lev}{\tsl}$
-decaem mas não se anulam, e em geral $s_{0} = d$. É por isso que a taxa lenta
+Note que $s_{0}$ é a esparsidade \emph{do oráculo do espaço de aproximação},
+não uma hipótese sobre o modelo: sob a Hipótese de Besov de E1.3 os
+$\coefs{\cv}{\md}{\lev}{\tsl}$ decaem mas não se anulam, e em geral $s_{0} = d$. É por isso que a taxa lenta
 do Teorema~\ref{thm:oraculo}(i), que não menciona $s_{0}$, é o enunciado
 incondicional, e a taxa rápida de (ii) é útil quando $\thetastar$ é
 comprimível; a distinção é a mesma que o WALL faz entre o Teorema~1 e o
@@ -197,7 +197,7 @@ apareçam com o número global que já têm (Corolário~1 de E1.3, Proposição~
 E1.4).
 
 \setcounter{corollary}{0}
-\begin{corollary}[viés do sieve; provado em E1.3]\label{cor:vies-E13}
+\begin{corollary}[viés de aproximação; provado em E1.3]\label{cor:vies-E13}
 Sob as hipóteses de E1.3,
 \[
   \norm{f - f_{J}}_{L_{2}(P)}^{2}
@@ -669,7 +669,7 @@ Lema~1 de E1.3 em cada bloco. \qed
 \begin{itemize}[nosep, leftmargin=*]
   \item \textbf{A norma populacional.} Tudo aqui é em $\normn{\cdot}$, a norma
     empírica. A passagem a $\norm{\widehat{f}-f}_{L_{2}(P)}$ exige concentração
-    uniforme sobre a classe do sieve e fica em E1.6.
+    uniforme sobre a classe de funções do espaço de aproximação e fica em E1.6.
   \item \textbf{A escolha de $J_{n}$ e de $\pen_{n}$.} O Corolário~\ref{cor:taxas}
     é não assintótico e vale para qualquer $J$; equilibrar
     $s_{0}\log(pq\NJ)/n$ contra $2^{-2J\seff}$, e obter

@@ -145,7 +145,34 @@ que é o que o WALL só obtém para o **estimador restrito**.
 Registrado aqui porque é material de comparação entre os dois artigos, e
 porque, se o WALL quiser a mesma folga, o caminho está escrito.
 
-### 3.2 Referências de adaptação ausentes do `.bib` do WALL
+### 3.2 O vocabulário: "sieve" é raro no público-alvo
+
+**Tipo:** escolha de redação, não erro. **Encontrado em:** 2026-09-21, ao
+preparar a terminologia do manuscrito do WAFC (D33).
+
+O WALL teórico usa **"sieve" 38 vezes**, e é de lá que o termo entrou no
+vocabulário do WAFC. Ele é padrão em estatística teórica e em econometria
+semiparamétrica (Grenander 1981; Geman & Hwang 1982; Shen & Wong 1994;
+Chen 2007), mas **incomum na literatura em que os dois artigos querem se
+inserir**: conferido, **Klopp & Pensky (2015) e Xue & Yang (2006) não o usam
+nenhuma vez**, e "Approximation space" é **palavra-chave** do artigo de Xue
+& Yang.
+
+O WAFC trocou (D33): nas derivações, por "espaço de aproximação", com uma
+única menção retida entre parênteses no ponto em que o espaço é definido
+(E1.10, 2026-09-21); no manuscrito, por "approximation space", na rodada de
+`k = 2`. O dicionário usado está no handoff de E1.10 e é reaproveitável:
+"sieve linear" virou **"aproximação linear"**, para fazer par com
+"aproximação não linear", que já era o termo do texto; "viés do sieve" virou
+**"viés de aproximação"**.
+
+**Para o WALL isto é decisão de lá**, e há um argumento honesto dos dois
+lados: o público da revista que o WALL mira pode ser outro, e o termo tem a
+vantagem de nomear a construção de uma vez. O que este documento registra é
+que, no público do WAFC, ele custa uma explicação que o texto não tem espaço
+para dar.
+
+### 3.3 Referências de adaptação ausentes do `.bib` do WALL
 
 **Tipo:** lacuna. **Encontrado em:** L1 (2026-09-18).
 
@@ -163,7 +190,8 @@ Cada item traz onde foi encontrado e com que evidência; nenhum exige refazer
 medição para ser conferido no WALL. A ordem de custo crescente para tratar
 lá: as três da §1 são edição de `.bib`; a §2.1 é um argumento `drop.phi` e a
 leitura de `coef()`; a §2.3 é uma linha na grade, mas pede repetir os estudos
-que dependem dela; a §2.2 é decisão de desenho; a §3 é material de discussão.
+que dependem dela; a §2.2 e a §3.2 são decisões de redação e de desenho; a
+§3.1 é material de discussão.
 
 Se algum item for tratado no WALL, vale registrar aqui o desfecho, para que
 os dois projetos não redescubram o mesmo.

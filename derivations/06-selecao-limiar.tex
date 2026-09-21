@@ -367,9 +367,9 @@ formalidade.
 \begin{remark}[é estimação seguida de limiar, e não seleção pelo estimador]
 \label{rem:nao-selecao}
 Nada aqui afirma que o LASSO seleciona. O suporte de $\thetahat$ não tem
-relação com $S$: sob a Hipótese de Besov de E1.3 o oráculo do sieve é
-genericamente denso (E1.6, ``onde este resultado entra''), e na prática o
-LASSO deixa coeficientes não nulos em blocos nulos --- a conferência de E2.2
+relação com $S$: sob a Hipótese de Besov de E1.3 o oráculo do espaço de
+aproximação é genericamente denso (E1.6, ``onde este resultado entra''), e na
+prática o LASSO deixa coeficientes não nulos em blocos nulos --- a conferência de E2.2
 mediu, com cerca de $99$ não nulos, \emph{zero} dos três blocos nulos zerados
 pelo LASSO contra três pelo sparse group LASSO. O que o
 Corolário~\ref{cor:limiar} diz é outra coisa: a \emph{norma} do bloco, e não o
@@ -456,8 +456,8 @@ em um passo.
     significado, fica fora. A dimensão efetiva do Corolário~5 de E1.6 é uma
     afirmação de taxa, não de recuperação de suporte, e continua sendo.
   \item \textbf{O alvo limiarizado é $\PiJ\gcomp{\cv}{\md}$, não
-    $\gcomp{\cv}{\md}$.} A estatística vive na resolução $J_{n}$, e o viés do
-    sieve entra em $D_{n}$ pela terceira parcela de \eqref{eq:Dn}. Nas
+    $\gcomp{\cv}{\md}$.} A estatística vive na resolução $J_{n}$, e o viés de
+    aproximação entra em $D_{n}$ pela terceira parcela de \eqref{eq:Dn}. Nas
     resoluções que a regra $J_{n}$ prescreve para os $n$ do piloto essa
     parcela \emph{domina} as outras duas, o que a conferência mede: a janela
     do Lema~\ref{lem:sanduiche} chega a ser vazia enquanto o acerto observado
@@ -513,8 +513,8 @@ na parte que mede a identidade de normas. As cinco partes e o que saiu em
     $1{,}00$ em todas as células com \texttt{cv.min} a partir de $n = 500$, e
     a fração de réplicas em que \emph{algum} limiar acerta é $1{,}00$ (a
     única exceção é $0{,}95$, em $n = 250$ no não homogêneo). É a assimetria
-    do Corolário~\ref{cor:limiar}(ii) contra (iii): o viés do sieve encolhe
-    todas as normas na mesma direção e não cria falso positivo.
+    do Corolário~\ref{cor:limiar}(ii) contra (iii): o viés de aproximação
+    encolhe todas as normas na mesma direção e não cria falso positivo.
   \item \textbf{Parte III, a curva.} Em $n = 2000$ o platô de acerto é largo:
     $\Prob(\Shat(t) = S) = 1$ para $t \in [0{,}062;\,0{,}590]$ no cenário
     suave e $t \in [0{,}127;\,0{,}590]$ no não homogêneo. À esquerda do platô

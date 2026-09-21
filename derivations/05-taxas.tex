@@ -84,15 +84,16 @@ de hipótese:
 \end{enumerate}
 
 Os três são necessários porque, \emph{sob a Hipótese de Besov de E1.3, o
-oráculo do sieve é genericamente denso}: os $\coefs{\cv}{\md}{\lev}{\tsl}$
-decaem mas não se anulam, e $s_{0} = |\Szero| = d$. Lido no oráculo com
-$s_{0} = d$, o Teorema~1(ii) de E1.5 dá a taxa do sieve de (b); a única
+oráculo do espaço de aproximação é genericamente denso}: os
+$\coefs{\cv}{\md}{\lev}{\tsl}$ decaem mas não se anulam, e
+$s_{0} = |\Szero| = d$. Lido no oráculo com $s_{0} = d$, o Teorema~1(ii) de
+E1.5 dá a taxa do espaço de aproximação, a de (b); a única
 afirmação que não usa condição alguma de desenho é a de (a); e o que troca
 $d$ por uma dimensão efetiva muito menor é (c). O Lema~\ref{lem:weak}(i)
 mostra que a compressibilidade de (c) \emph{não é hipótese nova}: ela já
 está contida na Hipótese de Besov, com $\tau = (s+1/2)^{-1}$. É essa
 observação que faz o Corolário~\ref{cor:compressivel} recuperar a taxa de
-aproximação não linear $n^{-2s/(2s+1)}$ onde o sieve linear só alcança
+aproximação não linear $n^{-2s/(2s+1)}$ onde a aproximação linear só alcança
 $n^{-2\seff/(2\seff+1)}$, exatamente a diferença que E1.3 registrou em ``o
 que isto não cobre''.
 
@@ -125,7 +126,7 @@ $d = pq\NJ$ e $\NJ = 2^{J}-1$, o estimador
   \bigl\{ \normn{\bY - \Amat\bc - \Bmat\btheta}^{2} + 2\pen\norm{\btheta}_{1}\bigr\},
   \qquad \widehat{f} = \Amat\chat + \Bmat\thetahat,
 \]
-o oráculo do sieve $\betastar = (\bc,\thetastar)$ com
+o oráculo do espaço de aproximação $\betastar = (\bc,\thetastar)$ com
 $\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$, o
 resíduo determinístico $\bb = f - f_{J}$, a perfilagem
 $\Btil = \MA\Bmat$ com $\gtil = \lmin(\Btil\T\Btil/n)$, e a norma empírica
@@ -236,7 +237,7 @@ quantifica a cauda da melhor aproximação com $M$ termos.
 \begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
   \item Sob as Hipóteses de base e de Besov de E1.3, com
     $\pi(s + 1/2) > 1$ --- que é exatamente $\seff > 0$ quando $\pi < 2$, e é
-    automático quando $\pi \ge 2$ ---, o oráculo do sieve
+    automático quando $\pi \ge 2$ ---, o oráculo do espaço de aproximação
     $\thetastar \in \R^{d}$ satisfaz, para todo $J$ e todo $k \ge 1$,
     \begin{equation}
       \label{eq:weak}
@@ -294,7 +295,7 @@ $\pi$. Em particular:
 
 \subsection*{Com a condição de desenho de E1.4}
 
-\begin{theorem}[taxa de predição do sieve]\label{thm:taxa}
+\begin{theorem}[taxa de predição no espaço de aproximação]\label{thm:taxa}
 Acrescente as hipóteses de E1.4 e tome
 \begin{equation}
   \label{eq:Jn}
@@ -388,8 +389,8 @@ $C_{\tau} < \infty$ que não dependem de $J$. Então:
     \end{equation}
     não vazia se e só se $\seff > (2-\tau)/4$. As três desigualdades são,
     nessa ordem: $\Mstar_{n} \le d_{n}$ (o mínimo em $M$ é interior);
-    $2^{-2J_{n}\seff} = O\bigl((J_{n}/n)^{(2-\tau)/2}\bigr)$ (o viés do sieve
-    não domina); e a condição empírica de E1.4. Fixado um tal $c$,
+    $2^{-2J_{n}\seff} = O\bigl((J_{n}/n)^{(2-\tau)/2}\bigr)$ (o viés de
+    aproximação não domina); e a condição empírica de E1.4. Fixado um tal $c$,
     \[
       \Mstar_{n} \;\asymp\; \Bigl(\frac{n}{J_{n}}\Bigr)^{\tau/2}
       \;\ll\; d_{n} \asymp pq\,2^{J_{n}},
@@ -415,10 +416,10 @@ $C_{\tau} < \infty$ que não dependem de $J$. Então:
 \end{corollary}
 
 \begin{remark}[a leitura das três taxas]\label{rem:tres}
-$\seff = s - (1/\pi - 1/2)_{+}$ é a regularidade que o \emph{sieve linear}
-enxerga (E1.3, Lema~2); $s$ é a que a \emph{aproximação não linear} enxerga.
-O Teorema~\ref{thm:taxa} é a taxa do sieve; o Corolário~\ref{cor:compressivel}
-é a do LASSO, que escolhe os termos. Para $\pi \ge 2$ as duas coincidem, e é
+$\seff = s - (1/\pi - 1/2)_{+}$ é a regularidade que a \emph{aproximação
+linear} enxerga (E1.3, Lema~2); $s$ é a que a \emph{aproximação não linear}
+enxerga. O Teorema~\ref{thm:taxa} é a taxa da aproximação linear; o
+Corolário~\ref{cor:compressivel} é a do LASSO, que escolhe os termos. Para $\pi \ge 2$ as duas coincidem, e é
 por isso que nesse regime estimadores lineares já são ótimos; para $\pi < 2$
 elas se separam, e é exatamente aí que a penalidade $\norm{\btheta}_{1}$ paga
 por si. A taxa $(\log n/n)^{2s/(2s+1)}$ é a referência minimax do modelo de
@@ -429,9 +430,9 @@ $\pen_{n} \asymp \sqrt{J_{n}/n}$, isto é, da união sobre as $d_{n}$ colunas.
 \end{remark}
 
 \begin{remark}[por que $s_{0} = d$ não é um defeito do Teorema~1]\label{rem:s0}
-Lido no oráculo, o Teorema~1(ii) de E1.5 tem $s_{0} = d$ e entrega a taxa do
-sieve do Teorema~\ref{thm:taxa}; lido num comparador esparso, pelo
-Lema~\ref{lem:comparador}, entrega a taxa comprimível. É a mesma desigualdade
+Lido no oráculo, o Teorema~1(ii) de E1.5 tem $s_{0} = d$ e entrega a taxa da
+aproximação linear do Teorema~\ref{thm:taxa}; lido num comparador esparso,
+pelo Lema~\ref{lem:comparador}, entrega a taxa comprimível. É a mesma desigualdade
 nos dois casos. O que a compressibilidade compra não é uma afirmação sobre
 $\operatorname{supp}(\thetahat)$ --- nada aqui diz que o LASSO seleciona
 $\Mstar_{n}$ coordenadas, e nenhuma condição de $\beta$-mínimo ou de
@@ -696,7 +697,8 @@ e de $\seff \le s$. \qed
     trabalha em $\Besov{s}{2}{\infty}$, não enxerga.
   \item \textbf{Novo:} a Proposição~\ref{prop:lenta}(ii), que mostra que para
     $\pi \ge 2$ e $s < 1/2$ a trilha lenta, balanceada, atinge a mesma taxa
-    $(J_{n}/n)^{2s/(2s+1)}$ do sieve \emph{sem nenhuma condição de desenho}.
+    $(J_{n}/n)^{2s/(2s+1)}$ da aproximação linear \emph{sem nenhuma condição de
+    desenho}.
   \item \textbf{Novo:} o Teorema~\ref{thm:taxa}(i), que observa que a condição
     empírica de E1.4 é, na resolução \eqref{eq:Jn}, exatamente da ordem da
     própria taxa; e o Corolário~\ref{cor:componentes-taxa}, que fecha a cadeia
@@ -714,8 +716,8 @@ e de $\seff \le s$. \qed
     é uma comparação de cota superior.
   \item \textbf{A norma populacional.} Tudo continua em $\normn{\cdot}$; a
     passagem a $\norm{\widehat f - f}_{L_{2}(P)}$ exige concentração uniforme
-    sobre a classe do sieve e não é feita nem aqui nem em E1.5. Para as
-    componentes, o Corolário~\ref{cor:componentes-taxa} \emph{é} em
+    sobre a classe de funções do espaço de aproximação e não é feita nem aqui
+    nem em E1.5. Para as componentes, o Corolário~\ref{cor:componentes-taxa} \emph{é} em
     $L_{2}[0,1]$ (medida de Lebesgue), porque a ortonormalidade da base o dá
     de graça; a versão em $L_{2}(P_{U_{\md}})$ custaria a densidade $C_{U}$ em
     um sentido e $c_{U}$ no outro.
@@ -752,8 +754,8 @@ $c_{U} = C_{U} = 1$ e $\gamma = \kappa_{1}c_{U} = 0.25$), erro gaussiano com
 $\sigma = 0.5$, $\pen = 2\sigma\smax\sqrt{2\log(2d/\alpha)/n}$, $\alpha = 0.05$
 e $n$ variando de $200$ a $12800$. A função verdadeira é a soma finita dos
 níveis $\lev < 10$ com $\norm{\theta_{\cv\md,\lev\cdot}}_{\pi}$ saturando a
-Hipótese de Besov em todo nível, de modo que o viés do sieve é exato. O que
-saiu em 2026-09-19 está registrado em \texttt{docs/handoff-E1.6.md}; os
+Hipótese de Besov em todo nível, de modo que o viés de aproximação é exato.
+O que saiu em 2026-09-19 está registrado em \texttt{docs/handoff-E1.6.md}; os
 números que importam:
 
 \begin{itemize}[nosep, leftmargin=*]
