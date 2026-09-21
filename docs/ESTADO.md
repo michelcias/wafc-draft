@@ -937,6 +937,43 @@ não cobria `wafc/R/fit.R` nem o `06-timing.R`, que o próprio texto da tarefa
 mandava tocar. Antes disso, E2.4 pôs o QUT em `competitors.R` pela mesma
 razão. **Quando eu catalogar, o arquivo vai junto do item.**
 
+### 2026-09-21: a tabela de tempo, medida no chat principal
+
+`06-timing.R`, 5 réplicas, cenário não homogêneo, `p = 3`, `q = 2`, nesta
+máquina. Medianas em segundos; `busca` é a sintonia e `ajuste` é o ajuste
+que ela seleciona.
+
+| método | 250 | 500 | 1000 |
+|---|---|---|---|
+| `gam` casado, por `bam` | **0,100** | **0,313** | **0,661** |
+| `bsgl` | 0,42 | 0,453 | 0,670 |
+| `gam k = 10` | 0,86 | 1,051 | 2,019 |
+| **`wafc.lasso`** | **0,361** | **6,856** | **3,204** |
+| `klopp` | 0,90 | 6,209 | 5,917 |
+| `vcbart` | 2,48 | 3,831 | 6,482 |
+| `aspline` | 3,70 | 4,801 | 6,574 |
+| `gam` casado, por `gam` | 1,49 | 10,013 | **31,393** |
+| `wafc.sglasso` | 6,94 | 39,342 | 37,507 |
+
+- **O ajuste do WAFC custa de 5 a 57 milissegundos**; todo o resto é a busca
+  sobre `(J, λ)`, e é a única coluna da tabela que **mostra** a busca: o
+  `gam` escolhe suavização por REML dentro da chamada e o `bsgl` faz
+  validação cruzada dentro do `cv.grpreg`.
+- **`n = 500` é mais caro que `n = 1000` no WAFC** (6,86 contra 3,20), e o
+  mesmo aparece no `klopp` (6,2 contra 5,9) e no `sglasso` (39,3 contra
+  37,5), que rodam no mesmo desenho: em `n = 500` a grade chega a `J = 5`
+  com 31 colunas por bloco e poucas linhas, que é o pior ponto da razão
+  entre dimensão e amostra. **É do desenho, não do laço de validação
+  cruzada.**
+- **A comparação em dimensão casada só é viável pelo `bam`:** `gam()` custa
+  **31,4 s** em `n = 1000`, quase cinquenta vezes o `bam` e dez vezes o
+  WAFC. É a razão pela qual o piloto rodou em `k = 10`, e é o obstáculo que
+  E2.4b removeu.
+- **O `sglasso` custa 19× o LASSO em `n = 250` e 12× em `n = 1000`.** Somado
+  ao que E1.7c mediu (o LASSO limiarizado acerta a estrutura em 10 de 10
+  réplicas onde ele acerta 0 de 10), a variante em grupos chega a E2.5
+  perdendo nos dois eixos.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1267,6 +1304,7 @@ Ordenadas pelo que bloqueia mais.
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
 | 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
+| 2026-09-21 | Tabela de tempo medida: o ajuste do WAFC custa milissegundos e o custo é a busca; a comparação em dimensão casada só é viável pelo `bam`; o `sglasso` custa 12 a 19 vezes o LASSO |
 | 2026-09-21 | E2.4b fechada: `uneven` nasce e lê `s' = 4`; a tolerância apertada é preço da verificação de KKT e não desperdício, contra o que eu tinha concluído; o WAFC deixa de ser o caro da tabela de tempo |
 | 2026-09-21 | E1.10 fechada (terminologia) e o documento das inconsistências do WALL criado; medidos os dois defeitos de desempenho do ajuste |
 | 2026-09-20 | E6.1a fechada com veredito negativo: nenhuma das três bases sustenta o argumento, e o ganho aparente sobre o spline era de dimensão, não de base — o que põe em dúvida a comparação com o `gam` no piloto |
