@@ -823,6 +823,30 @@ ser remedida.
   "ajustou estrutura" de "ajustou ruído" **sem precisar da verdade**, que é o
   que uma aplicação real nunca tem.
 
+### 2026-09-21: medição no chat principal, dois defeitos de desempenho
+
+Antes de decidir P1, fui ver por que o `bsgl` era 8 vezes mais rápido que o
+WAFC na tabela do piloto. **Não é o método, é o nosso ajuste.**
+
+- **A tolerância padrão de `wafc()` é `thresh = 1e-10`**, três ordens abaixo
+  do padrão do `glmnet`. Medido em `n = 1000`, `p = 3`, `q = 2`, mesmas
+  dobras: a validação cruzada do candidato `J = 5` custa **5,95 s** com
+  `1e-10` e **0,21 s** com `1e-7` (**28×**), e a sintonia **não muda**:
+  `lambda.min` idêntico, `cvm` mínimo diferente na quinta casa. O `glmnet`
+  sozinho, no mesmo desenho, leva `0,01 s`; o resto é a tolerância.
+- **Em candidatos de tamanho comparável o WAFC é mais rápido que o `bsgl`:**
+  em `J = 4`, que tem as mesmas 93 colunas do maior candidato dele, o ciclo
+  completo custa `0,15 s` contra `0,77 s` do `bsgl` inteiro.
+- **O `...` de `cv.wafc()` é roteado para `wafc_design()`**, então
+  `cv.wafc(..., thresh = 1e-7)` para com "argumento não utilizado": não há
+  como afrouxar a tolerância pela interface, o que provavelmente é a razão
+  de o defeito ter passado despercebido.
+
+**Consequência para P1:** a objeção de custo à grade profunda encolhe muito.
+O piloto estimou 5,3× a 5,6× para alargar a grade; com o ajuste 28× mais
+barato no candidato dominante, a grade larga cabe, e a comparação com o
+`gam` em dimensão casada (E6.1a) também.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -847,6 +871,7 @@ ser remedida.
 | D22 | 09-19 | **Centralização de Lebesgue:** a restrição de identificabilidade é `∫_0^1 g_{ℓm}(u) du = 0`, e não `E[g_{ℓm}(U_m)] = 0` como o `notacao.md` escrevia; a versão centrada em `P` sai pelo deslocamento `c_ℓ ↦ c_ℓ + Σ_m E{g_{ℓm}(U_m)}` e fica como observação | é o que a base impõe de graça (Lema 1 de E1.2) e o que o estimador estima; K&P (A1) usam base ortonormal em Lebesgue sem centralização, o WALL adota Lebesgue, e Xue & Yang centralizam em `P` mas recentralizam **empiricamente** na (3.4) deles. Adotar `P` obrigaria a mudar o alvo do Corolário 4 de E1.6, que hoje mede `‖ĝ − g‖_{L_2}` |
 | D23 | 09-19 | **A margem `eps` do reescalonamento tem função declarada:** periodizar a base num intervalo maior que o suporte dos dados, o que permite trocar `g` por uma extensão que emende em `0 ≡ 1`. Com isso a hipótese não é "densidade limitada por baixo em todo `[0,1]`" e sim sobre o **suporte**, e a constante de E1.4 passa a ser `c_U λ_min(G_eps)`, com `G_eps` a Gram da base restrita ao suporte. `rescale = TRUE` continua padrão e `boundary = "interval"` entra no `wafc()`, mas fica fora do manuscrito por enquanto | argumento do autor em 2026-09-19: tomar `[0,1]` é sem perda de generalidade sobre a escala, não sobre o suporte. O ganho é que a Proposição 2 de E1.3 (periodização trava a taxa em `2^{−J/2}`) deixa de se aplicar quando `eps > 0`; a emenda é E1.3b, e E2.4 mede `λ_min(G_eps)` e o ISE contra `eps` |
 | D24 | 09-19 | **As exigências de estilo da revista valem também nas derivações:** `E(·)`, `P(·)` e `Var(·)` em romano e com parênteses (§5 das instruções da SS), e um único `B_X` no lugar de `C_X` (E1.3) e `B_X` (E1.4). O `macros.tex` é ajustado quando E1.3b fechar | decisão do autor; manter dois conjuntos de símbolos para as mesmas quantidades é o que a notação congelada existe para evitar, e a revista não é negociável no ponto |
+| D33 | 09-21 | **O termo "sieve" sai do manuscrito**, trocado por "approximation space" (ou "expansão em base de dimensão crescente" onde couber a forma longa); o termo pode ficar uma vez, entre parênteses, para quem o conhece | pedido do autor: é padrão em estatística teórica e em econometria semiparamétrica, e **incomum onde o artigo quer se inserir** — conferido, Klopp & Pensky (2015) e Xue & Yang (2006) não o usam nenhuma vez, e "Approximation space" é **palavra-chave** do artigo de Xue & Yang; o WALL teórico usa 38 vezes, e é de lá que ele entrou no nosso vocabulário |
 | D32 | 09-20 | **A seleção de estrutura entra pela limiarização (saída (c)), e a saída (a) não abre agora.** O Corolário 8 de `06-selecao-limiar.tex` é o enunciado do artigo, com a hipótese de separação numerada e dizendo no próprio enunciado que é **estimação seguida de limiar**. A sondagem de E1.7a fica registrada como observação de meia página (a condição em grupos não depende de `J` nem da base), e a saída (a), se voltar depois de E2.5, volta pela rota de Wei & Huang (2010), não pela de Bach | veredito de E1.7a: a redução algébrica tira o risco de a condição falhar por construção, mas não o custo, e exige (BD) mais `E(XX'\|U)` constante, que contraria D13; além disso o valor de (a) continua condicionado a E2.5 escolher a variante em grupos, e E1.7c mostrou o LASSO limiarizado acertando 10 de 10 onde ela acerta 0 de 10 |
 | D31 | 09-20 | **Em avaliação numérica repetida, a base é fixada e avaliada por tabela**, não pelo algoritmo de Daubechies-Lagarias a cada ajuste: construir a tabela uma vez com `WaveBased::wtable()` para o par `(family, filter.size)` e passá-la em `wavelet.table` de `wafc_design()`, em vez de deixar a regra `use.table = "auto"` decidir réplica a réplica. Vale para o piloto (E2.4), o compêndio (E4) e a aplicação (E6). **Exceção:** conferência que mede precisão fina (as de `derivations/check/`, que leem decaimento até `1e-11`) continua com avaliação exata ou tabela com `prec.wavelet` alto, porque ali o `3.1e-06` engoliria o que se quer medir | pedido do autor, e a razão é **tempo de execução**: a tabela é o caminho rápido e a aproximação é boa o bastante (o erro de interpolação medido em E2.1 é `3.1e-06`), de modo que a variação entre os dois caminhos não é problema prático. A regra `auto` só dispara em `n q ≥ 2000 L`, isto é `n q ≥ 16000` com `L = 8`, e portanto **não dispara** nos `n` do piloto: deixá-la decidir significa pagar Daubechies-Lagarias em toda a varredura |
 | D30 | 09-19 | **O cenário suave é para ganhar, não só para não perder.** A hipótese `C^{p+1}` de Xue & Yang delimita a garantia deles, não o desempenho: com `J` e `λ` por validação cruzada o WAFC pode vencer splines também no suave, e E2.4 e E4 têm de medir isso em condição justa — o concorrente sintonizado nos termos dele (nós por BIC como no artigo deles, e `mgcv` com REML), predição e ISE relatadas em separado, e uma componente **suave de curvatura desigual** (gaussiana estreita ou `doppler` truncado longe da singularidade) acrescentada ao `dgp.R`, que é `C^∞` e portanto dentro da hipótese deles, mas com escala variando ao longo do domínio | argumento do autor; se o ganho aparecer, é ilustração forte para o artigo, e se não aparecer, a paridade no suave já é o que a Seção 5 precisa |
@@ -964,7 +989,9 @@ Ordenadas pelo que bloqueia mais.
 14. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
 15. **Edições acumuladas para `k = 2`** (decidido: não tocar em `ms_1`
-   avulso). Entram de uma vez, quando E1.3b e L4 fecharem: a frase de §4.3
+   avulso). Entram de uma vez: **a troca de "sieve" por "approximation
+   space" (D33), que são 25 ocorrências no `ms_1.tex` e 5 no `supp_1.tex`**;
+   a frase de §4.3
    sobre a regra teórica, que vira número com o que E2.3 mediu (`λ_n` de 7 a
    13 vezes o `λ` ótimo; sensível a `s'`, não sistematicamente acima); as
    citações de software que L4 trouxer; a observação de extensão de E1.3b; e
