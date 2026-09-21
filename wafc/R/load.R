@@ -12,8 +12,10 @@
 
 ## Packages the code in wafc/R/ requires. 'suggests' are needed by scripts
 ## and by the variants of the estimator, not by the functions loaded here.
+## VCBART is the engine of wafc_fit_vcbart(); step E2.4 used it and did not
+## declare it, because wafc/R/load.R was outside its catalogue.
 wafc_depends <- c("WaveBased", "glmnet", "Matrix")
-wafc_suggests <- c("testthat", "sparsegl", "grpreg", "mgcv")
+wafc_suggests <- c("testthat", "sparsegl", "grpreg", "mgcv", "VCBART")
 
 ## Directory holding this file, resolved from the source() frame when
 ## available and from the working directory otherwise.

@@ -1,5 +1,4 @@
-## wafc/R/competitors.R -- the competitors of the pilot (step E2.4) and the
-## one penalty rule the pilot adds to the five of E2.3.
+## wafc/R/competitors.R -- the competitors of the pilot (step E2.4).
 ##
 ## The list of competitors is the one proposal L2d fixed (docs/ESTADO.md,
 ## table of decisions), and every one of them is asked the same three
@@ -46,9 +45,10 @@
 ## the p by q matrix of selected blocks (NULL when the method selects
 ## nothing), and predict() gives rowSums(newx * beta(newu)).
 ##
-## Where this file should end up: wafc_lambda_qut() is a penalty rule and
-## belongs beside the five of wafc/R/tune.R; it is here because step E2.4
-## may not edit that file beyond three lines (docs/TAREFA.md, section 3).
+## The penalty rule step E2.4 added, wafc_lambda_qut(), used to live here
+## for want of a catalogue entry; step E2.4b moved it to wafc/R/tune.R,
+## beside the five rules it belongs with, and exposed it as
+## wafc_tune(rule = "qut").
 
 #' Fit a competitor of the WAFC
 #'
@@ -218,84 +218,48 @@ wafc_grid_components <- function(object, grid, s = NULL, design = NULL) {
   g
 }
 
-#' Quantile universal threshold for the WAFC
-#'
-#' The penalty rule of Giacobino, Sardy, Diaz-Rodriguez and Hengartner
-#' (2017), the one Sardy and Ma (2024) use, transcribed to the objective of
-#' \code{\link{wafc}}: the smallest \eqn{\lambda} that leaves every
-#' penalized coefficient at zero is
-#' \deqn{\lambda_0 = \|Z_{pen}' r_0\|_\infty / n,}
-#' with \eqn{r_0} the residual of the least squares fit on the unpenalized
-#' columns alone, and the rule takes the \eqn{1-\alpha} quantile of
-#' \eqn{\lambda_0} under the null model \eqn{y = Z_{unp}c + \varepsilon}.
-#'
-#' It is computed here in the pivotal form, which is what makes the rule
-#' free of \eqn{\sigma}: under the null, \eqn{r_0 = (I - P)\varepsilon}, so
-#' the ratio \eqn{\|Z_{pen}'(I-P)\varepsilon\|_\infty /
-#' \|(I-P)\varepsilon\|_2} does not depend on the error scale, and
-#' multiplying its simulated quantile by the observed \eqn{\|r_0\|_2 / n}
-#' gives a penalty level that needs neither \eqn{\sigma} nor
-#' cross-validation. This is the only rule of the pilot with that property:
-#' the rule of the theory needs \eqn{\sigma} and \eqn{s'}, the information
-#' criteria need a count of degrees of freedom, and the cross-validation
-#' needs the folds.
-#'
-#' @param design An object of class \code{"wafc_design"}.
-#' @param y The response.
-#' @param alpha One minus the level of the quantile. The default
-#'   \eqn{0.05} is the one of Giacobino et al.
-#' @param nsim Number of null samples simulated.
-#' @param seed Optional seed, so that two calls on the same design give the
-#'   same penalty level.
-#'
-#' @return A single penalty level, on the scale of the objective of
-#'   \code{\link{wafc}}.
-#'
-#' @references Giacobino, C., Sardy, S., Diaz-Rodriguez, J. and Hengartner,
-#'   N. (2017). Quantile universal threshold. \emph{Electronic Journal of
-#'   Statistics} 11(2), 4701-4722.
-#'
-#' @examples
-#' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
-#' des <- wafc_design(d$x, d$u, J = 3)
-#' wafc_lambda_qut(des, d$y, nsim = 50, seed = 1)
-#'
-#' @export
-wafc_lambda_qut <- function(design, y, alpha = 0.05, nsim = 200L,
-                            seed = NULL) {
-  if (!inherits(design, "wafc_design")) {
-    stop("'design' must be an object returned by wafc_design().", call. = FALSE)
-  }
-  if (length(alpha) != 1L || !is.finite(alpha) || alpha <= 0 || alpha >= 1) {
-    stop("'alpha' must be a single value in (0, 1).", call. = FALSE)
-  }
-  if (length(nsim) != 1L || !is.finite(nsim) || nsim < 1) {
-    stop("'nsim' must be a single positive integer.", call. = FALSE)
-  }
-  nsim <- as.integer(nsim)
-  n <- design[["n"]]
-  y <- wafc_check_y(y, n)
-  if (!is.null(seed)) set.seed(seed)
-  unp <- design[["unpenalized"]]
-  pen <- seq_len(design[["nvars"]])[-unp]
-  W <- as.matrix(design[["Z"]][, unp, drop = FALSE])
-  Zp <- design[["Z"]][, pen, drop = FALSE]
-  qrW <- qr(W)
-  resid_of <- function(v) as.numeric(v - W %*% wafc_qr_coef(qrW, v))
-  ## Pivotal statistic under the null: the ratio does not depend on sigma,
-  ## and the observed residual norm carries the scale.
-  E <- matrix(stats::rnorm(n * nsim), n, nsim)
-  R <- E - W %*% wafc_qr_coef(qrW, E)
-  G <- as.matrix(Matrix::crossprod(Zp, R))
-  ratio <- apply(abs(G), 2L, max) / sqrt(colSums(R^2))
-  r0 <- resid_of(y)
-  as.numeric(stats::quantile(ratio, 1 - alpha, names = FALSE)) *
-    sqrt(sum(r0^2)) / n
-}
-
 ## ---------------------------------------------------------------------------
 ## The fitters
 ## ---------------------------------------------------------------------------
+
+#' Spline basis dimension matched to a WAFC expansion
+#'
+#' The basis dimension the smooth of each modulating covariate needs for
+#' \code{\link{wafc_fit_gam}} to be compared with \code{\link{wafc}} at
+#' equal dimension and not at equal convenience: \eqn{2^J} per modulator,
+#' the number of wavelet columns a block of resolution \eqn{J} has with
+#' \eqn{j_0 = 0} and the constant scaling function discarded, truncated at
+#' what the data admit, since a smooth cannot have more basis functions
+#' than its covariate has distinct values.
+#'
+#' Step E6.1a is the reason this exists: on the three real candidates the
+#' WAFC seemed to beat \code{mgcv} by 6.6\% to 15.2\% at the default
+#' \code{k = 10} and tied with it at matched dimension, so the whole
+#' apparent gain was one of dimension. The pilot of step E2.4 ran at the
+#' default, and its verdict against this competitor has to be read again
+#' at matched dimension.
+#'
+#' @param u Matrix of modulating covariates.
+#' @param J The resolution level, or one per modulating covariate.
+#' @param kmin Smallest dimension returned.
+#'
+#' @return An integer vector of length \code{ncol(u)}.
+#'
+#' @examples
+#' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
+#' wafc_k_matched(d$u, J = 4)
+#'
+#' @export
+wafc_k_matched <- function(u, J, kmin = 3L) {
+  u <- wafc_as_matrix(u, "u")
+  q <- ncol(u)
+  J <- wafc_recycle(J, q, "J")
+  if (any(!is.finite(J)) || any(J != round(J)) || any(J < 1)) {
+    stop("'J' must contain integer values of at least 1.", call. = FALSE)
+  }
+  ndist <- vapply(seq_len(q), function(m) length(unique(u[, m])), 0L)
+  as.integer(pmax(kmin, pmin(2^as.integer(J), ndist - 1L)))
+}
 
 #' Additive varying coefficient model by penalized splines
 #'
@@ -314,28 +278,60 @@ wafc_lambda_qut <- function(design, y, alpha = 0.05, nsim = 200L,
 #' returns an exactly zero fit, so any structure count for this method
 #' needs a threshold and is reported with it.
 #'
+#' Two things step E2.4b changed, both from what step E6.1a measured on
+#' real data (\file{docs/aplicacao-candidatas.md}). First, \code{k} may
+#' now be given one value per modulating covariate, so that the basis
+#' dimension can be matched to the \eqn{2^J} of the WAFC expansion
+#' (\code{\link{wafc_k_matched}}): with the single default \code{k = 10}
+#' the comparison is one of dimension and not one of basis, and on the
+#' three real candidates that difference was the whole apparent gain of the
+#' WAFC, 6.6\% to 15.2\% at \code{k = 10} against a tie at matched
+#' dimension. Second, \code{engine = "bam"} fits the same model with
+#' \code{\link[mgcv]{bam}}, \code{method = "fREML"} and discretized
+#' covariates, which at these dimensions is two orders of magnitude faster
+#' (6.1 s against 1453 s for eight smooths of \eqn{k = 23}). That is a
+#' change of fitting algorithm plus a binning of the covariates, not a
+#' change of estimator, and the number it produces is labelled with it
+#' wherever it is reported.
+#'
 #' @param x,u,y The data, as in \code{\link{wafc_competitor}}.
-#' @param k Basis dimension of each smooth.
+#' @param k Basis dimension of each smooth: one value for every smooth, or
+#'   one value per modulating covariate.
 #' @param select Passed to \code{\link[mgcv]{gam}}: \code{TRUE} adds the
 #'   extra penalty on the null space, which is what lets a smooth be shrunk
 #'   away entirely and is the fair setting when half the blocks are zero.
 #' @param edf.tol Threshold on the effective degrees of freedom above which
 #'   a block counts as kept.
-#' @param ... Further arguments to \code{\link[mgcv]{gam}}.
+#' @param engine \code{"gam"} (the default) fits with
+#'   \code{\link[mgcv]{gam}} and \code{method = "REML"}, which is what
+#'   decision D30 asks for; \code{"bam"} fits with
+#'   \code{\link[mgcv]{bam}}, \code{method = "fREML"} and
+#'   \code{discrete = TRUE}.
+#' @param ... Further arguments to \code{\link[mgcv]{gam}} or to
+#'   \code{\link[mgcv]{bam}}.
 #'
-#' @return An object of class \code{"wafc_competitor"}.
+#' @return An object of class \code{"wafc_competitor"}, whose \code{extra}
+#'   carries the \code{edf} matrix, the \code{edf.tol} used, the vector
+#'   \code{k} and the \code{engine}.
 #'
 #' @examples
 #' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
 #' wafc_fit_gam(d$x, d$u, d$y)$blocks
 #'
 #' @export
-wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1, ...) {
+wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1,
+                         engine = c("gam", "bam"), ...) {
   if (!requireNamespace("mgcv", quietly = TRUE)) {
     stop("method = \"gam\" needs the package 'mgcv'.", call. = FALSE)
   }
+  engine <- match.arg(engine)
   p <- ncol(x)
   q <- ncol(u)
+  k <- wafc_recycle(k, q, "k")
+  if (any(!is.finite(k)) || any(k != round(k)) || any(k < 3)) {
+    stop("'k' must contain integer values of at least 3.", call. = FALSE)
+  }
+  k <- as.integer(k)
   xn <- wafc_names(x, p, "x")
   un <- wafc_names(u, q, "u")
   dat <- wafc_frame(x, u, xn, un)
@@ -348,11 +344,16 @@ wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1, ...) {
   terms <- character(0)
   for (l in seq_len(p)) {
     for (m in seq_len(q)) {
-      terms <- c(terms, sprintf("s(%s, k = %d, by = %s)", un[m], k, xn[l]))
+      terms <- c(terms, sprintf("s(%s, k = %d, by = %s)", un[m], k[m], xn[l]))
     }
   }
   fo <- stats::as.formula(paste("y ~ 0 +", paste(c(xn, terms), collapse = " + ")))
-  fit <- mgcv::gam(fo, data = dat, method = "REML", select = select, ...)
+  fit <- if (engine == "gam") {
+    mgcv::gam(fo, data = dat, method = "REML", select = select, ...)
+  } else {
+    mgcv::bam(fo, data = dat, method = "fREML", discrete = TRUE,
+              select = select, ...)
+  }
   ## Effective degrees of freedom by smooth, in the order the terms were
   ## written, which is the lexicographic order of D12.
   edf <- vapply(fit[["smooth"]],
@@ -365,8 +366,9 @@ wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1, ...) {
 
   term_at <- function(newu) {
     nd <- wafc_frame(matrix(1, nrow(newu), p), newu, xn, un)
-    tm <- mgcv::predict.gam(fit, newdata = nd, type = "terms")
-    tm
+    ## The generic, and not mgcv::predict.gam: a bam fitted with
+    ## discrete = TRUE has its own method.
+    stats::predict(fit, newdata = nd, type = "terms")
   }
   beta_fun <- function(newu) {
     newu <- wafc_as_matrix(newu, "newu")
@@ -401,7 +403,7 @@ wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1, ...) {
        fitted = as.numeric(stats::fitted(fit)), xnames = xn, unames = un,
        extra = list(edf = matrix(edf, p, q, byrow = TRUE,
                                  dimnames = list(xn, un)),
-                    edf.tol = edf.tol))
+                    edf.tol = edf.tol, k = k, engine = engine))
 }
 
 #' B-spline sieve with a group LASSO by block

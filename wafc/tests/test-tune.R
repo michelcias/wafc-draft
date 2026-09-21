@@ -250,10 +250,11 @@ test_that("wafc_sigma returns a scale near the true one at a rich enough sieve",
 ## ---------------------------------------------------------------------------
 
 test_that("every rule returns a pair on the path whose optimality conditions hold", {
-  rules <- c("cv.min", "cv.1se", "bic", "ebic", "theory")
+  rules <- c("cv.min", "cv.1se", "bic", "ebic", "theory", "qut")
   for (rule in rules) {
     tn <- wafc_tune(x0, u0, y0, rule = rule, J = 2:4, foldid = folds,
-                    s = 3/2, sigma = dgp[["sigma"]])
+                    s = 3/2, sigma = dgp[["sigma"]], nsim = 100L,
+                    qut.seed = 5L)
     expect_s3_class(tn, "wafc_tune")
     expect_equal(tn[["rule"]], rule)
     expect_true(tn[["lambda"]] %in% tn[["fit"]][["lambda"]])
@@ -265,6 +266,50 @@ test_that("every rule returns a pair on the path whose optimality conditions hol
     expect_equal(dim(coef(tn)), c(1L + tn[["fit"]][["nvars"]], 1L))
     expect_equal(nrow(predict(tn, x0, u0)), n)
   }
+})
+
+test_that("the qut rule is the cross-validated J with the penalty level of the QUT", {
+  ## Step E2.4b moved wafc_lambda_qut() here from competitors.R and made
+  ## it the sixth rule. The resolution is not part of the rule, so it is
+  ## the one the cross-validation of the other two rules selects, and only
+  ## the penalty level changes: that is what the pilot did by hand.
+  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds)
+  tn <- wafc_tune(x0, u0, y0, rule = "qut", J = 2:4, foldid = folds,
+                  nsim = 200L, qut.seed = 11L)
+  expect_equal(tn[["J"]], cv[["J.min"]])
+  expect_equal(tn[["lambda"]],
+               wafc_lambda_qut(cv[["wafc.fit"]][["design"]], y0, nsim = 200L,
+                               seed = 11L))
+  expect_equal(tn[["tab"]], cv[["cvtab"]])
+  ## and it is the conservative rule the pilot reports: calibrated on the
+  ## null, so never below the one calibrated on prediction
+  expect_gt(tn[["lambda"]], cv[["lambda.min"]])
+  expect_lte(tn[["nzero"]], wafc_nzero_at(cv[["wafc.fit"]], cv[["lambda.min"]]))
+})
+
+test_that("the dots of the tuning functions reach wafc() and not only wafc_design()", {
+  ## Step E2.3 routed the whole '...' to wafc_design(), so an argument of
+  ## the fit stopped with "unused argument" and the convergence threshold
+  ## could not be loosened through the interface at all (docs/ESTADO.md,
+  ## 2026-09-21). Both callees now get what is theirs, and a name that
+  ## belongs to neither is an error instead of a silent default.
+  a <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds, thresh = 1e-10)
+  b <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds, rescale = FALSE)
+  expect_s3_class(a, "cv.wafc")
+  expect_equal(a[["J.min"]], cv.wafc(x0, u0, y0, J = 2:3,
+                                     foldid = folds)[["J.min"]])
+  expect_false(b[["wafc.fit"]][["design"]][["rescale"]])
+  expect_error(cv.wafc(x0, u0, y0, J = 2L, foldid = folds, thrsh = 1e-7),
+               "unused argument")
+  expect_error(wafc_tune(x0, u0, y0, rule = "bic", J = 2L, nope = 1),
+               "unused argument")
+  ## the two kinds of argument travel together, and to the right callee
+  d <- wafc_tune(x0, u0, y0, rule = "bic", J = 2:3, rescale = FALSE,
+                 thresh = 1e-10)
+  expect_false(d[["fit"]][["design"]][["rescale"]])
+  ## the tighter tolerance is what the optimality check wants, and it is
+  ## reachable now
+  expect_true(all(wafc_kkt(d[["fit"]], s = d[["lambda"]])[["ok"]]))
 })
 
 test_that("the theory rule is exactly wafc_J_theory and wafc_lambda_theory", {

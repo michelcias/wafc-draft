@@ -75,7 +75,22 @@
 #'   right one here, as in \code{WaveBased::wall}: the wavelet basis is
 #'   orthonormal and standardizing the columns would change the penalty
 #'   from level to level.
-#' @param thresh Convergence threshold of the coordinate descent.
+#' @param thresh Convergence threshold of the coordinate descent,
+#'   \eqn{10^{-9}} by default. \code{NULL} uses the engine default,
+#'   \eqn{10^{-7}} for \pkg{glmnet} and \eqn{10^{-8}} for \pkg{sparsegl}.
+#'   The default is not the engine one because the design is not
+#'   standardized (decision D17), so the relative criterion of the engine
+#'   is read on a scale the penalty does not share: step E2.4b swept
+#'   \eqn{10^{-7}} to \eqn{10^{-10}} over two scenarios, two sample sizes
+#'   and three resolution levels, and \code{\link{wafc_kkt}} flagged
+#'   between 19 and 73 points of the path in every cell at \eqn{10^{-7}}
+#'   and in ten of twelve cells at \eqn{10^{-8}}, against none at
+#'   \eqn{10^{-9}} but one cell with three. The selected penalty level is
+#'   the same at every tolerance except one cell at \eqn{10^{-7}}, so what
+#'   a looser value buys is speed and what it costs is the verification,
+#'   not the tuning. Loosening it deliberately, for a simulation that
+#'   checks the optimality conditions elsewhere, is a legitimate choice and
+#'   is what the argument is for.
 #' @param maxit Maximum number of passes; \code{NULL} uses the engine
 #'   default.
 #' @param design An object returned by \code{\link{wafc_design}}, to be
@@ -111,7 +126,7 @@
 wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
                  lambda = NULL, nlambda = 100L, lambda.min.ratio = NULL,
                  asparse = 0.05, intercept = NULL, standardize = FALSE,
-                 thresh = 1e-10, maxit = NULL, design = NULL, ...) {
+                 thresh = 1e-9, maxit = NULL, design = NULL, ...) {
 
   this_call <- match.call()
   penalty <- match.arg(penalty)
@@ -165,9 +180,10 @@ wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
   if (penalty == "lasso") {
     args[["family"]] <- "gaussian"
     args[["penalty.factor"]] <- design[["penalty.factor"]]
-    ctrl <- list(thresh = thresh)
+    ctrl <- list()
+    if (!is.null(thresh)) ctrl[["thresh"]] <- thresh
     if (!is.null(maxit)) ctrl[["maxit"]] <- maxit
-    args[["control"]] <- ctrl
+    if (length(ctrl) > 0L) args[["control"]] <- ctrl
     if (!is.null(lambda.min.ratio) && is.null(lambda)) {
       args[["lambda.min.ratio"]] <- lambda.min.ratio
     }
@@ -195,7 +211,7 @@ wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
     args[["pf_sparse"]] <- group[["pf_sparse"]]
     args[["asparse"]] <- asparse
     args[["family"]] <- "gaussian"
-    args[["eps"]] <- thresh
+    if (!is.null(thresh)) args[["eps"]] <- thresh
     if (!is.null(maxit)) args[["maxit"]] <- maxit
     if (!is.null(lambda.min.ratio) && is.null(lambda)) {
       args[["lambda.factor"]] <- lambda.min.ratio

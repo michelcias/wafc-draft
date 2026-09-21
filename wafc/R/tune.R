@@ -2,7 +2,7 @@
 ## E2.3): cross-validation over the grid, the information criteria, and the
 ## resolution rule that the theory of E1.6 prescribes.
 ##
-## Four selection rules live here, and they answer different questions.
+## Five selection rules live here, and they answer different questions.
 ##
 ##  (i)   cv.wafc() cross-validates over (J, lambda) with folds that are
 ##        fixed once for the whole grid, as cv.wall() does in WaveBased: one
@@ -22,6 +22,14 @@
 ##        no data-driven search at all; it needs the effective regularity
 ##        s' of the components and the error scale sigma, and what it costs
 ##        to use it is the fourth column of the comparison of E2.3.
+##  (iv)  wafc_lambda_qut() is the quantile universal threshold of
+##        Giacobino et al. (2017), added by step E2.4 and moved here by
+##        step E2.4b, which is where a penalty rule belongs. It is the only
+##        rule that needs neither sigma, nor s', nor folds, and the pilot
+##        measured it as the only one that never turns on a false block.
+##        The resolution is not part of it, so wafc_tune(rule = "qut")
+##        takes J from the cross-validation and changes only lambda, which
+##        is what the pilot did.
 ##
 ## Two things this file inherits from E2.2 and does not renegotiate
 ## (decision D17): the lambda of every object is the lambda of the
@@ -112,11 +120,18 @@ cv.wafc <- function(x, u, y, J = NULL, penalty = c("lasso", "sglasso"),
                  mse = function(e) e^2,
                  mae = function(e) abs(e))
 
+  dots <- wafc_split_dots(list(...))
+
   run_one <- function(Ji) {
-    design <- wafc_design(x, u, J = Ji, ...)
-    full <- wafc(design = design, y = y, penalty = penalty, lambda = lambda,
-                 nlambda = nlambda, lambda.min.ratio = lambda.min.ratio, ...)
-    z <- wafc_cv_design(design, y, full, foldid, loss, penalty, ...)
+    design <- do.call(wafc_design,
+                      c(list(x = x, u = u, J = Ji), dots[["design"]]))
+    full <- do.call(wafc, c(list(design = design, y = y, penalty = penalty,
+                                 lambda = lambda, nlambda = nlambda,
+                                 lambda.min.ratio = lambda.min.ratio),
+                            dots[["fit"]]))
+    z <- do.call(wafc_cv_design,
+                 c(list(design, y, full, foldid, loss, penalty),
+                   dots[["fit"]]))
     z[["J"]] <- Ji
     list(cv = z, fit = full)
   }
@@ -384,7 +399,11 @@ wafc_lambda_theory <- function(design, sigma = NULL, alpha = 0.05, y = NULL) {
 #' @param method \code{"cv"} or \code{"fixed.point"}; see above.
 #' @param penalty \code{"lasso"} or \code{"sglasso"}, as in
 #'   \code{\link{wafc}}.
-#' @param alpha The confidence level of the penalty level of E1.5.
+#' @param alpha The confidence level of the penalty level of E1.5, and of
+#'   the quantile of \code{rule = "qut"}.
+#' @param nsim Number of null samples simulated by \code{rule = "qut"}.
+#' @param qut.seed Optional seed of that simulation, so that two calls on
+#'   the same design give the same penalty level.
 #' @param nfolds,foldid Folds used by \code{method = "cv"}.
 #' @param sigma0 Starting value of the iteration; \code{NULL} is the
 #'   default described above.
@@ -471,14 +490,17 @@ wafc_sigma <- function(design, y, method = c("cv", "fixed.point"),
 
 #' Select the pair (J, lambda) of a WAFC fit by one rule
 #'
-#' One entry point for the four selection rules of step E2.3, so that they
-#' are applied to the same data through the same interface and their cost
-#' can be compared. \code{"cv.min"} and \code{"cv.1se"} call
-#' \code{\link{cv.wafc}}; \code{"bic"} and \code{"ebic"} minimise the
-#' criterion of \code{\link{wafc_bic}} over the same grid of \eqn{J} and
-#' over the path of each candidate; \code{"theory"} takes the pair of
-#' \code{\link{wafc_J_theory}} and \code{\link{wafc_lambda_theory}} without
-#' looking at any loss.
+#' One entry point for the six selection rules, so that they are applied to
+#' the same data through the same interface and their cost can be compared.
+#' \code{"cv.min"} and \code{"cv.1se"} call \code{\link{cv.wafc}};
+#' \code{"bic"} and \code{"ebic"} minimise the criterion of
+#' \code{\link{wafc_bic}} over the same grid of \eqn{J} and over the path
+#' of each candidate; \code{"theory"} takes the pair of
+#' \code{\link{wafc_J_theory}} and \code{\link{wafc_lambda_theory}}
+#' without looking at any loss; and \code{"qut"} takes \eqn{J} from the
+#' same cross-validation the first two use and \eqn{\lambda} from
+#' \code{\link{wafc_lambda_qut}}, since the quantile universal threshold
+#' is a rule for the penalty level alone.
 #'
 #' @param x,u,y The data, as in \code{\link{wafc}}.
 #' @param rule The selection rule.
@@ -489,10 +511,15 @@ wafc_sigma <- function(design, y, method = c("cv", "fixed.point"),
 #' @param nfolds,foldid Folds of the cross-validation rules.
 #' @param nlambda,lambda.min.ratio The paths of the candidates.
 #' @param gamma The parameter of \code{\link{wafc_ebic}}.
-#' @param s The effective regularity used by \code{rule = "theory"}.
+#' @param s The effective regularity used by \code{rule = "theory"}; the
+#'   value a scenario declares is \code{\link{wafc_sprime}}.
 #' @param sigma The error scale used by \code{rule = "theory"};
 #'   \code{NULL} estimates it with \code{\link{wafc_sigma}}.
-#' @param alpha The confidence level of the penalty level of E1.5.
+#' @param alpha The confidence level of the penalty level of E1.5, and of
+#'   the quantile of \code{rule = "qut"}.
+#' @param nsim Number of null samples simulated by \code{rule = "qut"}.
+#' @param qut.seed Optional seed of that simulation, so that two calls on
+#'   the same design give the same penalty level.
 #' @param ... Passed to \code{\link{wafc}} and to
 #'   \code{\link{wafc_design}}.
 #'
@@ -505,7 +532,7 @@ wafc_sigma <- function(design, y, method = c("cv", "fixed.point"),
 #'   cross-validation rules, the whole \code{"cv.wafc"} object in \code{cv}.
 #'
 #' @seealso \code{\link{cv.wafc}}, \code{\link{wafc_bic}},
-#'   \code{\link{wafc_J_theory}}.
+#'   \code{\link{wafc_J_theory}}, \code{\link{wafc_lambda_qut}}.
 #'
 #' @examples
 #' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
@@ -516,11 +543,13 @@ wafc_sigma <- function(design, y, method = c("cv", "fixed.point"),
 #'
 #' @export
 wafc_tune <- function(x, u, y,
-                      rule = c("cv.min", "cv.1se", "bic", "ebic", "theory"),
+                      rule = c("cv.min", "cv.1se", "bic", "ebic", "theory",
+                               "qut"),
                       J = NULL, penalty = c("lasso", "sglasso"),
                       nfolds = 10L, foldid = NULL, nlambda = 100L,
                       lambda.min.ratio = NULL, gamma = 1, s = 1,
-                      sigma = NULL, alpha = 0.05, ...) {
+                      sigma = NULL, alpha = 0.05, nsim = 200L,
+                      qut.seed = NULL, ...) {
 
   this_call <- match.call()
   rule <- match.arg(rule)
@@ -529,6 +558,7 @@ wafc_tune <- function(x, u, y,
   u <- wafc_as_matrix(u, "u")
   n <- nrow(x)
   y <- wafc_check_y(y, n)
+  dots <- wafc_split_dots(list(...))
 
   if (rule == "theory") {
     Jn <- wafc_J_theory(n, s = s)
@@ -537,15 +567,22 @@ wafc_tune <- function(x, u, y,
     ## wafc_rescale() requires. Since step E2.1b the margin is a fixed
     ## constant and the design exists at every J > j0, so the rule is
     ## followed wherever it leads and there is nothing to guard against.
-    design <- wafc_design(x, u, J = Jn, ...)
+    design <- do.call(wafc_design,
+                      c(list(x = x, u = u, J = Jn), dots[["design"]]))
     if (is.null(sigma)) {
-      est <- wafc_sigma(design, y, alpha = alpha, nfolds = nfolds,
-                        foldid = foldid, penalty = penalty, ...)
+      ## 'maxit' is held back: it is the number of iterations of the fixed
+      ## point of wafc_sigma() and the number of passes of the engine, and
+      ## the two are not the same number.
+      est <- do.call(wafc_sigma,
+                     c(list(design, y, alpha = alpha, nfolds = nfolds,
+                            foldid = foldid, penalty = penalty),
+                       dots[["fit"]][names(dots[["fit"]]) != "maxit"]))
       sigma <- est[["sigma"]]
     }
     lam <- wafc_lambda_theory(design, sigma = sigma, alpha = alpha)
-    fit <- wafc(design = design, y = y, penalty = penalty,
-                lambda = wafc_path_to(lam, design, y), ...)
+    fit <- do.call(wafc, c(list(design = design, y = y, penalty = penalty,
+                                lambda = wafc_path_to(lam, design, y)),
+                           dots[["fit"]]))
     tab <- data.frame(J = Jn, lambda = lam, sigma = sigma,
                       nzero = fit[["nzero"]][length(fit[["lambda"]])])
     out <- list(rule = rule, J = Jn, lambda = lam, fit = fit,
@@ -555,12 +592,27 @@ wafc_tune <- function(x, u, y,
     return(out)
   }
 
-  if (rule %in% c("cv.min", "cv.1se")) {
+  if (rule %in% c("cv.min", "cv.1se", "qut")) {
     cv <- cv.wafc(x, u, y, J = J, penalty = penalty, nfolds = nfolds,
                   foldid = foldid, nlambda = nlambda,
                   lambda.min.ratio = lambda.min.ratio, ...)
-    lam <- if (rule == "cv.min") cv[["lambda.min"]] else cv[["lambda.1se"]]
-    fit <- cv[["wafc.fit"]]
+    ## The quantile universal threshold says nothing about the
+    ## resolution, so J is the cross-validated one and only lambda
+    ## changes. The fit is refitted down to that lambda, because it need
+    ## not belong to the path the cross-validation built.
+    if (rule == "qut") {
+      fit0 <- cv[["wafc.fit"]]
+      lam <- wafc_lambda_qut(fit0[["design"]], y, alpha = alpha,
+                             nsim = nsim, seed = qut.seed)
+      fit <- do.call(wafc,
+                     c(list(design = fit0[["design"]], y = y,
+                            penalty = penalty,
+                            lambda = wafc_path_to(lam, fit0[["design"]], y)),
+                       dots[["fit"]]))
+    } else {
+      lam <- if (rule == "cv.min") cv[["lambda.min"]] else cv[["lambda.1se"]]
+      fit <- cv[["wafc.fit"]]
+    }
     nz <- wafc_nzero_at(fit, lam)
     out <- list(rule = rule, J = cv[["J.min"]], lambda = lam, fit = fit,
                 nzero = nz, tab = cv[["cvtab"]], sigma = NA_real_, cv = cv,
@@ -580,8 +632,10 @@ wafc_tune <- function(x, u, y,
   best <- NULL
   rows <- vector("list", length(J))
   for (i in seq_along(J)) {
-    fit <- wafc(x, u, y, J = J[i], penalty = penalty, nlambda = nlambda,
-                lambda.min.ratio = lambda.min.ratio, ...)
+    fit <- do.call(wafc, c(list(x = x, u = u, y = y, J = J[i],
+                                penalty = penalty, nlambda = nlambda,
+                                lambda.min.ratio = lambda.min.ratio),
+                           dots[["design"]], dots[["fit"]]))
     ic <- wafc_ic(fit, s = NULL, gamma = gam, name = name)
     k <- attr(ic, "which.min")
     rows[[i]] <- data.frame(J = J[i], lambda = ic[["lambda"]][k],
@@ -637,9 +691,112 @@ predict.wafc_tune <- function(object, newx, newu, ...) {
   predict(object[["fit"]], newx, newu, s = object[["lambda"]], ...)
 }
 
+#' Quantile universal threshold for the WAFC
+#'
+#' The penalty rule of Giacobino, Sardy, Diaz-Rodriguez and Hengartner
+#' (2017), the one Sardy and Ma (2024) use, transcribed to the objective of
+#' \code{\link{wafc}}: the smallest \eqn{\lambda} that leaves every
+#' penalized coefficient at zero is
+#' \deqn{\lambda_0 = \|Z_{pen}' r_0\|_\infty / n,}
+#' with \eqn{r_0} the residual of the least squares fit on the unpenalized
+#' columns alone, and the rule takes the \eqn{1-\alpha} quantile of
+#' \eqn{\lambda_0} under the null model \eqn{y = Z_{unp}c + \varepsilon}.
+#'
+#' It is computed here in the pivotal form, which is what makes the rule
+#' free of \eqn{\sigma}: under the null, \eqn{r_0 = (I - P)\varepsilon}, so
+#' the ratio \eqn{\|Z_{pen}'(I-P)\varepsilon\|_\infty /
+#' \|(I-P)\varepsilon\|_2} does not depend on the error scale, and
+#' multiplying its simulated quantile by the observed \eqn{\|r_0\|_2 / n}
+#' gives a penalty level that needs neither \eqn{\sigma} nor
+#' cross-validation. This is the only rule of the pilot with that property:
+#' the rule of the theory needs \eqn{\sigma} and \eqn{s'}, the information
+#' criteria need a count of degrees of freedom, and the cross-validation
+#' needs the folds.
+#'
+#' @param design An object of class \code{"wafc_design"}.
+#' @param y The response.
+#' @param alpha One minus the level of the quantile. The default
+#'   \eqn{0.05} is the one of Giacobino et al.
+#' @param nsim Number of null samples simulated.
+#' @param seed Optional seed, so that two calls on the same design give the
+#'   same penalty level.
+#'
+#' @return A single penalty level, on the scale of the objective of
+#'   \code{\link{wafc}}.
+#'
+#' @references Giacobino, C., Sardy, S., Diaz-Rodriguez, J. and Hengartner,
+#'   N. (2017). Quantile universal threshold. \emph{Electronic Journal of
+#'   Statistics} 11(2), 4701-4722.
+#'
+#' @examples
+#' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
+#' des <- wafc_design(d$x, d$u, J = 3)
+#' wafc_lambda_qut(des, d$y, nsim = 50, seed = 1)
+#'
+#' @export
+wafc_lambda_qut <- function(design, y, alpha = 0.05, nsim = 200L,
+                            seed = NULL) {
+  if (!inherits(design, "wafc_design")) {
+    stop("'design' must be an object returned by wafc_design().", call. = FALSE)
+  }
+  if (length(alpha) != 1L || !is.finite(alpha) || alpha <= 0 || alpha >= 1) {
+    stop("'alpha' must be a single value in (0, 1).", call. = FALSE)
+  }
+  if (length(nsim) != 1L || !is.finite(nsim) || nsim < 1) {
+    stop("'nsim' must be a single positive integer.", call. = FALSE)
+  }
+  nsim <- as.integer(nsim)
+  n <- design[["n"]]
+  y <- wafc_check_y(y, n)
+  if (!is.null(seed)) set.seed(seed)
+  unp <- design[["unpenalized"]]
+  pen <- seq_len(design[["nvars"]])[-unp]
+  W <- as.matrix(design[["Z"]][, unp, drop = FALSE])
+  Zp <- design[["Z"]][, pen, drop = FALSE]
+  ## wafc_qr_coef() is the least squares solve of wafc/R/competitors.R; it
+  ## is shared and not duplicated.
+  qrW <- qr(W)
+  resid_of <- function(v) as.numeric(v - W %*% wafc_qr_coef(qrW, v))
+  ## Pivotal statistic under the null: the ratio does not depend on sigma,
+  ## and the observed residual norm carries the scale.
+  E <- matrix(stats::rnorm(n * nsim), n, nsim)
+  R <- E - W %*% wafc_qr_coef(qrW, E)
+  G <- as.matrix(Matrix::crossprod(Zp, R))
+  ratio <- apply(abs(G), 2L, max) / sqrt(colSums(R^2))
+  r0 <- resid_of(y)
+  as.numeric(stats::quantile(ratio, 1 - alpha, names = FALSE)) *
+    sqrt(sum(r0^2)) / n
+}
+
 ## ---------------------------------------------------------------------------
 ## Internals
 ## ---------------------------------------------------------------------------
+
+## Routing of the '...' of the tuning functions. It carries arguments for
+## two callees: wafc_design(), which takes the basis, the margin and the
+## rescaling, and wafc(), which takes the engine (thresh, maxit, asparse,
+## standardize, intercept). Step E2.3 sent the whole lot to wafc_design(),
+## so cv.wafc(x, u, y, thresh = 1e-7) stopped with "unused argument" and
+## the tolerance of the fit could not be reached through the interface at
+## all; that is why the default of 1e-10 survived three steps unmeasured
+## (docs/ESTADO.md, 2026-09-21). Split by name, and refuse a name that is
+## neither, so that a typo is an error and not a silent default.
+wafc_split_dots <- function(dots) {
+  if (length(dots) == 0L) return(list(design = list(), fit = list()))
+  if (is.null(names(dots)) || any(!nzchar(names(dots)))) {
+    stop("every argument passed through '...' must be named.", call. = FALSE)
+  }
+  dnames <- setdiff(names(formals(wafc_design)), c("x", "u", "J", "..."))
+  fnames <- setdiff(names(formals(wafc)),
+                    c("x", "u", "y", "J", "design", "...", dnames))
+  unknown <- setdiff(names(dots), c(dnames, fnames))
+  if (length(unknown) > 0L) {
+    stop("unused argument(s) in '...': ", paste(unknown, collapse = ", "),
+         ". They belong to neither wafc_design() nor wafc().", call. = FALSE)
+  }
+  list(design = dots[names(dots) %in% dnames],
+       fit = dots[names(dots) %in% fnames])
+}
 
 ## Grid of candidate resolution levels: the rule of cv.wall, with j0 = 0,
 ## starting at J = 2. Only one of the two reasons E2.3 gave survives step

@@ -9,10 +9,19 @@
 ## discarded (Lemma 1 of derivations/01-identificabilidade.md, and open
 ## question 4 of docs/ESTADO.md).
 ##
-## Three scenarios, in the terms of docs/plano-projeto.md, E2.1:
+## Four scenarios, in the terms of docs/plano-projeto.md, E2.1, plus
+## the one decision D30 adds:
 ##
 ##   "smooth"          sine, cosine and a cubic: functions in every Besov
-##                     space, where a linear sieve is already efficient;
+##                     space, where an expansion of growing dimension is
+##                     already efficient;
+##   "uneven"          a mixture of a wide and a narrow Gaussian, a chirp
+##                     and a cosine: every component is C^infinity, and so
+##                     inside the hypothesis of Xue and Yang (2006), but
+##                     the scale of two of them varies along the domain.
+##                     It is the scenario decision D30 asks for: the smooth
+##                     case where a single smoothing parameter has to
+##                     compromise and an adaptive basis need not;
 ##   "inhomogeneous"   bumps, blocks and heavisine of Donoho and Johnstone
 ##                     (1994), rescaled to [0,1]: spatially inhomogeneous
 ##                     regularity, which is where the wavelet LASSO is
@@ -21,9 +30,45 @@
 ##                     regression and the whole penalized part must be
 ##                     shrunk away.
 ##
-## The active structure is the same in the first two: beta_1 depends on two
-## modulating covariates (the additive structure that is the point of the
-## model), beta_2 on one, and beta_l is constant for l >= 3.
+## The active structure is the same in the first three: beta_1 depends on
+## two modulating covariates (the additive structure that is the point of
+## the model), beta_2 on one, and beta_l is constant for l >= 3.
+##
+## Each scenario also declares the effective regularity s' of decision D27,
+## through wafc_sprime(); see the note on that function for why the number
+## has to carry the regime it is read in.
+
+#' A window that vanishes to every order at the endpoints
+#'
+#' The \eqn{C^\infty} partition-of-unity profile of Step 2 of Lemma 10
+#' (\file{derivations/02-aproximacao-besov.tex}), used here to make a
+#' component and all of its derivatives vanish at \eqn{0} and at \eqn{1}.
+#' A component built this way has a \eqn{C^\infty} periodic extension, so
+#' the effective regularity the wavelet basis reads is the one of the
+#' function itself and not the one of a seam.
+#'
+#' @param u A numeric vector in \eqn{[0,1]}.
+#' @param d Width of each transition. The window is one on
+#'   \eqn{[d, 1-d]}.
+#'
+#' @return A numeric vector of the same length as \code{u}, with values in
+#'   \eqn{[0,1]}.
+#'
+#' @examples
+#' wafc_window(c(0, 0.04, 0.5, 1))
+#'
+#' @export
+wafc_window <- function(u, d = 0.08) {
+  if (length(d) != 1L || !is.finite(d) || d <= 0 || d >= 0.5) {
+    stop("'d' must be a single value in (0, 0.5).", call. = FALSE)
+  }
+  step <- function(t) {
+    a <- exp(-1 / pmax(t, 1e-300))
+    b <- exp(-1 / pmax(1 - t, 1e-300))
+    ifelse(t <= 0, 0, ifelse(t >= 1, 1, a / (a + b)))
+  }
+  step(u / d) * step((1 - u) / d)
+}
 
 #' Additive components of the data generating processes
 #'
@@ -33,23 +78,42 @@
 #' \eqn{\int_0^1 g^2 = 1}, both up to the accuracy of the grid used to
 #' compute the two constants (\eqn{2^{16}} midpoints).
 #'
+#' \code{"gaussians"} and \code{"chirp"} are the components of uneven
+#' curvature decision D30 asks for. Both are \eqn{C^\infty} on the whole
+#' line, so both are inside the hypothesis of Xue and Yang (2006) that a
+#' penalized spline is efficient under, and both have a scale that changes
+#' along the domain: \code{"gaussians"} superposes a bump of standard
+#' deviation \eqn{0.10} on one of \eqn{0.018}, and \code{"chirp"} sweeps
+#' the frequency from one to eight cycles over the interval. Both are
+#' multiplied by the \eqn{C^\infty} window \code{\link{wafc_window}},
+#' which vanishes to every order at the two endpoints, so that the periodic
+#' extension is \eqn{C^\infty} too and the scenario measures uneven
+#' curvature and not a seam: the corner of the cubic is the reason the
+#' smooth scenario reads \eqn{s' = 3/2} (see \code{\link{wafc_sprime}}),
+#' and repeating it here would confound the two effects.
+#'
 #' @param name One of \code{"sine"}, \code{"cosine"}, \code{"cubic"},
-#'   \code{"bumps"}, \code{"blocks"}, \code{"heavisine"} or \code{"zero"}.
-#'   The last three are the test functions of Donoho and Johnstone (1994),
-#'   with their usual constants, seen as functions on the unit interval.
+#'   \code{"gaussians"}, \code{"chirp"}, \code{"bumps"},
+#'   \code{"blocks"}, \code{"heavisine"} or \code{"zero"}. The last three
+#'   are the test functions of Donoho and Johnstone (1994), with their usual
+#'   constants, seen as functions on the unit interval.
 #'
 #' @return A function of a numeric vector in \eqn{[0,1]}.
 #'
 #' @references Donoho, D. L. and Johnstone, I. M. (1994). Ideal spatial
 #'   adaptation by wavelet shrinkage. \emph{Biometrika} 81(3), 425-455.
 #'
+#'   Xue, L. and Yang, L. (2006). Additive coefficient modeling via
+#'   polynomial spline. \emph{Statistica Sinica} 16(4), 1423-1446.
+#'
 #' @examples
 #' g <- wafc_component("bumps")
 #' mean(g((seq_len(1024) - 0.5)/1024))
 #'
 #' @export
-wafc_component <- function(name = c("sine", "cosine", "cubic", "bumps",
-                                    "blocks", "heavisine", "zero")) {
+wafc_component <- function(name = c("sine", "cosine", "cubic", "gaussians",
+                                    "chirp", "bumps", "blocks", "heavisine",
+                                    "zero")) {
   name <- match.arg(name)
   if (name == "zero") return(function(u) rep_len(0, length(u)))
   raw <- switch(
@@ -57,6 +121,19 @@ wafc_component <- function(name = c("sine", "cosine", "cubic", "bumps",
     sine = function(u) sin(2 * pi * u),
     cosine = function(u) cos(4 * pi * u),
     cubic = function(u) u^3 - 1.4 * u^2 + 0.4 * u,
+    ## Uneven curvature, decision D30. The wide bump is five and a half
+    ## times the narrow one, which is the ratio a single smoothing
+    ## parameter has to split the difference between.
+    gaussians = function(u) {
+      wafc_window(u) * (exp(-(u - 0.40)^2 / (2 * 0.10^2)) -
+                          0.8 * exp(-(u - 0.72)^2 / (2 * 0.018^2)))
+    },
+    ## Linear chirp: the instantaneous frequency goes from f0 = 1 to
+    ## f1 = 8 cycles per unit, so the local scale varies by a factor of
+    ## eight while the function stays analytic.
+    chirp = function(u) {
+      wafc_window(u) * sin(2 * pi * (1 * u + (8 - 1) * u^2 / 2))
+    },
     bumps = function(u) {
       t <- c(0.1, 0.13, 0.15, 0.23, 0.25, 0.40, 0.44, 0.65, 0.76, 0.78, 0.81)
       h <- c(4, 5, 3, 4, 5, 4.2, 2.1, 4.3, 3.1, 5.1, 4.2)
@@ -96,30 +173,130 @@ wafc_component <- function(name = c("sine", "cosine", "cubic", "bumps",
 #' covariate and one column per modulating covariate. An empty string marks
 #' a block \eqn{(\ell, m)} whose component is zero.
 #'
-#' @param scenario One of \code{"smooth"}, \code{"inhomogeneous"} or
-#'   \code{"null"}.
-#' @param p,q Numbers of linear and of modulating covariates.
+#' The returned matrix carries the effective regularity of the scenario in
+#' the attribute \code{"sprime"}, with the regime it is read in in
+#' \code{"regime"}; see \code{\link{wafc_sprime}}.
 #'
-#' @return A character matrix of dimension \eqn{p \times q}.
+#' @param scenario One of \code{"smooth"}, \code{"uneven"},
+#'   \code{"inhomogeneous"} or \code{"null"}.
+#' @param p,q Numbers of linear and of modulating covariates.
+#' @param regime The regime the attribute \code{"sprime"} is read in, as
+#'   in \code{\link{wafc_sprime}}.
+#'
+#' @return A character matrix of dimension \eqn{p \times q}, with the
+#'   attributes \code{"sprime"} and \code{"regime"}.
 #'
 #' @examples
 #' wafc_scenario("smooth", 3, 2)
+#' attr(wafc_scenario("uneven", 3, 2), "sprime")
 #'
 #' @export
-wafc_scenario <- function(scenario = c("smooth", "inhomogeneous", "null"),
-                          p, q) {
+wafc_scenario <- function(scenario = c("smooth", "uneven", "inhomogeneous",
+                                       "null"),
+                          p, q, regime = c("periodic", "margin", "interval")) {
   scenario <- match.arg(scenario)
+  regime <- match.arg(regime)
   if (p < 1L || q < 1L) stop("'p' and 'q' must be at least 1.", call. = FALSE)
   out <- matrix("", p, q)
-  if (scenario == "null") return(out)
-  nm <- if (scenario == "smooth") c("sine", "cubic", "cosine")
-        else c("bumps", "blocks", "heavisine")
-  ## beta_1 additive in two modulating covariates, beta_2 in one, the
-  ## remaining coefficients constant.
-  out[1L, 1L] <- nm[1L]
-  if (q >= 2L) out[1L, 2L] <- nm[2L]
-  if (p >= 2L) out[2L, 1L] <- nm[3L]
+  if (scenario != "null") {
+    nm <- switch(scenario,
+                 smooth = c("sine", "cubic", "cosine"),
+                 uneven = c("gaussians", "chirp", "cosine"),
+                 inhomogeneous = c("bumps", "blocks", "heavisine"))
+    ## beta_1 additive in two modulating covariates, beta_2 in one, the
+    ## remaining coefficients constant.
+    out[1L, 1L] <- nm[1L]
+    if (q >= 2L) out[1L, 2L] <- nm[2L]
+    if (p >= 2L) out[2L, 1L] <- nm[3L]
+  }
+  attr(out, "sprime") <- wafc_sprime_value(scenario, regime)
+  attr(out, "regime") <- regime
   out
+}
+
+## The table of declared regularities, and the only place it is written.
+## wafc_scenario() reads it through this internal name and not through the
+## exported wafc_sprime(), so that a script that binds an object of its own
+## to that name, as wafc/scripts/04-pilot.R still does, shadows the
+## accessor and not the data generating process.
+wafc_sprime_value <- function(scenario, regime) {
+  tab <- rbind(smooth        = c(periodic = 3/2, margin = 4, interval = 4),
+               uneven        = c(4,              4,          4),
+               inhomogeneous = c(1/2,            1/2,        1/2),
+               null          = c(3/2,            3/2,        3/2))
+  out <- tab[scenario, regime]
+  attr(out, "regime") <- regime
+  out
+}
+
+#' Effective regularity declared by a scenario
+#'
+#' The \eqn{s'} of decision D27: the regularity the wavelet expansion
+#' actually reads off the components of a scenario, which is what the
+#' penalty level of \code{\link{wafc_lambda_theory}} and the resolution
+#' rule of \code{\link{wafc_J_theory}} consume. It is the smallest value
+#' over the components the scenario activates, since the slowest one sets
+#' the approximation error of the sum.
+#'
+#' The number cannot be stated without the regime it is read in, which is
+#' the point decision D27 and Lemma 12 (\file{derivations/
+#' 07-rota-intervalo.tex}) make: a component may be smooth on the interval
+#' and still have a corner, or a jump, where the periodic extension joins
+#' \eqn{1} to \eqn{0}. Three regimes are distinguished, and they are the
+#' three of that lemma:
+#'
+#' \describe{
+#'   \item{\code{"periodic"}}{the periodized basis with no margin, which
+#'     is where the theory of the manuscript is stated (decisions D23 and
+#'     D26) and the regime the numbers of step E2.3 were read in;}
+#'   \item{\code{"margin"}}{the periodized basis with the fixed margin of
+#'     \code{\link{wafc_eps}}, where the component is extended off its
+#'     support by the \eqn{C^\infty} cut of Lemma 10, so a corner at the
+#'     seam is bought away;}
+#'   \item{\code{"interval"}}{the boundary-corrected basis of
+#'     \code{boundary = "interval"}, where there is no seam to begin with.}
+#' }
+#'
+#' The declared values are the ones measured in part (C2) of
+#' \file{derivations/check/07-rota-intervalo.R}, rounded to the value of
+#' the table of that file: \code{"smooth"} reads \eqn{3/2} under
+#' \code{"periodic"}, because the cubic has a corner at the seam
+#' (\eqn{g'(0) = 0.4} against \eqn{g'(1) = 0.6}), and \eqn{4} under the
+#' other two, where that corner is bought away; \code{"inhomogeneous"}
+#' reads \eqn{1/2} under all three, because \code{blocks} and
+#' \code{heavisine} jump inside the interval, where no basis helps; and
+#' \code{"uneven"} reads \eqn{4} under all three, because its components
+#' are windowed by \code{\link{wafc_window}} and have no seam. The cap of
+#' \eqn{4} is the one of the filter in use, not a property of the
+#' functions: an analytic component cannot be read as decaying faster than
+#' the number of vanishing moments allows.
+#'
+#' The null scenario has no component, so no regularity is defined for it.
+#' The value returned, \eqn{3/2}, is the convention step E2.4 used when it
+#' had to give \code{rule = "theory"} some number in that cell, and it is
+#' recorded here so that the two are not chosen independently.
+#'
+#' @param scenario One of \code{"smooth"}, \code{"uneven"},
+#'   \code{"inhomogeneous"} or \code{"null"}.
+#' @param regime \code{"periodic"} (the default), \code{"margin"} or
+#'   \code{"interval"}.
+#'
+#' @return A single value, with the attribute \code{"regime"}.
+#'
+#' @seealso \code{\link{wafc_J_theory}},
+#'   \code{\link{wafc_lambda_theory}}.
+#'
+#' @examples
+#' wafc_sprime("smooth")
+#' wafc_sprime("smooth", "margin")
+#'
+#' @export
+wafc_sprime <- function(scenario = c("smooth", "uneven", "inhomogeneous",
+                                     "null"),
+                        regime = c("periodic", "margin", "interval")) {
+  scenario <- match.arg(scenario)
+  regime <- match.arg(regime)
+  wafc_sprime_value(scenario, regime)
 }
 
 #' Simulate from the WAFC model
@@ -133,8 +310,12 @@ wafc_scenario <- function(scenario = c("smooth", "inhomogeneous", "null"),
 #'   one when \code{intercept = TRUE}, which makes the additive intercept
 #'   \eqn{c_1 + \sum_m g_{1m}(U_m)} part of the model.
 #' @param q Number of modulating covariates.
-#' @param scenario One of \code{"smooth"}, \code{"inhomogeneous"} or
-#'   \code{"null"}; see \code{\link{wafc_scenario}}.
+#' @param scenario One of \code{"smooth"}, \code{"uneven"},
+#'   \code{"inhomogeneous"} or \code{"null"}; see
+#'   \code{\link{wafc_scenario}}.
+#' @param regime The regime the declared \code{sprime} is read in; see
+#'   \code{\link{wafc_sprime}}. It labels a number, and changes nothing
+#'   about the sample.
 #' @param seed Optional integer passed to \code{\link{set.seed}} before the
 #'   draw.
 #' @param snr Signal to noise ratio: the error standard deviation is set to
@@ -167,8 +348,9 @@ wafc_scenario <- function(scenario = c("smooth", "inhomogeneous", "null"),
 #'   \code{f} and the matrix \code{beta} of the \eqn{\beta_\ell(U_i)}
 #'   evaluated at the sample, the true \code{cc}, the \eqn{p \times q} list
 #'   \code{g} of components (\code{NULL} where the block is zero), the
-#'   \code{structure} matrix of names, and \code{sigma}, \code{scenario},
-#'   \code{seed} and \code{call}.
+#'   \code{structure} matrix of names, the declared effective regularity
+#'   \code{sprime} of \code{\link{wafc_sprime}} with its \code{regime},
+#'   and \code{sigma}, \code{scenario}, \code{seed} and \code{call}.
 #'
 #' @examples
 #' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
@@ -177,15 +359,18 @@ wafc_scenario <- function(scenario = c("smooth", "inhomogeneous", "null"),
 #'
 #' @export
 simulate_wafc <- function(n, p = 3L, q = 2L,
-                          scenario = c("smooth", "inhomogeneous", "null"),
+                          scenario = c("smooth", "uneven", "inhomogeneous",
+                                       "null"),
                           seed = NULL, snr = 4, sigma = NULL,
                           x_dist = c("gaussian", "uniform"),
                           intercept = TRUE,
                           u_dist = c("uniform", "beta"), u_rho = 0,
-                          cc = NULL, amplitude = 1) {
+                          cc = NULL, amplitude = 1,
+                          regime = c("periodic", "margin", "interval")) {
 
   this_call <- match.call()
   scenario <- match.arg(scenario)
+  regime <- match.arg(regime)
   x_dist <- match.arg(x_dist)
   u_dist <- match.arg(u_dist)
   if (length(n) != 1L || !is.finite(n) || n < 1 || n != round(n)) {
@@ -228,7 +413,7 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
   colnames(x) <- paste0("x", seq_len(p))
 
   ## Functional coefficients.
-  struct <- wafc_scenario(scenario, p, q)
+  struct <- wafc_scenario(scenario, p, q, regime = regime)
   g <- vector("list", p * q)
   dim(g) <- c(p, q)
   beta <- matrix(rep(cc, each = n), n, p)
@@ -265,7 +450,8 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
   y <- f + stats::rnorm(n, sd = sigma)
 
   out <- list(y = y, x = x, u = u, f = f, beta = beta, cc = cc, g = g,
-              structure = struct, sigma = sigma, scenario = scenario,
+              structure = struct, sprime = as.numeric(attr(struct, "sprime")),
+              regime = regime, sigma = sigma, scenario = scenario,
               seed = seed, n = as.integer(n), p = p, q = q, call = this_call)
   class(out) <- "wafc_dgp"
   out

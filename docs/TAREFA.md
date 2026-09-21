@@ -55,7 +55,7 @@ que ler antes está aqui e no plano.
 | L4 referências de software | **fechada** (2026-09-19): `.bib` com 63 entradas | `referencias-verificadas.bib` |
 | E1.8 rota do intervalo | **fechada** (2026-09-19): Lemas 11 e 12, Proposições 5 e 6, Corolários 6 e 7; conferência `OK` | `derivations/07-rota-intervalo.tex` |
 | E2.4 piloto | **fechada** (2026-09-20): sete concorrentes, seis regras de `λ`, varredura de `eps`; 544 testes passam | `wafc/R/competitors.R`, `wafc/scripts/04-pilot.R` |
-| E2.4b emendas do piloto | não aberta; **pode abrir já** | catálogo da §3 |
+| E2.4b emendas do piloto | **fechada** (2026-09-21): cenário `uneven`, `s'` como atributo, QUT em `tune.R`, `k` casado e `bam` no `gam`, tolerância e `...` consertados; 642 testes passam | `wafc/R/dgp.R`, `wafc/R/tune.R`, `wafc/scripts/06-timing.R` |
 | E1.10 terminologia | **fechada** (2026-09-21): "sieve" sai das derivações, uma menção retida | `derivations/*.tex` |
 | E1.7a sondagem de irrepresentabilidade | **fechada** (2026-09-20): veredito de escopo reduzido (D32) | `derivations/06a-sondagem-irrepresentabilidade.md` |
 | E1.7c seleção por limiarização | **fechada** (2026-09-20): Lema 13 e Corolário 8; conferência `OK` | `derivations/06-selecao-limiar.tex` |
@@ -76,14 +76,22 @@ tarefa pode criar ou editar**.
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
 
-| E2.4b | as emendas que E2.4 não podia fazer, porque os arquivos estavam fora do catálogo dela. **(i)** `wafc/R/dgp.R`: gravar `s'` como atributo do cenário (D27: `3/2` no suave, `1/2` no não homogêneo, com o **regime** anotado, porque com margem o suave leria `4`), hoje só em `wafc_sprime` no alto de `04-pilot.R`; e **acrescentar a componente suave de curvatura desigual** que D30 pede (gaussiana estreita ou `doppler` truncado longe da singularidade), `C^∞` e portanto dentro da hipótese de Xue & Yang, mas com escala variando ao longo do domínio — é ela que testa a afirmação de D30, e é pré-requisito de E2.5. **(ii)** `wafc/R/tune.R`: mover `wafc_lambda_qut()` de `competitors.R` para cá e expô-la como sexta regra de `wafc_tune(rule = "qut")`, que é onde ela pertence (E2.4 a escreveu em `competitors.R` por restrição de catálogo). **(iii)** `wafc/R/load.R`: `VCBART` entra em `wafc_suggests`. **(iv)** O `gam` como concorrente: `k` por moduladora e ajuste por `bam`, porque E6.1a mostrou que a comparação em dimensão **não** casada é o que separa "o WAFC ganha 6 a 15%" de "empata", e o piloto rodou com o padrão `k = 10`. **(v)** Se o autor ratificar P1 e P2 (perguntas 8 e 9 da §4 do `ESTADO.md`), aplicar as duas linhas: grade de `J` até `⌈log_2 n⌉` em `wafc_J_grid()` e `wafc_eps_periodic` de `0.05` para `0`; se não ratificar, deixar como estão e dizer no handoff. **(vi) Dois defeitos de desempenho, medidos no chat principal em 2026-09-21, que são o que faz o WAFC parecer caro na tabela do piloto.** O padrão `thresh = 1e-10` de `wafc()` custa **28×** no candidato dominante (`J = 5`, `n = 1000`: validação cruzada de 5,95 s contra 0,21 s com `1e-7`) **sem mudar a sintonia** (`lambda.min` idêntico, `cvm` mínimo diferente na quinta casa); o `glmnet` sozinho, no mesmo desenho, leva `0,01 s`. Rever o padrão (a tolerância apertada pertence às conferências de KKT, não ao ajuste de produção) e **consertar o roteamento do `...` de `cv.wafc()`**, que hoje manda os argumentos para `wafc_design()` e faz `cv.wafc(..., thresh = 1e-7)` parar com "argumento não utilizado". **(vii) `wafc/scripts/06-timing.R`**, curto e só de tempo: um cenário, dois ou três `n`, todos os concorrentes, com o tempo **separado em sintonia e ajuste final** — hoje o tempo do WAFC inclui a validação cruzada inteira e o do `gam` é um ajuste só, com os parâmetros de suavização escolhidos por REML por dentro, e a tabela do piloto não diz isso. O `gam` medido em `k = 10` **e** em `k` casado à dimensão do sieve, que é a comparação honesta de E6.1a e tem custo diferente; com a opção de `bam` do item do `competitors.R`, medir as duas. A bateria inteira roda antes do handoff | E2.4, fechada; D27, D30, e P1/P2 conforme a resposta do autor | `wafc/R/dgp.R`, `wafc/R/tune.R`, `wafc/R/load.R`, `wafc/R/design.R` (só a linha da margem), `wafc/R/competitors.R` (a remoção do QUT **e** o `k` do `gam`: passar a aceitar `k` por moduladora, hoje um só para todos os suavizadores, e ganhar opção de ajuste por `mgcv::bam` com `fREML` e `discrete = TRUE`, que é duas ordens de grandeza mais rápido nestes `n` — E6.1a §3.2), `wafc/tests/test-dgp.R`, `wafc/tests/test-tune.R`, `wafc/tests/test-design.R`, `docs/handoff-E2.4b.md` |
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**Em curso: E2.4b.** O catálogo não tem outra tarefa aberta; E2.5 (go/no-go)
-espera E2.4b, pelas três razões da lista acima. **E2.5 (go/no-go) só deve abrir depois de E2.4b**, por
+**O catálogo está vazio.** A próxima é E2.5 (go/no-go), e ela **não deve
+abrir antes de três coisas**: o conserto do repasse de `wavelet.table` aos
+concorrentes, que hoje faz a coluna do `vcbart` sumir em silêncio; a decisão
+sobre P1 e P2, que E2.4b devolveu sem ratificação; e a repetição da parte
+`competitors` com `k` casado no `gam` (`wafc_k_matched()` e motor `bam`, já
+disponíveis).
+
+**Ao catalogar, o arquivo vai junto do item.** Duas tarefas seguidas
+esbarraram em coluna de arquivos que não cobria o que o próprio texto
+mandava fazer: E2.4 pôs o QUT em `competitors.R` por isso, e E2.4b teve de
+tocar `fit.R` e criar `06-timing.R` fora da coluna. **E2.5 (go/no-go) só deve abrir depois de E2.4b**, por
 três razões medidas: o veredito contra os concorrentes muda com a grade de
 `J` (P1); o cenário suave que D30 quer medir depende da componente nova em
 `dgp.R`; e a comparação com o `gam` foi feita em dimensão não casada, que é

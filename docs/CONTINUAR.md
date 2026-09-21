@@ -92,12 +92,13 @@ Rscript derivations/check/05-taxas.R                # ~7 min
 E o código do método, que já existe:
 
 ```bash
-Rscript -e 'testthat::test_dir("wafc/tests")'   # 544 passam, ~35 s
+Rscript -e 'testthat::test_dir("wafc/tests")'   # 642 passam, ~37 s
 Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
 Rscript wafc/scripts/03-tune-decomp.R           # ~2 min
 Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 min
 Rscript wafc/scripts/04-pilot.R 5 competitors 8 250 smooth   # fumaça do piloto, ~1 min
 Rscript wafc/scripts/04-pilot.R 50 all 12                    # o piloto inteiro, ~3 h em 12 núcleos
+Rscript wafc/scripts/06-timing.R                             # só tempo, curto
 ```
 
 ## 3. Onde o trabalho está (resumo de 2026-09-19; o `ESTADO.md` manda)

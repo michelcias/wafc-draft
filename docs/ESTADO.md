@@ -861,6 +861,82 @@ de aproximação**; sieve linear → **aproximação linear** (para fazer par co
 **viés de aproximação**; regime de sieve → **regime de resolução**. Ficou
 **uma** menção, entre parênteses, no ponto em que `W_J` é definido.
 
+### 2026-09-21: E2.4b fechada, e a minha leitura da tolerância estava errada
+
+Conferido aqui: **642 testes passam** (eram 544).
+
+**A correção que mais importa, e é sobre o que eu afirmei ontem.** Eu medi
+28× entre `thresh = 1e-10` e `1e-7` e concluí que o padrão apertado era
+desperdício. A varredura de E2.4b, em 12 células, mostra que **não é**: com
+`1e-7` o `wafc_kkt()` **rejeita pontos do caminho em todas as 12 células**
+(de 19 a 73 pontos, de caminhos de 58 a 100) e com `1e-8` em dez delas; com
+`1e-9` rejeita em uma e com `1e-10` em nenhuma. E a minha frase "a sintonia
+não muda" vale **a partir de `1e-8`**, não de `1e-7`: em `smooth`,
+`n = 250`, `J = 5`, o `1e-7` escolhe `λ = 0.0914` contra `0.1003` das
+demais. O ganho de tempo está quase todo entre `1e-9` e `1e-7`, isto é,
+**os 8× restantes se compram entregando a verificação**, não cortando
+folga. O padrão novo é `1e-9`, o mais frouxo que mantém o KKT limpo, e o
+conserto do `...` é o que deixa um estudo escolher `1e-7` **de propósito**.
+
+**O `...` de `cv.wafc()` está consertado**, com separação por nome e recusa
+de nome que não pertença a nenhum destino, de modo que erro de digitação
+vira erro em vez de padrão silencioso.
+
+**A tabela de tempo, com a separação que faltava** (não homogêneo, `q = 2`,
+medianas; `secs.tune` é a busca, `secs.fit` o ajuste escolhido):
+
+| `n` | `wafc.lasso` | `bsgl` | `gam k=10` | `gam` casado (`bam`) | `klopp` | `vcbart` |
+|---|---|---|---|---|---|---|
+| 250 | **0,375** (0,371 + 0,005) | 0,424 | 0,855 | 0,094 | 0,901 | 2,482 |
+| 1000 | **3,105** (3,096 + 0,010) | 0,694 | 1,955 | 0,589 | 5,641 | 6,266 |
+
+O WAFC deixou de ser o caro da tabela: em `n = 250` ele é mais rápido que
+todos menos o `gam` por `bam`, e em `n = 1000` perde só para `bsgl` e para o
+`bam`. E a coluna `split` registra o que a tabela do piloto escondia: o
+tempo do WAFC **expõe** a busca de sintonia, o dos outros a esconde dentro
+de uma chamada.
+
+**O cenário `uneven` de D30 nasceu**, com `gaussians` (razão de escalas
+5,6), `chirp` (frequência de 1 a 8 ciclos) e `cosine`, todas `C^∞` por
+construção. Medido na maquinaria de E1.8: queda por nível de **3,91** e
+**3,63**, contra 3,99 do `sine`, isto é, as duas leem o **teto do filtro**
+(`N = 4`), que é o que autoriza `s' = 4`. A janela `C^∞` do Lema 10 não é
+enfeite: sem ela a `gaussians` tinha `g(0) = 0.044` contra `g(1) ≈ 3e-11`, e
+o salto na emenda derrubava a queda para **0,76**, assinatura de
+descontinuidade. E o cenário novo **não é adversário gratuito**:
+`⟨gaussians, chirp⟩ = −0,126`, contra `⟨sine, cubic⟩ = 0,969` do `smooth`.
+
+- **`s'` virou atributo** (`wafc_sprime(scenario, regime)`), com o **regime**
+  anotado: `smooth` lê `3/2` em `periodic` e `4` com margem ou no intervalo;
+  `inhomogeneous` lê `1/2` nos três; `uneven` lê `4` nos três.
+- **Quinta aparição do regime pré-assintótico:** no `uneven` a regra da
+  teoria **colapsa em `J = 1` e zera tudo**, porque `s' = 4` faz
+  `2^J ≥ (n/log n)^{1/9}` pedir `2^J ≥ 1.6`. A coluna `theory` desse cenário
+  vai ser degenerada em E2.5, e isso tem de ser dito na tabela.
+- **P1 e P2 não foram ratificadas** (o autor respondeu no chat da tarefa):
+  a grade continua em `⌈log_2 n/2⌉` e a margem em `0.05`. **E2.5 herda as
+  duas**, e a evidência de E2.4 a favor de P1 continua na mesa.
+- O `gam` ganhou `k` por moduladora e motor `bam`, e `wafc_k_matched()`.
+
+**Sobre o alarme do `vcbart`: o handoff suspeitou que o piloto tivesse
+perdido a coluna, e eu fui conferir.** Ela não se perdeu. O `vcbart` **está**
+na tabela de razões da análise de E2.4, com `rr` de `0.999`, `0.992` e
+`0.899` no não homogêneo e `0.964`, `0.972`, `0.889` na `mixed` — os números
+que o `ESTADO.md` registra. O que aconteceu é outra coisa, e em duas
+camadas: ele some da tabela de **medianas absolutas** porque não decompõe em
+componentes, então tem `ise = NA` e o `aggregate()` descarta a linha; e a
+chamada **hoje** falha, porque o ajuste a D31 passou a mandar
+`wavelet.table` a todo concorrente e o `VCBART` não conhece o argumento —
+ajuste que, como o próprio handoff de E2.4 registra, **veio depois** de os
+números serem produzidos. Ou seja: **os números valem; o script, como está,
+perderia a coluna em silêncio na próxima execução.** É conserto obrigatório
+antes de E2.5 rodar qualquer coisa.
+
+**Lição de catálogo, segunda vez:** a coluna de arquivos permitidos de E2.4b
+não cobria `wafc/R/fit.R` nem o `06-timing.R`, que o próprio texto da tarefa
+mandava tocar. Antes disso, E2.4 pôs o QUT em `competitors.R` pela mesma
+razão. **Quando eu catalogar, o arquivo vai junto do item.**
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -975,17 +1051,21 @@ Ordenadas pelo que bloqueia mais.
 8. **A comparação com o `gam` foi em dimensão casada?** Não: o piloto usou
    o padrão `k = 10` de `wafc_fit_gam()`, e E6.1a mostrou que é isso que
    separa "o WAFC ganha 6 a 15%" de "empata". **E2.5 tem de remedir o
-   cenário não homogêneo com `k` casado ao sieve** (e com `bam`, que torna
-   isso viável), junto com a grade larga de P1.
-9. **P1, a grade de `J`** (a mais importante desta rodada): `cv.wafc()`
-   passa a ir até `⌈log_2 n⌉` em vez de `⌈log_2 n/2⌉`? A evidência é forte
-   (17,6% de erro e 32% de ISE em 50 de 50 réplicas no cenário não
-   homogêneo, e nada no suave), e o custo é tempo. É uma linha em
-   `wafc_J_grid()`. **E2.5 precisa repetir `competitors` com ela antes de
-   fixar o veredito.**
-10. **P2, a margem padrão:** `wafc_eps_periodic` passa de `0.05` para `0`? A
-   tabela de E2.4 mostra o `0.05` dominado, e `eps = 0` é onde a teoria
-   enuncia (D26). Uma linha em `design.R`.
+   cenário não homogêneo com `k` casado ao espaço de aproximação**, o que
+   E2.4b tornou barato (`wafc_k_matched()` e o motor `bam`, que custa
+   `0,589 s` em `n = 1000` contra `1,955 s` do `k = 10` por `gam`).
+9. **P1 e P2, não ratificadas em 2026-09-21 e herdadas por E2.5.** A grade
+   de `J` continua em `⌈log_2 n/2⌉` e a margem em `0.05`. A evidência a favor
+   das duas continua na mesa — 17,6% de erro e 32% de ISE em 50 de 50
+   réplicas para a grade larga; a margem `0.05` dominada por `eps = 0` —, e
+   agora com um argumento a mais: o custo da grade profunda, que era a
+   objeção, encolheu com a tolerância nova e com o `bam` no concorrente.
+10. **Conserto obrigatório antes de E2.5 rodar:** o `wafc_competitor()`
+   repassa `wavelet.table` a todo concorrente, e o `VCBART` para com
+   "argumento não utilizado" dentro de um `try()` silencioso — a coluna dele
+   sumiria da próxima execução sem aviso. Os números já registrados **não**
+   são afetados (foram produzidos antes do ajuste a D31, e estão na tabela
+   de razões da análise de E2.4).
 11. **Calibração do limiar `t_n`** (nova, de E1.7c): o Corolário 8 é
    explícito em que `t_n` depende de constantes desconhecidas, e a regra
    grosseira `t = 0.15 max_{ℓm} ‖ĝ_{ℓm}‖` acertou 1.00 e 0.90 nos dois
@@ -1187,6 +1267,7 @@ Ordenadas pelo que bloqueia mais.
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
 | 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
+| 2026-09-21 | E2.4b fechada: `uneven` nasce e lê `s' = 4`; a tolerância apertada é preço da verificação de KKT e não desperdício, contra o que eu tinha concluído; o WAFC deixa de ser o caro da tabela de tempo |
 | 2026-09-21 | E1.10 fechada (terminologia) e o documento das inconsistências do WALL criado; medidos os dois defeitos de desempenho do ajuste |
 | 2026-09-20 | E6.1a fechada com veredito negativo: nenhuma das três bases sustenta o argumento, e o ganho aparente sobre o spline era de dimensão, não de base — o que põe em dúvida a comparação com o `gam` no piloto |
 | 2026-09-20 | E2.4 fechada: a grade de `J` do `cv.wall()` trunca o sieve no ótimo, e alargá-la corta 17,6% do erro e 32% do ISE no cenário não homogêneo, invertendo o veredito contra o VCBART; a margem `0.05` é dominada por `eps = 0` |
