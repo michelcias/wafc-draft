@@ -32,6 +32,10 @@ No `referencias-verificadas.bib` daqui a entrada ficou como `unpublished`,
 com `note` e `url`. **Se o WALL for submetido citando como livro da CUP, a
 referência sai errada.**
 
+**Desfecho (2026-09-22):** corrigido no WALL (commit `4529c1d` do `wall-manuscript`): a entrada virou `unpublished`,
+com `note = {Book draft, version of September 16}` e `url`, e a chave foi
+mantida.
+
 ### 1.2 `hardle1998wavelets` grafa "Tsybakov, Alexandre"
 
 **Tipo:** divergência de grafia. **Onde:** mesma fonte. **Encontrado em:** L3
@@ -41,6 +45,9 @@ O Crossref e o Springer grafam **"Alexander"**. A entrada daqui foi copiada
 sem redigitar, como manda a regra de cópia, e por isso herdou a grafia; a
 divergência continua nos dois repositórios.
 
+**Desfecho (2026-09-22):** corrigido no WALL (commit `4529c1d` do `wall-manuscript`) para "Alexander". A
+cópia daqui, em `referencias-verificadas.bib`, ainda traz "Alexandre".
+
 ### 1.3 Sardy & Ma citado só como preprint
 
 **Tipo:** desatualização. **Encontrado em:** L1 (2026-09-18).
@@ -49,6 +56,10 @@ O WALL cita `sardy2022sparse`, o preprint. O trabalho saiu em *Scandinavian
 Journal of Statistics* **51**(1), 89-108, DOI `10.1111/sjos.12680`. Para o
 WAFC isso importa porque é o vizinho mais próximo no método; para o WALL, é
 só atualizar a entrada.
+
+**Desfecho (2026-09-22):** corrigido no WALL (commit `4529c1d` do `wall-manuscript`). A entrada aponta para
+a versão da *SJS*, com DOI, e a chave `sardy2022sparse` foi mantida para não
+tocar nos `\cite`; o texto passa a mostrar "Sardy and Ma (2024)".
 
 ---
 
@@ -182,6 +193,12 @@ Statist.*), Daubechies & Lagarias (1991, 1992) e Bickel, Ritov & Tsybakov
 Johnstone de *PTRF* 1994. Todas foram verificadas aqui e estão em
 `docs/referencias-verificadas.bib`, prontas para copiar sem redigitar.
 
+**Desfecho (2026-09-22):** as cinco foram copiadas para `references_theo_1.bib`
+(commit `4529c1d` do `wall-manuscript`), com as chaves `donoho1994ideal`, `donoho1998minimax`,
+`daubechies1991two`, `daubechies1992two` e `bickel2009simultaneous`. O
+manuscrito ainda não cita nenhuma delas, então nada muda no PDF até alguém
+incluir um `\cite`.
+
 ---
 
 ## 4. Como usar este documento
@@ -195,3 +212,31 @@ que dependem dela; a §2.2 e a §3.2 são decisões de redação e de desenho; a
 
 Se algum item for tratado no WALL, vale registrar aqui o desfecho, para que
 os dois projetos não redescubram o mesmo.
+
+---
+
+## 5. Conferência no WALL (2026-09-22)
+
+Leitura deste documento contra o material de lá, isto é, o `wall-manuscript`,
+os scripts do benchmark em `~/Documentos/wall` e o `WaveBased`. Os itens de
+§1 e §3.3 foram tratados (ver os desfechos acima). O resto ficou assim:
+
+- **Caminhos.** Os repositórios estão em `~/Documentos/wall-manuscript` e
+  `~/Documentos/WaveBased`, ou seja, `../../../` a partir desta pasta, e não
+  `../../`.
+- **§2.1 tem alcance maior.** Em `wall.R`, `drop.phi` só é `TRUE` com
+  `boundary = "periodic"` **e** `j0 == 0`. O caso periódico com `j0 > 0`
+  mantém as funções de escala e tem a mesma singularidade.
+- **§2.2, `J = 1`: o candidato não é inconstruível.** `.wall_eps()` devolve
+  o padrão `1,9^{-J}` antes de validar o intervalo `[0, 0.5)`. Com
+  `eps ≈ 0,526`, o mapa leva `[0,1]` para `[0,474; 0,526]`, invertido, sem
+  nenhum aviso. O benchmark do artigo aplicado inclui `J = 1` na grade
+  (protocolo de `ms_app_5.tex`), e `wall_J_profile.csv` dá
+  `inner_score = 0,5` em `J = 1` nas 138 dobras. Esse nível nunca foi
+  selecionado, então os resultados não mudam, mas a afirmação
+  `x* ∈ [ε, 1−ε]` da equação `eq:rescale` é falsa em `J = 1`.
+- **§2.3 não vale para o artigo aplicado.** O benchmark não usa a grade
+  padrão do `cv.wall()`. Usa `J ∈ {1, …, J_max}` com
+  `J_max = min{9, ⌊log₂(4n/d)⌋}`, e o `J` selecionado nunca passou de 7. O
+  alerta continua valendo para quem usa o `cv.wall()` com a grade padrão.
+- **§3.2.** A contagem confere: são 38 linhas, com 39 ocorrências.
