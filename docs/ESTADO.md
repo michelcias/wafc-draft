@@ -3,7 +3,7 @@
 **Última atualização:** 2026-09-28.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
 E1.10), E5a e E2.1 a E2.4b fechadas**, mais L1 a L4 e a sondagem E6.1a.
-Falta E2.5 (go/no-go) para fechar E2, e ela espera três coisas (§5). Nenhum
+Falta E2.5 (go/no-go) para fechar E2, e ela espera duas coisas (§5). Nenhum
 chat de tarefa em curso e nenhuma tarefa catalogada. A decidir pelo autor:
 P1 e P2 (pergunta 9) e a saída da aplicação (pergunta 2). O teto de páginas
 fica para o fim (D21).
@@ -975,6 +975,64 @@ que ela seleciona.
   réplicas onde ele acerta 0 de 10), a variante em grupos chega a E2.5
   perdendo nos dois eixos.
 
+### 2026-09-28: revisão do código de `wafc/` (defeitos, memória, velocidade)
+
+Leitura dos sete arquivos de `wafc/R/` e dos seis scripts, com medição de
+tempo e memória no chat principal; aplicado o grupo que **não muda número
+nenhum** (nem `J`, nem `λ.min`, nem `λ.1se`). Conferido aqui: **672 testes
+passam** (eram 642; 30 novos), e o `04-pilot.R` antigo e o novo, rodados
+em 2 réplicas de `smooth` com `n = 250` nas partes `competitors` e
+`lambda`, dão **diferença máxima 0** nas 15 colunas numéricas das 30 linhas
+comuns.
+
+- **Defeitos corrigidos.** (1) `wafc_competitor()` mandava `wavelet.table`
+  ao `VCBART_ind`, que parava com "argumento não utilizado" (pergunta 10):
+  agora argumento de `wafc_design()` só chega a quem constrói desenho
+  (`klopp`, `oracle`), e o `vcbart` voltou à tabela. (2) O `04-pilot.R`
+  tinha um vetor `wafc_sprime` que escondia a função e não tinha `uneven`:
+  a célula nova sumiria da parte `lambda`; agora lê `wafc_sprime()` do
+  `dgp.R`. (3) Falha de método virava ausência de linha (`try(silent)` +
+  `next`), que é como o `vcbart` sumiu sem aviso: agora vira linha sem
+  números com a mensagem na coluna `error`, e o `sweep_part` conta as
+  falhas na saída. (4) Sem covariável constante, `bsgl` e `klopp` somavam o
+  intercepto do `grpreg` a `β_1`, multiplicando-o por `X_1` (RMSE de 7,1
+  com nível 5): agora ele fica em `intercept`, fora de `β`. Não afeta o
+  piloto, que sempre tem `X_1 ≡ 1`. (5) `wafc_lambda_max()` punha coluna de
+  intercepto mesmo quando o ajuste não tem: o topo do caminho saía 0,760 em
+  vez de 1,029; agora bate com o do `glmnet` nos dois casos.
+- **Memória.** Chamados por `do.call`, `glmnet` e `sparsegl` guardavam no
+  `call` o desenho inteiro, e `wafc_design()`, `wafc()` e `cv.wafc()`
+  guardavam os dados e o corpo da própria função: era **49% de cada cache**
+  do `05-sondagem` (97 a 115 MB), e `print(fit$fit)` imprimia 534 mil
+  caracteres. Agora o `call` é compacto. E o `cv.wafc()` guardava o ajuste
+  de todo candidato de `J` até o fim; agora só o melhor. Medido: ajuste em
+  `J = 6`, `n = 1000`, de **7,35 para 4,35 MB** salvo; `cv.wafc` com grade
+  `2:8`, de **11,4 para 3,6 MB**.
+- **Velocidade.** A busca de nós do spline adaptativo pontua todos os
+  candidatos com uma projeção (acrescentar o nó `κ` acrescenta
+  `(v − κ)³₊` ao espaço), em vez de um ajuste por candidato: **mesmos nós
+  em 18 de 18 casos**, valores ajustados idênticos, **7 a 11× mais
+  rápida** (no piloto, 6,95 s para 0,61 s). A parte `lambda` do piloto
+  rodava o mesmo `cv.wafc()` três vezes (`cv.min`, `cv.1se`, `qut`); agora
+  uma, com a mesma coluna `time` (cada regra continua carregando o tempo
+  da validação cruzada que usa).
+- **Lição de ferramenta:** um limiar relativo de `1e-10` para descartar
+  candidato degenerado na busca de nós zerava candidatos legítimos (um nó
+  entre dois vizinhos acrescenta pouco, mas acrescenta) e mudou os nós em
+  5 de 18 casos; `1e-24` separa isso do arredondamento, que é da ordem de
+  `1e-32`.
+
+**O que ficou para decidir, com número** (pergunta 29): 97% do tempo do
+WAFC está dentro do Fortran do `glmnet`, e a cauda do caminho de `λ`
+abaixo de `imin + 20` custa **90% a 98%** das dobras em `J = 5` e `6`
+(`J = 6`, `n = 1000`: 11,5 s contra 0,65 s), com `λ.min` entre os pontos
+22 e 43 de ~100. Na grade `2:8` com `n = 250`, é ali que o `glmnet` deixa
+de convergir (6 avisos). E o `sglasso` herdou o `thresh = 1e-9` medido para
+o `glmnet`: com `1e-8`, o padrão do `sparsegl`, ele é **2× mais rápido e
+passa o KKT em 200 de 200 pontos** nos dois desenhos medidos (com `1e-7`,
+metade falha). Forçar `type.gaussian`, trocar denso por esparso e o
+custo de R em volta do motor (< 3%) não compram nada.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1100,12 +1158,13 @@ Ordenadas pelo que bloqueia mais.
    réplicas para a grade larga; a margem `0.05` dominada por `eps = 0` —, e
    agora com um argumento a mais: o custo da grade profunda, que era a
    objeção, encolheu com a tolerância nova e com o `bam` no concorrente.
-10. **Conserto obrigatório antes de E2.5 rodar:** o `wafc_competitor()`
-   repassa `wavelet.table` a todo concorrente, e o `VCBART` para com
-   "argumento não utilizado" dentro de um `try()` silencioso — a coluna dele
-   sumiria da próxima execução sem aviso. Os números já registrados **não**
-   são afetados (foram produzidos antes do ajuste a D31, e estão na tabela
-   de razões da análise de E2.4).
+10. **~~Conserto obrigatório antes de E2.5 rodar~~ feito em 2026-09-28:**
+   o `wafc_competitor()` repassava `wavelet.table` a todo concorrente, e o
+   `VCBART` parava com "argumento não utilizado" dentro de um `try()`
+   silencioso. Agora o argumento só chega a `klopp` e `oracle`, e falha de
+   método vira linha com a mensagem em vez de sumir. Os números já
+   registrados **não** são afetados (foram produzidos antes do ajuste a
+   D31, e estão na tabela de razões da análise de E2.4).
 11. **Calibração do limiar `t_n`** (nova, de E1.7c): o Corolário 8 é
    explícito em que `t_n` depende de constantes desconhecidas, e a regra
    grosseira `t = 0.15 max_{ℓm} ‖ĝ_{ℓm}‖` acertou 1.00 e 0.90 nos dois
@@ -1264,21 +1323,37 @@ Ordenadas pelo que bloqueia mais.
      herdadas do WALL (`cohen1993wavelets` etc.)? Proposta: **manter as do
      WALL**, porque o `ms_theo_1.tex` é o molde da prova e a citação
      cruzada fica direta.
+29. **Duas acelerações do WAFC que podem mudar a escolha, a medir antes de
+   adotar** (revisão de 2026-09-28). (a) **Validação cruzada em etapas:** o
+   `glmnet` calcula o caminho em sequência, então as dobras num prefixo do
+   caminho dão exatamente as mesmas soluções; calcula-se o prefixo e só se
+   estende se o mínimo estiver perto do fim. Ganho estimado de 5 a 10× no
+   `cv.wafc()` e fim dos avisos de não convergência da cauda. O `λ.1se`
+   nunca muda sozinho (é o primeiro ponto do caminho com
+   `cvm ≤ cvm[imin] + cvsd[imin]`, logo antes do `imin`); o `λ.min` muda só
+   se a curva tiver um segundo mínimo, mais baixo, além da guarda, e o
+   `cvm` devolvido fica truncado na cauda. (b) **`thresh = 1e-8` no
+   `sparsegl`:** 2× mais rápido, KKT limpo, mas os `cvm` mudam um pouco e a
+   escolha pode pular um ponto da grade em caso apertado; não medido.
+   Critério proposto para as duas: `J.min`, `λ.min` e `λ.1se` idênticos em
+   todas as réplicas das células do piloto, senão fica o comportamento
+   atual. **Depois da P1**, porque o ganho de (a) depende da profundidade
+   da grade.
 
 ---
 
 ## 5. Próximos passos
 
-Tudo converge em E2.5 (go/no-go), que **não abre** antes de (a), (b) e (c).
+Tudo converge em E2.5 (go/no-go), que **não abre** antes de (b) e (c).
 
-- (a) **Conserto do repasse de `wavelet.table`** (pergunta 10): o
-  `wafc_competitor()` manda o argumento ao `VCBART`, que para dentro de um
-  `try()` silencioso e a coluna some. Correção curta no chat principal ou
-  tarefa catalogada com `wafc/R/competitors.R` e o teste na coluna de
-  arquivos.
+- (a) **~~Conserto do repasse de `wavelet.table`~~ feito em 2026-09-28**
+  (pergunta 10), com a revisão do código de `wafc/` (§2).
 - (b) **Autor: decidir P1 e P2** (pergunta 9): grade de `J` larga (`2:8`
   contra `⌈log_2 n/2⌉`) e margem `eps = 0` contra `0.05`. A evidência de
   E2.4 favorece as duas, e o custo da grade larga encolheu com E2.4b.
+- (b') **Depois da P1, medir as duas acelerações da pergunta 29** e adotar
+  só as que mantêm `J.min`, `λ.min` e `λ.1se` em todas as réplicas; é o
+  que torna barata a repetição de (c).
 - (c) **Repetir a parte `competitors` do piloto** com a grade decidida em
   (b), o `gam` em dimensão casada (`wafc_k_matched()`, motor `bam`) e o
   cenário `uneven` de D30; só então fixar o fator do critério de saída no
@@ -1297,6 +1372,7 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (a), (b) e (c).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-28 | Revisão do código de `wafc/`: cinco defeitos corrigidos (o `vcbart` volta à tabela; `uneven` não quebra mais o piloto; falha vira linha), `call` compacto e só o melhor ajuste no `cv.wafc` (objeto salvo de 11,4 para 3,6 MB), busca de nós 7 a 11× mais rápida com os mesmos nós; 672 testes, piloto idêntico ao anterior; duas acelerações que podem mudar a escolha ficam para medir (pergunta 29) |
 | 2026-09-28 | Documentos de continuidade alinhados ao estado de 09-21: cabeçalho e §5 do `ESTADO.md`, §3 do `CONTINUAR.md`, catálogo e numeração do `TAREFA.md`, marcas de etapa do `plano-projeto.md`, teto de 40 páginas no `instrucoes.md`; perguntas da §4 renumeradas a partir da 16 (havia duas 15) |
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |

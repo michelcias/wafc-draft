@@ -373,3 +373,28 @@ test_that("wafc_tune validates its arguments", {
   expect_error(wafc_tune(x0, u0, y0, rule = "theory", s = -1), "positive")
   expect_error(wafc_tune(x0, u0, y0, rule = "bic", J = 0L), "larger than j0")
 })
+
+test_that("cv.wafc keeps the fit of the selected level and only that one", {
+  ## Only the best fit so far is held during the loop over J; the one
+  ## returned has to be the fit at J.min, identical to fitting it directly.
+  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds)
+  direct <- wafc(x0, u0, y0, J = cv[["J.min"]])
+  expect_equal(cv[["J.min"]], cv[["J"]][which.min(cv[["cvtab"]][["mse"]])])
+  expect_equal(cv[["wafc.fit"]][["lambda"]], direct[["lambda"]])
+  expect_equal(as.matrix(cv[["wafc.fit"]][["beta"]]),
+               as.matrix(direct[["beta"]]))
+  expect_equal(cv[["wafc.fit"]][["a0"]], direct[["a0"]])
+})
+
+test_that("wafc_lambda_max is the entry point of the engine with and without an intercept", {
+  for (ic in c(TRUE, FALSE)) {
+    d1 <- simulate_wafc(n, p = p, q = q, scenario = "smooth", seed = 4L,
+                        intercept = ic)
+    y1 <- d1[["y"]] + 5
+    des <- wafc_design(d1[["x"]], d1[["u"]], J = 3L)
+    fit <- wafc(design = des, y = y1)
+    expect_equal(fit[["intercept"]], ic)
+    expect_equal(wafc_lambda_max(des, y1), fit[["lambda"]][1L],
+                 tolerance = 1e-8)
+  }
+})

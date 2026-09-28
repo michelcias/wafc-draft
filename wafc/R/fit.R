@@ -128,7 +128,7 @@ wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
                  asparse = 0.05, intercept = NULL, standardize = FALSE,
                  thresh = 1e-9, maxit = NULL, design = NULL, ...) {
 
-  this_call <- match.call()
+  this_call <- wafc_compact_call(match.call(), "wafc")
   penalty <- match.arg(penalty)
 
   if (is.null(design)) {
@@ -188,6 +188,7 @@ wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
       args[["lambda.min.ratio"]] <- lambda.min.ratio
     }
     fit <- do.call(glmnet::glmnet, args)
+    fit[["call"]] <- wafc_engine_call(quote(glmnet::glmnet), args)
     a0 <- as.numeric(fit[["a0"]])
     beta <- fit[["beta"]]
     lam <- fit[["lambda"]] * lambda.factor
@@ -217,6 +218,7 @@ wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
       args[["lambda.factor"]] <- lambda.min.ratio
     }
     fit <- do.call(sparsegl::sparsegl, args)
+    fit[["call"]] <- wafc_engine_call(quote(sparsegl::sparsegl), args)
     a0 <- as.numeric(fit[["b0"]])
     beta <- fit[["beta"]]
     lam <- fit[["lambda"]]
@@ -596,6 +598,27 @@ wafc_levels <- function(beta, a0, design, carrier) {
   }
   rownames(cc) <- design[["xnames"]]
   cc
+}
+
+## The call the engine records. Reached through do.call(), glmnet and
+## sparsegl store their call with every argument evaluated, so the engine
+## object carried a second copy of the design (half of each saved fit of
+## wafc/scripts/05-sondagem-aplicacao.R) and printing it deparsed the whole
+## matrix. Nothing reads the call back: the path is interpolated by
+## wafc_raw_coef() and never by the engine with exact = TRUE. The data become
+## the symbols Z and y, and every other argument keeps its name, with its
+## value when it is short.
+wafc_engine_call <- function(fun, args) {
+  a <- args
+  a[["x"]] <- quote(Z)
+  a[["y"]] <- quote(y)
+  for (nm in setdiff(names(a), c("x", "y"))) {
+    v <- a[[nm]]
+    if (!(is.list(v) || (is.atomic(v) && length(v) <= 10L))) {
+      a[[nm]] <- as.symbol(nm)
+    }
+  }
+  as.call(c(list(fun), a))
 }
 
 ## Least squares on the level terms alone, written into the path points at

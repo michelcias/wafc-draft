@@ -60,6 +60,7 @@ que ler antes está aqui e no plano.
 | E1.7a sondagem de irrepresentabilidade | **fechada** (2026-09-20): veredito de escopo reduzido (D32) | `derivations/06a-sondagem-irrepresentabilidade.md` |
 | E1.7c seleção por limiarização | **fechada** (2026-09-20): Lema 13 e Corolário 8; conferência `OK` | `derivations/06-selecao-limiar.tex` |
 | E1.4c tradução do `03` | **fechada** (2026-09-20) | `derivations/03-desenho-produtos.tex` |
+| Revisão de `wafc/` | **feita** (2026-09-28): cinco defeitos, `call` compacto, só o melhor ajuste no `cv.wafc`, busca de nós rápida; 672 testes passam, piloto idêntico | `wafc/R/`, `wafc/scripts/04-pilot.R`, `wafc/tests/` |
 | E6.1a sondagem de bases | **fechada** (2026-09-20): veredito negativo nas três candidatas | `docs/aplicacao-candidatas.md` |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
@@ -82,9 +83,9 @@ no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
 **O catálogo está vazio.** A próxima é E2.5 (go/no-go), e ela **não deve
-abrir antes de três coisas**: o conserto do repasse de `wavelet.table` aos
-concorrentes, que hoje faz a coluna do `vcbart` sumir em silêncio; a decisão
-sobre P1 e P2, que E2.4b devolveu sem ratificação; e a repetição da parte
+abrir antes de duas coisas** (o conserto do repasse de `wavelet.table` ao
+`vcbart` foi feito em 2026-09-28): a decisão sobre P1 e P2, que E2.4b
+devolveu sem ratificação; e a repetição da parte
 `competitors` com a grade decidida, `k` casado no `gam` (`wafc_k_matched()`
 e motor `bam`, já disponíveis) e o cenário `uneven`. A razão é medida: o
 veredito contra os concorrentes muda com a grade de `J` (P1), e a

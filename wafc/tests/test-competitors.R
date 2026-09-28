@@ -267,3 +267,103 @@ test_that("the components of a fit reproduce a truth that is in the basis", {
   expect_equal(g[[1L, 1L]], truth - mean(truth), tolerance = 1e-4)
   expect_lt(max(abs(unlist(g[-1L]))), 1e-4)
 })
+
+## ---------------------------------------------------------------------------
+## Corrections of the review of 2026-09-28
+## ---------------------------------------------------------------------------
+
+test_that("an argument of the basis reaches only the fitters that build one", {
+  ## The pilot passes 'wavelet.table' to every method (decision D31). It
+  ## used to reach the engine of vcbart, which stopped with "unused
+  ## argument" and removed the column from the table.
+  tb <- WaveBased::wtable(family = "Daublets", filter.size = 8L,
+                          prec.wavelet = 30L, check = FALSE)
+  if (has("VCBART")) {
+    expect_s3_class(wafc_competitor("vcbart", x0, u0, y0, burn = 20L,
+                                    nd = 20L, wavelet.table = tb),
+                    "wafc_competitor")
+  }
+  if (has("grpreg")) {
+    kp <- wafc_competitor("klopp", x0, u0, y0, foldid = folds, J = 3L,
+                          wavelet.table = tb)
+    expect_false(is.null(kp[["design"]][["wavelet.table"]]))
+    expect_s3_class(wafc_competitor("bsgl", x0, u0, y0, foldid = folds,
+                                    df = 8L, wavelet.table = tb),
+                    "wafc_competitor")
+  }
+  if (has("mgcv")) {
+    expect_s3_class(wafc_competitor("gam", x0, u0, y0, wavelet.table = tb),
+                    "wafc_competitor")
+  }
+})
+
+test_that("bsgl and klopp keep the engine intercept out of beta", {
+  ## Without a constant covariate grpreg still fits an intercept, which no
+  ## level can carry. It used to be added to beta_1, so every prediction
+  ## multiplied it by X_1.
+  skip_if_not(has("grpreg"))
+  d1 <- simulate_wafc(n, p = p, q = q, scenario = "smooth", seed = 11L,
+                      snr = 6, intercept = FALSE)
+  y1 <- d1[["y"]] + 5
+  for (mth in c("bsgl", "klopp")) {
+    fit <- wafc_competitor(mth, d1[["x"]], d1[["u"]], y1, foldid = folds,
+                           df = 8L, J = 3L)
+    expect_equal(fit[["intercept"]], 5, tolerance = 0.2)
+    expect_equal(predict(fit, d1[["x"]], d1[["u"]]), fit[["fitted"]],
+                 tolerance = 1e-8)
+    expect_equal(predict(fit, d1[["x"]], d1[["u"]]),
+                 as.numeric(fit[["intercept"]] +
+                              rowSums(d1[["x"]] * fit[["beta"]](d1[["u"]]))),
+                 tolerance = 1e-8)
+    expect_lt(sqrt(mean((fit[["fitted"]] - d1[["f"]] - 5)^2)),
+              0.5 * stats::sd(d1[["f"]]))
+  }
+  ## with a constant covariate the intercept is folded into its level
+  fit <- wafc_competitor("bsgl", x0, u0, y0, foldid = folds, df = 8L)
+  expect_equal(fit[["intercept"]], 0)
+})
+
+test_that("the knot search scores the candidates as a refit would", {
+  ## Reference: the search as it was written first, one B-spline basis and
+  ## one least squares fit per candidate knot.
+  refit_search <- function(r, w, v, rng, cand, max.knots, degree, n) {
+    basis <- function(kn) {
+      as.matrix(splines::bs(pmin(pmax(v, rng[1L]), rng[2L]), knots = kn,
+                            degree = degree, Boundary.knots = rng,
+                            intercept = TRUE))
+    }
+    score <- function(kn) {
+      fk <- stats::.lm.fit(basis(kn) * w, r)
+      rss <- sum(fk[["residuals"]]^2)
+      list(bic = n * log(max(rss, .Machine[["double.eps"]]) / n) +
+             fk[["rank"]] * log(n), rss = rss, knots = kn)
+    }
+    kn <- numeric(0)
+    path <- list(score(kn))
+    while (length(kn) < max.knots) {
+      pool <- setdiff(cand, kn)
+      if (length(pool) == 0L) break
+      best <- NULL
+      for (k in pool) {
+        sc <- score(sort(c(kn, k)))
+        if (is.null(best) || sc[["rss"]] < best[["rss"]]) best <- sc
+      }
+      kn <- best[["knots"]]
+      path[[length(path) + 1L]] <- best
+    }
+    path[[which.min(vapply(path, `[[`, 0, "bic"))]][["knots"]]
+  }
+  for (sc in c("inhomogeneous", "uneven")) {
+    d1 <- simulate_wafc(n, p = p, q = q, scenario = sc, seed = 5L, snr = 3)
+    r <- as.numeric(d1[["y"]] - d1[["x"]] %*%
+                      qr.coef(qr(d1[["x"]]), d1[["y"]]))
+    for (l in c(1L, 2L)) {
+      v <- d1[["u"]][, 1L]
+      rng <- range(v)
+      cand <- unique(stats::quantile(v, seq_len(20L) / 21, names = FALSE))
+      a <- wafc_knot_search(r, d1[["x"]][, l], v, rng, cand, 8L, 3L, n)
+      expect_equal(a[["knots"]],
+                   refit_search(r, d1[["x"]][, l], v, rng, cand, 8L, 3L, n))
+    }
+  }
+})

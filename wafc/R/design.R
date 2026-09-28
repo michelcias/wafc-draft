@@ -193,7 +193,7 @@ wafc_design <- function(x, u, J, j0 = 0L, family = "Daublets",
                         sparse = c("auto", "always", "never"),
                         spec = NULL) {
 
-  this_call <- match.call()
+  this_call <- wafc_compact_call(match.call(), "wafc_design")
   x <- wafc_as_matrix(x, "x")
   u <- wafc_as_matrix(u, "u")
   n <- nrow(x)
@@ -329,6 +329,26 @@ wafc_design <- function(x, u, J, j0 = 0L, family = "Daublets",
 ## ---------------------------------------------------------------------------
 ## Internals
 ## ---------------------------------------------------------------------------
+
+## A call recorded by match.call() in a function reached through do.call()
+## holds every argument already evaluated, the data included: cv.wafc()
+## builds its designs and fits that way, so a stored call carried a copy of
+## x, u, y or the whole design, which doubled the size of a saved object and
+## made printing the call deparse the matrices. Arguments that are neither a
+## symbol, nor an expression, nor a short constant are replaced by a
+## placeholder naming their class, and the function itself, which do.call()
+## puts in the call as a closure when it is given one, by its name 'fun'.
+## Nothing in wafc/ evaluates a stored call.
+wafc_compact_call <- function(cl, fun, max_length = 10L) {
+  if (!is.symbol(cl[[1L]]) && !is.call(cl[[1L]])) cl[[1L]] <- as.symbol(fun)
+  for (i in seq_along(cl)[-1L]) {
+    a <- cl[[i]]
+    keep <- is.null(a) || is.symbol(a) || is.call(a) ||
+      (is.atomic(a) && length(a) <= max_length)
+    if (!keep) cl[[i]] <- as.symbol(paste0("<", class(a)[1L], ">"))
+  }
+  cl
+}
 
 ## Coerces to a numeric matrix, keeping the column names when there are any.
 wafc_as_matrix <- function(z, what) {

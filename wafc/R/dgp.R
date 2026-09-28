@@ -368,7 +368,7 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
                           cc = NULL, amplitude = 1,
                           regime = c("periodic", "margin", "interval")) {
 
-  this_call <- match.call()
+  this_call <- wafc_compact_call(match.call(), "simulate_wafc")
   scenario <- match.arg(scenario)
   regime <- match.arg(regime)
   x_dist <- match.arg(x_dist)

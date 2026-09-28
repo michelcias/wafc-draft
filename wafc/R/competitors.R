@@ -43,7 +43,10 @@
 ## g(grid) gives the p by q list of additive components (NULL when the
 ## method does not decompose, which is the case of vcbart), blocks gives
 ## the p by q matrix of selected blocks (NULL when the method selects
-## nothing), and predict() gives rowSums(newx * beta(newu)).
+## nothing), and predict() gives rowSums(newx * beta(newu)), plus the
+## 'intercept' slot when the method has one that no constant covariate can
+## carry (bsgl and klopp, whose engine always fits an intercept; zero when
+## the design has a constant covariate, which then carries it).
 ##
 ## The penalty rule step E2.4 added, wafc_lambda_qut(), used to live here
 ## for want of a catalogue entry; step E2.4b moved it to wafc/R/tune.R,
@@ -90,20 +93,25 @@ wafc_competitor <- function(method = c("gam", "bsgl", "klopp", "aspline",
                    klopp = wafc_fit_klopp, aspline = wafc_fit_aspline,
                    vcbart = wafc_fit_vcbart, linear = wafc_fit_linear,
                    oracle = wafc_fit_oracle)
-  ## The pilot loops over the methods with one list of arguments, so an
-  ## argument meant for another method is dropped here rather than raising
-  ## an error. A fitter with a '...' of its own keeps receiving everything.
-  args <- list(x = x, u = u, y = y)
-  extra <- list(...)
-  extra[["active"]] <- NULL
   ## The pilot calls every method with one list of arguments, so an
   ## argument that belongs to another fitter is dropped here instead of
   ## raising an error. A fitter with a '...' of its own keeps everything
-  ## else, because that is how wafc_design() arguments such as 'rescale'
-  ## reach it; only a name that is some other fitter's argument is removed.
+  ## else; only a name that is some other fitter's argument is removed, and
+  ## so is a wafc_design() argument unless the '...' of the fitter reaches
+  ## wafc_design(). The second rule is what the pilot needed: it passes
+  ## 'wavelet.table' to every method (decision D31), gam and bsgl swallowed
+  ## it through the '...' of their engines, and VCBART_ind() stopped with
+  ## "unused argument", which removed the column from the table.
+  args <- list(x = x, u = u, y = y)
+  extra <- list(...)
+  extra[["active"]] <- NULL
   own <- setdiff(names(formals(fitter)), "...")
   if ("..." %in% names(formals(fitter))) {
-    extra <- extra[!(names(extra) %in% setdiff(wafc_fitter_args(), own))]
+    drop <- setdiff(wafc_fitter_args(), own)
+    if (!(method %in% wafc_design_fitters)) {
+      drop <- union(drop, setdiff(wafc_design_args(), own))
+    }
+    extra <- extra[!(names(extra) %in% drop)]
   } else {
     extra <- extra[names(extra) %in% own]
   }
@@ -139,7 +147,8 @@ predict.wafc_competitor <- function(object, newx, newu, ...) {
     stop("'newx' and 'newu' must have ", object[["p"]], " and ",
          object[["q"]], " column(s).", call. = FALSE)
   }
-  as.numeric(rowSums(newx * object[["beta"]](newu)))
+  a0 <- if (is.null(object[["intercept"]])) 0 else object[["intercept"]]
+  as.numeric(a0 + rowSums(newx * object[["beta"]](newu)))
 }
 
 #' @rdname wafc_competitor
@@ -460,9 +469,9 @@ wafc_fit_bsgl <- function(x, u, y, df = c(4L, 8L, 16L), nfolds = 10L,
                             fold = foldid, ...)
     val <- min(cv[["cve"]])
     if (is.null(best) || val < best[["cve"]]) {
-      best <- list(cve = val, df = d, spec = sp, cv = cv, group = grp,
-                   Z = Z)
+      best <- list(cve = val, df = d, spec = sp, cv = cv, group = grp)
     }
+    rm(Z)
   }
   d <- best[["df"]]
   sp <- best[["spec"]]
@@ -497,18 +506,21 @@ wafc_fit_bsgl <- function(x, u, y, df = c(4L, 8L, 16L), nfolds = 10L,
     dimnames(g) <- list(xn, un)
     g
   }
+  ## Without a constant covariate the intercept of grpreg has no level to be
+  ## folded into, and it stays out of beta: adding it to beta_1, as this
+  ## function did, multiplied it by X_1 in every prediction.
   beta_fun <- function(newu) {
     g <- g_of(newu)
     nr <- length(g[[1L, 1L]])
     out <- matrix(rep(cc, each = nr), nr, p, dimnames = list(NULL, xn))
-    out[, 1L] <- out[, 1L] + a0
     for (l in seq_len(p)) {
       for (m in seq_len(q)) out[, l] <- out[, l] + g[[l, m]]
     }
     out
   }
   list(fit = best[["cv"]], cc = cc, beta = beta_fun, g = g_of, blocks = nz,
-       fitted = as.numeric(rowSums(x * beta_fun(u))), xnames = xn, unames = un,
+       fitted = as.numeric(a0 + rowSums(x * beta_fun(u))), intercept = a0,
+       xnames = xn, unames = un,
        extra = list(df = d, lambda = best[["cv"]][["lambda.min"]],
                     cve = best[["cve"]]))
 }
@@ -615,18 +627,20 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
     dimnames(g) <- list(xn, un)
     g
   }
+  ## The intercept of grpreg stays out of beta when no constant covariate
+  ## can carry it; see the same note in wafc_fit_bsgl().
   beta_fun <- function(newu) {
     g <- g_of(newu)
     nr <- length(g[[1L, 1L]])
     out <- matrix(rep(cc, each = nr), nr, p, dimnames = list(NULL, xn))
-    out[, 1L] <- out[, 1L] + a0
     for (l in seq_len(p)) {
       for (m in seq_len(q)) out[, l] <- out[, l] + g[[l, m]]
     }
     out
   }
   list(fit = best[["cv"]], cc = cc, beta = beta_fun, g = g_of, blocks = nz,
-       fitted = as.numeric(rowSums(x * beta_fun(u))), xnames = xn, unames = un,
+       fitted = as.numeric(a0 + rowSums(x * beta_fun(u))), intercept = a0,
+       xnames = xn, unames = un,
        design = des,
        extra = list(J = best[["J"]], block.size = block.size,
                     ngroups = length(unique(best[["group"]][best[["group"]] > 0L])),
@@ -1003,6 +1017,16 @@ wafc_fitter_args <- function() {
           c("...", "x", "u", "y"))
 }
 
+## The methods whose '...' is passed to wafc_design(); the '...' of the
+## others goes to an engine (mgcv, grpreg, VCBART) that does not know the
+## arguments of the basis.
+wafc_design_fitters <- c("klopp", "oracle")
+
+## The arguments of wafc_design() that describe the basis and the rescaling.
+wafc_design_args <- function() {
+  setdiff(names(formals(wafc_design)), c("x", "u", "J", "spec"))
+}
+
 ## qr.coef on a matrix or a vector, with the NA of a rank-deficient fit
 ## turned into zero, which is what every caller here wants.
 wafc_qr_coef <- function(qrx, v) {
@@ -1160,11 +1184,28 @@ wafc_design_keep <- function(design, active) {
 ## with a stopping rule the search halts on a component whose first knot
 ## alone does not pay, which is exactly a spiky component such as 'bumps',
 ## the one the comparison is about.
+##
+## The candidates of a step are scored at once, not refitted one by one.
+## Adding the knot k to a spline of the given degree adds the truncated
+## power (v - k)_+^degree to its span, so the residual sum of squares of the
+## fit with that knot is the current one minus (c'e)^2 / c'c, where e is the
+## current residual and c is the weighted truncated power projected off the
+## current span. That is the same number the refit gives, one projection per
+## step instead of one B-spline basis and one least squares fit per
+## candidate: the search chose the same knots as the refit in all eighteen
+## cases compared (three scenarios, n = 250 and 1000, three seeds), with
+## identical fitted values, and was seven to eleven times faster. A candidate
+## whose projection is at the level of rounding (no observation between two
+## knots, where the refit is rank deficient and the sum of squares does not
+## move) is given no gain; the threshold, 1e-24 of the squared norm of the
+## column, is far below the legitimate small projections (a knot between
+## two close knots adds little, and 1e-10 already discarded such knots in
+## the comparison) and far above rounding, which is of order 1e-32.
 wafc_knot_search <- function(r, w, v, rng, cand, max.knots, degree, n) {
-  basis <- function(kn, at = v) {
-    B <- splines::bs(pmin(pmax(at, rng[1L]), rng[2L]), knots = kn,
-                     degree = degree, Boundary.knots = rng, intercept = TRUE)
-    as.matrix(B)
+  vc <- pmin(pmax(v, rng[1L]), rng[2L])
+  basis <- function(kn) {
+    as.matrix(splines::bs(vc, knots = kn, degree = degree,
+                          Boundary.knots = rng, intercept = TRUE))
   }
   score <- function(kn) {
     fitk <- stats::.lm.fit(basis(kn) * w, r)
@@ -1173,16 +1214,22 @@ wafc_knot_search <- function(r, w, v, rng, cand, max.knots, degree, n) {
     list(bic = n * log(max(rss, .Machine[["double.eps"]]) / n) + df * log(n),
          coef = wafc_zero_na(fitk[["coefficients"]]), rss = rss, knots = kn)
   }
+  tpow <- w * pmax(outer(vc, cand, "-"), 0)^degree
+  tnorm <- colSums(tpow^2)
   kn <- numeric(0)
   path <- list(score(kn))
   while (length(kn) < max.knots) {
-    pool <- setdiff(cand, kn)
+    pool <- which(!(cand %in% kn))
     if (length(pool) == 0L) break
-    best <- NULL
-    for (k in pool) {
-      sc <- score(sort(c(kn, k)))
-      if (is.null(best) || sc[["rss"]] < best[["rss"]]) best <- sc
-    }
+    Q <- qr.Q(qr(basis(kn) * w))
+    e <- r - as.numeric(Q %*% crossprod(Q, r))
+    Cp <- tpow[, pool, drop = FALSE]
+    Cp <- Cp - Q %*% crossprod(Q, Cp)
+    nrm <- colSums(Cp^2)
+    gain <- ifelse(nrm > 1e-24 * tnorm[pool],
+                   as.numeric(crossprod(Cp, e))^2 / nrm, 0)
+    ## which.max takes the first of tied candidates, as the refit loop did
+    best <- score(sort(c(kn, cand[pool[which.max(gain)]])))
     kn <- best[["knots"]]
     path[[length(path) + 1L]] <- best
   }

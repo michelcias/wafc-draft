@@ -93,7 +93,7 @@ Rscript derivations/check/07-rota-intervalo.R      # ~2 min
 E o código do método, que já existe:
 
 ```bash
-Rscript -e 'testthat::test_dir("wafc/tests")'   # 642 passam, ~37 s
+Rscript -e 'testthat::test_dir("wafc/tests")'   # 672 passam, ~40 s
 Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
 Rscript wafc/scripts/03-tune-decomp.R           # ~2 min
 Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 min
@@ -119,10 +119,10 @@ Rscript wafc/scripts/06-timing.R                             # só tempo, curto
   escrita e não vai ao manuscrito (D26). E1.9 (cota inferior) fica para
   depois dos resultados.
 - **Código: E2.1 a E2.4b fechadas**, com o piloto, os sete concorrentes, o
-  QUT, o cenário `uneven` e a tabela de tempo; **642 testes passam**. Falta
-  o go/no-go (E2.5), que espera o conserto do repasse de `wavelet.table` ao
-  `vcbart`, a decisão sobre P1 e P2 e a repetição da parte `competitors`
-  (`ESTADO.md` §5).
+  QUT, o cenário `uneven` e a tabela de tempo, e a revisão de 2026-09-28
+  (defeitos, memória, busca de nós); **672 testes passam**. Falta o
+  go/no-go (E2.5), que espera a decisão sobre P1 e P2 e a repetição da
+  parte `competitors` (`ESTADO.md` §5).
 - **Avaliação da base em estudo numérico:** tabela fixa (`wtable()` uma vez,
   passada em `wavelet.table`), que é o caminho rápido; a regra `auto` não
   dispara nos `n` do estudo e deixaria tudo no algoritmo lento (D31). A

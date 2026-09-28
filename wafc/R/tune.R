@@ -104,7 +104,7 @@ cv.wafc <- function(x, u, y, J = NULL, penalty = c("lasso", "sglasso"),
                     nlambda = 100L, lambda.min.ratio = NULL,
                     type.measure = c("mse", "mae"), trace = FALSE, ...) {
 
-  this_call <- match.call()
+  this_call <- wafc_compact_call(match.call(), "cv.wafc")
   penalty <- match.arg(penalty)
   type.measure <- match.arg(type.measure)
   x <- wafc_as_matrix(x, "x")
@@ -136,18 +136,27 @@ cv.wafc <- function(x, u, y, J = NULL, penalty = c("lasso", "sglasso"),
     list(cv = z, fit = full)
   }
 
-  runs <- vector("list", length(J))
+  ## Only the fit of the best candidate so far is kept: every fit carries its
+  ## design, and holding all of them until the end made the memory peak the
+  ## sum over the grid instead of its largest term. The candidate kept is the
+  ## one which.min() over the whole grid selects, since which.min() over the
+  ## first i values points at i exactly when i is a new first minimum.
+  cvlist <- vector("list", length(J))
+  best_fit <- NULL
   for (i in seq_along(J)) {
-    runs[[i]] <- run_one(J[i])
+    run <- run_one(J[i])
+    cvlist[[i]] <- run[["cv"]]
+    cvm_sofar <- vapply(cvlist[seq_len(i)], `[[`, 0, "cvm.min")
+    if (identical(which.min(cvm_sofar), i)) best_fit <- run[["fit"]]
     if (trace) {
-      z <- runs[[i]][["cv"]]
+      z <- run[["cv"]]
       cat(sprintf("J = %d: %s = %.5f at lambda = %.5g (%d nonzero of %d)\n",
                   J[i], type.measure, z[["cvm.min"]], z[["lambda.min"]],
-                  z[["nzero.min"]], runs[[i]][["fit"]][["npen"]]))
+                  z[["nzero.min"]], run[["fit"]][["npen"]]))
     }
+    rm(run)
   }
 
-  cvlist <- lapply(runs, `[[`, "cv")
   cvm_all <- vapply(cvlist, `[[`, 0, "cvm.min")
   ## ties go to the smallest J: the grid is increasing and which.min takes
   ## the first minimum, which is the parsimonious reading
@@ -168,7 +177,7 @@ cv.wafc <- function(x, u, y, J = NULL, penalty = c("lasso", "sglasso"),
               lambda.1se = z[["lambda.1se"]], cvm.min = z[["cvm.min"]],
               cvsd.min = z[["cvsd.min"]], nzero.min = z[["nzero.min"]],
               type.measure = type.measure, nfolds = nfolds, foldid = foldid,
-              penalty = penalty, wafc.fit = runs[[best]][["fit"]])
+              penalty = penalty, wafc.fit = best_fit)
   class(out) <- "cv.wafc"
   out
 }
@@ -551,7 +560,7 @@ wafc_tune <- function(x, u, y,
                       sigma = NULL, alpha = 0.05, nsim = 200L,
                       qut.seed = NULL, ...) {
 
-  this_call <- match.call()
+  this_call <- wafc_compact_call(match.call(), "wafc_tune")
   rule <- match.arg(rule)
   penalty <- match.arg(penalty)
   x <- wafc_as_matrix(x, "x")
@@ -941,11 +950,17 @@ wafc_ic <- function(object, s = NULL, gamma = 0, name = "bic") {
 ## penalized coefficient is zero, which is max_a |B_a' r_0| / n with r_0 the
 ## residual of the least squares fit on the unpenalized columns alone. On
 ## the scale of the objective, this is the lambda at which glmnet starts.
-wafc_lambda_max <- function(design, y) {
+## The intercept column enters only when the fit has one, which by default
+## (wafc(), argument 'intercept') is when the design has a constant
+## covariate; always adding it, as this function did, gave the entry point
+## of a fit without an intercept the wrong residual.
+wafc_lambda_max <- function(design, y,
+                            intercept = length(design[["constant"]]) > 0L) {
   n <- design[["n"]]
   unp <- design[["unpenalized"]]
   pen <- seq_len(design[["nvars"]])[-unp]
-  W <- cbind(`(Intercept)` = 1, as.matrix(design[["Z"]][, unp, drop = FALSE]))
+  W <- as.matrix(design[["Z"]][, unp, drop = FALSE])
+  if (isTRUE(intercept)) W <- cbind(`(Intercept)` = 1, W)
   r <- qr.resid(qr(W), y)
   max(abs(as.numeric(Matrix::crossprod(design[["Z"]][, pen, drop = FALSE], r)))) / n
 }

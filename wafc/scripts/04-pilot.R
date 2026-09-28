@@ -94,18 +94,12 @@ ns <- if (length(args) >= 4L && nzchar(args[4L])) {
 } else c(250L, 500L, 1000L)
 R_small <- min(R, 20L)
 
-## Scenarios of dgp.R, with the effective regularity s' each one declares.
-## Decision D27 fixed the two values: the cubic of "smooth" has a corner in
-## its periodic extension and the theory is stated at eps = 0 (D26), so the
-## smooth scenario reads 3/2 and not the 4 it would read with a margin and
-## an extension; blocks and heavisine jump inside the interval, where no
-## basis helps, so the inhomogeneous one reads 1/2.
-##
-## The number belongs in dgp.R as an attribute of the scenario, which is
-## what D27 asks for and what step E2.4 may not edit (docs/TAREFA.md,
-## section 3); the line to add is in the handoff. Until then it lives here,
-## and here only.
-wafc_sprime <- c(smooth = 3/2, inhomogeneous = 1/2, null = 3/2)
+## The effective regularity s' each scenario declares (decision D27) is read
+## from wafc_sprime() of dgp.R, in the regime "periodic" of the theory
+## (D26). This script used to carry its own vector under that name, from
+## before step E2.4b moved the number into dgp.R; the vector shadowed the
+## function and had no entry for "uneven", so a cell of that scenario would
+## have failed in the part 'lambda' and been dropped.
 
 ## The four cells of the pilot. The third is the "mixture with half the
 ## components null" of plano-projeto.md E2.4, as far as dgp.R reaches:
@@ -214,7 +208,24 @@ one_row <- function(cell, n, r, method, dgp, test, grid, fit, active,
     J = if (is.null(extra[["J"]])) NA_integer_ else extra[["J"]],
     lambda = if (is.null(extra[["lambda"]])) NA_real_ else extra[["lambda"]],
     nzero = if (is.null(extra[["nzero"]])) NA_integer_ else extra[["nzero"]],
-    sigma = dgp[["sigma"]], time = fit[["time"]],
+    sigma = dgp[["sigma"]], time = fit[["time"]], error = NA_character_,
+    stringsAsFactors = FALSE)
+}
+
+## A method that fails leaves a row with its error message and no numbers,
+## instead of no row at all: a column that disappears from the table is
+## read as a method that was never run, which is how the failure of vcbart
+## went unnoticed after step E2.4b.
+fail_row <- function(cell, n, r, method, dgp, active, err) {
+  data.frame(
+    cell = cell[["name"]], scenario = cell[["scenario"]], n = n, rep = r,
+    method = method, rmse_f = NA_real_, rmse_y = NA_real_,
+    mse_beta = NA_real_, ise = NA_real_, ise_active = NA_real_,
+    ise_null = NA_real_, n_true = NA_integer_, n_false = NA_integer_,
+    n_active = sum(active), n_block = length(active), J = NA_integer_,
+    lambda = NA_real_, nzero = NA_integer_, sigma = dgp[["sigma"]],
+    time = NA_real_,
+    error = gsub("\\s+", " ", conditionMessage(attr(err, "condition"))),
     stringsAsFactors = FALSE)
 }
 
@@ -241,7 +252,11 @@ run_competitors <- function(cell, n, r) {
     cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], penalty = pen,
                       foldid = foldid, wavelet.table = wafc_pilot_table),
               silent = TRUE)
-    if (inherits(cv, "try-error")) next
+    if (inherits(cv, "try-error")) {
+      rows[[length(rows) + 1L]] <- fail_row(cell, n, r, paste0("wafc.", pen),
+                                            dgp, active, cv)
+      next
+    }
     el <- proc.time()[["elapsed"]] - t0
     f <- cv[["wafc.fit"]]
     lam <- cv[["lambda.min"]]
@@ -264,7 +279,10 @@ run_competitors <- function(cell, n, r) {
     f <- try(wafc_competitor(mth, dgp[["x"]], dgp[["u"]], dgp[["y"]],
                              active = active, foldid = foldid,
                              wavelet.table = wafc_pilot_table), silent = TRUE)
-    if (inherits(f, "try-error")) next
+    if (inherits(f, "try-error")) {
+      rows[[length(rows) + 1L]] <- fail_row(cell, n, r, mth, dgp, active, f)
+      next
+    }
     gh <- wafc_grid_components(f, grid)
     rows[[length(rows) + 1L]] <- one_row(
       cell, n, r, mth, dgp, test, grid,
@@ -295,7 +313,7 @@ run_lambda <- function(cell, n, r) {
   active <- nzchar(dgp[["structure"]])
   set.seed(seed + 77L)
   foldid <- sample(rep_len(1:10, n))
-  sp <- wafc_sprime[[cell[["scenario"]]]]
+  sp <- as.numeric(wafc_sprime(cell[["scenario"]]))
   rows <- list()
   dcache <- list()
 
@@ -321,12 +339,39 @@ run_lambda <- function(cell, n, r) {
                  nzero = sum(cf[-1L, 1L][-fit[["design"]][["unpenalized"]]] != 0)))
   }
 
-  for (rule in c("cv.min", "cv.1se", "bic", "ebic", "theory")) {
+  ## One cross-validation serves the three rules that use it: cv.min and
+  ## cv.1se read its two penalty levels, and the QUT takes its resolution.
+  ## This part used to run the same cv.wafc() three times, once inside
+  ## wafc_tune() for each of the first two rules and once for the QUT, on the
+  ## same data and folds, which gives the same object three times: the
+  ## numbers are unchanged and the part costs about a third. The time of
+  ## each of the three rules is still the time of that cross-validation,
+  ## plus, for the QUT, its own simulation and refit.
+  t0 <- proc.time()[["elapsed"]]
+  cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], foldid = foldid,
+                    wavelet.table = wafc_pilot_table), silent = TRUE)
+  el_cv <- proc.time()[["elapsed"]] - t0
+  if (inherits(cv, "try-error")) {
+    for (rule in c("cv.min", "cv.1se", "qut")) {
+      rows[[length(rows) + 1L]] <- fail_row(cell, n, r, rule, dgp, active, cv)
+    }
+  } else {
+    fcv <- cv[["wafc.fit"]]
+    rows[[length(rows) + 1L]] <- record("cv.min", fcv, cv[["lambda.min"]],
+                                        el_cv, cv[["J.min"]])
+    rows[[length(rows) + 1L]] <- record("cv.1se", fcv, cv[["lambda.1se"]],
+                                        el_cv, cv[["J.min"]])
+  }
+
+  for (rule in c("bic", "ebic", "theory")) {
     t0 <- proc.time()[["elapsed"]]
     tn <- try(wafc_tune(dgp[["x"]], dgp[["u"]], dgp[["y"]], rule = rule,
                         foldid = foldid, s = sp, sigma = dgp[["sigma"]],
                         wavelet.table = wafc_pilot_table), silent = TRUE)
-    if (inherits(tn, "try-error")) next
+    if (inherits(tn, "try-error")) {
+      rows[[length(rows) + 1L]] <- fail_row(cell, n, r, rule, dgp, active, tn)
+      next
+    }
     el <- proc.time()[["elapsed"]] - t0
     rows[[length(rows) + 1L]] <- record(rule, tn[["fit"]], tn[["lambda"]], el,
                                         tn[["J"]])
@@ -334,17 +379,14 @@ run_lambda <- function(cell, n, r) {
 
   ## QUT: the resolution is not part of the rule, so it is taken from the
   ## same cross-validation the other rules use, and only lambda changes.
-  t0 <- proc.time()[["elapsed"]]
-  cvq <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], foldid = foldid,
-                     wavelet.table = wafc_pilot_table), silent = TRUE)
-  if (!inherits(cvq, "try-error")) {
-    fq <- cvq[["wafc.fit"]]
-    lq <- wafc_lambda_qut(fq[["design"]], dgp[["y"]], nsim = 200L,
+  if (!inherits(cv, "try-error")) {
+    t0 <- proc.time()[["elapsed"]]
+    lq <- wafc_lambda_qut(fcv[["design"]], dgp[["y"]], nsim = 200L,
                           seed = seed + 5L)
-    fq2 <- wafc(design = fq[["design"]], y = dgp[["y"]],
-                lambda = wafc_path_to(lq, fq[["design"]], dgp[["y"]]))
-    el <- proc.time()[["elapsed"]] - t0
-    rows[[length(rows) + 1L]] <- record("qut", fq2, lq, el, cvq[["J.min"]])
+    fq2 <- wafc(design = fcv[["design"]], y = dgp[["y"]],
+                lambda = wafc_path_to(lq, fcv[["design"]], dgp[["y"]]))
+    el <- el_cv + proc.time()[["elapsed"]] - t0
+    rows[[length(rows) + 1L]] <- record("qut", fq2, lq, el, cv[["J.min"]])
   }
 
   ## The oracle of the grid.
@@ -564,7 +606,25 @@ sweep_part <- function(fun, label, cells_used = cells, ns_used = ns,
              })
   }, mc.cores = ncores, mc.preschedule = FALSE)
   cat(sprintf("   %.1f s\n", proc.time()[["elapsed"]] - t0))
-  do.call(rbind, res[!vapply(res, is.null, TRUE)])
+  ## Failures are counted where they are printed, and not only in the
+  ## messages: a job that fails as a whole leaves no row (a worker that dies
+  ## returns a "try-error", which is not a data frame either), and a method
+  ## that fails inside a job leaves a row with its message in 'error'.
+  ok <- vapply(res, is.data.frame, TRUE)
+  if (any(!ok)) {
+    cat(sprintf("   %d of %d job(s) failed as a whole and left no row\n",
+                sum(!ok), length(jobs)))
+  }
+  out <- do.call(rbind, res[ok])
+  if (!is.null(out[["error"]]) && any(!is.na(out[["error"]]))) {
+    bad <- out[!is.na(out[["error"]]), c("method", "error")]
+    cat("   failed fits, kept as rows with no numbers:\n")
+    for (m in unique(bad[["method"]])) {
+      cat(sprintf("     %-14s %3d: %s\n", m, sum(bad[["method"]] == m),
+                  substr(bad[["error"]][bad[["method"]] == m][1L], 1L, 100L)))
+    }
+  }
+  out
 }
 
 ## Median of each variable by the grouping columns. The ordering goes

@@ -397,3 +397,23 @@ test_that("the null scenario is shrunk to a linear model by both penalties", {
     expect_equal(max(abs(unlist(fn[["g"]]))), 0)
   }
 })
+
+test_that("a fit does not store a second copy of its data in a call", {
+  ## Reached through do.call(), as cv.wafc() reaches them, wafc_design(),
+  ## wafc() and the engines recorded their calls with every argument
+  ## evaluated: the engine object carried the whole design again, half of a
+  ## saved fit, and printing it deparsed the matrix.
+  d <- simulate_wafc(n, p = p, q = q, scenario = "smooth", seed = 1L)
+  des <- do.call(wafc_design, list(x = d[["x"]], u = d[["u"]], J = 4L))
+  fit <- do.call(wafc, list(design = des, y = d[["y"]]))
+  for (cl in list(des[["call"]], fit[["call"]], fit[["fit"]][["call"]])) {
+    expect_lt(sum(nchar(deparse(cl))), 1000L)
+  }
+  expect_lt(length(serialize(fit, NULL)),
+            1.2 * length(serialize(fit[["design"]], NULL)) +
+              length(serialize(fit[["beta"]], NULL)) + 1e5)
+  if (has_sparsegl) {
+    fg <- wafc(design = des, y = d[["y"]], penalty = "sglasso")
+    expect_lt(sum(nchar(deparse(fg[["fit"]][["call"]]))), 1000L)
+  }
+})
