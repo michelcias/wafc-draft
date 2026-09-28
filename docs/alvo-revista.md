@@ -148,7 +148,7 @@ pela variante em grupos, quais moduladoras afetam quais coeficientes.
   único problema do `glmnet`, dá o corolário de compressibilidade sem
   restringir `τ`, e a comparação numérica contra os blocos está em E4. A
   variante em grupos existe em `wafc()` para quem quiser estrutura (E2.2).
-- **"Onde está a cota inferior para `q ≥ 2`?"** Não existe (pergunta 12 da
+- **"Onde está a cota inferior para `q ≥ 2`?"** Não existe (pergunta 20 da
   §4 do `ESTADO.md`), e sob este posicionamento ela fica mais visível: o
   artigo cita a de K&P e afirma otimalidade só onde ela vale. É o risco
   assumido da escolha.

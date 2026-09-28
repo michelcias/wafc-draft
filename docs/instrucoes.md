@@ -4,7 +4,8 @@ Documento normativo do projeto. Em caso de conflito com qualquer outro arquivo
 deste repositório, este manda. Adaptado do `instrucoes.md` do `bdm-draft`, com
 o que mudou: o alvo é uma revista de estatística geral (não bayesiana), a
 teoria é de regressão penalizada (desigualdades oráculo, taxas em Besov), e o
-código de produção entra num pacote que **já existe** (`WaveBased`).
+código do método vive na pasta `wafc/` deste repositório, com o `WaveBased`
+só como dependência para as bases (D4); empacotar decide-se em E3.3.
 
 ---
 
@@ -175,9 +176,9 @@ muda; quando o autor pede o trecho inteiro como entrega, o trecho inteiro.
 ### Específico da revista-alvo
 
 Ver [`alvo-revista.md`](alvo-revista.md). O que muda na prática enquanto o
-alvo for a *Statistica Sinica*: teto de **30 páginas de manuscrito** (a
-confirmar na página oficial, que estava inacessível em 2026-09-18), provas
-no suplementar, o leitor é metodólogo de estatística geral (a exposição de
+alvo for a *Statistica Sinica*: teto de **40 páginas em espaço duplo no
+template, referências e apêndice incluídos** (`ss-instrucoes-autores.md`),
+provas no suplementar, o leitor é metodólogo de estatística geral (a exposição de
 wavelets precisa ser autossuficiente em uma página; a de LASSO pode ser
 econômica), e o padrão da revista para este tipo de artigo é **método +
 teoria + simulação + aplicação real**, todos os quatro. Se o alvo mudar para

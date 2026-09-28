@@ -65,11 +65,11 @@ decisões para a hora errada.
 
 ### E0.1 Nomes
 
-| O quê | Nome | Estado (2026-09-18) |
+| O quê | Nome | Estado (2026-09-28) |
 |---|---|---|
-| método | WAFC, *wavelet additive functional coefficients* (provisório) | a ratificar (D8) |
+| método | WAFC, *wavelet additive functional coefficients* | ratificado (D8, 2026-09-19) |
 | funções | `wafc()`, `cv.wafc()`, classe `"wafc"`, na pasta `wafc/` | D4 fechada: pasta dedicada, não o `WaveBased` |
-| repositório de rascunho | `michelcias/wafc-draft` (este) | criado localmente em 2026-09-18; a publicar no GitHub |
+| repositório de rascunho | `michelcias/wafc-draft` (este) | publicado (privado) em 2026-09-18 |
 | compêndio | `michelcias/wafc-studies` | a criar em E4.1; conferir que está livre |
 
 ### E0.2 Onde o código vive em cada momento
@@ -83,20 +83,19 @@ decisões para a hora errada.
 ### E0.3 Template e instruções da revista
 
 - **Feito:** `manuscript/ejs-template/` (imsart 2025/03/18, `ejsv2`) compila.
-- **Autor:** abrir https://www3.stat.sinica.edu.tw/statistica/AUTHORS.HTM
-  (inacessível desta máquina em 2026-09-18), transcrever as instruções em
-  `docs/ss-instrucoes-autores.md`, confirmar o teto de 30 páginas e o tipo de
-  revisão, baixar o template para `manuscript/ss-template/` e conferir que
-  compila. Conferir no SCImago o quartil 2024 da *Statistica Sinica*
-  (`docs/alvo-revista.md`, §1).
+- **Feito (2026-09-18/19):** instruções da *Statistica Sinica* transcritas
+  em `docs/ss-instrucoes-autores.md` (teto de 40 páginas em espaço duplo,
+  referências incluídas; tipo de revisão não declarado), template em
+  `manuscript/ss-template/` compilando, e Q1 confirmado pelo autor no
+  SCImago.
 
 ### E0.4 Ferramentas
 
 Presentes: R 4.6.1, `glmnet`, `grpreg`, `gglasso`, `mgcv`, `Matrix`,
 `bench`, `testthat`, `devtools`, `roxygen2`, `pkgdown`, `renv`, `latexmk`.
-`WaveBased` 2.6-0 instalado de `../../WaveBased` em 2026-09-18. Instalar:
-`sparsegl` quando E2.2 abrir; `gh` para criar repositórios (ou criar pela
-página do GitHub).
+`WaveBased` 2.6-0 instalado de `../../WaveBased` em 2026-09-18; `sparsegl`,
+`VCBART`, `quadprog` e `gh` instalados depois. A lista em dia está em
+`CONTINUAR.md` §2.
 
 ### E0.5 Inventário
 
@@ -173,6 +172,7 @@ coeficientes conhecidos.
 
 ### E1.3 `02-aproximacao-besov.tex`
 
+**Fechada em 2026-09-18** (Lemas 2 e 3, Corolário 1, Proposição 2).
 Lema de aproximação: `g ∈ B^s_{π,r}[0,1]`, `s > 1/π`, base com `N > s`
 momentos nulos; `‖g − Π_J g‖_{L_2(P_U)} ≤ C 2^{−J s'}` com densidade de `U`
 limitada; e a versão em `L_∞` se precisar para a compatibilidade. Transposto
@@ -224,9 +224,13 @@ taxa melhor que a do sieve cheio, transposto do WALL (trilha rápida).
 implica** weak-`ℓ_τ`, então a compressibilidade não custa hipótese. O
 enunciado principal do artigo sai daqui e é o Corolário 5 (D16).
 
-### E1.7 (condicional) `06-selecao-grupos.tex`
+### E1.7 Seleção de estrutura
 
-**O escopo desta etapa está em decisão (L2f).** O plano original era
+**Decidida (D28, D32) e fechada em 2026-09-20:** E1.7c entregou a seleção
+por limiarização (`06-selecao-limiar.tex`, Lema 13 e Corolário 8), e E1.7a
+deu veredito de escopo reduzido para a saída (a)
+(`06a-sondagem-irrepresentabilidade.md`). O texto abaixo é o registro da
+pergunta original. Era: **o escopo desta etapa está em decisão (L2f).** O plano original era
 seleção consistente de `{(ℓ,m): g_{ℓm} ≢ 0}` com sparse group LASSO
 adaptativo, seguindo Wei, Huang & Li (2011) e Huang, Horowitz & Wei (2010).
 L2 mostrou que a ideia não é nova, e as três saídas estão escritas em
@@ -243,7 +247,7 @@ preço é `C(eps) ≍ eps^{−(s−1/π)}`, exato, e a margem **não pode encolh
 `J`**. A tensão com a Gram restrita e a decisão de manter a teoria em
 `eps = 0` estão em D26.
 
-### E1.8 A rota do intervalo (aberta)
+### E1.8 A rota do intervalo (fechada em 2026-09-19)
 
 `07-rota-intervalo.tex`: a teoria sem periodicidade, pronta para o caso de
 um referee pedir — o que transfere verbatim para a base CDV, o que precisa
@@ -264,7 +268,7 @@ se a evidência numérica sustentar o artigo, a cota inferior é cortesia que
 um referee da SS pode pedir e que se responde em revisão; se a contribuição
 numérica ficar fraca, ela vira o peso que falta. Sob D18 o artigo se declara
 extensão de quem tem a dele, o que torna a ausência mais visível — é o risco
-assumido, registrado na pergunta 14 do `ESTADO.md`.
+assumido, registrado na pergunta 20 do `ESTADO.md`.
 
 **Critério de saída de E1:** E1.2 a E1.6 com prova e script de conferência
 imprimindo `OK`; hipóteses numeradas e congeladas; o teorema principal
@@ -301,6 +305,7 @@ a margem `eps` do nível `J`.
 `R/tune.R`, `tests/test-tune.R`: `cv.wafc()` sobre `(J, λ)` como o
 `cv.wall()`; BIC e EBIC com graus de liberdade = número de não nulos.
 Comparar as três regras nos cenários de E2.1 em `n ∈ {250, 1000}`.
+**Fechada em 2026-09-19** (D19, D20: `cv.min` é o padrão).
 
 ### E2.4 Piloto
 
@@ -323,6 +328,9 @@ ISE contra `eps`** (D23, com `eps ∈ {0, 2^{−J−1}, 1.9^{−J}}`), que é o 
 decide o padrão da margem e conserta o `eps` que hoje varia com `J`; e
 incluir o **QUT** de Giacobino et al. (2017) como regra de `λ` sem `σ`
 (proposta L2c, ratificada), ao lado das cinco regras que E2.3 já compara.
+
+**Fechada em 2026-09-20 (E2.4) e 2026-09-21 (emendas E2.4b):** números no
+`ESTADO.md` §2. O que ela deixou para E2.5 está no `ESTADO.md` §5.
 
 ### E2.5 Go/no-go e variante principal
 
@@ -497,6 +505,6 @@ interface nem se escreve a seção de computação em versão final.
 | A condição de desenho dos produtos não fecha no caso geral | E1.4 (ii) não sai; conferência numérica mostra `λ_min` restrito indo a zero com `X` dependente de `U` | enunciar sob `X ⊥ U` (fatoração) e a versão geral como hipótese de alto nível, com a conferência numérica como evidência |
 | A adaptatividade não aparece nos números | E2.4: WAFC não vence `mgcv` em bumps/blocks | `boundary = "interval"`, pesos adaptativos, limiarização em blocos; se persistir, o artigo é sobre seleção de estrutura (grupos) e o alvo muda para JCGS |
 | Sardy & Ma (2024) cobre mais do que parece | L2 | o peso vai para E1.4 (produtos) e para a aplicação |
-| Teto de 30 páginas | `ms` passa | provas e tabelas secundárias ao suplementar; cenários da simulação reduzidos no corpo |
+| Teto de 40 páginas, referências incluídas | `ms` passa | provas e tabelas secundárias ao suplementar; cenários da simulação reduzidos no corpo |
 | Custo do desenho em `p q 2^J` grande | `glmnet` lento em E4 com `p q = 50` | desenho esparso; `wtable()`; `J ≤ 5`; grade de `λ` curta |
-| Sem aplicação convincente | E6.1 sem candidato | decidir cedo (pergunta 3 do `ESTADO.md`); a EJS tolera aplicação mais leve |
+| Sem aplicação convincente | E6.1 sem candidato | decidir cedo (pergunta 2 do `ESTADO.md`); a EJS tolera aplicação mais leve |

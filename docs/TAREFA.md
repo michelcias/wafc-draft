@@ -32,7 +32,7 @@ que ler antes está aqui e no plano.
 
 | Etapa | Estado | Onde está |
 |---|---|---|
-| E0.1 nomes | D4 fechada (código em `wafc/`); D5, D8 adiadas | `plano-projeto.md` E0.1, `ESTADO.md` |
+| E0.1 nomes | fechada: D4 (código em `wafc/`), D5 e D8 ratificadas em 2026-09-19 | `plano-projeto.md` E0.1, `ESTADO.md` |
 | E0.2 onde o código vive | fechada (D4, D7) | `plano-projeto.md` E0.2 |
 | E0.3 template e instruções | **fechada** (quartil Q1 confirmado em 2026-09-19) | `manuscript/ejs-template/`, `manuscript/ss-template/`, `ss-instrucoes-autores.md` |
 | E0.4 ferramentas | fechada; `WaveBased` 2.6-0, `grpreg`, `gglasso`, `sparsegl` e `gh` instalados | `inventario-codigo.md` §4, `CONTINUAR.md` |
@@ -85,42 +85,20 @@ no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 abrir antes de três coisas**: o conserto do repasse de `wavelet.table` aos
 concorrentes, que hoje faz a coluna do `vcbart` sumir em silêncio; a decisão
 sobre P1 e P2, que E2.4b devolveu sem ratificação; e a repetição da parte
-`competitors` com `k` casado no `gam` (`wafc_k_matched()` e motor `bam`, já
-disponíveis).
+`competitors` com a grade decidida, `k` casado no `gam` (`wafc_k_matched()`
+e motor `bam`, já disponíveis) e o cenário `uneven`. A razão é medida: o
+veredito contra os concorrentes muda com a grade de `J` (P1), e a
+comparação com o `gam` em dimensão não casada é o que E6.1a mostrou separar
+empate de vitória.
 
 **Ao catalogar, o arquivo vai junto do item.** Duas tarefas seguidas
 esbarraram em coluna de arquivos que não cobria o que o próprio texto
 mandava fazer: E2.4 pôs o QUT em `competitors.R` por isso, e E2.4b teve de
-tocar `fit.R` e criar `06-timing.R` fora da coluna. **E2.5 (go/no-go) só deve abrir depois de E2.4b**, por
-três razões medidas: o veredito contra os concorrentes muda com a grade de
-`J` (P1); o cenário suave que D30 quer medir depende da componente nova em
-`dgp.R`; e a comparação com o `gam` foi feita em dimensão não casada, que é
-o que E6.1a mostrou separar empate de vitória.
+tocar `fit.R` e criar `06-timing.R` fora da coluna.
 
-**Quem abrir E1.7a** entrega um **veredito**, não um teorema: a tarefa
-existe para decidir se vale gastar semanas na saída (a), e um "não fecha,
-e eis o contra-exemplo" é resultado tão bom quanto um "fecha".
-
- Não compartilham arquivo: E1.8 está em
-`derivations/`, E2.4 em `wafc/`. A numeração "E1.8" é desta tarefa; a cota
-inferior, que o handoff de E1.6 chegou a chamar de E1.8, será **E1.9** se
-algum dia for aberta.
-
-**Quem abrir E1.8** escreve teoria que **não vai ao manuscrito agora** (D23,
-D26): o artigo enuncia na base periodizada com `eps = 0`. O arquivo existe
-para estar pronto se um referee pedir, e para guardar a análise de `s'` que
-E2.4 e E4 vão citar.
-
-**Quem abrir E2.4** herda um conserto de três linhas em `wafc/R/tune.R`, que
-descrevem o padrão de `eps` anterior a E2.1b e ficaram falsas. A próxima depois dela é E2.4 (piloto), que espera a
-ratificação de D19 e D20 e a resposta sobre `s'` de cada cenário (pergunta
-16). Tarefa nova pede catalogação antes de abrir.
-
-**Quem abrir E1.3b** lê antes a §7 do `notacao.md` (D22) e a entrada D23 da
-tabela de decisões: a margem `eps` deixou de ser conveniência numérica e
-passou a ter função declarada, que é comprar a extensão. O arquivo é de uma
-etapa fechada; a emenda acrescenta, não reescreve, e a Proposição 2 continua
-onde está, agora com o caso `eps = 0` explicitado.
+A cota inferior para `q ≥ 2`, que o handoff de E1.6 chegou a chamar de E1.8,
+é **E1.9** se algum dia for aberta (a numeração E1.8 ficou com a rota do
+intervalo).
 
 **O manuscrito está vivo em `k = 1`.** Qualquer alteração nele passa pela
 regra do `CLAUDE.md`: perguntar antes se deve nascer `k = 2`, e `ms`, `supp`
@@ -148,13 +126,13 @@ pelo chat principal, com o mapa abaixo.
 **Este mapa é a autoridade**, e é ele que E5a usa ao montar o manuscrito. O
 `04-oraculo.tex` já imprime o número global (via `\setcounter` no
 preâmbulo), prática adotada daqui em diante; `02` e `03` ainda imprimem o
-contador local. O próximo resultado numera a partir de Proposição 6, **Lema 13**, Teorema 2
-e **Corolário 8**. O `06-selecao-limiar.tex` imprime `Hipótese S`, com letra
+contador local. O próximo resultado novo é **Proposição 7**, **Lema 14**, **Teorema 3**
+ou **Corolário 9**, conforme o tipo. O `06-selecao-limiar.tex` imprime `Hipótese S`, com letra
 em vez de número, porque é citada lado a lado com a `Hipótese 1` de E1.6;
 é desvio local e aceito.
 
-**O enunciado que vai ao resumo do artigo é o Corolário 5** (D16, a
-ratificar).
+**O enunciado que vai ao resumo do artigo é o Corolário 5** (D16, ratificada
+em 2026-09-19).
 
 A notação está congelada (E1.1): `ψ_{jk}` com nível `j` e translação `k`,
 covariável linear `X_ℓ`, moduladora `U_m`, coeficiente `θ_{ℓm,jk}`. As

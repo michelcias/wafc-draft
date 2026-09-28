@@ -87,6 +87,7 @@ Rscript derivations/check/06a-irrepresentabilidade.R # ~4 min
 Rscript derivations/check/06-selecao-limiar.R       # ~7 min, precisa de glmnet e sparsegl
 Rscript derivations/check/02-aproximacao-besov.R    # ~72 s (com a emenda E1.3b)
 Rscript derivations/check/05-taxas.R                # ~7 min
+Rscript derivations/check/07-rota-intervalo.R      # ~2 min
 ```
 
 E o código do método, que já existe:
@@ -98,10 +99,11 @@ Rscript wafc/scripts/03-tune-decomp.R           # ~2 min
 Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 min
 Rscript wafc/scripts/04-pilot.R 5 competitors 8 250 smooth   # fumaça do piloto, ~1 min
 Rscript wafc/scripts/04-pilot.R 50 all 12                    # o piloto inteiro, ~3 h em 12 núcleos
+Rscript wafc/scripts/05-sondagem-aplicacao.R all           # a sondagem de E6.1a, horas; baixa os dados
 Rscript wafc/scripts/06-timing.R                             # só tempo, curto
 ```
 
-## 3. Onde o trabalho está (resumo de 2026-09-19; o `ESTADO.md` manda)
+## 3. Onde o trabalho está (resumo de 2026-09-28; o `ESTADO.md` manda)
 
 - **E0 fechada.** Código em `wafc/` (D4); alvo *Statistica Sinica* (D5,
   confirmada Q1 no SCImago) e método chamado **WAFC** (D8); instruções da
@@ -110,16 +112,17 @@ Rscript wafc/scripts/06-timing.R                             # só tempo, curto
   incluídas. O tipo de revisão não consta da página oficial.
 - **Notação congelada** (E1.1, D9 a D12): `ψ_{jk}`, `X_ℓ`, `U_m`,
   `θ_{ℓm,jk}`, `U ∈ [0,1]^q`; `derivations/macros.tex` implementa e compila.
-- **Teoria: E1 fechada** (E1.2 a E1.6, mais a emenda E1.3b), com as cinco
-  conferências numéricas rodando. O enunciado principal é o Corolário 5 de
-  `05-taxas.tex` (D16). E1.7 espera a decisão de L2f
-  (`docs/selecao-estrutura.md`); E1.8 (rota do intervalo) está aberta e E1.9
-  (cota inferior) fica para depois dos resultados.
-- **Código: E2.1 a E2.3 fechadas**, mais a emenda E2.1b (margem `eps` fixa,
-  desacoplada de `J`). `wafc/R/` tem o carregador, os cenários,
-  `wafc_design()`, `wafc()` com as duas penalidades e a sintonia
-  (`cv.wafc()`, BIC, EBIC, regra da teoria); **420 testes passam**. E2.4
-  (piloto) está aberta; falta o go/no-go (E2.5).
+- **Teoria: E1 fechada** (E1.2 a E1.6, mais E1.3b, E1.4c, E1.7a, E1.7c,
+  E1.8 e E1.10), com as oito conferências numéricas rodando. O enunciado
+  principal é o Corolário 5 de `05-taxas.tex` (D16); a seleção de estrutura
+  entra pela limiarização (Corolário 8, D32); a rota do intervalo está
+  escrita e não vai ao manuscrito (D26). E1.9 (cota inferior) fica para
+  depois dos resultados.
+- **Código: E2.1 a E2.4b fechadas**, com o piloto, os sete concorrentes, o
+  QUT, o cenário `uneven` e a tabela de tempo; **642 testes passam**. Falta
+  o go/no-go (E2.5), que espera o conserto do repasse de `wavelet.table` ao
+  `vcbart`, a decisão sobre P1 e P2 e a repetição da parte `competitors`
+  (`ESTADO.md` §5).
 - **Avaliação da base em estudo numérico:** tabela fixa (`wtable()` uma vez,
   passada em `wavelet.table`), que é o caminho rápido; a regra `auto` não
   dispara nos `n` do estudo e deixaria tudo no algoritmo lento (D31). A
@@ -127,11 +130,12 @@ Rscript wafc/scripts/06-timing.R                             # só tempo, curto
   fina.
 - **Manuscrito vivo em `k = 1`:** `manuscript/ms_1.tex` e `supp_1.tex`
   compilam limpos, em 28 e 26 páginas. Alterar pede decidir antes se nasce
-  `k = 2`, e há uma lista de edições acumuladas esperando (pergunta 9 do
+  `k = 2`, e há uma lista de edições acumuladas esperando (pergunta 15 do
   `ESTADO.md`).
 - **Bibliografia:** 63 entradas verificadas (L1, L3 e L4); nada pendente.
-- **Abertas no catálogo:** E1.8 (rota do intervalo, em `derivations/`) e
-  E2.4 (piloto, em `wafc/`); não compartilham arquivo.
+- **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
+  (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
+- **Catálogo vazio:** nenhuma tarefa aberta.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
   `instrucoes.md`.

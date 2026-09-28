@@ -1,11 +1,12 @@
 # Estado do trabalho, handoff de continuidade
 
-**Última atualização:** 2026-09-19.
-**Etapa corrente:** **E0, E1, E5a e E2.1 a E2.3 fechadas**, mais L1, L2 e
-L3. Faltam E2.4 e E2.5 (piloto e go/no-go) para fechar E2. Nenhum chat de
-tarefa em curso e nenhuma tarefa catalogada. A ratificar: D17, as propostas
-L2b a L2f, as duas propostas de E2.3 (D19, D20) e as sete decisões de
-redação de E5a. O teto de páginas fica para o fim (D21).
+**Última atualização:** 2026-09-28.
+**Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
+E1.10), E5a e E2.1 a E2.4b fechadas**, mais L1 a L4 e a sondagem E6.1a.
+Falta E2.5 (go/no-go) para fechar E2, e ela espera três coisas (§5). Nenhum
+chat de tarefa em curso e nenhuma tarefa catalogada. A decidir pelo autor:
+P1 e P2 (pergunta 9) e a saída da aplicação (pergunta 2). O teto de páginas
+fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 1` (`manuscript/ms_1.tex`,
 `supp_1.tex`, `references_1.bib`); a próxima alteração pergunta se cria
 `k = 2`.
@@ -1081,7 +1082,9 @@ Ordenadas pelo que bloqueia mais.
    contaminada: em amostra finita a margem certa acompanha `J`, ainda que
    não compre nada assintoticamente (D26). O padrão atual, `0.05`, está no
    código marcado como provisório, e é largo demais para `J` pequeno e
-   estreito demais para `J` grande por esse critério.
+   estreito demais para `J` grande por esse critério. **Medido em E2.4
+   (2026-09-20):** `eps = 0` domina, e `0.05` custa 12% a 15% no cenário
+   suave; a troca do padrão é a P2, ainda não ratificada (pergunta 9).
 7. **~~Posicionamento diante de Klopp & Pensky~~ decidido (D18):**
    extensão deles. O parágrafo aprovado e a lista de contribuições reescrita
    estão em `alvo-revista.md` §4, e L2a está cumprida.
@@ -1127,17 +1130,17 @@ Ordenadas pelo que bloqueia mais.
    13 vezes o `λ` ótimo; sensível a `s'`, não sistematicamente acima); as
    citações de software que L4 trouxer; a observação de extensão de E1.3b; e
    a frase de reprodutibilidade no resumo ou na discussão.
-15. **~~Idioma do código e das derivações~~ decidido (D29):** inglês no
+16. **~~Idioma do código e das derivações~~ decidido (D29):** inglês no
    código, português nas derivações. O `macros.tex` já imprime os ambientes
    em português e os quatro arquivos em português foram recompilados. Falta
    alinhar o `03-desenho-produtos.tex`, que está em inglês e hoje imprime
    cabeçalhos em português; é tradução, catalogada como E1.4c e de
    prioridade baixa.
-16. **~~`rescale = TRUE` como padrão~~ decidido (D23):** continua padrão, e
+17. **~~`rescale = TRUE` como padrão~~ decidido (D23):** continua padrão, e
    agora com razão declarada, não herdada. O deslocamento de centralização
    que ele causa é um nível, e a leitura correta é que a componente é
    identificada no suporte.
-17. **~~Quem escolhe `J`~~ não era pergunta:** o plano sempre disse
+18. **~~Quem escolhe `J`~~ não era pergunta:** o plano sempre disse
    `cv.wafc()` sobre `(J, λ)`, como o `cv.wall()` (`plano-projeto.md` E2.3);
    o handoff de E1.6 leu o plano como se ele só falasse de `λ`. O que fica
    de E1.6 é **matéria de medição para E2.3**, não bloqueio: a regra teórica
@@ -1145,7 +1148,7 @@ Ordenadas pelo que bloqueia mais.
    realizado em toda a varredura, ao custo de 5% a 11% de erro, e as
    escolhas de `J_n` e de `c` dependem de `s'` e `τ`, que ninguém conhece.
    E2.3 compara a regra teórica com a validação cruzada.
-18. **~~A compatibilidade sobre as direções estimáveis~~ resolvida por
+19. **~~A compatibilidade sobre as direções estimáveis~~ resolvida por
    decisão de rumo (2026-09-19), e o caminho está em D26.** Registro do que
    se aprendeu, porque é fácil reabrir por engano:
 
@@ -1170,7 +1173,7 @@ Ordenadas pelo que bloqueia mais.
      menos margem é necessária. É implicitamente o que motiva a construção
      de Cohen, Daubechies e Vial, que corrige as wavelets da borda em vez
      de negociar a largura da faixa.
-19. **Cota inferior, registrada como E1.9 no plano** (mais visível depois de
+20. **Cota inferior, registrada como E1.9 no plano** (mais visível depois de
    D18, porque o artigo se declara extensão de quem tem a dele). Não existe
    aqui, e Klopp & Pensky têm a deles para `q = 1` com `X ⊥ U`. **A decisão
    de abrir fica para depois dos resultados de E2.5 e E4**, por escolha do
@@ -1181,11 +1184,11 @@ Ordenadas pelo que bloqueia mais.
    `05-taxas.tex` faz hoje; (b) abrir E1.8 e construir a cota para `q ≥ 2`,
    trabalho do porte de E1.4 mais E1.5; (c) restringir a afirmação de
    otimalidade a `q = 1`. O referee da SS pode cobrar a (b).
-20. **`p` crescente com `n`.** A teoria fixa `p` e `q`. Se a aplicação de E6
+21. **`p` crescente com `n`.** A teoria fixa `p` e `q`. Se a aplicação de E6
    tiver `p` grande, o termo `σ² p / n` deixa de ser de ordem menor e a
    janela do Corolário 5 estreita; mudar isso mexe em E1.3 e E1.4, não só em
    E1.6.
-21. **Bibliografia, pontos de L3** (nenhum bloqueia): a identidade
+22. **Bibliografia, pontos de L3** (nenhum bloqueia): a identidade
    `Σ_l φ(x − l) ≡ 1`, usada na prova do Lema 1(i) de E1.2, ficou **sem
    âncora** — a expressão não ocorre em Daubechies (1992), a quem estava
    atribuída, e os candidatos a conferir são Härdle et al. (1998, cap. 5) e
@@ -1196,10 +1199,10 @@ Ordenadas pelo que bloqueia mais.
    o Crossref diz "Alexander" (uniformizar nos dois repositórios ou deixar?).
    Proposta: abrir uma frente curta só para a âncora da partição da unidade
    quando E5a precisar dela.
-22. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
+23. **~~O teto de páginas~~ adiado por decisão do autor (D21):** escrever
    sem contar, medir no fim e então decidir entre resumir mais e mandar
    coisa ao suplemento.
-23. **~~A rota do intervalo~~ escrita e fechada em E1.8** (2026-09-19),
+24. **~~A rota do intervalo~~ escrita e fechada em E1.8** (2026-09-19),
    em `derivations/07-rota-intervalo.tex`. **É ela a resposta** a um referee
    que peça teoria sem periodicidade, e não a rota (ii) de D26, que continua
    sem existir. Levar a rota ao manuscrito é reescrever as provas de E1.3 a
@@ -1217,13 +1220,13 @@ Ordenadas pelo que bloqueia mais.
    com filtro 20) e o `wbasis()` exige `j_0 ≳ log_2(5L)`, o que tira os `J`
    pequenos da grade; e a cota pontual `Σ ψ²_{jk} ≤ C_ψ 2^J`, que E1.4 usa,
    foi conferida na base periódica e **não** na CDV.
-24. **~~Qual `s'` cada cenário declara~~ confirmado pelo autor (D27):**
+25. **~~Qual `s'` cada cenário declara~~ confirmado pelo autor (D27):**
    `s' = 3/2` no `smooth` e `s' = 1/2` no não homogêneo, que é o que E2.3 já
    tinha usado. O `3/2` vale porque a teoria é enunciada em `eps = 0`
    (D26), onde a quina da cúbica na extensão periódica é real; com margem e
    extensão o mesmo cenário leria `s' = 4`, e é uma das coisas que a rota do
    intervalo (E1.8) tem de deixar escritas.
-25. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
+26. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
    pequeno e vai junto com `k = 2`: copiar as seis chaves novas para
    `references_1.bib` e citá-las onde L4 propôs (o lasso na Introduction e
    na seção do estimador; `glmnet` e R na computação; `WaveBased` onde as
@@ -1237,7 +1240,7 @@ Ordenadas pelo que bloqueia mais.
    Tibshirani (1996), Friedman, Hastie & Tibshirani (2010), a citação do R,
    o `sparsegl`, e o Johnstone de modelos de sequência. Frente curta nos
    moldes de L1 e L3, antes de E5b.
-26. **Pendências de acabamento do manuscrito**, todas para a semana da
+27. **Pendências de acabamento do manuscrito**, todas para a semana da
    submissão e nenhuma bloqueando (estão no checklist de `alvo-revista.md`
    §6): (a) o `chicago.bst` do template abrevia em "et al." a partir de três
    autores, contra a §4 das instruções, e a correção é no `.bst`, não no
@@ -1246,7 +1249,7 @@ Ordenadas pelo que bloqueia mais.
    entre bloco copiado e arquivo de origem; (c) autores, afiliações, e-mails
    na última página e agradecimentos, que hoje são os marcadores do
    template.
-27. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+28. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
@@ -1266,41 +1269,35 @@ Ordenadas pelo que bloqueia mais.
 
 ## 5. Próximos passos
 
-(a) e (b) correm em paralelo; (c) espera E1.2.
+Tudo converge em E2.5 (go/no-go), que **não abre** antes de (a), (b) e (c).
 
-- (a0) **Conserto pendente em `wafc/R/design.R`**, que nenhuma tarefa podia
-  tocar e que nenhuma tarefa aberta cobre: `eps = 1.9^{−J}` cai fora de
-  `[0, 0.5)` em `J = 1`, e a margem variando com `J` faz os candidatos de
-  `cv.wafc()` estimarem alvos diferentes. Entra no catálogo de E2.4 ou numa
-  correção curta antes dela.
-- (b0) **Também para a integração de E2.4, e para E4 e E6:** D31, a tabela
-  de avaliação fixada e passada explicitamente.
-- (b) **Para a integração de E2.4** (em curso enquanto D30 foi decidida, e
-  portanto fora do catálogo que aquele chat leu): acrescentar a componente
-  suave de curvatura desigual ao `dgp.R`, dar ao concorrente spline a
-  sintonia própria (nós por BIC; `mgcv` com REML) e relatar predição e ISE
-  em separado. Se não couber na rodada dela, vira emenda catalogada.
-- (a) **Autor:** ratificar D17 e as propostas L2b a L2f, que são baratas; responder a
-  pergunta 2 se já tiver a base da aplicação, que é o que E6 precisa cedo.
-  O cluster de centralização e borda (perguntas 4, 5, 6 e 10) deve ser
-  resolvido antes de a Seção 2 de E5a ser escrita e antes de E2.4.
-- (b) **Chats de tarefa, podem abrir já e em paralelo:** E2.3 (sintonia,
-  com a comparação entre a regra teórica de `J_n` e a validação cruzada) e
-  **E5a** (Seções 1 a 4 do manuscrito, no template da SS, com o parágrafo de
-  posicionamento de `alvo-revista.md` §4 e o nome WAFC).
-- (b') **L3 fechada.** Quando o autor ratificar as propostas de L2, entram
-  as edições de `alvo-revista.md` e `plano-projeto.md` da §6 de
-  `busca-novidade.md`, que são do chat principal.
-- (c) **Chat de tarefa, depois do enunciado de E1.2:** E2.1, que precisa
-  saber o que a identificabilidade descarta do desenho.
-- (d) **Chat principal:** integrar os handoffs e catalogar E1.5, E1.6 e
-  E2.2 a E2.5 quando as dependências fecharem.
-- (e) **Depois de E1.3 e E1.4:** E1.5, E1.6; E2.2 a E2.5.
+- (a) **Conserto do repasse de `wavelet.table`** (pergunta 10): o
+  `wafc_competitor()` manda o argumento ao `VCBART`, que para dentro de um
+  `try()` silencioso e a coluna some. Correção curta no chat principal ou
+  tarefa catalogada com `wafc/R/competitors.R` e o teste na coluna de
+  arquivos.
+- (b) **Autor: decidir P1 e P2** (pergunta 9): grade de `J` larga (`2:8`
+  contra `⌈log_2 n/2⌉`) e margem `eps = 0` contra `0.05`. A evidência de
+  E2.4 favorece as duas, e o custo da grade larga encolheu com E2.4b.
+- (c) **Repetir a parte `competitors` do piloto** com a grade decidida em
+  (b), o `gam` em dimensão casada (`wafc_k_matched()`, motor `bam`) e o
+  cenário `uneven` de D30; só então fixar o fator do critério de saída no
+  cenário suave (pergunta 8). A coluna `theory` do `uneven` sai degenerada
+  e tem de ser dita na tabela.
+- (d) **E2.5**, com a calibração do limiar `t_n` (pergunta 11) e a escolha
+  entre LASSO limiarizado e sparse group LASSO, que E1.7c e a tabela de
+  tempo já inclinam para o primeiro.
+- (e) **Autor, sem bloquear E2.5:** a saída da aplicação (pergunta 2) e a
+  decisão de abrir `k = 2` com as edições acumuladas (pergunta 15).
+- (f) **Depois de E2.5:** E3 (consolidação e E3.3, o empacotamento), E4 e
+  E6 em paralelo; a decisão sobre E1.9 (cota inferior, pergunta 20) espera
+  os números de E2.5 e E4.
 
 ## 6. Histórico de sessões
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-28 | Documentos de continuidade alinhados ao estado de 09-21: cabeçalho e §5 do `ESTADO.md`, §3 do `CONTINUAR.md`, catálogo e numeração do `TAREFA.md`, marcas de etapa do `plano-projeto.md`, teto de 40 páginas no `instrucoes.md`; perguntas da §4 renumeradas a partir da 16 (havia duas 15) |
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |
 | 2026-09-18 | D4 decidida pelo autor (código em `wafc/`, não no `WaveBased`); D5 e D8 adiadas; `prototype/` virou `wafc/`; plano E2 e E3 reescritos; repositório publicado; o autor confirmou o `WaveBased` como dependência e que as funções ficam privadas |
 | 2026-09-19 | E2.3 e E5a fechadas e integradas: `cv.min` é o padrão de sintonia (D20) e a regra da teoria custa de 7 a 13 vezes no `λ`; o manuscrito nasce em `k = 1` com 28 e 26 páginas compilando limpo, e o teto vira a decisão urgente |
