@@ -101,6 +101,8 @@ Rscript wafc/scripts/04-pilot.R 5 competitors 8 250 smooth   # fumaça do piloto
 Rscript wafc/scripts/04-pilot.R 50 all 12                    # o piloto inteiro, ~3 h em 12 núcleos
 Rscript wafc/scripts/05-sondagem-aplicacao.R all           # a sondagem de E6.1a, horas; baixa os dados
 Rscript wafc/scripts/06-timing.R                             # só tempo, curto
+Rscript wafc/scripts/07-accel.R 20 staged,sgl 14             # pergunta 29: ~10 min + ~48 min em 14 núcleos
+Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 min em 14 núcleos
 ```
 
 ## 3. Onde o trabalho está (resumo de 2026-09-28; o `ESTADO.md` manda)

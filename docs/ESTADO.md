@@ -4,7 +4,8 @@
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
 E1.10), E5a e E2.1 a E2.4b fechadas**, mais L1 a L4 e a sondagem E6.1a.
 Falta E2.5 (go/no-go) para fechar E2; P1 e P2 foram ratificadas (D34,
-D35) e ela espera a medição da pergunta 29 e a repetição do piloto (§5).
+D35), as perguntas 29 e 31 estão fechadas, e ela espera só a repetição do
+piloto (§5).
 Nenhum chat de tarefa em curso e nenhuma tarefa catalogada. A decidir pelo
 autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
 (D21).
@@ -1062,6 +1063,99 @@ a `2:8` (`wafc_J_top` em `tune.R`), e a margem padrão do caso periódico a
   truncava como truncava o WAFC. O preço é ~60 s por ajuste em
   `n = 1000`, contra 0,9 s. **674 testes passam.**
 
+### 2026-09-28: as acelerações da pergunta 29, medidas
+
+`wafc/scripts/07-accel.R`, grade `2:8`, cinco células (as quatro do piloto
+mais `uneven` com SNR 4), `n ∈ {250, 500, 1000}`, dobras e dados iguais
+entre os braços; 20 réplicas no LASSO (5 na `mixed`) e 10 no sparse group
+LASSO (3 na `mixed`); 14 núcleos, 10 min e 48 min. Critério declarado antes:
+`J.min`, `λ.min` e `λ.1se` idênticos em **todas** as réplicas.
+
+- **O prefixo é exato**, como a teoria do motor dizia: o `cvm` calculado
+  num prefixo do caminho difere do caminho inteiro em no máximo `3.6e-15`
+  (LASSO) e `0` (grupos).
+- **Validação cruzada em etapas, LASSO: passa, mas ganha pouco.** Seleção
+  idêntica em **255 de 255** réplicas; o tempo total cai só **1,5×**
+  (4709 s para 3095 s), de 2,6× a 3,4× em `n = 250` e `500` no não
+  homogêneo e no nulo, e **fica mais lento** em `n = 1000` em três células
+  (suave 10,6 s para 12,6 s), porque o protótipo recalcula o prefixo a cada
+  extensão e, em `J = 8`, o mínimo está no ponto ~55 e a busca vai a 80.
+  A estimativa de 5 a 10× que eu tinha feito era da cauda em `J = 5` e `6`
+  da grade antiga, não da grade `2:8`.
+- **Validação cruzada em etapas, grupos: reprovada.** Idêntica em **104 de
+  129**; muda a escolha em 18 de 30 réplicas do nulo e em 3 de 3 da `mixed`
+  com `n = 1000`, porque nos `J` profundos o mínimo do caminho inteiro
+  está no fim (pontos 89 a 100) e a busca para em 40.
+- **`thresh = 1e-8` no `sparsegl`: reprovado pelo critério, por uma
+  réplica.** Idêntico em **128 de 129** (o `λ.1se` muda numa réplica de
+  `uneven` com `n = 500`), caminhos de `λ` iguais nas duas tolerâncias,
+  KKT limpo no `λ.min` nas duas; ganho de 1,6×.
+- **Achado que não era a pergunta, e que importa para E2.5: a validação
+  cruzada do sparse group LASSO se engana no nulo com a grade funda.**
+  Escolhe `J = 8` em 6 de 10 réplicas com `n = 500`, com o `λ.min` no fim
+  do caminho. Conferido numa réplica: em `J = 8` o `cvm` **desce** até o
+  fim (0,4178 para 0,398) num ajuste com 1223 de 1530 coeficientes não
+  nulos, todas as dobras devolvem os 100 pontos (não é truncamento), e esse
+  ajuste é **pior** contra a verdade (RMSE 0,221 contra 0,050 em `J = 2`).
+  O LASSO, no mesmo dado, escolhe em `J = 8` um ajuste com 24 não nulos e
+  RMSE 0,092, e o `cvm` dele sobe na cauda (0,614), como deve. A causa não
+  está identificada (pergunta 31). **Corrigido pela investigação seguinte
+  (bloco abaixo):** não é defeito nem vazamento, e o custo em erro
+  verdadeiro é o mesmo do LASSO; a réplica examinada estava no percentil
+  90, e "se engana" era forte demais.
+
+### 2026-09-28: a pergunta 31, investigada
+
+`wafc/scripts/08-sgl-null.R`, três partes, cada uma um teste de hipótese;
+rodado duas vezes, com resultado idêntico. **Veredito: não há defeito no
+código nem vazamento; é a maldição do vencedor numa faixa plana da curva
+de validação cruzada, e o preço em predição é o mesmo do LASSO. O que o
+sparse group LASSO paga a mais é estrutura, não erro.**
+
+- **O laço de dobras está certo.** O `cv.sparsegl()` do próprio pacote, no
+  mesmo desenho, caminho e dobras, dá a mesma curva: diferença máxima de
+  `7e-9` em `J = 2` e `3e-6` em `J = 8`, e o mesmo `argmin`.
+- **A mecânica.** No nulo, em `J = 8`, o caminho do sparse group LASSO fica
+  em zero por ~85 dos 100 pontos e salta para 1223 não nulos nos últimos
+  ~15, terminando em `λ = 0,01 λ_max`. A penalidade de grupo vale
+  `0,95·√255·λ ≈ 15λ` por bloco; no nulo os gradientes de todos os blocos
+  são ruído do mesmo tamanho, então eles entram juntos, densos e muito
+  encolhidos (com `asparse = 0.05` a esparsidade dentro do bloco quase não
+  age). Isso cria uma faixa de ajustes quase nulos cuja validação cruzada
+  difere do nulo menos que o ruído dela, e o mínimo sobre 7 valores de `J`
+  e ~20 pontos dessa faixa cai ali por acaso. O LASSO ativa um a um e sua
+  curva sobe logo.
+- **Não há vazamento.** O excesso de `cvm` sobre o ponto nulo se decompõe
+  em `média((η̂ − f)²) − 2·média(ε(η̂ − f))`; sem vazamento o termo
+  cruzado tem média zero. Em 30 réplicas do nulo (`n = 500`, `J = 8`):
+  termo cruzado `+0,0005` (`t = 0,6`) no fim do caminho do sparse group
+  LASSO e `+0,0019` (`t = 1,7`) no LASSO com o mesmo erro de treino; o fim
+  do caminho fica abaixo do nulo em só 2 de 30.
+- **O custo em erro verdadeiro**, excesso sobre a verdade em fração de
+  `σ²` (mediana), `cv.wafc` na grade `2:8`, 20 réplicas por `n`:
+
+  | nulo | LASSO `λ.min` | grupos `λ.min` | os dois `λ.1se` |
+  |---|---|---|---|
+  | `n = 250` | 0,026 | 0,025 | 0,013 |
+  | `n = 500` | 0,013 | 0,012 | 0,005 |
+  | `n = 1000` | 0,005 | 0,005 | 0,002 |
+
+  Idêntico entre as variantes. Com `λ.1se` os dois voltam ao modelo nulo
+  (mediana de 0 não nulos). No não homogêneo, `n = 500`, as duas também
+  empatam (1,24 e 1,26).
+- **O que difere é a estrutura:** no nulo, o sparse group LASSO em `λ.min`
+  liga **303, 105 e 23** coeficientes (medianas, `n = 250, 500, 1000`),
+  contra **3 a 5** do LASSO, e cai nos últimos 20 pontos do caminho em 13,
+  7 e 2 de 20 réplicas. E nos dois o mínimo da validação cruzada fica
+  abaixo do ponto nulo em 19 ou 20 de 20 réplicas, e o `J` escolhido no nulo
+  é essencialmente aleatório: `λ.min` sempre escolhe *alguma* coisa quando
+  não há nada.
+- **O que isso muda para a E2.5:** a coluna `wafc.sglasso` do piloto pode
+  ser lida em predição, inclusive no nulo; em estrutura, `λ.min` não é
+  regra de seleção para nenhuma das duas (é o que D20 já dizia), e o
+  sparse group LASSO fica pior que o LASSO nisso. Estrutura se lê pela
+  limiarização de E1.7c ou por `λ.1se`.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1090,6 +1184,7 @@ a `2:8` (`wafc_J_top` em `tune.R`), e a margem padrão do caso periódico a
 | D34 | 09-28 | **A grade padrão de `J` é `2:8`**, independente de `n` (proposta P1 de E2.4), para `cv.wafc()`, `wafc_tune()` e os concorrentes no mesmo desenho (`klopp`, `oracle`); `n` maior que o medido pede `J` explícito | a grade `2:⌈log_2 n/2⌉` herdada do `cv.wall()` tinha o oráculo no topo em 100% das réplicas com componente; ir a 8 cortou 17,6% do erro de predição e 32% do ISE no não homogêneo em `n = 1000`, em 50 de 50 réplicas, e inverteu o veredito contra o VCBART (0.839 contra 0.910); ratificada pelo autor |
 | D35 | 09-28 | **A margem padrão do reescalonamento é `eps = 0`** também na base periódica (proposta P2 de E2.4); margem positiva continua disponível pelo argumento | em E2.4, `0.05` custou 12% a 15% no suave, perdendo em 95% a 100% das réplicas, e não ganhou no não homogêneo (0.992 e 0.994); `eps = 0` perde no máximo 2,4% ali e é o único valor com `λ_min(G_eps) = 1`, onde a teoria do manuscrito é enunciada (D26); ratificada pelo autor |
 | D36 | 09-28 | **O `bsgl` escolhe a dimensão por bloco entre `2^J`, `J = 2, …, 8`**, a grade de D34, em vez de 4, 8 e 16; candidato maior que o número de valores distintos de uma moduladora é descartado | com 4, 8 e 16 (isto é, `J ≤ 4`) a comparação que isola a base voltava a medir dimensão, a lição de E6.1a; medido no não homogêneo em `n = 1000`: a grade estendida escolhe 64 e baixa o erro de validação cruzada de 2,129 para 1,958, ao custo de ~60 s contra 0,9 s; ratificada pelo autor (pergunta 30) |
+| D37 | 09-28 | **Nenhuma das duas acelerações da pergunta 29 entra:** o `cv.wafc()` continua calculando o caminho inteiro nas dobras, e o `sparsegl` continua em `thresh = 1e-9` | medido em `07-accel.R`: a validação cruzada em etapas passa no LASSO (255 de 255) mas ganha só 1,5× e fica mais lenta em `n = 1000`, o que não paga truncar o `cvm` devolvido; é reprovada nos grupos (104 de 129); o `1e-8` nos grupos é reprovado pelo critério declarado antes por uma réplica (128 de 129); decisão do autor |
 | D32 | 09-20 | **A seleção de estrutura entra pela limiarização (saída (c)), e a saída (a) não abre agora.** O Corolário 8 de `06-selecao-limiar.tex` é o enunciado do artigo, com a hipótese de separação numerada e dizendo no próprio enunciado que é **estimação seguida de limiar**. A sondagem de E1.7a fica registrada como observação de meia página (a condição em grupos não depende de `J` nem da base), e a saída (a), se voltar depois de E2.5, volta pela rota de Wei & Huang (2010), não pela de Bach | veredito de E1.7a: a redução algébrica tira o risco de a condição falhar por construção, mas não o custo, e exige (BD) mais `E(XX'\|U)` constante, que contraria D13; além disso o valor de (a) continua condicionado a E2.5 escolher a variante em grupos, e E1.7c mostrou o LASSO limiarizado acertando 10 de 10 onde ela acerta 0 de 10 |
 | D31 | 09-20 | **Em avaliação numérica repetida, a base é fixada e avaliada por tabela**, não pelo algoritmo de Daubechies-Lagarias a cada ajuste: construir a tabela uma vez com `WaveBased::wtable()` para o par `(family, filter.size)` e passá-la em `wavelet.table` de `wafc_design()`, em vez de deixar a regra `use.table = "auto"` decidir réplica a réplica. Vale para o piloto (E2.4), o compêndio (E4) e a aplicação (E6). **Exceção:** conferência que mede precisão fina (as de `derivations/check/`, que leem decaimento até `1e-11`) continua com avaliação exata ou tabela com `prec.wavelet` alto, porque ali o `3.1e-06` engoliria o que se quer medir | pedido do autor, e a razão é **tempo de execução**: a tabela é o caminho rápido e a aproximação é boa o bastante (o erro de interpolação medido em E2.1 é `3.1e-06`), de modo que a variação entre os dois caminhos não é problema prático. A regra `auto` só dispara em `n q ≥ 2000 L`, isto é `n q ≥ 16000` com `L = 8`, e portanto **não dispara** nos `n` do piloto: deixá-la decidir significa pagar Daubechies-Lagarias em toda a varredura |
 | D30 | 09-19 | **O cenário suave é para ganhar, não só para não perder.** A hipótese `C^{p+1}` de Xue & Yang delimita a garantia deles, não o desempenho: com `J` e `λ` por validação cruzada o WAFC pode vencer splines também no suave, e E2.4 e E4 têm de medir isso em condição justa — o concorrente sintonizado nos termos dele (nós por BIC como no artigo deles, e `mgcv` com REML), predição e ISE relatadas em separado, e uma componente **suave de curvatura desigual** (gaussiana estreita ou `doppler` truncado longe da singularidade) acrescentada ao `dgp.R`, que é `C^∞` e portanto dentro da hipótese deles, mas com escala variando ao longo do domínio | argumento do autor; se o ganho aparecer, é ilustração forte para o artigo, e se não aparecer, a paridade no suave já é o que a Seção 5 precisa |
@@ -1351,8 +1446,12 @@ Ordenadas pelo que bloqueia mais.
      herdadas do WALL (`cohen1993wavelets` etc.)? Proposta: **manter as do
      WALL**, porque o `ms_theo_1.tex` é o molde da prova e a citação
      cruzada fica direta.
-29. **Duas acelerações do WAFC que podem mudar a escolha, a medir antes de
-   adotar** (revisão de 2026-09-28). (a) **Validação cruzada em etapas:** o
+29. **~~Duas acelerações do WAFC~~ decidida em 2026-09-28 (D37): nenhuma
+   entra.** Medidas em 2026-09-28 (§2). A em etapas passa no LASSO (255 de 255) mas ganha só
+   1,5× e fica mais lenta em `n = 1000`; é reprovada nos grupos (104 de
+   129); o `1e-8` nos grupos é reprovado por uma réplica (128 de 129).
+   O autor decidiu que a em etapas não entra (D37). Texto original:
+   duas acelerações a medir antes de adotar (revisão de 2026-09-28). (a) **Validação cruzada em etapas:** o
    `glmnet` calcula o caminho em sequência, então as dobras num prefixo do
    caminho dão exatamente as mesmas soluções; calcula-se o prefixo e só se
    estende se o mínimo estiver perto do fim. Ganho estimado de 5 a 10× no
@@ -1373,21 +1472,37 @@ Ordenadas pelo que bloqueia mais.
    ser em dimensão comparável, que é a lição de E6.1a. Proposta: estender
    os candidatos a `2^(2:8)`, como o `gam` casado de (c). Decide-se antes
    de repetir o piloto.
+31. **~~Por que a validação cruzada do sparse group LASSO prefere, no
+   cenário nulo e em `J` profundo, o fim do caminho?~~ Respondida em
+   2026-09-28 (§2):** maldição do vencedor numa faixa plana da curva, sem
+   defeito nem vazamento, com o mesmo custo em predição do LASSO; o preço
+   é estrutura (centenas de coeficientes falsos em `λ.min`). Texto
+   original: (medição de
+   2026-09-28, §2). O `cvm` desce até o último `λ` num ajuste denso que é
+   pior contra a verdade, e o LASSO no mesmo dado não faz isso. Enquanto a
+   causa não for achada, a coluna `wafc.sglasso` do piloto repetido não
+   pode ser lida no nulo, e a escolha entre as duas variantes de E2.5 tem
+   de levar isso em conta. Candidatos a examinar: a solução do `sparsegl`
+   no fim do caminho (a penalidade de grupo ainda encolhe em bloco, o que
+   pode dar um ajuste denso de variância baixa), e se a diferença de `cvm`
+   entre `J = 2` e `J = 8` é maior que o ruído das dobras.
 
 ---
 
 ## 5. Próximos passos
 
-Tudo converge em E2.5 (go/no-go), que **não abre** antes de (b') e (c).
+Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
 
 - (a) **~~Conserto do repasse de `wavelet.table`~~ feito em 2026-09-28**
   (pergunta 10), com a revisão do código de `wafc/` (§2).
 - (b) **~~Autor: decidir P1 e P2~~ ratificadas em 2026-09-28** (D34,
   D35), já no código.
-- (b') **Medir as duas acelerações da pergunta 29** e adotar só as que
-  mantêm `J.min`, `λ.min` e `λ.1se` em todas as réplicas. Ficou mais
-  urgente: com `2:8` o `cv.wafc` custa de 10 a 18 vezes o que custava, e
-  o `klopp` até 13 vezes (§2, 2026-09-28).
+- (b') **~~Medir as duas acelerações da pergunta 29~~ medidas, e nenhuma
+  entra (D37).**
+- (b'') **~~Pergunta 31~~ respondida (§2):** a coluna `wafc.sglasso` pode
+  ser lida em predição; em estrutura, `λ.min` liga centenas de
+  coeficientes falsos no nulo, e a estrutura se lê pela limiarização ou
+  por `λ.1se`.
 - (c) **Repetir a parte `competitors` do piloto** com a grade `2:8`
   (D34), o `bsgl` na mesma grade (D36), o `gam` em dimensão casada (`wafc_k_matched()`, motor `bam`) e o
   cenário `uneven` de D30; só então fixar o fator do critério de saída no
@@ -1406,6 +1521,8 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (b') e (c).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-28 | Pergunta 31 investigada (`08-sgl-null.R`, reproduzido): o laço de dobras bate com o `cv.sparsegl`, não há vazamento (termo cruzado `t = 0,6`), e o sparse group LASSO no nulo cai numa faixa plana da curva por maldição do vencedor, com o mesmo custo em predição do LASSO e centenas de coeficientes falsos; D37: nenhuma aceleração entra |
+| 2026-09-28 | Pergunta 29 medida (`07-accel.R`, 384 réplicas): o prefixo do caminho é exato; em etapas passa no LASSO (255/255) com ganho de só 1,5×, reprova nos grupos (104/129); `1e-8` nos grupos reprova por uma réplica (128/129); e a validação cruzada do sparse group LASSO se engana no nulo com a grade funda (pergunta 31) |
 | 2026-09-28 | P1 e P2 ratificadas (D34, D35): grade padrão `2:8` e margem padrão `0`, já no código; a grade nova custa de 10 a 18 vezes no `cv.wafc` e até 13 no `klopp`, o que torna a pergunta 29 urgente; o `bsgl` passou a acompanhar a grade (D36), escolhendo 64 funções em `n = 1000` onde o teto era 16 |
 | 2026-09-28 | Revisão do código de `wafc/`: cinco defeitos corrigidos (o `vcbart` volta à tabela; `uneven` não quebra mais o piloto; falha vira linha), `call` compacto e só o melhor ajuste no `cv.wafc` (objeto salvo de 11,4 para 3,6 MB), busca de nós 7 a 11× mais rápida com os mesmos nós; 672 testes, piloto idêntico ao anterior; duas acelerações que podem mudar a escolha ficam para medir (pergunta 29) |
 | 2026-09-28 | Documentos de continuidade alinhados ao estado de 09-21: cabeçalho e §5 do `ESTADO.md`, §3 do `CONTINUAR.md`, catálogo e numeração do `TAREFA.md`, marcas de etapa do `plano-projeto.md`, teto de 40 páginas no `instrucoes.md`; perguntas da §4 renumeradas a partir da 16 (havia duas 15) |
