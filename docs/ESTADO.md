@@ -3,10 +3,11 @@
 **Última atualização:** 2026-09-28.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
 E1.10), E5a e E2.1 a E2.4b fechadas**, mais L1 a L4 e a sondagem E6.1a.
-Falta E2.5 (go/no-go) para fechar E2, e ela espera duas coisas (§5). Nenhum
-chat de tarefa em curso e nenhuma tarefa catalogada. A decidir pelo autor:
-P1 e P2 (pergunta 9) e a saída da aplicação (pergunta 2). O teto de páginas
-fica para o fim (D21).
+Falta E2.5 (go/no-go) para fechar E2; P1 e P2 foram ratificadas (D34,
+D35) e ela espera a medição da pergunta 29 e a repetição do piloto (§5).
+Nenhum chat de tarefa em curso e nenhuma tarefa catalogada. A decidir pelo
+autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
+(D21).
 **Versão viva do manuscrito:** `k = 1` (`manuscript/ms_1.tex`,
 `supp_1.tex`, `references_1.bib`); a próxima alteração pergunta se cria
 `k = 2`.
@@ -1033,6 +1034,34 @@ passa o KKT em 200 de 200 pontos** nos dois desenhos medidos (com `1e-7`,
 metade falha). Forçar `type.gaussian`, trocar denso por esparso e o
 custo de R em volta do motor (< 3%) não compram nada.
 
+### 2026-09-28: P1 e P2 ratificadas (D34, D35)
+
+O autor ratificou as duas propostas de E2.4 e o código já as segue: a
+grade padrão de `J` de `cv.wafc()`, `wafc_tune()`, `klopp` e `oracle` passou
+a `2:8` (`wafc_J_top` em `tune.R`), e a margem padrão do caso periódico a
+`0` (`wafc_eps_periodic` em `design.R`). **672 testes passam**; o
+`01-smoke.R` imprime `OK`.
+
+- **O custo medido da grade nova**, cenário não homogêneo, 10 dobras, nesta
+  máquina: `cv.wafc` de 0,5 s para **9,1 s** em `n = 250` e de 0,4 s para
+  **3,9 s** em `n = 1000`; o `klopp`, que usa a mesma grade por ser o
+  concorrente no mesmo desenho, de 0,5 s para 5,7 s e de 1,6 s para
+  **20,2 s**. É o que torna a medição da pergunta 29 prioritária antes de
+  repetir o piloto: a cauda do caminho é justamente o que cresce com `J`.
+- **Números registrados que não se reproduzem mais com os padrões:** os de
+  `02-tune.R` e `03-tune-decomp.R` (E2.3), `05-sondagem-aplicacao.R`
+  (E6.1a) e `06-timing.R` (2026-09-21) foram produzidos com a grade
+  `2:⌈log_2 n/2⌉` e, depois de E2.1b, a margem `0.05`; rodá-los hoje usa
+  `2:8` e `0`. Reproduzi-los pede passar os dois argumentos. O `04-pilot.R`
+  segue os padrões novos, que é o que a E2.5 quer, e a parte `jgrid` agora
+  escreve a regra antiga por extenso, para continuar comparando as duas.
+- **Aberto pela ratificação e decidido no mesmo dia** (pergunta 30, D36):
+  o `bsgl` escolhia a dimensão entre 4, 8 e 16, que são as de `J ≤ 4`;
+  agora entre `2^2` e `2^8`. Em `n = 1000` ele passa a escolher 64 e o erro
+  de validação cruzada cai de 2,129 para 1,958, isto é, a grade curta o
+  truncava como truncava o WAFC. O preço é ~60 s por ajuste em
+  `n = 1000`, contra 0,9 s. **674 testes passam.**
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1058,6 +1087,9 @@ custo de R em volta do motor (< 3%) não compram nada.
 | D23 | 09-19 | **A margem `eps` do reescalonamento tem função declarada:** periodizar a base num intervalo maior que o suporte dos dados, o que permite trocar `g` por uma extensão que emende em `0 ≡ 1`. Com isso a hipótese não é "densidade limitada por baixo em todo `[0,1]`" e sim sobre o **suporte**, e a constante de E1.4 passa a ser `c_U λ_min(G_eps)`, com `G_eps` a Gram da base restrita ao suporte. `rescale = TRUE` continua padrão e `boundary = "interval"` entra no `wafc()`, mas fica fora do manuscrito por enquanto | argumento do autor em 2026-09-19: tomar `[0,1]` é sem perda de generalidade sobre a escala, não sobre o suporte. O ganho é que a Proposição 2 de E1.3 (periodização trava a taxa em `2^{−J/2}`) deixa de se aplicar quando `eps > 0`; a emenda é E1.3b, e E2.4 mede `λ_min(G_eps)` e o ISE contra `eps` |
 | D24 | 09-19 | **As exigências de estilo da revista valem também nas derivações:** `E(·)`, `P(·)` e `Var(·)` em romano e com parênteses (§5 das instruções da SS), e um único `B_X` no lugar de `C_X` (E1.3) e `B_X` (E1.4). O `macros.tex` é ajustado quando E1.3b fechar | decisão do autor; manter dois conjuntos de símbolos para as mesmas quantidades é o que a notação congelada existe para evitar, e a revista não é negociável no ponto |
 | D33 | 09-21 | **O termo "sieve" sai do manuscrito e das derivações**, trocado por "espaço de aproximação" / "approximation space" (e "sieve linear" por "aproximação linear", para fazer par com "aproximação não linear"); uma menção fica, entre parênteses, onde o espaço é definido. Cumprida nas derivações por E1.10 em 2026-09-21; no manuscrito, entra em `k = 2` | pedido do autor: é padrão em estatística teórica e em econometria semiparamétrica, e **incomum onde o artigo quer se inserir** — conferido, Klopp & Pensky (2015) e Xue & Yang (2006) não o usam nenhuma vez, e "Approximation space" é **palavra-chave** do artigo de Xue & Yang; o WALL teórico usa 38 vezes, e é de lá que ele entrou no nosso vocabulário |
+| D34 | 09-28 | **A grade padrão de `J` é `2:8`**, independente de `n` (proposta P1 de E2.4), para `cv.wafc()`, `wafc_tune()` e os concorrentes no mesmo desenho (`klopp`, `oracle`); `n` maior que o medido pede `J` explícito | a grade `2:⌈log_2 n/2⌉` herdada do `cv.wall()` tinha o oráculo no topo em 100% das réplicas com componente; ir a 8 cortou 17,6% do erro de predição e 32% do ISE no não homogêneo em `n = 1000`, em 50 de 50 réplicas, e inverteu o veredito contra o VCBART (0.839 contra 0.910); ratificada pelo autor |
+| D35 | 09-28 | **A margem padrão do reescalonamento é `eps = 0`** também na base periódica (proposta P2 de E2.4); margem positiva continua disponível pelo argumento | em E2.4, `0.05` custou 12% a 15% no suave, perdendo em 95% a 100% das réplicas, e não ganhou no não homogêneo (0.992 e 0.994); `eps = 0` perde no máximo 2,4% ali e é o único valor com `λ_min(G_eps) = 1`, onde a teoria do manuscrito é enunciada (D26); ratificada pelo autor |
+| D36 | 09-28 | **O `bsgl` escolhe a dimensão por bloco entre `2^J`, `J = 2, …, 8`**, a grade de D34, em vez de 4, 8 e 16; candidato maior que o número de valores distintos de uma moduladora é descartado | com 4, 8 e 16 (isto é, `J ≤ 4`) a comparação que isola a base voltava a medir dimensão, a lição de E6.1a; medido no não homogêneo em `n = 1000`: a grade estendida escolhe 64 e baixa o erro de validação cruzada de 2,129 para 1,958, ao custo de ~60 s contra 0,9 s; ratificada pelo autor (pergunta 30) |
 | D32 | 09-20 | **A seleção de estrutura entra pela limiarização (saída (c)), e a saída (a) não abre agora.** O Corolário 8 de `06-selecao-limiar.tex` é o enunciado do artigo, com a hipótese de separação numerada e dizendo no próprio enunciado que é **estimação seguida de limiar**. A sondagem de E1.7a fica registrada como observação de meia página (a condição em grupos não depende de `J` nem da base), e a saída (a), se voltar depois de E2.5, volta pela rota de Wei & Huang (2010), não pela de Bach | veredito de E1.7a: a redução algébrica tira o risco de a condição falhar por construção, mas não o custo, e exige (BD) mais `E(XX'\|U)` constante, que contraria D13; além disso o valor de (a) continua condicionado a E2.5 escolher a variante em grupos, e E1.7c mostrou o LASSO limiarizado acertando 10 de 10 onde ela acerta 0 de 10 |
 | D31 | 09-20 | **Em avaliação numérica repetida, a base é fixada e avaliada por tabela**, não pelo algoritmo de Daubechies-Lagarias a cada ajuste: construir a tabela uma vez com `WaveBased::wtable()` para o par `(family, filter.size)` e passá-la em `wavelet.table` de `wafc_design()`, em vez de deixar a regra `use.table = "auto"` decidir réplica a réplica. Vale para o piloto (E2.4), o compêndio (E4) e a aplicação (E6). **Exceção:** conferência que mede precisão fina (as de `derivations/check/`, que leem decaimento até `1e-11`) continua com avaliação exata ou tabela com `prec.wavelet` alto, porque ali o `3.1e-06` engoliria o que se quer medir | pedido do autor, e a razão é **tempo de execução**: a tabela é o caminho rápido e a aproximação é boa o bastante (o erro de interpolação medido em E2.1 é `3.1e-06`), de modo que a variação entre os dois caminhos não é problema prático. A regra `auto` só dispara em `n q ≥ 2000 L`, isto é `n q ≥ 16000` com `L = 8`, e portanto **não dispara** nos `n` do piloto: deixá-la decidir significa pagar Daubechies-Lagarias em toda a varredura |
 | D30 | 09-19 | **O cenário suave é para ganhar, não só para não perder.** A hipótese `C^{p+1}` de Xue & Yang delimita a garantia deles, não o desempenho: com `J` e `λ` por validação cruzada o WAFC pode vencer splines também no suave, e E2.4 e E4 têm de medir isso em condição justa — o concorrente sintonizado nos termos dele (nós por BIC como no artigo deles, e `mgcv` com REML), predição e ISE relatadas em separado, e uma componente **suave de curvatura desigual** (gaussiana estreita ou `doppler` truncado longe da singularidade) acrescentada ao `dgp.R`, que é `C^∞` e portanto dentro da hipótese deles, mas com escala variando ao longo do domínio | argumento do autor; se o ganho aparecer, é ilustração forte para o artigo, e se não aparecer, a paridade no suave já é o que a Seção 5 precisa |
@@ -1142,7 +1174,7 @@ Ordenadas pelo que bloqueia mais.
    código marcado como provisório, e é largo demais para `J` pequeno e
    estreito demais para `J` grande por esse critério. **Medido em E2.4
    (2026-09-20):** `eps = 0` domina, e `0.05` custa 12% a 15% no cenário
-   suave; a troca do padrão é a P2, ainda não ratificada (pergunta 9).
+   suave; o padrão passou a `0` com a ratificação da P2 (D35, 2026-09-28).
 7. **~~Posicionamento diante de Klopp & Pensky~~ decidido (D18):**
    extensão deles. O parágrafo aprovado e a lista de contribuições reescrita
    estão em `alvo-revista.md` §4, e L2a está cumprida.
@@ -1152,12 +1184,8 @@ Ordenadas pelo que bloqueia mais.
    cenário não homogêneo com `k` casado ao espaço de aproximação**, o que
    E2.4b tornou barato (`wafc_k_matched()` e o motor `bam`, que custa
    `0,589 s` em `n = 1000` contra `1,955 s` do `k = 10` por `gam`).
-9. **P1 e P2, não ratificadas em 2026-09-21 e herdadas por E2.5.** A grade
-   de `J` continua em `⌈log_2 n/2⌉` e a margem em `0.05`. A evidência a favor
-   das duas continua na mesa — 17,6% de erro e 32% de ISE em 50 de 50
-   réplicas para a grade larga; a margem `0.05` dominada por `eps = 0` —, e
-   agora com um argumento a mais: o custo da grade profunda, que era a
-   objeção, encolheu com a tolerância nova e com o `bam` no concorrente.
+9. **~~P1 e P2~~ ratificadas em 2026-09-28 (D34, D35):** grade padrão de
+   `J` em `2:8` e margem padrão `0`, já no código.
 10. **~~Conserto obrigatório antes de E2.5 rodar~~ feito em 2026-09-28:**
    o `wafc_competitor()` repassava `wavelet.table` a todo concorrente, e o
    `VCBART` parava com "argumento não utilizado" dentro de um `try()`
@@ -1339,23 +1367,29 @@ Ordenadas pelo que bloqueia mais.
    todas as réplicas das células do piloto, senão fica o comportamento
    atual. **Depois da P1**, porque o ganho de (a) depende da profundidade
    da grade.
+30. **~~O `bsgl` acompanha a grade de D34?~~ Sim, D36 (2026-09-28).** Ele escolhia o número de funções
+   B-spline por bloco entre 4, 8 e 16, que são as dimensões de `J ≤ 4`;
+   com o WAFC indo a `J = 8` (256), a comparação que isola a base deixa de
+   ser em dimensão comparável, que é a lição de E6.1a. Proposta: estender
+   os candidatos a `2^(2:8)`, como o `gam` casado de (c). Decide-se antes
+   de repetir o piloto.
 
 ---
 
 ## 5. Próximos passos
 
-Tudo converge em E2.5 (go/no-go), que **não abre** antes de (b) e (c).
+Tudo converge em E2.5 (go/no-go), que **não abre** antes de (b') e (c).
 
 - (a) **~~Conserto do repasse de `wavelet.table`~~ feito em 2026-09-28**
   (pergunta 10), com a revisão do código de `wafc/` (§2).
-- (b) **Autor: decidir P1 e P2** (pergunta 9): grade de `J` larga (`2:8`
-  contra `⌈log_2 n/2⌉`) e margem `eps = 0` contra `0.05`. A evidência de
-  E2.4 favorece as duas, e o custo da grade larga encolheu com E2.4b.
-- (b') **Depois da P1, medir as duas acelerações da pergunta 29** e adotar
-  só as que mantêm `J.min`, `λ.min` e `λ.1se` em todas as réplicas; é o
-  que torna barata a repetição de (c).
-- (c) **Repetir a parte `competitors` do piloto** com a grade decidida em
-  (b), o `gam` em dimensão casada (`wafc_k_matched()`, motor `bam`) e o
+- (b) **~~Autor: decidir P1 e P2~~ ratificadas em 2026-09-28** (D34,
+  D35), já no código.
+- (b') **Medir as duas acelerações da pergunta 29** e adotar só as que
+  mantêm `J.min`, `λ.min` e `λ.1se` em todas as réplicas. Ficou mais
+  urgente: com `2:8` o `cv.wafc` custa de 10 a 18 vezes o que custava, e
+  o `klopp` até 13 vezes (§2, 2026-09-28).
+- (c) **Repetir a parte `competitors` do piloto** com a grade `2:8`
+  (D34), o `bsgl` na mesma grade (D36), o `gam` em dimensão casada (`wafc_k_matched()`, motor `bam`) e o
   cenário `uneven` de D30; só então fixar o fator do critério de saída no
   cenário suave (pergunta 8). A coluna `theory` do `uneven` sai degenerada
   e tem de ser dita na tabela.
@@ -1372,6 +1406,7 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (b) e (c).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-28 | P1 e P2 ratificadas (D34, D35): grade padrão `2:8` e margem padrão `0`, já no código; a grade nova custa de 10 a 18 vezes no `cv.wafc` e até 13 no `klopp`, o que torna a pergunta 29 urgente; o `bsgl` passou a acompanhar a grade (D36), escolhendo 64 funções em `n = 1000` onde o teto era 16 |
 | 2026-09-28 | Revisão do código de `wafc/`: cinco defeitos corrigidos (o `vcbart` volta à tabela; `uneven` não quebra mais o piloto; falha vira linha), `call` compacto e só o melhor ajuste no `cv.wafc` (objeto salvo de 11,4 para 3,6 MB), busca de nós 7 a 11× mais rápida com os mesmos nós; 672 testes, piloto idêntico ao anterior; duas acelerações que podem mudar a escolha ficam para medir (pergunta 29) |
 | 2026-09-28 | Documentos de continuidade alinhados ao estado de 09-21: cabeçalho e §5 do `ESTADO.md`, §3 do `CONTINUAR.md`, catálogo e numeração do `TAREFA.md`, marcas de etapa do `plano-projeto.md`, teto de 40 páginas no `instrucoes.md`; perguntas da §4 renumeradas a partir da 16 (havia duas 15) |
 | 2026-09-18 | Avaliação de viabilidade; criação do repositório e dos documentos de trabalho; template da EJS; plano E0 a E7 |

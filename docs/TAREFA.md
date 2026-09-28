@@ -84,9 +84,9 @@ no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 
 **O catálogo está vazio.** A próxima é E2.5 (go/no-go), e ela **não deve
 abrir antes de duas coisas** (o conserto do repasse de `wavelet.table` ao
-`vcbart` foi feito em 2026-09-28): a decisão sobre P1 e P2, que E2.4b
-devolveu sem ratificação; e a repetição da parte
-`competitors` com a grade decidida, `k` casado no `gam` (`wafc_k_matched()`
+`vcbart` foi feito e P1 e P2 foram ratificadas em 2026-09-28, D34 e D35):
+a medição das acelerações da pergunta 29 do `ESTADO.md`; e a repetição da
+parte `competitors` com a grade `2:8`, `k` casado no `gam` (`wafc_k_matched()`
 e motor `bam`, já disponíveis) e o cenário `uneven`. A razão é medida: o
 veredito contra os concorrentes muda com a grade de `J` (P1), e a
 comparação com o `gam` em dimensão não casada é o que E6.1a mostrou separar

@@ -232,7 +232,8 @@ test_that("the default margin does not depend on the resolution level", {
   expect_equal(eps_of(2L), rep(wafc_eps_periodic, q))
   expect_equal(eps_of(5L), rep(wafc_eps_periodic, q))
   expect_equal(eps_of(c(2L, 5L)), rep(wafc_eps_periodic, q))
-  expect_true(wafc_eps_periodic > 0 && wafc_eps_periodic < 0.5)
+  ## decision D35: the default margin of the periodized basis is zero
+  expect_equal(wafc_eps_periodic, 0)
   ## the rescaled support, and so the estimated target, is the same for
   ## every candidate of the grid of cv.wafc()
   d2 <- wafc_design(x0, u0, J = 2L)

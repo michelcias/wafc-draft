@@ -58,7 +58,8 @@ test_that("every competitor recovers a model of its own form without noise", {
   for (mth in c("gam", "bsgl", "klopp", "aspline", "linear")) {
     if (mth %in% c("bsgl", "klopp") && !has("grpreg")) next
     if (mth == "gam" && !has("mgcv")) next
-    fit <- wafc_competitor(mth, x0, u0, f, foldid = folds, J = 4L)
+    ## df fixed so that the test does not run the whole grid of D36
+    fit <- wafc_competitor(mth, x0, u0, f, foldid = folds, J = 4L, df = 16L)
     fh <- predict(fit, x0, u0)
     ## the linear fit cannot reproduce the varying part and is the control
     ## that the tolerance is not vacuous
@@ -100,7 +101,7 @@ test_that("every competitor answers in the coordinates of the model", {
     if (mth %in% c("bsgl", "klopp") && !has("grpreg")) next
     if (mth == "gam" && !has("mgcv")) next
     fit <- wafc_competitor(mth, x0, u0, y0, active = active0, foldid = folds,
-                           J = 3L, burn = 100L, nd = 100L)
+                           J = 3L, df = 8L, burn = 100L, nd = 100L)
     expect_s3_class(fit, "wafc_competitor")
     ## beta(u) has one column per linear covariate, in the order of the design
     b <- fit[["beta"]](u0)
@@ -366,4 +367,17 @@ test_that("the knot search scores the candidates as a refit would", {
                    refit_search(r, d1[["x"]][, l], v, rng, cand, 8L, 3L, n))
     }
   }
+})
+
+test_that("bsgl searches the grid of the WAFC and respects discrete modulators", {
+  ## decision D36: the candidate dimensions are 2^J for J = 2, ..., 8, the
+  ## grid of decision D34
+  expect_equal(eval(formals(wafc_fit_bsgl)[["df"]]), 2L^(2:8))
+  skip_if_not(has("grpreg"))
+  ## a modulating covariate with ten distinct values admits at most nine
+  ## basis functions per block, so the larger candidates are dropped
+  ud <- u0
+  ud[, 1L] <- round(ud[, 1L] * 9) / 9
+  fit <- wafc_competitor("bsgl", x0, ud, y0, foldid = folds)
+  expect_lte(fit[["extra"]][["df"]], 9L)
 })

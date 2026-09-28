@@ -93,10 +93,10 @@ Rscript derivations/check/07-rota-intervalo.R      # ~2 min
 E o código do método, que já existe:
 
 ```bash
-Rscript -e 'testthat::test_dir("wafc/tests")'   # 672 passam, ~40 s
+Rscript -e 'testthat::test_dir("wafc/tests")'   # 674 passam, ~45 s
 Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
 Rscript wafc/scripts/03-tune-decomp.R           # ~2 min
-Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 min
+Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 min com a grade antiga (hoje o padrão é 2:8, D34)
 Rscript wafc/scripts/04-pilot.R 5 competitors 8 250 smooth   # fumaça do piloto, ~1 min
 Rscript wafc/scripts/04-pilot.R 50 all 12                    # o piloto inteiro, ~3 h em 12 núcleos
 Rscript wafc/scripts/05-sondagem-aplicacao.R all           # a sondagem de E6.1a, horas; baixa os dados
@@ -120,7 +120,7 @@ Rscript wafc/scripts/06-timing.R                             # só tempo, curto
   depois dos resultados.
 - **Código: E2.1 a E2.4b fechadas**, com o piloto, os sete concorrentes, o
   QUT, o cenário `uneven` e a tabela de tempo, e a revisão de 2026-09-28
-  (defeitos, memória, busca de nós); **672 testes passam**. Falta o
+  (defeitos, memória, busca de nós) e D34 a D36; **674 testes passam**. Falta o
   go/no-go (E2.5), que espera a decisão sobre P1 e P2 e a repetição da
   parte `competitors` (`ESTADO.md` §5).
 - **Avaliação da base em estudo numérico:** tabela fixa (`wtable()` uma vez,

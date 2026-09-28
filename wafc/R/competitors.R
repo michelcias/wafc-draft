@@ -426,9 +426,17 @@ wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1,
 #' The basis of each modulating covariate is centred on the training sample,
 #' which is the spline analogue of discarding \eqn{\phi_{00}}, and the
 #' penalty level is chosen by cross-validation. The number of basis
-#' functions is chosen from the same grid the WAFC uses for \eqn{2^J}, so
-#' the two sieves are compared at comparable dimensions rather than at a
-#' number pulled from the air.
+#' functions is chosen from a grid of the form \eqn{2^J}, so the two
+#' expansions are compared at comparable dimensions rather than at a number
+#' pulled from the air. The default candidates are \eqn{2^J} for
+#' \eqn{J = 2, \ldots, 8}, the grid of the WAFC since decision D34 (decision
+#' D36). They were 4, 8 and 16 before, the dimensions of \eqn{J \le 4},
+#' and that truncated this competitor as the old grid truncated the WAFC:
+#' in the inhomogeneous scenario at \eqn{n = 1000} the extended grid
+#' selects 64 functions and lowers the cross-validated error from 2.129 to
+#' 1.958, at the price of about 60 s against 0.9 s. A candidate larger
+#' than the number of distinct values of some modulating covariate has no
+#' data between its knots and is dropped.
 #'
 #' @param x,u,y The data.
 #' @param df Number of B-spline basis functions per block, or a vector of
@@ -446,7 +454,7 @@ wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1,
 #' wafc_fit_bsgl(d$x, d$u, d$y, df = 8)$blocks
 #'
 #' @export
-wafc_fit_bsgl <- function(x, u, y, df = c(4L, 8L, 16L), nfolds = 10L,
+wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
                           foldid = NULL, penalty = "grLasso", ...) {
   if (!requireNamespace("grpreg", quietly = TRUE)) {
     stop("method = \"bsgl\" needs the package 'grpreg'.", call. = FALSE)
@@ -459,6 +467,10 @@ wafc_fit_bsgl <- function(x, u, y, df = c(4L, 8L, 16L), nfolds = 10L,
   foldid <- wafc_foldid(foldid, n, nfolds)
   df <- sort(unique(as.integer(df)))
   if (any(df < 3L)) stop("'df' must be at least 3.", call. = FALSE)
+  ## the same truncation as wafc_k_matched(): a block cannot have more basis
+  ## functions than its covariate has distinct values
+  ndist <- min(vapply(seq_len(q), function(m) length(unique(u[, m])), 0L))
+  df <- if (any(df <= ndist - 1L)) df[df <= ndist - 1L] else min(df)
 
   best <- NULL
   for (d in df) {

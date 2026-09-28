@@ -15,8 +15,8 @@
 ##                column that gives the word "cost" a meaning;
 ##   margin       lambda_min(G_eps) and the error against eps, on the grid
 ##                of open question 6 of docs/ESTADO.md plus the family
-##                eps = a (L-1) 2^(-J); it is what fixes wafc_eps_periodic,
-##                provisional at 0.05;
+##                eps = a (L-1) 2^(-J); it is what fixed wafc_eps_periodic
+##                at 0, decision D35 (it was provisional at 0.05);
 ##   j1           whether the grid of cv.wafc() should start at J = 1, now
 ##                that the margin no longer depends on J (step E2.1b);
 ##   jgrid        what the grid of cv.wafc() costs at the other end. The
@@ -549,7 +549,9 @@ run_jgrid <- function(cell, n, r, deep = 8L) {
   active <- nzchar(dgp[["structure"]])
   set.seed(seed + 77L)
   foldid <- sample(rep_len(1:10, n))
-  Jshort <- max(wafc_J_grid(NULL, n))
+  ## the short grid is the rule of cv.wall written out, since the default
+  ## of cv.wafc() is now the deep one (decision D34)
+  Jshort <- max(2L, as.integer(ceiling(log2(n) / 2)))
   rows <- list()
   for (lab in c("short", "deep")) {
     Jtop <- if (lab == "short") Jshort else deep

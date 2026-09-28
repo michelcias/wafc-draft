@@ -44,7 +44,7 @@ empacotar dentro dele, esta tabela diz o que refatorar.
 moduladora; `j0 = 0` periódico como padrão com `drop.phi`; **`eps` não**: o padrão
 `1.9^{-J}` do `wall()` foi descartado em E2.1b, porque acopla a margem à
 resolução e só margem **fixa** compra a taxa cheia (Lema 10 de E1.3b, D23);
-o padrão do WAFC é fixo, provisoriamente `0.05`, e `0` na base do intervalo (E2.4 mediu `eps = 0` dominando `0.05`; a troca do padrão é a P2, pendente no `ESTADO.md`); `use.table = "auto"` por carga de trabalho; `sparse = "auto"`;
+o padrão do WAFC é `0` nas duas bases (D35, depois de E2.4 medir `eps = 0` dominando `0.05`), e margem positiva só por argumento; a grade de `J` também não é mais a do `cv.wall()`: é `2:8` (D34); `use.table = "auto"` por carga de trabalho; `sparse = "auto"`;
 `standardize = FALSE` por padrão (base ortonormal); erro informativo em
 argumento desconhecido (lição do 2.6-0).
 

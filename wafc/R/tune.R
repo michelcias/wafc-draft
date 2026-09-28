@@ -56,13 +56,14 @@
 #'
 #' @param x,u,y The data, as in \code{\link{wafc}}.
 #' @param J The grid of candidate resolution levels. \code{NULL} (the
-#'   default) uses \code{2:max(2, ceiling(log2(n)/2))}, the rule of
-#'   \code{cv.wall} truncated below at \eqn{J = 2}: a block of a single
-#'   wavelet column is not a sieve, and step E2.4 measured that adding
-#'   \eqn{J = 1} to the grid changes neither the selected pair nor the
-#'   error. Since step E2.1b the margin no longer depends on \eqn{J}, so
-#'   \eqn{J = 1} is a design \code{\link{wafc_design}} can build and
-#'   passing \code{J = 1:Jmax} is allowed.
+#'   default) uses \code{2:8} (decision D34). The rule of \code{cv.wall},
+#'   \code{2:ceiling(log2(n)/2)}, used before, truncated the expansion
+#'   exactly where the choice was being made: in the pilot of step E2.4 its
+#'   top was the oracle of the grid in every replicate with a component to
+#'   resolve, and going to 8 cut the prediction error by 17.6\% and the
+#'   error of the components by 32\% in the inhomogeneous scenario at
+#'   \eqn{n = 1000}. The grid starts at 2 because step E2.4 measured that
+#'   \eqn{J = 1} is never selected; passing \code{J = 1:8} is allowed.
 #' @param penalty \code{"lasso"} or \code{"sglasso"}, as in
 #'   \code{\link{wafc}}.
 #' @param nfolds Number of folds, at least 3.
@@ -807,15 +808,22 @@ wafc_split_dots <- function(dots) {
        fit = dots[names(dots) %in% fnames])
 }
 
-## Grid of candidate resolution levels: the rule of cv.wall, with j0 = 0,
-## starting at J = 2. Only one of the two reasons E2.3 gave survives step
-## E2.1b: a block of a single wavelet column is not a sieve. The other, that
-## the default margin eps = 1.9^{-J} was not admissible at J = 1, died with
-## the fixed margin, and J = 1 is now a design like any other; a user who
-## wants it only has to ask for it. Step E2.4 measured what carrying it
-## would buy and the answer was nothing, so the default is unchanged.
+## Grid of candidate resolution levels, 2:8 by default (decision D34,
+## proposal P1 of step E2.4, ratified on 2026-09-28). It used to be the rule
+## of cv.wall, 2:ceiling(log2(n)/2), which is 2:5 at n = 1000; the oracle of
+## that grid sat on its top in every replicate of every cell of the pilot
+## with a component to resolve, and widening it to 2:8 cut the prediction
+## error by 17.6% and the error of the components by 32% in the
+## inhomogeneous scenario at n = 1000, in 50 replicates of 50, while
+## changing nothing in the smooth one (E1.3 had measured that bumps only
+## resolves from J = 9). The top does not grow with n: 8 is the depth that
+## was measured, at n from 250 to 1000, and a larger sample that wants more
+## asks for it through 'J'. The grid starts at 2 because a block of a single
+## wavelet column is not an approximation space, and step E2.4 measured that
+## carrying J = 1 buys nothing; the argument 'n' is kept for the callers.
+wafc_J_top <- 8L
 wafc_J_grid <- function(J, n) {
-  if (is.null(J)) return(seq(2L, max(2L, ceiling(log2(n) / 2))))
+  if (is.null(J)) return(seq(2L, wafc_J_top))
   if (!is.numeric(J) || length(J) == 0L || any(!is.finite(J)) ||
       any(J != round(J))) {
     stop("'J' must contain only integer values.", call. = FALSE)
