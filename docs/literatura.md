@@ -80,6 +80,7 @@ L1), `[VERIFICAR]` (citado de memória; nada de `.bib` até L1). **A segunda rod
 |---|---|---|
 | WALL teórico (`wall-manuscript/manuscript/theo/`) | sieve LASSO com wavelets no modelo aditivo logístico: aproximação em Besov, oráculo de taxa lenta, trilha rápida com compatibilidade e corolário de compressibilidade | `lido` (resumo e estrutura, 2026-09-18); é o molde |
 | WALL aplicado (`manuscript/app/`) | benchmark do `wall()` em 14 bases | `lido` (estrutura) |
+| Montoril, Chang & Vidakovic (2019), *Sankhya B* 81(2) 318–349, "Wavelet-based estimation of generalized discriminant functions" (DOI 10.1007/s13571-018-0158-1) | wavelets periódicas com as covariáveis reescalonadas para `[ε, 1 − ε]`: a origem do reescalonamento que o `wall()` herdou e o WAFC reimplementa em `wafc_rescale()` | `verificado` (`Montoril-Chang-Vidakovic-2019`; Crossref em 2026-09-28) |
 | Montoril, Pinheiro & Vidakovic (2019), *Scand. J. Statist.* 46(1) 215–234, "Wavelet-based estimators for mixture regression" | wavelets em regressão de mistura | `verificado` (`Montoril-Pinheiro-Vidakovic-2019`; Crossref em L1) |
 | Motta & Montoril (2026), *Comm. Statist. Simul. Comput.* 55(6) 2426–2434 | mistura bayesiana com wavelets | `verificado` (`Motta-Montoril-2026`; Crossref em L1) |
 
