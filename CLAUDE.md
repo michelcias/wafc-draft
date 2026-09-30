@@ -2,8 +2,8 @@
 
 Repositório de trabalho do projeto **WAFC: regressão com coeficientes
 funcionais aditivos, estimados por LASSO em bases de wavelets** (nome
-provisório), com alvo de publicação em periódico Q1 de Statistics and
-Probability (SCImago). Alvo primário proposto: *Statistica Sinica*;
+ratificado em D8), com alvo de publicação em periódico Q1 de Statistics and
+Probability (SCImago). Alvo primário: *Statistica Sinica* (D5);
 reserva: *Electronic Journal of Statistics*. Detalhe em
 [`docs/alvo-revista.md`](docs/alvo-revista.md).
 
