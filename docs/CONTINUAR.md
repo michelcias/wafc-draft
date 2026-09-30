@@ -137,7 +137,8 @@ Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 
 - **Bibliografia:** 63 entradas verificadas (L1, L3 e L4); nada pendente.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo vazio:** nenhuma tarefa aberta.
+- **Catálogo:** E2.4c e E2.5a (a repetição do piloto), em sequência;
+  detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
   `instrucoes.md`.

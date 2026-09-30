@@ -1,12 +1,14 @@
 # Estado do trabalho, handoff de continuidade
 
-**Última atualização:** 2026-09-28.
+**Última atualização:** 2026-09-30.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
 E1.10), E5a e E2.1 a E2.4b fechadas**, mais L1 a L4 e a sondagem E6.1a.
 Falta E2.5 (go/no-go) para fechar E2; P1 e P2 foram ratificadas (D34,
 D35), as perguntas 29 e 31 estão fechadas, e ela espera só a repetição do
 piloto (§5).
-Nenhum chat de tarefa em curso e nenhuma tarefa catalogada. A decidir pelo
+Catalogadas em 2026-09-30, em sequência: **E2.4c** (preparar o
+`04-pilot.R`) e **E2.5a** (rodar a repetição); nenhum chat de tarefa em
+curso. A decidir pelo
 autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
 (D21).
 **Versão viva do manuscrito:** `k = 1` (`manuscript/ms_1.tex`,
@@ -1507,7 +1509,11 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
   (D34), o `bsgl` na mesma grade (D36), o `gam` em dimensão casada (`wafc_k_matched()`, motor `bam`) e o
   cenário `uneven` de D30; só então fixar o fator do critério de saída no
   cenário suave (pergunta 8). A coluna `theory` do `uneven` sai degenerada
-  e tem de ser dita na tabela.
+  e tem de ser dita na tabela. **Catalogado em 2026-09-30** como E2.4c
+  (o script ainda não tem a célula `uneven` nem o `gam` casado por `bam`:
+  a parte `competitors` chama o `gam` com `k = 10`) seguida de E2.5a (a
+  rodada), no `TAREFA.md` §3; E2.4c sem rodada de calibração, por decisão
+  do autor.
 - (d) **E2.5**, com a calibração do limiar `t_n` (pergunta 11) e a escolha
   entre LASSO limiarizado e sparse group LASSO, que E1.7c e a tabela de
   tempo já inclinam para o primeiro.
