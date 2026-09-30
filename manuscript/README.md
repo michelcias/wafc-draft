@@ -9,6 +9,10 @@ mesmo índice `k`; a versão `{k+1}` copia os três e atualiza
 A versão `1` não leva marcação de alteração; o preâmbulo já define `colR1`
 e carrega `ulem` para quando `k = 2` existir.
 
+**Versão viva: `k = 2`**, aberta em 2026-09-30 como cópia de `k = 1`
+(`ms_2.tex`, `supp_2.tex`, `references_2.bib`), com toda alteração marcada
+em `colR1`; as edições são da tarefa E5c.
+
 | Pasta | O que é |
 |---|---|
 | `ejs-template/` | template da *Electronic Journal of Statistics* (`imsart.cls` 2025/03/18, opção `ejsv2`, `imsart.sty`, `imsart-nameyear.bst`, `ejs-sample.tex/.pdf`, LPPL), clonado de `vtex-soft/texsupport.ims_cosponsored-ejs` em 2026-09-18; o `ejs-sample.tex` compila com o `latexmk` local |
@@ -29,5 +33,5 @@ geradas dos arquivos de origem é item do checklist de submissão
 ## Compilar
 
 ```bash
-cd manuscript && latexmk -pdf ms_1.tex && latexmk -pdf supp_1.tex && latexmk -c
+cd manuscript && latexmk -pdf ms_2.tex && latexmk -pdf supp_2.tex && latexmk -c
 ```

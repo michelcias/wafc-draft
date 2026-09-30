@@ -73,7 +73,7 @@ Conferência de que tudo roda (da raiz de `wafc-draft`):
 Rscript -e 'library(WaveBased); w <- wbasis(sort(runif(64)), j0 = 0, J = 3); cat(dim(w), "\n")'   # 64 8
 cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd -   # compila
 cd manuscript/ss-template && latexmk -pdf SS-template.tex && latexmk -c && cd -   # compila (9 páginas)
-cd manuscript && latexmk -pdf ms_1.tex && latexmk -pdf supp_1.tex && latexmk -c && cd -   # 28 e 26 páginas, sem indefinida
+cd manuscript && latexmk -pdf ms_2.tex && latexmk -pdf supp_2.tex && latexmk -c && cd -   # versão viva k = 2; 28 e 26 páginas, sem indefinida, antes de E5c
 ```
 
 As conferências das derivações, que devem imprimir `OK` (tempos desta
@@ -130,15 +130,14 @@ Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 
   dispara nos `n` do estudo e deixaria tudo no algoritmo lento (D31). A
   exceção são as conferências de `derivations/check/`, que medem precisão
   fina.
-- **Manuscrito vivo em `k = 1`:** `manuscript/ms_1.tex` e `supp_1.tex`
-  compilam limpos, em 28 e 26 páginas. Alterar pede decidir antes se nasce
-  `k = 2`, e há uma lista de edições acumuladas esperando (pergunta 15 do
-  `ESTADO.md`).
+- **Manuscrito vivo em `k = 2`** (aberto em 2026-09-30): `ms_2.tex` e
+  `supp_2.tex` compilam limpos, em 28 e 26 páginas; as edições acumuladas
+  da pergunta 15 do `ESTADO.md` são a tarefa E5c, marcadas em `colR1`.
 - **Bibliografia:** 63 entradas verificadas (L1, L3 e L4); nada pendente.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** E2.4c e E2.5a (a repetição do piloto), em sequência;
-  detalhe no `TAREFA.md` §3.
+- **Catálogo:** E2.4c e E2.5a (a repetição do piloto), em sequência, e
+  E5c (o manuscrito em `k = 2`) em paralelo; detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
   `instrucoes.md`.

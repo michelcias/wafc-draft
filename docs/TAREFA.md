@@ -64,6 +64,7 @@ que ler antes está aqui e no plano.
 | P1, P2 e perguntas 29 a 31 | **decididas** (2026-09-28): grade `2:8` (D34), margem `0` (D35), `bsgl` na mesma grade (D36), nenhuma aceleração (D37); 674 testes passam | `wafc/R/tune.R`, `wafc/R/design.R`, `wafc/R/competitors.R`, `wafc/scripts/07-accel.R`, `wafc/scripts/08-sgl-null.R` |
 | E6.1a sondagem de bases | **fechada** (2026-09-20): veredito negativo nas três candidatas | `docs/aplicacao-candidatas.md` |
 | E2.4c e E2.5a (repetição do piloto) | **catalogadas** (2026-09-30), em sequência | §3 |
+| E5c manuscrito `k = 2` | **catalogada** (2026-09-30), em paralelo a E2.4c e E2.5a | §3 |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
@@ -80,6 +81,7 @@ tarefa pode criar ou editar**.
 |---|---|---|---|
 | **E2.4c** preparar o piloto | `04-pilot.R` pronto para o item (c) da §5 do `ESTADO.md`: (i) célula `uneven` (`p = 3`, `q = 2`, SNR 4, 50 réplicas) na lista de células; (ii) método novo `gam.matched`, com `k = wafc_k_matched(u, J)` tomando o `J.min` do `wafc.lasso` da mesma réplica e `engine = "bam"`, **mantendo** a coluna `gam` com `k = 10` para comparar com a tabela de E2.4; (iii) as tabelas impressas pela parte `competitors` incluindo a célula e o método novos; (iv) o nome do `.rds` de saída parametrizado (hoje é sempre `e24-competitors.rds`), para a repetição não sobrescrever a de E2.4. **Sem rodada de calibração** (decisão do autor): só a bateria de testes e a fumaça `04-pilot.R 1 competitors 8 250` em cada célula, para conferir que nenhum método vira linha de falha | nada | `wafc/scripts/04-pilot.R`, `wafc/tests/test-competitors.R` (só se tocar `wafc_competitor()`), `wafc/R/competitors.R` (idem, e só para o repasse de `k` e `engine` ao `gam`), `wafc/README.md` (a linha do `04-pilot.R`), `docs/handoff-E2.4c.md` |
 | **E2.5a** repetir o piloto | a parte `competitors` do `04-pilot.R` inteira, com os padrões de D34 a D36, 50 réplicas (15 na `mixed`) e `WAFC_OUT=wafc/cache/e25a`; no handoff, as tabelas de razões contra `wafc.lasso` por célula e `n` (`rmse_f` e ISE), a contagem de falhas por método, a mediana do `J` escolhido, o tempo por método e o tempo total da rodada, e a leitura contra o critério de E2.5 (`plano-projeto.md`): margem no cenário não homogêneo, fator contra o `gam.matched` no suave e no `uneven` | E2.4c | nenhum arquivo versionado além de `docs/handoff-E2.5a.md`; os `.rds` ficam em `wafc/cache/`, que não é versionado. Defeito achado no script vira item do handoff, não edição |
+| **E5c** manuscrito `k = 2` | as edições acumuladas da pergunta 15 do `ESTADO.md`, **todas marcadas** (`\textcolor{gray}{\sout{...}}` e `\textcolor{colR1}{...}`, `instrucoes.md` §3), em `ms_2`, `supp_2` e `references_2`, já criados pelo chat principal: (i) "sieve" trocado conforme D33 e o dicionário de E1.10 (§2 do `ESTADO.md`, bloco de 2026-09-21), com uma menção retida onde `W_J` é definido (~26 ocorrências no `ms`, 5 no `supp`), **com a marcação de D38**: o termo novo em `colR1` e o antigo apagado, sem tachado; a contagem por arquivo vai ao handoff; (ii) a frase da §4.3 sobre a regra teórica, que vira número com E2.3 (`λ_n` de 7 a 13 vezes o `λ` ótimo; a direção do erro de `J_n` depende de `s'`, que não se conhece); (iii) as seis referências de software de L4 copiadas de `docs/referencias-verificadas.bib` e citadas onde a pergunta 26 diz; (iv) a §4.2 alinhada a D23, D26, D35 e ao Lema 10 de E1.3b: o texto hoje diz `ε` "da ordem de `2^{−J}`", e o padrão é `0`, com margem fixa só como opção de amostra finita; (v) a frase de reprodutibilidade, no resumo ou na discussão; (vi) **o Corolário 8 de `derivations/06-selecao-limiar.tex`** (D32), por decisão do autor em 2026-09-30: enunciado na Seção 3, com a hipótese de separação numerada e o texto dizendo que é estimação seguida de limiar, a distinção entre triagem e recuperação, e o Lema 13 com a prova no `supp`; o parágrafo da variante estrutural na §4.3, que hoje diz que a teoria não cobre seleção, passa a remeter a ele. Ficam fora a regra prática do limiar `t_n` (pergunta 11, depende de E2.5) e a observação de E1.7a (pergunta 13). O rótulo do LaTeX segue o mapa de numeração do cabeçalho do `ms_2.tex`, que ganha a linha nova. **Não entra** sem pergunta ao autor no handoff: outro resultado novo ou texto das Seções 5 a 7. Compilar os dois sem referência indefinida | nada (`k = 2` aberto em 2026-09-30) | `manuscript/ms_2.tex`, `manuscript/supp_2.tex`, `manuscript/references_2.bib`, `manuscript/ms_2.pdf`, `manuscript/supp_2.pdf`, `docs/handoff-E5c.md` |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
@@ -107,10 +109,10 @@ A cota inferior para `q ≥ 2`, que o handoff de E1.6 chegou a chamar de E1.8,
 é **E1.9** se algum dia for aberta (a numeração E1.8 ficou com a rota do
 intervalo).
 
-**O manuscrito está vivo em `k = 1`.** Qualquer alteração nele passa pela
-regra do `CLAUDE.md`: perguntar antes se deve nascer `k = 2`, e `ms`, `supp`
-e `references` andam juntos. O mapa da numeração global para os rótulos do
-LaTeX está no cabeçalho do `ms_1.tex`.
+**O manuscrito está vivo em `k = 2`** (aberto em 2026-09-30 para E5c;
+`k = 1` fica intacta). Toda alteração é marcada em `colR1`; `ms`, `supp` e
+`references` andam juntos. O mapa da numeração global para os rótulos do
+LaTeX está no cabeçalho do `ms_2.tex`.
 
 ## 5. Numeração dos resultados
 

@@ -11,10 +11,11 @@ Catalogadas em 2026-09-30, em sequência: **E2.4c** (preparar o
 curso. A decidir pelo
 autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
 (D21).
-**Versão viva do manuscrito:** `k = 1` (`manuscript/ms_1.tex`,
-`supp_1.tex`, `references_1.bib`); a próxima alteração pergunta se cria
-`k = 2`.
-**Cor da rodada corrente:** `colR1` (entra em uso quando existir `k = 2`).
+**Versão viva do manuscrito:** `k = 2` (`manuscript/ms_2.tex`,
+`supp_2.tex`, `references_2.bib`), aberta em 2026-09-30 por decisão do
+autor, cópia de `k = 1` compilando limpa em 28 e 26 páginas; as edições
+são de E5c.
+**Cor da rodada corrente:** `colR1`, em uso desde `k = 2`.
 
 Este documento é o ponto de partida de cada sessão. Ele diz onde o trabalho
 parou, o que já foi decidido (para não reabrir) e o que vem a seguir.
@@ -1187,6 +1188,7 @@ sparse group LASSO paga a mais é estrutura, não erro.**
 | D35 | 09-28 | **A margem padrão do reescalonamento é `eps = 0`** também na base periódica (proposta P2 de E2.4); margem positiva continua disponível pelo argumento | em E2.4, `0.05` custou 12% a 15% no suave, perdendo em 95% a 100% das réplicas, e não ganhou no não homogêneo (0.992 e 0.994); `eps = 0` perde no máximo 2,4% ali e é o único valor com `λ_min(G_eps) = 1`, onde a teoria do manuscrito é enunciada (D26); ratificada pelo autor |
 | D36 | 09-28 | **O `bsgl` escolhe a dimensão por bloco entre `2^J`, `J = 2, …, 8`**, a grade de D34, em vez de 4, 8 e 16; candidato maior que o número de valores distintos de uma moduladora é descartado | com 4, 8 e 16 (isto é, `J ≤ 4`) a comparação que isola a base voltava a medir dimensão, a lição de E6.1a; medido no não homogêneo em `n = 1000`: a grade estendida escolhe 64 e baixa o erro de validação cruzada de 2,129 para 1,958, ao custo de ~60 s contra 0,9 s; ratificada pelo autor (pergunta 30) |
 | D37 | 09-28 | **Nenhuma das duas acelerações da pergunta 29 entra:** o `cv.wafc()` continua calculando o caminho inteiro nas dobras, e o `sparsegl` continua em `thresh = 1e-9` | medido em `07-accel.R`: a validação cruzada em etapas passa no LASSO (255 de 255) mas ganha só 1,5× e fica mais lenta em `n = 1000`, o que não paga truncar o `cvm` devolvido; é reprovada nos grupos (104 de 129); o `1e-8` nos grupos é reprovado pelo critério declarado antes por uma réplica (128 de 129); decisão do autor |
+| D38 | 09-30 | **Marcação da troca de "sieve" (D33) no manuscrito:** o termo que substitui vai em `colR1` e o termo antigo é apagado, sem `\sout` nem cinza; vale só para essa troca, e o resto de `k = 2` segue a marcação do §3 do `instrucoes.md` | decisão do autor: são ~31 ocorrências de uma troca de terminologia já ratificada, e o tachado em cada uma polui o PDF sem informar nada que o azul não diga |
 | D32 | 09-20 | **A seleção de estrutura entra pela limiarização (saída (c)), e a saída (a) não abre agora.** O Corolário 8 de `06-selecao-limiar.tex` é o enunciado do artigo, com a hipótese de separação numerada e dizendo no próprio enunciado que é **estimação seguida de limiar**. A sondagem de E1.7a fica registrada como observação de meia página (a condição em grupos não depende de `J` nem da base), e a saída (a), se voltar depois de E2.5, volta pela rota de Wei & Huang (2010), não pela de Bach | veredito de E1.7a: a redução algébrica tira o risco de a condição falhar por construção, mas não o custo, e exige (BD) mais `E(XX'\|U)` constante, que contraria D13; além disso o valor de (a) continua condicionado a E2.5 escolher a variante em grupos, e E1.7c mostrou o LASSO limiarizado acertando 10 de 10 onde ela acerta 0 de 10 |
 | D31 | 09-20 | **Em avaliação numérica repetida, a base é fixada e avaliada por tabela**, não pelo algoritmo de Daubechies-Lagarias a cada ajuste: construir a tabela uma vez com `WaveBased::wtable()` para o par `(family, filter.size)` e passá-la em `wavelet.table` de `wafc_design()`, em vez de deixar a regra `use.table = "auto"` decidir réplica a réplica. Vale para o piloto (E2.4), o compêndio (E4) e a aplicação (E6). **Exceção:** conferência que mede precisão fina (as de `derivations/check/`, que leem decaimento até `1e-11`) continua com avaliação exata ou tabela com `prec.wavelet` alto, porque ali o `3.1e-06` engoliria o que se quer medir | pedido do autor, e a razão é **tempo de execução**: a tabela é o caminho rápido e a aproximação é boa o bastante (o erro de interpolação medido em E2.1 é `3.1e-06`), de modo que a variação entre os dois caminhos não é problema prático. A regra `auto` só dispara em `n q ≥ 2000 L`, isto é `n q ≥ 16000` com `L = 8`, e portanto **não dispara** nos `n` do piloto: deixá-la decidir significa pagar Daubechies-Lagarias em toda a varredura |
 | D30 | 09-19 | **O cenário suave é para ganhar, não só para não perder.** A hipótese `C^{p+1}` de Xue & Yang delimita a garantia deles, não o desempenho: com `J` e `λ` por validação cruzada o WAFC pode vencer splines também no suave, e E2.4 e E4 têm de medir isso em condição justa — o concorrente sintonizado nos termos dele (nós por BIC como no artigo deles, e `mgcv` com REML), predição e ISE relatadas em separado, e uma componente **suave de curvatura desigual** (gaussiana estreita ou `doppler` truncado longe da singularidade) acrescentada ao `dgp.R`, que é `C^∞` e portanto dentro da hipótese deles, mas com escala variando ao longo do domínio | argumento do autor; se o ganho aparecer, é ilustração forte para o artigo, e se não aparecer, a paridade no suave já é o que a Seção 5 precisa |
@@ -1307,7 +1309,10 @@ Ordenadas pelo que bloqueia mais.
 14. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
 15. **Edições acumuladas para `k = 2`** (decidido: não tocar em `ms_1`
-   avulso). Entram de uma vez: **a troca de "sieve" por "approximation
+   avulso). **`k = 2` aberta em 2026-09-30; as edições são a tarefa E5c**,
+   que acrescenta à lista a §4.2, cujo `ε` "da ordem de `2^{−J}`" contraria
+   D35, e o Corolário 8 de D32 na Seção 3, com a prova no `supp` (decisão
+   do autor, 2026-09-30); a troca de "sieve" segue a marcação de D38. Entram de uma vez: **a troca de "sieve" por "approximation
    space" (D33), que são 25 ocorrências no `ms_1.tex` e 5 no `supp_1.tex`**;
    a frase de §4.3
    sobre a regra teórica, que vira número com o que E2.3 mediu (`λ_n` de 7 a
