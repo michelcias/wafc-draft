@@ -7,7 +7,8 @@ Falta E2.5 (go/no-go) para fechar E2, e **a repetição do piloto (E2.5a)
 devolveu, pelo critério literal, no-go para a variante LASSO**: o block
 LASSO de Klopp & Pensky no mesmo desenho vence no não homogêneo, e o `gam`
 em dimensão casada vence no suave por 1,5 a 1,7 em ISE (§2, pergunta 33).
-A decisão de rumo é do autor. Catálogo vazio. A decidir pelo
+A decisão de rumo é do autor; **E2.5b** (medir o block LASSO com níveis
+livres em todas as células, e a `mixed` com 50 réplicas) está catalogada. A decidir pelo
 autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
 (D21).
 **Versão viva do manuscrito:** `k = 2` (`manuscript/ms_2.tex`,
@@ -1680,7 +1681,8 @@ Ordenadas pelo que bloqueia mais.
    artigo para seleção de estrutura e mudar o alvo para o JCGS. E2.5a
    aponta um candidato anterior a esses: **o block LASSO de K&P com os
    níveis livres**, que já está em `wafc_fit_klopp()` e é a penalidade de
-   D3 com o agrupamento de K&P. Quatro pontos a decidir, nesta ordem:
+   D3 com o agrupamento de K&P. Quatro pontos a decidir, nesta ordem
+   ((a) catalogado como **E2.5b** em 2026-09-30):
    - (a) Medir o `klopp` de níveis livres em todas as células, inclusive o
      nulo e a `mixed`, e a `mixed` com 50 réplicas (custo medido: ~12,5 h
      de processador, 1 a 2 h em 12 núcleos). É medição, não decisão, e é o

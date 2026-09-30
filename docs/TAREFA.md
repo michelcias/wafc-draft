@@ -66,6 +66,7 @@ que ler antes está aqui e no plano.
 | E2.4c preparar o piloto | **fechada** (2026-09-30): célula `uneven`, `gam.matched` por `bam`, `WAFC_TAG`, sementes independentes da restrição; 674 testes, fumaça sem falha | `wafc/scripts/04-pilot.R` |
 | E2.5a repetir o piloto | **fechada** (2026-09-30): 6 450 linhas, 0 falhas; no-go para a variante LASSO pelo critério literal (pergunta 33 do `ESTADO.md`) | `wafc/cache/e25a/` (não versionado), `ESTADO.md` §2 |
 | E5c manuscrito `k = 2` | **fechada** (2026-09-30): pergunta 15 aplicada e marcada, Corolário 8 no artigo (§3.6, S7); 33 e 30 páginas, `.bib` com 37 entradas | `manuscript/ms_2.tex`, `supp_2.tex`, `references_2.bib` |
+| E2.5b medir o block LASSO com níveis livres | **catalogada** (2026-09-30) | §3 |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
@@ -80,17 +81,19 @@ tarefa pode criar ou editar**.
 
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
+| **E2.5b** medir o block LASSO com níveis livres | a medição do item (a) da pergunta 33 do `ESTADO.md`, **sem decisão de rumo**. (i) No `04-pilot.R`: método novo `klopp.free` (`wafc_competitor("klopp", ..., penalize.levels = FALSE)`), ao lado do `klopp`; o `bsgl` passa a registrar a dimensão escolhida (hoje `J` sai `NA`, embora `extra$df` exista); o cabeçalho sai dos custos da grade antiga e passa aos medidos em E2.5a; e dois controles por ambiente, `WAFC_METHODS` (restringe os métodos rodados, sem mudar dados, dobras nem sementes) e `WAFC_REPS_MIXED` (sobrepõe as 15 réplicas da `mixed`). (ii) Rodar, com `WAFC_OUT=wafc/cache/e25b`: nas quatro células `q = 2`, só `wafc.lasso` e `klopp.free`, 50 réplicas, e conferir que o `wafc.lasso` reproduz o `e25a-competitors.rds` linha a linha antes de juntar os dois; na `mixed`, **todos** os métodos com 50 réplicas, conferindo as 15 primeiras contra o `e25a-mixed-competitors.rds`. (iii) No handoff: razões de `rmse_f` e ISE do `klopp.free` contra o `wafc.lasso`, o `klopp` e o `gam.matched` por célula e `n`, frações de vitória, o nulo (onde o `klopp` perdia por 1,31 a 1,43 por penalizar os níveis), o fator do suave contra o `gam.matched`, a tabela inteira da `mixed` em 50 réplicas, o `J` e a dimensão do `bsgl` escolhidos, tempos e memória | E2.5a (os `.rds` de `wafc/cache/e25a/`) | `wafc/scripts/04-pilot.R`, `wafc/R/competitors.R` (só o registro da dimensão do `bsgl` em `extra`), `wafc/tests/test-competitors.R` (idem), `wafc/README.md` (a linha do `04-pilot.R`), `docs/handoff-E2.5b.md`; os `.rds` e logs ficam em `wafc/cache/e25b/`, não versionado |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**O catálogo está vazio.** E2.4c e E2.5a fecharam em 2026-09-30, e a
-repetição do piloto devolveu no-go para a variante LASSO. E2.5 é do chat
-principal e espera a decisão da pergunta 33 do `ESTADO.md`, cujo primeiro
-item (medir o `klopp` de níveis livres em todas as células, com a `mixed`
-em 50 réplicas) é a próxima tarefa candidata.
+**Catalogada em 2026-09-30: E2.5b.** E2.4c e E2.5a fecharam no mesmo dia,
+e a repetição do piloto devolveu no-go para a variante LASSO. E2.5 é do chat
+principal e espera a decisão da pergunta 33 do `ESTADO.md`; E2.5b é o
+primeiro item dela, só medição. Rodar só dois métodos nas células `q = 2`
+é o que as sementes independentes de E2.4c permitem: os dados, as dobras e
+a amostra de teste são os de E2.5a, e o `wafc.lasso` refeito confere isso.
 
 **Ao catalogar, o arquivo vai junto do item.** Duas tarefas seguidas
 esbarraram em coluna de arquivos que não cobria o que o próprio texto
