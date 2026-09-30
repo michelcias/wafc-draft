@@ -7,6 +7,17 @@
 % redigitar; nelas só se acrescentou a linha `doi`, conferida no Crossref.
 % Nada daqui leva mais a nota "[L1: confirmar]".
 %
+% Quarta rodada (L5, 2026-09-30): entraram as duas referências de que a
+% sondagem de E1.11 depende (Hsu, Kakade & Zhang 2012; Cai 1999), a
+% referência de forma do Corolário 8 de E1.7c (van de Geer, Bühlmann &
+% Zhou 2011), a âncora da partição da unidade do Lema 1(i) de E1.2
+% (Mallat 2009) e Restrepo & Leaf (1997), trazido pelo autor. Cada uma foi
+% lida no PDF (em refs/, fora do versionamento) além do Crossref. Os nomes
+% seguem D39: como estão impressos na folha de rosto ou no cabeçalho do
+% próprio trabalho, sem uniformizar entre entradas, e o Crossref só na
+% falta deles; por isso `hardle1998wavelets` passou a "Gerard" e
+% "Alexander", e as outras três entradas com Tsybakov ficaram como estavam.
+%
 % Terceira rodada (L4, 2026-09-19): entraram as referências de que o
 % manuscrito precisa para citar o lasso, o software usado e a referência
 % minimax do modelo de sequência. As de software (R, glmnet, sparsegl,
@@ -248,6 +259,28 @@
   number  = {3},
   pages   = {879--921},
   doi     = {10.1214/aos/1024691081}
+}
+
+% L5 (2026-09-30). O Crossref confere título, autor, veículo, 27(3),
+% `published-print` 1999-06 e DOI, sem páginas; as páginas vêm do cabeçalho
+% do artigo ("The Annals of Statistics 1999, Vol. 27, No. 3, 898-924") e o
+% nome, da linha de autoria ("By T. Tony Cai"). Lido no PDF da editora.
+% Localizações, porque E1.11 o cita: o BlockJS, James-Stein em blocos de
+% tamanho L = log n com limiar 4,50524, é das seções 3 e 4 (Teorema 1,
+% eq. 3.12); a taxa exata em Besov com p >= 2 é o Teorema 3, e com
+% 1 <= p < 2 e alpha >= 1/p o Teorema 4 (eq. 5.4) perde o fator
+% (log n)^((2/p - 1)/(1 + 2 alpha)); a seção 6 compara L = 1, log n e
+% (log n)^(1 + delta), o último atribuído a Hall, Kerkyacharian & Picard
+% (1999), que não está neste arquivo.
+@article{Cai-1999,
+  author  = {Cai, T. Tony},
+  title   = {Adaptive wavelet estimation: a block thresholding and oracle inequality approach},
+  journal = {The Annals of Statistics},
+  year    = {1999},
+  volume  = {27},
+  number  = {3},
+  pages   = {898--924},
+  doi     = {10.1214/aos/1018031262}
 }
 
 % Copiada do WALL (references_theo_1.bib), com uma correção: a entrada de lá
@@ -606,7 +639,30 @@
   doi     = {10.1198/016214506000000735}
 }
 
+% L5 (2026-09-30). O Crossref confere título, autores, veículo, volume 5,
+% `published-print` 2011 e DOI, sem páginas; as páginas vêm do cabeçalho do
+% PDF da editora ("Electronic Journal of Statistics Vol. 5 (2011) 688-749").
+% "Lasso" vai protegido porque o título impresso o grafa com maiúscula.
+% É a referência de forma do Corolário 8 de E1.7c: o LASSO limiarizado com
+% reajuste por mínimos quadrados é a eq. (1.3), p. 691, e o resultado com
+% ruído é o Teorema 3.2, p. 698 (predição, erros l1 e l2 e falsos
+% positivos, sem condição beta-min); os falsos negativos pelo erro l_q são
+% a seção 3.5, e a limiarização sob beta-min fica para Zhou (2010,
+% arXiv:1002.1583), que não está neste arquivo.
+@article{vandeGeer-Buhlmann-Zhou-2011,
+  author  = {van de Geer, Sara and B{\"u}hlmann, Peter and Zhou, Shuheng},
+  title   = {The adaptive and the thresholded {L}asso for potentially misspecified models (and a lower bound for the {L}asso)},
+  journal = {Electronic Journal of Statistics},
+  year    = {2011},
+  volume  = {5},
+  pages   = {688--749},
+  doi     = {10.1214/11-EJS624}
+}
+
 % Páginas conferidas no Semantic Scholar.
+% Grafia conferida em L5 (D39): "Alexandre B. Tsybakov" na linha de autoria
+% das versões 2 e 3 do arXiv:0801.1095 e no Crossref; o cabeçalho do Annals
+% não foi visto (o Project Euclid pede verificação humana).
 @article{Bickel-Ritov-Tsybakov-2009,
   author  = {Bickel, Peter J. and Ritov, Ya'acov and Tsybakov, Alexandre B.},
   title   = {Simultaneous analysis of lasso and {D}antzig selector},
@@ -619,6 +675,10 @@
 }
 
 % Páginas conferidas no Semantic Scholar.
+% Grafia conferida em L5 (D39): "Alexandre B. Tsybakov" no cabeçalho do
+% arXiv:1007.1771v3 e no Crossref. A ordem dos autores é a do Crossref, a
+% publicada; no arXiv, Tsybakov vem antes de van de Geer. O cabeçalho do
+% Annals não foi visto (o Project Euclid pede verificação humana).
 @article{Lounici-Pontil-vandeGeer-Tsybakov-2011,
   author  = {Lounici, Karim and Pontil, Massimiliano and van de Geer, Sara and Tsybakov, Alexandre B.},
   title   = {Oracle inequalities and optimal inference under group sparsity},
@@ -635,6 +695,8 @@
 % publicação online em 2013, fascículo impresso em 2014. Preprint:
 % arXiv:1208.6402. A linha de L2 em literatura.md deixava esses campos
 % como [VERIFICAR].
+% Grafia conferida em L5 (D39): "Alexandre B. Tsybakov" na lista de autores
+% do artigo na página da Springer, no arXiv:1208.6402v3 e no Crossref.
 @article{Dalalyan-Ingster-Tsybakov-2014,
   author  = {Dalalyan, Arnak and Ingster, Yuri and Tsybakov, Alexandre B.},
   title   = {Statistical inference in compound functional models},
@@ -664,15 +726,27 @@
 % (fontes citadas pelas derivações E1.2 a E1.5; entraram em L3)
 % ---------------------------------------------------------------------
 
-% Copiada do WALL (references_theo_1.bib); `doi` acrescentado. O Crossref
-% e o Springer grafam o quarto autor "Alexander Tsybakov"; a entrada do
-% WALL traz "Alexandre" e foi mantida como está, por ser cópia.
+% Copiada do WALL (references_theo_1.bib); `doi` acrescentado. Grafia
+% corrigida em L5 (2026-09-30) por D39: "Gerard Kerkyacharian", sem acento,
+% e "Alexander Tsybakov", como na folha de rosto da versão lida (a do
+% Seminário Paris-Berlim, em refs/), na página do livro na Springer e no
+% Crossref; a folha de rosto da impressão da Springer não foi vista (o PDF
+% das páginas preliminares vem como download). A entrada do WALL continua
+% com "Gérard" e "Alexandre".
 % Localização conferida em L3: cap. 9 "Wavelets and Besov Spaces",
 % pp. 101--124, é onde está a caracterização de Besov por coeficientes.
+% Conferido em L5, na versão do seminário: a partição da unidade (a soma
+% das translações inteiras de phi igual a 1) não está no cap. 5 e não é
+% enunciada em lugar nenhum. Sai do cap. 8 (pp. 71--100 na Springer): o
+% Corolário 8.1(i) dá integral em y de K(x, y) igual a 1 para o núcleo
+% K(x, y) = soma em k de phi(x - k) phi(y - k), o que, com a integral de
+% phi igual a 1, é a identidade; ou as Proposições 8.5(ii), com a eq.
+% (8.25), e 8.6(iii). A numeração é a da versão do seminário, não
+% conferida na impressão.
 @book{hardle1998wavelets,
   title     = {Wavelets, Approximation, and Statistical Applications},
-  author    = {H{\"a}rdle, Wolfgang and Kerkyacharian, G{\'e}rard and
-               Picard, Dominique and Tsybakov, Alexandre},
+  author    = {H{\"a}rdle, Wolfgang and Kerkyacharian, Gerard and
+               Picard, Dominique and Tsybakov, Alexander},
   volume    = {129},
   series    = {Lecture Notes in Statistics},
   year      = {1998},
@@ -693,6 +767,26 @@
   year      = {2012},
   publisher = {Springer},
   doi       = {10.1007/s10208-011-9099-z}
+}
+
+% L5 (2026-09-30). O Crossref confere título, autores, veículo, volume 17,
+% `published-print` 2012 e DOI, e não guarda número nem páginas (o campo
+% `issue` vem "none"); o número do artigo e as páginas vêm do cabeçalho do
+% PDF da editora ("Electron. Commun. Probab. 17 (2012), no. 52, 1-6"). O
+% Crossref grafa "Sham Kakade"; o cabeçalho imprime "Sham M. Kakade", que é
+% o que fica (D39). O artigo substitui o arXiv:1110.2842, que E1.11 leu: o
+% "Theorem 1" de lá é o Teorema 2.1 daqui, e o caso mu = 0 é a Observação
+% 2.2. O enunciado publicado toma A quadrada (n x n), e o do arXiv, m x n;
+% como só Sigma = A'A entra, uma A retangular se reduz a Sigma^(1/2).
+@article{Hsu-Kakade-Zhang-2012,
+  author  = {Hsu, Daniel and Kakade, Sham M. and Zhang, Tong},
+  title   = {A tail inequality for quadratic forms of subgaussian random vectors},
+  journal = {Electronic Communications in Probability},
+  year    = {2012},
+  volume  = {17},
+  number  = {52},
+  pages   = {1--6},
+  doi     = {10.1214/ECP.v17-2079}
 }
 
 % Série, volume e editora conferidos na ficha da SIAM e no registro da
@@ -727,6 +821,57 @@
   address   = {Cambridge},
   note      = {Volume 1; traduzido do francês por D. H. Salinger},
   doi       = {10.1017/CBO9780511623820}
+}
+
+% L5 (2026-09-30). Folha de rosto e página de direitos do PDF: "Stéphane
+% Mallat, with contributions from Gabriel Peyré", Academic Press (selo da
+% Elsevier), Burlington, MA, 2009, ISBN 978-0-12-374370-1. O Crossref
+% registra o DOI do livro (tipo edited-book, sem autor e sem o subtítulo)
+% e o do cap. 7, "Wavelet Bases", pp. 263-376
+% (10.1016/B978-0-12-374370-1.00011-2), com nome e sobrenome trocados.
+% Lido só o cap. 7; as páginas abaixo são as impressas (no PDF de refs/,
+% somar 19). É a âncora do Lema 1(i) de E1.2: o Teorema 7.16 (seção 7.5.1,
+% p. 318) diz que as funções de escala periodizadas de um nível grosso,
+% com as wavelets periodizadas desse nível e dos mais finos, formam base
+% ortogonal de L2[0,1] para todo nível grosso, inclusive aquele em que
+% resta uma só função de escala; logo depois (p. 319) afirma, sem prova,
+% que essa função é identicamente 1. A prova sai do Teorema 7.4 (p. 284), item 4 com k = 0
+% (Fix-Strang): a soma das translações inteiras de phi é constante, igual
+% à integral de phi, e o módulo de phi-chapéu em 0 é 1 (prova do Teorema
+% 7.2, p. 272). Convenção de escala: psi_{j,n}(t) = 2^(-j/2) psi(2^(-j) t - n)
+% com j <= 0, isto é, o j de Mallat é o -j do WAFC.
+@book{Mallat-2009,
+  author    = {Mallat, St{\'e}phane},
+  title     = {A Wavelet Tour of Signal Processing: The Sparse Way},
+  edition   = {Third},
+  year      = {2009},
+  publisher = {Academic Press},
+  address   = {Burlington, MA},
+  isbn      = {978-0-12-374370-1},
+  doi       = {10.1016/B978-0-12-374370-1.X0001-8}
+}
+
+% L5 (2026-09-30), trazido pelo autor. O Crossref confere tudo, inclusive
+% 40(19), 3557-3578 e `published-print` 1997-10-15; os nomes estão como no
+% cabeçalho do artigo ("Juan Mario Restrepo and Gary K. Leaf"). Lido no PDF
+% da editora. Não é âncora da base periodizada: a propriedade (5), p. 3559,
+% dá como base ortonormal de L2(R) as funções de escala de todos os níveis
+% j >= 0, e a proposição do Apêndice II (p. 3575) repete o engano em
+% L2[0,1], com prova; a família certa (escala num nível e wavelets acima)
+% só é afirmada, sem prova (p. 3576). O que ele dá certo: a periodização
+% (seção 2, p. 3560), a partição da unidade como propriedade (10), p. 3559,
+% sem prova e remetida a Daubechies e a Chui, e a prova de que a função de
+% escala periodizada do nível 0 é identicamente 1 (Apêndice II, p. 3575),
+% que se apoia na (10).
+@article{Restrepo-Leaf-1997,
+  author  = {Restrepo, Juan Mario and Leaf, Gary K.},
+  title   = {Inner product computations using periodized {D}aubechies wavelets},
+  journal = {International Journal for Numerical Methods in Engineering},
+  year    = {1997},
+  volume  = {40},
+  number  = {19},
+  pages   = {3557--3578},
+  doi     = {10.1002/(SICI)1097-0207(19971015)40:19<3557::AID-NME227>3.0.CO;2-A}
 }
 
 % Sem DOI. Série, volume, editora e ISBN conferidos na ficha da Elsevier e

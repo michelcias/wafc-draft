@@ -1425,6 +1425,52 @@ os outros (`< 1` é o `klopp.free` melhor), `n = 250`, `500`, `1000`:
   `J` bimodal do `klopp` na `mixed`, que só importa se o `klopp` fiel
   continuar como concorrente.
 
+### 2026-09-30: L5 fechada, a bibliografia curta
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina:
+`referencias-verificadas.bib` com **69 entradas** (eram 64), 69 `\bibitem`
+e zero erro ou aviso de BibTeX. Os seis PDFs de `refs/` foram lidos, e os
+nomes seguem D39.
+
+- **Entraram:** Hsu, Kakade & Zhang (2012, *ECP* 17, no. 52, pp. 1–6, do
+  cabeçalho do PDF; o Crossref não guarda páginas), Cai (1999, 898–924),
+  van de Geer, Bühlmann & Zhou (2011, 688–749), Mallat (2009, 3ª ed.) e
+  Restrepo & Leaf (1997); `hardle1998wavelets` passou a "Gerard" e
+  "Alexander", como na folha de rosto. As outras três entradas com
+  Tsybakov ficam com "Alexandre B.", como nas fontes delas.
+- **A pergunta 22 fecha:** a âncora da partição da unidade é **Mallat
+  (2009, §7.5.1, Teorema 7.16 e p. 319)**, que cobre também a base
+  periodizada com `j_0 = 0`; a prova está no Teorema 7.4 com `k = 0`.
+  Härdle et al. só dão a identidade por dedução no cap. 8, não no 5.
+  **Restrepo & Leaf não serve de âncora:** a propriedade (5) e o Apêndice
+  II afirmam que as funções de escala de todos os níveis formam base
+  ortonormal, o que é falso (`⟨φ̃_{0,0}, φ̃_{1,0}⟩ = 2^{−1/2}`); ficou no
+  `.bib` com o comentário do que não sustenta.
+- **Cai (1999) é a origem dos blocos de tamanho `log n`**, como E1.11 o
+  cita, e o Teorema 4 dele dá o mesmo expoente de E1.11,
+  `(log n)^{(2/π−1)/(2s+1)}`, com a ressalva `α ≥ 1/p` e no modelo de
+  sequência; os blocos em limiarização em geral são de Hall,
+  Kerkyacharian & Picard (1999), não verificado.
+- **Hsu et al.:** o "Theorem 1" do arXiv que E1.11 leu é o **Teorema 2.1**
+  do artigo publicado, que toma `A` quadrada; o `08a` usa `A` retangular, o
+  que não muda a matemática (entra só `Σ = A'A`), mas a citação deve ser ao
+  Teorema 2.1 com essa observação.
+- **van de Geer et al. sustenta a frase de E1.7c** (Teorema 3.2, p. 698),
+  com três diferenças que um referee pode apontar: eles reajustam por
+  mínimos quadrados depois do limiar, limiarizam coordenadas e evitam
+  beta-min.
+- **Correções que ficaram fora da coluna de L5** (pergunta 35): a
+  citação de Mallat no `01-identificabilidade.md`; o Teorema 2.1 de Hsu
+  et al. e as páginas de Cai no `08a-sondagem-blocos.md`; as páginas de van
+  de Geer et al. e a ressalva do reajuste no `06-selecao-limiar.tex`; e,
+  na próxima rodada do manuscrito, Mallat na prova do Lemma 1 do `supp`.
+- **Lições de ferramenta:** o Crossref do *ECP* e da *EJS* não guarda
+  páginas, e perde iniciais do meio (Kakade); o cabeçalho do artigo é a
+  fonte. O Project Euclid pede verificação humana também no navegador
+  embutido. Na extração de texto do Mallat `=` e `≠` viram o mesmo glifo:
+  fórmula se lê na página renderizada. Com o `chicago.bst` os prenomes saem
+  abreviados, de modo que D39 aparece no `.bib`, não no PDF.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1652,7 +1698,10 @@ Ordenadas pelo que bloqueia mais.
    tiver `p` grande, o termo `σ² p / n` deixa de ser de ordem menor e a
    janela do Corolário 5 estreita; mudar isso mexe em E1.3 e E1.4, não só em
    E1.6.
-22. **Bibliografia, pontos de L3** (nenhum bloqueia): a identidade
+22. **~~Bibliografia, pontos de L3~~ fechada por L5 (2026-09-30, §2):**
+   âncora em Mallat (2009, §7.5.1); Tsybakov por D39. Resta só levar a
+   correção de `hardle1998wavelets` ao WALL, se o autor quiser (pergunta
+   35). Texto original: (nenhum bloqueia) a identidade
    `Σ_l φ(x − l) ≡ 1`, usada na prova do Lema 1(i) de E1.2, ficou **sem
    âncora** — a expressão não ocorre em Daubechies (1992), a quem estava
    atribuída, e os candidatos a conferir são Härdle et al. (1998, cap. 5) e
@@ -1786,7 +1835,8 @@ Ordenadas pelo que bloqueia mais.
      Theorem 1. Enunciado novo: acrescentar?
    - (d) Levar o Lema 10 ao `supp` como Proposition S3.2, com o expoente
      exato e a observação sobre a margem acoplada a `J`?
-   - (e) **Catalogado como L5** (2026-09-30), com as duas referências de
+   - (e) **~~Catalogado como L5~~ verificado por L5 (2026-09-30):** Teorema
+     3.2, pp. 688–749. Texto original: catalogado como L5, com as duas referências de
      E1.11 e a pergunta 22. van de Geer, Bühlmann & Zhou (2011), o LASSO limiarizado, é a
      âncora natural do procedimento em dois passos, mas não está verificado
      (faltam as páginas). Frente curta de bibliografia?
@@ -1838,6 +1888,24 @@ Ordenadas pelo que bloqueia mais.
    E2.5b. É uma linha em `wafc_kp_groups()` ou `wafc_fit_klopp()`, arquivos
    de E2.5b; abre depois dela. **Catalogada como E2.5c** (2026-09-30).
 
+35. **Pendências de L5** (2026-09-30), nenhuma bloqueando:
+   - (a) Levar as correções bibliográficas aos `derivations/`: Mallat
+     (2009, §7.5.1) na prova do Lema 1(i) do `01-identificabilidade.md`;
+     Hsu et al. como Teorema 2.1, com a nota da `A` quadrada, e Cai com
+     páginas e Teorema 4 no `08a-sondagem-blocos.md`; páginas e Teorema 3.2
+     de van de Geer et al., e a ressalva do reajuste, no
+     `06-selecao-limiar.tex` (recompilar o PDF). Tarefa curta, sem conflito
+     com as de medição.
+   - (b) Na próxima rodada do manuscrito, Mallat (2009) na prova do Lemma 1
+     do `supp`; Hsu et al. e Cai só se a variante em blocos for adotada.
+   - (c) O `hardle1998wavelets` do WALL continua com "Gérard" e
+     "Alexandre"; levar D39 ao `references_theo_1.bib` de lá é decisão do
+     autor. "Gerard" sem acento veio da versão do seminário, da página da
+     Springer e do Crossref; a folha de rosto da impressão não foi vista.
+   - (d) Hall, Kerkyacharian & Picard (1999, *Statist. Sinica* 9) e Zhou
+     (2010, arXiv:1002.1583) não verificados; entram só se o manuscrito
+     precisar.
+
 ---
 
 ## 5. Próximos passos
@@ -1880,6 +1948,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-30 | L5 fechada e integrada: `.bib` com 69 entradas; a partição da unidade ancorada em Mallat (2009); Cai (1999) confere com E1.11; Restrepo & Leaf não serve para a base; D39 aplicada; pergunta 35 |
 | 2026-09-30 | E2.5b fechada e integrada: o `klopp.free` vence o `wafc.lasso` em toda célula com componente e empata no nulo, reprodução exata de E2.5a; a `mixed` em 50 réplicas confirma o `gam.matched`; a máquina tem 8 núcleos físicos; E2.5c e E2.5d ganham regras de concorrência |
 | 2026-09-30 | E1.11 fechada e integrada: o oráculo de E1.5 transfere para o block LASSO com níveis livres sem cone, e o Corolário 5 ganha `(log n)^{2s'/(2s+1)}`, sem logaritmo em `π ≥ 2`; a teoria cobre pesos 1, e o `grpreg` usa `sqrt(\|G\|)` (pergunta 34) |
 | 2026-09-30 | E2.5a fechada e integrada (6 450 linhas, 0 falhas, 5 h de relógio): no-go para a variante LASSO pelo critério literal; o `klopp` vence no não homogêneo porque D34 lhe deu a grade larga, e o ganho é do agrupamento; o `gam` casado vence no suave por 1,5 a 1,7 em ISE; D30 não se confirma; pergunta 33 |

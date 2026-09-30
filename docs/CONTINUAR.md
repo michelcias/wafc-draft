@@ -139,10 +139,10 @@ Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 
   `supp_2.tex` compilam limpos, em 33 e 30 páginas, com as edições de E5c
   marcadas em `colR1` (inclusive o Corolário 8 na §3.6); as pendências
   dela são a pergunta 32 do `ESTADO.md`.
-- **Bibliografia:** 63 entradas verificadas (L1, L3 e L4); nada pendente.
+- **Bibliografia:** 69 entradas verificadas (L1, L3, L4 e L5); pendências na pergunta 35 do `ESTADO.md`.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** E2.5c (os pesos do block LASSO), E2.5d (o `gam` autônomo) e L5 (bibliografia), em paralelo; E2.5b fechou em 2026-09-30; E2.4c, E2.5a e E1.11 fecharam em 2026-09-30;
+- **Catálogo:** E2.5c (os pesos do block LASSO) e E2.5d (o `gam` autônomo), em paralelo; E2.5b e L5 fecharam em 2026-09-30; E2.4c, E2.5a e E1.11 fecharam em 2026-09-30;
   detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
