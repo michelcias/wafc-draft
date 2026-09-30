@@ -1990,7 +1990,9 @@ Ordenadas pelo que bloqueia mais.
    pesos 1 da teoria são a pior forma na predição; o padrão do `grpreg`
    vence no suave e a junção dos níveis grossos no não homogêneo e na
    `mixed`. A quarta forma que talvez reconcilie teoria e prática é
-   conjectura (§2). Texto original: (de E1.11, 2026-09-30) o `klopp` e o
+   conjectura (§2), **catalogada como E2.5e** (2026-09-30), com a parte
+   teórica de saber se E1.11 aceita pesos de razão limitada. Texto
+   original: (de E1.11, 2026-09-30) o `klopp` e o
    `klopp.free` do código usam os pesos `sqrt(|G|)` do `grpreg`; a teoria
    de E1.11 cobre pesos 1, os de K&P, e com `sqrt(|G|)` a cota volta à
    ordem do LASSO. **E2.5b roda com `sqrt(|G|)`.** Antes de a pergunta 33

@@ -71,6 +71,7 @@ que ler antes está aqui e no plano.
 | E2.5c os pesos do block LASSO | **fechada** (2026-09-30): os pesos 1 da teoria predizem pior; `grpreg` melhor no suave, níveis grossos juntos no não homogêneo e na `mixed`; 696 testes | `wafc/R/competitors.R`, `wafc/cache/e25c/` |
 | E2.5d o `gam` autônomo | **fechada** (2026-09-30): empata com o `gam.matched`, confirma E2.5a, fator do suave pior; reprodução exata | `wafc/scripts/09-gam-autonomo.R`, `wafc/cache/e25d/` |
 | L5 bibliografia curta | **fechada** (2026-09-30): 69 entradas; a partição da unidade ancorada em Mallat (2009); D39 aplicada | `referencias-verificadas.bib`, `literatura.md` |
+| E2.5e pedaços balanceados | **catalogada** (2026-09-30) | §3 |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
@@ -85,13 +86,14 @@ tarefa pode criar ou editar**.
 
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
+| **E2.5e** pedaços balanceados | a quarta forma do block LASSO proposta por E2.5c, **sem decisão de rumo**. (i) Em `wafc_kp_groups()` e `wafc_fit_klopp()`: opção que junta num pedaço só os níveis com `2^j < b_n` de cada bloco (como `merge.coarse`) **e** absorve a sobra de cada nível mais fino no pedaço anterior do mesmo nível, de modo que todo pedaço tenha tamanho entre `b_n` e `2 b_n` (dizer no roxygen o tamanho do pedaço grosso, `2^{j*+1} − 1`, e o caso em que ele fica abaixo de `b_n`); pesos do `grpreg` e níveis livres; teste contra vetores montados à mão em `b_n = 6` e `7`, e de que as opções antigas não mudam a `1e-12`. (ii) No `04-pilot.R`: método `klopp.balanced`. (iii) Rodar com `WAFC_OUT=wafc/cache/e25e`, `WAFC_METHODS=klopp.balanced`, as cinco células, 50 réplicas (`WAFC_REPS_MIXED=50`), 8 processos, e o `klopp.free` refeito só na `smooth` para provar a junção ao `wafc/cache/e25c/e25c-joined.rds`. (iv) **A parte teórica, curta:** dizer se o argumento de E1.11 (calibração em blocos, Teorema 1 em blocos, risco ideal por pedaços) aceita pesos `w_G` com razão `max w_G / min w_G` limitada, e com que constante; escrever como seção nova no fim de `derivations/08a-sondagem-blocos.md`, sem mudar o resto do arquivo, e conferir numericamente em `check/08a-blocos.R` o que for afirmado com número (a cobertura da calibração com esses pesos, na forma densa, `n ≤ 500`). (v) No handoff: o `klopp.balanced` contra `klopp.free`, `klopp.merged`, `klopp.unit`, `wafc.lasso`, `gam.matched` e `gam.k128` (de E2.5d), por célula e `n`, `rmse_f` e ISE, frações de vitória, o nulo, o fator do suave, a `mixed`, o `J` escolhido, o tempo, e o veredito teórico | E2.5c (os `.rds` de `wafc/cache/e25c/`) | `wafc/R/competitors.R`, `wafc/tests/test-competitors.R`, `wafc/scripts/04-pilot.R`, `wafc/README.md` (as linhas desses três), `derivations/08a-sondagem-blocos.md` (só a seção nova), `derivations/check/08a-blocos.R` (só a parte nova, e o `OK` final continua valendo), `docs/handoff-E2.5e.md`; os `.rds` em `wafc/cache/e25e/`, não versionado |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**O catálogo está vazio** (2026-09-30). A repetição do piloto (E2.4c,
+**Catalogada: E2.5e** (2026-09-30), a última medição antes da decisão da pergunta 33. A repetição do piloto (E2.4c,
 E2.5a) devolveu no-go para a variante LASSO, e as medições que a pergunta
 33 do `ESTADO.md` pedia fecharam no mesmo dia: E2.5b (o block LASSO com
 níveis livres), E2.5c (os pesos), E2.5d (o `gam` autônomo), E1.11 (a
