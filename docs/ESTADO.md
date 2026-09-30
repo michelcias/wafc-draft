@@ -1721,7 +1721,8 @@ Ordenadas pelo que bloqueia mais.
      Theorem 1. Enunciado novo: acrescentar?
    - (d) Levar o Lema 10 ao `supp` como Proposition S3.2, com o expoente
      exato e a observação sobre a margem acoplada a `J`?
-   - (e) van de Geer, Bühlmann & Zhou (2011), o LASSO limiarizado, é a
+   - (e) **Catalogado como L5** (2026-09-30), com as duas referências de
+     E1.11 e a pergunta 22. van de Geer, Bühlmann & Zhou (2011), o LASSO limiarizado, é a
      âncora natural do procedimento em dois passos, mas não está verificado
      (faltam as páginas). Frente curta de bibliografia?
    - (f) A frase de reprodutibilidade ganha endereço quando houver (E3.3,
@@ -1756,8 +1757,8 @@ Ordenadas pelo que bloqueia mais.
    - (c) O fator do suave. Medido contra o `gam.matched`: 1,67 a 1,69
      (`smooth`) e 1,50 a 1,60 (`uneven`) para o LASSO; 1,45 a 1,61 e 1,31
      a 1,38 para o `klopp`. Com 1,5, os dois reprovam no `smooth`.
-   - (d) O `gam.matched` herda o `J` da busca do WAFC na mesma réplica, e
-     não é método autônomo; E4 precisa de um `gam` que escolha `k` sozinho
+   - (d) **Catalogado como E2.5d** (2026-09-30). O `gam.matched` herda o
+     `J` da busca do WAFC na mesma réplica, e não é método autônomo; E4 precisa de um `gam` que escolha `k` sozinho
      (REML com `k` generoso é a prática usual, não medida aqui).
 
 34. **Os pesos do block LASSO** (de E1.11, 2026-09-30). O `klopp` e o

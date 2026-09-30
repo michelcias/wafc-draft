@@ -34,4 +34,6 @@ wafc/cache/
 
 # Local scratch (never versioned)
 scratch/
+# PDFs of references, for reading only (copyright; never versioned)
+refs/
 docs/handoff-*.md.bak
