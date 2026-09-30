@@ -101,6 +101,7 @@ Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 mi
 Rscript wafc/scripts/04-pilot.R 5 competitors 8 250 smooth   # fumaça do piloto, ~1 min
 Rscript wafc/scripts/04-pilot.R 50 all 12                    # o piloto inteiro de E2.4, ~3 h em 12 núcleos com a grade antiga
 WAFC_OUT=wafc/cache/e25a WAFC_TAG=e25a Rscript wafc/scripts/04-pilot.R 50 competitors 12 "" smooth,inhomogeneous,null,uneven   # E2.5a, parte 1: ~4 h em 12 núcleos
+# variáveis do 04-pilot.R: WAFC_OUT (pasta), WAFC_TAG (prefixo dos .rds), WAFC_METHODS (só estes métodos, sem mudar dados nem sementes), WAFC_REPS_MIXED (réplicas da mixed); máquina com 8 núcleos físicos
 WAFC_OUT=wafc/cache/e25a WAFC_TAG=e25a-mixed Rscript wafc/scripts/04-pilot.R 50 competitors 4 "" mixed                       # E2.5a, parte 2: ~1 h em 4 núcleos, pico de 1,35 GB por processo
 Rscript wafc/scripts/05-sondagem-aplicacao.R all           # a sondagem de E6.1a, horas; baixa os dados
 Rscript wafc/scripts/06-timing.R                             # só tempo, curto
@@ -141,7 +142,7 @@ Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 
 - **Bibliografia:** 63 entradas verificadas (L1, L3 e L4); nada pendente.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** E2.5b (medir o block LASSO com níveis livres) e, depois dela, E2.5c (os pesos do block LASSO); em paralelo, E2.5d (o `gam` autônomo) e L5 (bibliografia); E2.4c, E2.5a e E1.11 fecharam em 2026-09-30;
+- **Catálogo:** E2.5c (os pesos do block LASSO), E2.5d (o `gam` autônomo) e L5 (bibliografia), em paralelo; E2.5b fechou em 2026-09-30; E2.4c, E2.5a e E1.11 fecharam em 2026-09-30;
   detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de

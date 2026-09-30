@@ -8,7 +8,8 @@ devolveu, pelo critério literal, no-go para a variante LASSO**: o block
 LASSO de Klopp & Pensky no mesmo desenho vence no não homogêneo, e o `gam`
 em dimensão casada vence no suave por 1,5 a 1,7 em ISE (§2, pergunta 33).
 A decisão de rumo é do autor; **E2.5b** (medir o block LASSO com níveis
-livres em todas as células, e a `mixed` com 50 réplicas) está em curso;
+livres em todas as células, e a `mixed` com 50 réplicas) **fechou**: o
+block LASSO de níveis livres vence o LASSO em toda célula com componente;
 **E1.11** fechou: a teoria transfere para os blocos e a taxa melhora, com
 pesos 1 (pergunta 34). A decidir pelo
 autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
@@ -1364,6 +1365,66 @@ da pergunta 33(b) cai.**
   `W(𝒢_0)`, `Ψ̃_G`, `R_𝒢(θ; η)`, `λ_n^𝒢`; a lista com as razões está na §3
   do handoff, reproduzida no `08a`.
 
+### 2026-09-30: E2.5b fechada, o block LASSO com níveis livres medido
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: **678 testes
+passam** (eram 674); `e25b-joined.rds` tem 8 250 linhas, e as razões do
+`klopp.free` contra o `wafc.lasso` em `n = 1000` reproduzem (0,926, 0,939,
+0,959, 1,000, 0,916). O `wafc.lasso` refeito nas quatro células bate com
+E2.5a nas 600 linhas, e as 15 primeiras réplicas da `mixed` batem nas 450,
+**diferença 0 em toda coluna e todo método, inclusive o `vcbart`**. 0
+falhas em 2 850 linhas. Para `WAFC_METHODS` não mover nada, o gerador é
+restaurado ao estado deixado pelas dobras antes de cada método; é isso que
+torna legítimo acrescentar um método a uma tabela antiga sem refazê-la, e
+economizou ~40 h de processador aqui. O `bsgl` passou a registrar a
+dimensão escolhida.
+
+Mediana da razão dentro da réplica, `rmse_f` / ISE, `klopp.free` contra
+os outros (`< 1` é o `klopp.free` melhor), `n = 250`, `500`, `1000`:
+
+| célula | contra `wafc.lasso` | contra `gam.matched` |
+|---|---|---|
+| smooth | 0.934, 0.957, 0.926 / 0.864, 0.911, 0.856 | 1.215, 1.220, 1.233 / 1.492, 1.545, 1.590 |
+| uneven | 0.940, 0.901, 0.939 / 0.882, 0.813, 0.873 | 1.133, 1.139, 1.169 / 1.299, 1.306, 1.358 |
+| inhomogeneous | 0.951, 0.947, 0.959 / 0.898, 0.902, 0.922 | 0.994, 0.959, 0.943 / 0.987, 0.904, 0.870 |
+| null | 0.996, 1.000, 1.000 / 0.560, 0.822, 0.910 | 0.999, 0.925, 0.975 / 1.183, 0.499, 0.727 |
+| mixed (50 réplicas) | 0.944, 0.909, 0.916 / 0.893, 0.826, 0.842 | 1.013, 0.998, 0.995 / 1.023, 1.008, 1.004 |
+
+- **O item (a) da pergunta 33 está respondido.** Onde há componente, o
+  `klopp.free` vence o `wafc.lasso` em toda célula e todo `n`: 4% a 10% em
+  `rmse_f`, 8% a 19% em ISE, em 78% a 100% das réplicas. No nulo empata
+  (cara ou coroa: vence em 54%, 50% e 48%), e **a penalização dos níveis
+  explica a derrota inteira do `klopp` ali** (1,31 a 1,43 em E2.5a).
+- **Contra o `gam.matched`:** vence no não homogêneo a partir de `n = 500`
+  (4% a 6% em `rmse_f`, 10% a 13% em ISE, 70% a 84% das réplicas), empata
+  na `mixed`, e perde no suave. O fator de ISE fica em 1,49 a 1,59 no
+  `smooth` e 1,30 a 1,36 no `uneven`; com o fator 1,5, passa no `uneven` e
+  na `mixed` e reprova no `smooth` em `n ≥ 500`.
+- **Contra o `klopp` fiel a K&P**, soltar os níveis compra pouco nas
+  células `q = 2` (0,984 a 0,997 em `rmse_f`), fora a `mixed` em
+  `n = 1000`, onde o `klopp` escolhe `J = 5` em 29 de 50 réplicas, numa
+  distribuição bimodal sem nenhum `J = 6`, e perde por 0,832. A causa não
+  está identificada.
+- **A `mixed` em 50 réplicas confirma E2.5a:** o `gam.matched` vence o
+  `wafc.lasso` em 49 de 50 réplicas em `n = 1000`; tomando o melhor dos
+  sete concorrentes em cada réplica, o `wafc.lasso` o vence em 0% das
+  réplicas nos três `n`, e, nas cinco células, em uma réplica de 600 com
+  componente. Quinze réplicas moveram medianas em até 0,043.
+- **Custo:** as quatro células com dois métodos, 42 min em 12 núcleos; a
+  `mixed` inteira em 50 réplicas, 2 h 02 min em 8 núcleos (15,7 h de
+  processador, pico de 1,49 GB por processo). O `klopp.free` custa ~1,26
+  vez o `klopp`.
+- **Lição de máquina:** esta tem **8 núcleos físicos** e 16 fios; acima de
+  8 processos cada um fica ~25% mais lento, e a estimativa de custo tem de
+  contar isso (a `mixed` estimada em 12,5 h levou 15,7 h). Com a grade
+  `2:8`, a `mixed` custa por tarefa o mesmo que as outras células, e o
+  orçamento de 15 réplicas deixou de ter razão de custo.
+- **Pendências de E2.5b** (nenhuma bloqueia): a dimensão do `bsgl` nas
+  células `q = 2` não foi medida (~50 min em 12 núcleos, rodando só ele);
+  o padrão de 15 réplicas da `mixed` no script (50 daqui em diante?); e o
+  `J` bimodal do `klopp` na `mixed`, que só importa se o `klopp` fiel
+  continuar como concorrente.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1745,10 +1806,12 @@ Ordenadas pelo que bloqueia mais.
    D3 com o agrupamento de K&P. Quatro pontos a decidir, nesta ordem
    ((a) catalogado como **E2.5b** e a sondagem teórica de (b) como
    **E1.11**, ambos em 2026-09-30, em paralelo; E1.11 fechou no mesmo dia):
-   - (a) Medir o `klopp` de níveis livres em todas as células, inclusive o
-     nulo e a `mixed`, e a `mixed` com 50 réplicas (custo medido: ~12,5 h
-     de processador, 1 a 2 h em 12 núcleos). É medição, não decisão, e é o
-     que as outras três pedem.
+   - (a) **~~Medir o `klopp` de níveis livres~~ feito por E2.5b
+     (2026-09-30, §2):** vence o `wafc.lasso` em toda célula com componente
+     (4% a 10% em `rmse_f`), empata no nulo, empata com o `gam.matched` na
+     `mixed`, vence-o no não homogêneo a partir de `n = 500` e perde no
+     suave (ISE 1,49 a 1,59 no `smooth`, 1,30 a 1,36 no `uneven`). Falta a
+     forma com pesos 1, que é a da teoria (pergunta 34, E2.5c).
    - (b) O `klopp` conta como concorrente ou como variante do WAFC? Mesma
      base, mesmo desenho, outra penalidade. Adotá-lo não contraria D18 (o
      artigo já se diz extensão de K&P), mas muda o que "o WAFC" é.
@@ -1817,6 +1880,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-30 | E2.5b fechada e integrada: o `klopp.free` vence o `wafc.lasso` em toda célula com componente e empata no nulo, reprodução exata de E2.5a; a `mixed` em 50 réplicas confirma o `gam.matched`; a máquina tem 8 núcleos físicos; E2.5c e E2.5d ganham regras de concorrência |
 | 2026-09-30 | E1.11 fechada e integrada: o oráculo de E1.5 transfere para o block LASSO com níveis livres sem cone, e o Corolário 5 ganha `(log n)^{2s'/(2s+1)}`, sem logaritmo em `π ≥ 2`; a teoria cobre pesos 1, e o `grpreg` usa `sqrt(\|G\|)` (pergunta 34) |
 | 2026-09-30 | E2.5a fechada e integrada (6 450 linhas, 0 falhas, 5 h de relógio): no-go para a variante LASSO pelo critério literal; o `klopp` vence no não homogêneo porque D34 lhe deu a grade larga, e o ganho é do agrupamento; o `gam` casado vence no suave por 1,5 a 1,7 em ISE; D30 não se confirma; pergunta 33 |
 | 2026-09-30 | Documentos alinhados ao estado depois de E5c e E2.4c: frase-tese e respostas ao referee do `alvo-revista.md` passam à limiarização (D32) e à §4.3 do `ms_2`; E2.5 e E5c no `plano-projeto.md`; `notacao.md` sem "sieve" e com o `\E` em romano já feito; E1.9 no lugar de E1.8 na pergunta 20 |

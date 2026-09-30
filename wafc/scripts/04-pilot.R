@@ -39,17 +39,36 @@
 ## file name ("e24" by default, the name of the files of step E2.4). The
 ## rerun of step E2.5a sets both, and so leaves the files of E2.4 alone.
 ##
+## Two more restrict the part 'competitors' without touching what it draws
+## (step E2.5b). WAFC_METHODS is a comma separated subset of the methods
+## below: the others are not run, and the data, the folds, the test sample
+## and the random stream each method starts from are the ones of the full
+## run, so a method added later can be run alone and joined to an earlier
+## table, and the rows of a method run twice coincide. 'gam.matched' needs
+## the J of 'wafc.lasso' and cannot be run without it. WAFC_REPS_MIXED
+## replaces the 15 replicates of the cell "mixed"; the seeds are numbered
+## by replicate, so its first 15 are the ones of a run with 15.
+##
 ## Default: 50 replicates, every part, as many cores as the machine has
-## minus two, with one exception that is measured and not guessed. The cell
-## "mixed" has p q = 16 blocks and up to 500 columns, and the cross-
-## validation of the WAFC over (J, lambda) costs there what a whole other
-## cell costs: at n = 250 one replicate of it spends 71.6 s on the sparse
-## group LASSO and 28.7 s on the LASSO, against 4.5 s on the B-spline group
-## LASSO and 6.9 s on the block LASSO, and about 27 minutes of processor
-## over the three sample sizes. Fifty replicates of that cell would be 23
-## processor-hours, against 3 for the other three together, so it carries
-## its own budget, the 'reps' field of the list below. The cells that
-## carry the verdict of step E2.5 keep the 50 the plan asks for.
+## minus two, and 15 replicates in the cell "mixed". That budget was fixed
+## in step E2.4, when the grid of J stopped at ceiling(log2(n)/2) and one
+## replicate of that cell cost 27 minutes of processor over the three
+## sample sizes, 23 processor-hours for 50 against 3 for the other three
+## cells together. With the grid 2:8 (decision D34) that is no longer so.
+## Measured in step E2.5a, part 'competitors': the four cells with q = 2
+## took 49.1 processor-hours for 600 replicate-by-n jobs (4 h 08 min on 12
+## cores), and the cell "mixed" 3.75 for 45 (1 h on 4 cores), about five
+## minutes of processor per job in both, because the cells with q = 2 now
+## go deep in J and the WAFC does not choose J = 8 in the mixed one. Of the
+## 52 hours, the sparse group LASSO took 22.2 (42%) and the B-spline group
+## LASSO 10.9; the WAFC with the LASSO takes 7 to 26 s per fit, search
+## included. What the mixed cell still has is memory: 'gam.matched' at
+## J = 8 there with n = 1000 ran past 15 minutes and 3 to 4 GB per process
+## (step E2.4c), against a peak of 1.35 GB in E2.5a, where the WAFC chose
+## J <= 7. The 15 stay the default so that a rerun reproduces E2.5a. With
+## WAFC_REPS_MIXED = 50 and every method, step E2.5b took 15.7 processor-
+## hours (2 h 02 min on 8 cores) and peaked at 1.49 GB per process; the
+## WAFC chose J = 8 in none of the 150 jobs.
 ##
 ## The two parts that answer a question about the code rather than about
 ## the method, 'margin' and 'j1', are capped at 20 replicates:
@@ -140,6 +159,15 @@ cells_all <- list(
   list(name = "null", scenario = "null", p = 3L, q = 2L, sigma = 0.62),
   list(name = "uneven", scenario = "uneven", p = 3L, q = 2L, snr = 4)
 )
+reps_mixed <- Sys.getenv("WAFC_REPS_MIXED", "")
+if (nzchar(reps_mixed)) {
+  reps_mixed <- as.integer(reps_mixed)
+  if (is.na(reps_mixed) || reps_mixed < 1L) {
+    stop("WAFC_REPS_MIXED must be a positive integer.", call. = FALSE)
+  }
+  im <- match("mixed", vapply(cells_all, `[[`, "", "name"))
+  cells_all[[im]][["reps"]] <- reps_mixed
+}
 cell_index <- function(cell) {
   match(cell[["name"]], vapply(cells_all, `[[`, "", "name"))
 }
@@ -153,9 +181,30 @@ if (length(args) >= 5L && nzchar(args[5L])) {
 ## 'gam' is mgcv at the default k = 10, the column of the table of E2.4,
 ## kept to read the rerun against it; 'gam.matched' is the same model at the
 ## dimension of the WAFC (step E6.1a showed that the difference between the
-## two can be the whole verdict). The order is the order of the tables.
+## two can be the whole verdict). 'klopp.free' is the block LASSO of Klopp
+## and Pensky with the level terms left unpenalized, as decision D3 leaves
+## them in the WAFC (step E2.5b): step E2.5a found 'klopp' ahead of the
+## WAFC wherever there are components, and behind it in the null scenario,
+## where penalizing the levels shrinks them. The order is the order of the
+## tables; a method added later goes after the one it varies, which changes
+## no seed, since the random stream of every method is the one it would
+## start from alone (run_competitors()).
 methods <- c("wafc.lasso", "wafc.sglasso", "gam", "gam.matched", "bsgl",
-             "klopp", "aspline", "vcbart", "linear", "oracle")
+             "klopp", "klopp.free", "aspline", "vcbart", "linear", "oracle")
+run_methods <- methods
+if (nzchar(Sys.getenv("WAFC_METHODS", ""))) {
+  run_methods <- strsplit(Sys.getenv("WAFC_METHODS"), ",", fixed = TRUE)[[1L]]
+  bad <- setdiff(run_methods, methods)
+  if (length(bad) > 0L) {
+    stop("Unknown method(s) in WAFC_METHODS: ", paste(bad, collapse = ", "),
+         call. = FALSE)
+  }
+  if ("gam.matched" %in% run_methods && !("wafc.lasso" %in% run_methods)) {
+    stop("'gam.matched' needs the J of 'wafc.lasso'; add it to WAFC_METHODS.",
+         call. = FALSE)
+  }
+  run_methods <- methods[methods %in% run_methods]
+}
 
 ## ---------------------------------------------------------------------------
 ## Shared machinery
@@ -276,12 +325,21 @@ run_competitors <- function(cell, n, r) {
   set.seed(seed + 77L)
   foldid <- sample(rep_len(1:10, n))
   rows <- list()
+  ## Every method starts from the random stream left by the folds, so that
+  ## what one method draws (vcbart is the one that draws) does not depend on
+  ## which methods ran before it: that is what lets WAFC_METHODS restrict the
+  ## run and a method be inserted in the list without moving anything.
+  ## Nothing before vcbart draws, so its rows are the ones of E2.5a.
+  rng <- get(".Random.seed", envir = globalenv())
+  from_start <- function() assign(".Random.seed", rng, envir = globalenv())
 
   ## The two WAFC variants, tuned by cross-validation over (J, lambda),
   ## which decision D20 made the default rule. The resolution the LASSO
   ## selects is kept for 'gam.matched' below.
   J_lasso <- NULL
   for (pen in c("lasso", "sglasso")) {
+    if (!(paste0("wafc.", pen) %in% run_methods)) next
+    from_start()
     t0 <- proc.time()[["elapsed"]]
     cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], penalty = pen,
                       foldid = foldid, wavelet.table = wafc_pilot_table),
@@ -316,9 +374,11 @@ run_competitors <- function(cell, n, r) {
   ## wafc_fit_gam()). Its row carries that J, and its time is the time of
   ## the spline fit alone: the search that chose J is paid, and reported, in
   ## the column of the WAFC. Without a J to match, it fails as a row.
-  for (lab in setdiff(methods, c("wafc.lasso", "wafc.sglasso"))) {
-    mth <- sub("\\.matched$", "", lab)
-    own <- list()
+  ## 'klopp.free' is 'klopp' with penalize.levels = FALSE.
+  for (lab in setdiff(run_methods, c("wafc.lasso", "wafc.sglasso"))) {
+    from_start()
+    mth <- sub("\\.(matched|free)$", "", lab)
+    own <- if (lab == "klopp.free") list(penalize.levels = FALSE) else list()
     if (lab == "gam.matched") {
       if (is.null(J_lasso)) {
         err <- try(stop("wafc.lasso failed, so there is no J to match"),
@@ -700,6 +760,8 @@ if ("competitors" %in% parts) {
                    "n_true", "n_false", "J", "time"),
             c("cell", "n", "method")),
         row.names = FALSE, digits = 3)
+}
+if ("competitors" %in% parts && "wafc.lasso" %in% run_methods) {
   cat("\nrelative to the WAFC with the LASSO (rmse_f, median of the ratios",
       "within replicate):\n")
   base <- res[res[["method"]] == "wafc.lasso",

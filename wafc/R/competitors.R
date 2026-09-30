@@ -447,7 +447,10 @@ wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1,
 #'   \code{"grLasso"} is the group LASSO.
 #' @param ... Further arguments to \code{\link[grpreg]{cv.grpreg}}.
 #'
-#' @return An object of class \code{"wafc_competitor"}.
+#' @return An object of class \code{"wafc_competitor"}, whose \code{extra}
+#'   carries the dimension chosen, \code{df}, and \code{J = log2(df)}, the
+#'   level of the WAFC block with as many columns (\code{NA} when \code{df}
+#'   is not a power of two).
 #'
 #' @examples
 #' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
@@ -530,10 +533,17 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
     }
     out
   }
+  ## The dimension chosen is also recorded as the level J of the WAFC block
+  ## with as many columns (2^J basis functions, 2^J - 1 after centring), so
+  ## the pilot can read it in the column it reads the J of the others from;
+  ## a candidate that is not a power of two has no such level.
+  Jd <- log2(d)
   list(fit = best[["cv"]], cc = cc, beta = beta_fun, g = g_of, blocks = nz,
        fitted = as.numeric(a0 + rowSums(x * beta_fun(u))), intercept = a0,
        xnames = xn, unames = un,
-       extra = list(df = d, lambda = best[["cv"]][["lambda.min"]],
+       extra = list(df = d,
+                    J = if (Jd == round(Jd)) as.integer(Jd) else NA_integer_,
+                    lambda = best[["cv"]][["lambda.min"]],
                     cve = best[["cve"]]))
 }
 

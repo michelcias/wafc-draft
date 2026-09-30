@@ -381,3 +381,18 @@ test_that("bsgl searches the grid of the WAFC and respects discrete modulators",
   fit <- wafc_competitor("bsgl", x0, ud, y0, foldid = folds)
   expect_lte(fit[["extra"]][["df"]], 9L)
 })
+
+test_that("bsgl records the dimension it chose as a level of the WAFC", {
+  ## step E2.5b: the pilot read the J of bsgl from 'extra' and found none
+  skip_if_not(has("grpreg"))
+  fit <- wafc_competitor("bsgl", x0, u0, y0, foldid = folds, df = c(4L, 16L))
+  expect_true(fit[["extra"]][["df"]] %in% c(4L, 16L))
+  expect_identical(fit[["extra"]][["J"]],
+                   as.integer(log2(fit[["extra"]][["df"]])))
+  ## df - 1 columns per block, the 2^J - 1 of a WAFC block at that J
+  des <- wafc_design(x0, u0, J = fit[["extra"]][["J"]])
+  expect_equal(length(des[["blocks"]][[1L]]), fit[["extra"]][["df"]] - 1L)
+  ## a candidate that is not a power of two has no level
+  fit <- wafc_competitor("bsgl", x0, u0, y0, foldid = folds, df = 6L)
+  expect_identical(fit[["extra"]][["J"]], NA_integer_)
+})
