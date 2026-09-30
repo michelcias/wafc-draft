@@ -48,7 +48,7 @@ wafc-draft/
 │   ├── inventario-codigo.md     #   o que o WaveBased, o wall e o wall-manuscript têm de reaproveitável
 │   ├── notacao.md               #   símbolos (congelada em E1.1)
 │   └── referencias-verificadas.bib
-├── manuscript/                  # ms_{k}.tex, supp_{k}.tex, references_{k}.bib (vivo em k = 1)
+├── manuscript/                  # ms_{k}.tex, supp_{k}.tex, references_{k}.bib (vivo em k = 2)
 │   ├── ss-template/             #   template da Statistica Sinica, compila
 │   └── ejs-template/            #   template da EJS (imsart.cls, opção ejsv2), compila
 ├── derivations/                 # rascunhos matemáticos, um resultado por arquivo

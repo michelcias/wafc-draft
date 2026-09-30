@@ -122,8 +122,9 @@ modulator is present.
 **dependente** produz um estimador que (i) atinge a taxa de aproximação não
 linear em wavelets a menos de um fator logarítmico, sob a mesma hipótese de
 Besov que governa o sieve linear (Corolário 5, D16); (ii) é um único
-problema convexo resolvido pelo `glmnet` em segundos; e (iii) seleciona,
-pela variante em grupos, quais moduladoras afetam quais coeficientes.
+problema convexo resolvido pelo `glmnet` em segundos; e (iii) recupera,
+por limiarização das normas por bloco, quais moduladoras afetam quais
+coeficientes (Corolário 8, D32; Corollary 2 no `ms_2`).
 
 **Contribuições a defender (em ordem de força):**
 
@@ -147,7 +148,8 @@ pela variante em grupos, quais moduladoras afetam quais coeficientes.
   posicionamento escolhido convida. A resposta: a penalidade coordenada é um
   único problema do `glmnet`, dá o corolário de compressibilidade sem
   restringir `τ`, e a comparação numérica contra os blocos está em E4. A
-  variante em grupos existe em `wafc()` para quem quiser estrutura (E2.2).
+  estrutura sai da limiarização do LASSO (D32), e a variante em grupos
+  existe em `wafc()` como opção (E2.2).
 - **"Onde está a cota inferior para `q ≥ 2`?"** Não existe (pergunta 20 da
   §4 do `ESTADO.md`), e sob este posicionamento ela fica mais visível: o
   artigo cita a de K&P e afirma otimalidade só onde ela vale. É o risco
@@ -157,11 +159,14 @@ pela variante em grupos, quais moduladoras afetam quais coeficientes.
 - "Isso não é Sardy & Ma com um `X_ℓ` multiplicando?" Não: a teoria deles é
   de otimização (L2, `busca-novidade.md` §3). A resposta fica na Seção 2.
 - "Como escolhe `J`?" Validação cruzada conjunta com `λ` (E2.3), e a teoria
-  diz a ordem; a regra teórica ficou dois níveis acima do melhor `J`
-  empírico na conferência de E1.6, e E2.3 mede o custo disso.
-- "E a seleção de estrutura?" A variante em grupos zera os blocos nulos
-  (E2.2, com número); ou entra com resultado (E1.7) ou o artigo diz que
-  seleção não é o objetivo.
+  diz a ordem. A regra teórica erra `J` por até dois níveis, acima ou
+  abaixo conforme `s'` (E1.6, E2.3), e o que a torna cara é o `λ`, de 7 a
+  13 vezes o ótimo; é o que a §4.3 do `ms_2` diz.
+- "E a seleção de estrutura?" Estimação seguida de limiar: o Corolário 8
+  (D32) está na §3.6 do `ms_2` como Corollary 2, triagem sem hipótese e
+  recuperação sob separação por bloco, e vale para o LASSO puro. A variante
+  em grupos, lida em `lambda.min`, acerta a estrutura em 0 de 10 réplicas
+  onde o LASSO limiarizado acerta 10 (E1.7c).
 - "Aplicação real?" E6, com efeito que varia com covariáveis e interpretação.
 
 ## 5. Estrutura-alvo do manuscrito (40 páginas, SS)
@@ -172,7 +177,7 @@ referências**, ao contrário do que esta tabela supunha.
 | Seção | Páginas | Conteúdo |
 |---|---|---|
 | 1 Introduction | 2,5 | problema, o que existe, o que falta, contribuições |
-| 2 Model and wavelet sieve | 4 | modelo, identificabilidade, base, desenho de produtos, estimador |
+| 2 Model and wavelet approximation space | 4 | modelo, identificabilidade, base, desenho de produtos, estimador |
 | 3 Theory | 6 | hipóteses, aproximação, condição de desenho, oráculo, taxas, adaptação; provas no suplementar |
 | 4 Computation and tuning | 2 | `glmnet`, desenho esparso, `(J, λ)` por CV, custo |
 | 5 Simulation | 6 | desenho, competidores, métricas, resultados |
@@ -187,6 +192,11 @@ contra as 14,5 desta tabela, e as referências em 4. Por D21, a conta final é
 feita quando o corpo estiver completo, contra o PDF compilado; até lá E5b
 escreve sem contar, mas **cada tabela vai num `\input{}` próprio**, para que
 mandá-la ao suplemento seja mover uma linha.
+
+**Medido em 2026-09-30, com `k = 2`** (depois de E5c): o `ms` tem 33
+páginas e o `supp` 30. A §3.6 (seleção por limiar) e a §4.2 somaram cerca
+de 3,5 páginas ao corpo, e a projeção com as Seções 5 a 7 fica em ~44 a 46,
+acima do teto; a decisão continua sendo a de D21.
 
 A folga de cerca de 11 páginas não está alocada de propósito: se a teoria
 pedir espaço, ela vai para as Seções 3 e 5, nessa ordem. A conferência é

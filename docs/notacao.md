@@ -26,7 +26,7 @@ E2.2.
 | `j` | nível de resolução da wavelet | `j = j_0, …, J − 1` |
 | `k` | translação da wavelet | `k = 0, …, 2^j − 1` |
 | `j_0` | nível mais grosso da base | `j_0 = 0` no caso periódico |
-| `J`, `J_n` | nível de resolução do sieve | cresce com `n` |
+| `J`, `J_n` | nível de resolução do espaço de aproximação | cresce com `n` |
 | `N_J` | número de wavelets por par `(ℓ, m)` | `2^J − 2^{j_0}` (`= 2^J − 1` se `j_0 = 0`) |
 | `d` | número total de colunas penalizadas | `p q N_J` |
 | `s_0` | esparsidade do oráculo | número de coeficientes não nulos de `θ*` |
@@ -60,7 +60,7 @@ Y_i = Σ_{ℓ=1}^{p} β_ℓ(U_i) X_{iℓ} + ε_i,            i = 1, …, n
 | `ε` | erro | `E[ε | X, U] = 0`, sub-gaussiano de parâmetro `σ` |
 | `f(x, u)` | função de regressão `Σ_ℓ β_ℓ(u) x_ℓ` | |
 
-## 3. Wavelets e sieve
+## 3. Wavelets e espaço de aproximação
 
 | Símbolo | Significado |
 |---|---|
@@ -170,8 +170,10 @@ que os dois não imprimam símbolos diferentes para a mesma coisa.
 Na mesma emenda, `C_X` (E1.3) e `B_X` (E1.4) eram dois nomes para a cota de
 `‖X‖_∞`: fica **`B_X`**, como na tabela da §4.
 
-O `derivations/macros.tex` ainda imprime `\mathbb{E}`; a troca é feita quando
-E1.3b fechar, para não mudar o arquivo debaixo de uma tarefa em curso. Os
-`.tex` de E1.3 a E1.6 recompilam com a macro nova sem alteração de fonte,
-porque `\E` continua sendo `\E`; o que muda é como ele imprime.
+A troca no `derivations/macros.tex` está feita: `\E` e `\Prob` imprimem
+`E` e `P` em romano. Os `.tex` das derivações recompilaram sem alteração de
+fonte, porque `\E` continua sendo `\E`; o que muda é como ele imprime.
+
+(D33, 2026-09-21: nos documentos de trabalho, "sieve" também cede lugar a
+"espaço de aproximação"; os símbolos não mudam.)
 

@@ -122,7 +122,7 @@ Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 
   entra pela limiarização (Corolário 8, D32); a rota do intervalo está
   escrita e não vai ao manuscrito (D26). E1.9 (cota inferior) fica para
   depois dos resultados.
-- **Código: E2.1 a E2.4b fechadas**, com o piloto, os sete concorrentes, o
+- **Código: E2.1 a E2.4c fechadas**, com o piloto, os sete concorrentes, o
   QUT, o cenário `uneven` e a tabela de tempo, e a revisão de 2026-09-28
   (defeitos, memória, busca de nós) e D34 a D37; **674 testes passam**. Falta o
   go/no-go (E2.5), que espera só a repetição da parte `competitors` do

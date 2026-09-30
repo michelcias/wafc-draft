@@ -1407,8 +1407,8 @@ Ordenadas pelo que bloqueia mais.
    código, português nas derivações. O `macros.tex` já imprime os ambientes
    em português e os quatro arquivos em português foram recompilados. Falta
    alinhar o `03-desenho-produtos.tex`, que está em inglês e hoje imprime
-   cabeçalhos em português; é tradução, catalogada como E1.4c e de
-   prioridade baixa.
+   cabeçalhos em português; é tradução, catalogada como E1.4c e **feita
+   em 2026-09-20**.
 17. **~~`rescale = TRUE` como padrão~~ decidido (D23):** continua padrão, e
    agora com razão declarada, não herdada. O deslocamento de centralização
    que ele causa é um nível, e a leitura correta é que a componente é
@@ -1454,7 +1454,7 @@ Ordenadas pelo que bloqueia mais.
    se responde em revisão; se a contribuição numérica ficar fraca, ela vira
    o peso que falta. As três saídas: (a) citar K&P e dizer que a cota
    superior atinge a referência do modelo de sequência, que é o que o
-   `05-taxas.tex` faz hoje; (b) abrir E1.8 e construir a cota para `q ≥ 2`,
+   `05-taxas.tex` faz hoje; (b) abrir E1.9 e construir a cota para `q ≥ 2`,
    trabalho do porte de E1.4 mais E1.5; (c) restringir a afirmação de
    otimalidade a `q = 1`. O referee da SS pode cobrar a (b).
 21. **`p` crescente com `n`.** A teoria fixa `p` e `q`. Se a aplicação de E6
@@ -1640,6 +1640,7 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-30 | Documentos alinhados ao estado depois de E5c e E2.4c: frase-tese e respostas ao referee do `alvo-revista.md` passam à limiarização (D32) e à §4.3 do `ms_2`; E2.5 e E5c no `plano-projeto.md`; `notacao.md` sem "sieve" e com o `\E` em romano já feito; E1.9 no lugar de E1.8 na pergunta 20 |
 | 2026-09-30 | E2.4c fechada e integrada: `uneven` e `gam.matched` no `04-pilot.R`, `WAFC_TAG`, sementes independentes da restrição de células; o `gam.matched` em `J = 8` custa de 72 s a mais de 15 min e até 4 GB, e a `mixed` roda à parte em E2.5a |
 | 2026-09-30 | Este chat vira o orquestrador; documentos alinhados a D5, D8 e D34 a D37; E2.4c e E2.5a catalogadas; `k = 2` aberta; D38; E5c fechada e integrada: Corolário 8 no artigo (§3.6, S7), §4.2 alinhada a D35, "sieve" trocado, 33 e 30 páginas |
 | 2026-09-28 | Pergunta 31 investigada (`08-sgl-null.R`, reproduzido): o laço de dobras bate com o `cv.sparsegl`, não há vazamento (termo cruzado `t = 0,6`), e o sparse group LASSO no nulo cai numa faixa plana da curva por maldição do vencedor, com o mesmo custo em predição do LASSO e centenas de coeficientes falsos; D37: nenhuma aceleração entra |

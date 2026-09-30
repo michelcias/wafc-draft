@@ -65,7 +65,7 @@ decisões para a hora errada.
 
 ### E0.1 Nomes
 
-| O quê | Nome | Estado (2026-09-28) |
+| O quê | Nome | Estado (2026-09-30) |
 |---|---|---|
 | método | WAFC, *wavelet additive functional coefficients* | ratificado (D8, 2026-09-19) |
 | funções | `wafc()`, `cv.wafc()`, classe `"wafc"`, na pasta `wafc/` | D4 fechada: pasta dedicada, não o `WaveBased` |
@@ -332,13 +332,21 @@ incluir o **QUT** de Giacobino et al. (2017) como regra de `λ` sem `σ`
 **Fechada em 2026-09-20 (E2.4) e 2026-09-21 (emendas E2.4b):** números no
 `ESTADO.md` §2. O que ela deixou para E2.5 está no `ESTADO.md` §5.
 
+**E2.4c (fechada em 2026-09-30) e E2.5a (em curso):** a repetição da parte
+`competitors` com a grade `2:8` (D34), o `bsgl` na mesma grade (D36), o
+`gam` em dimensão casada por `bam` (`gam.matched`) e o cenário `uneven`
+(D30), que E2.5 espera antes de decidir.
+
 ### E2.5 Go/no-go e variante principal
 
 **Go** se o WAFC vence os competidores no cenário (b) por margem clara e
 não perde no (a) por mais de um fator a fixar (proposta: 1,5 em ISE). Se
 não: antes de mudar de rumo, testar `boundary = "interval"`, pesos
 adaptativos e limiarização em blocos. Registrar em `ESTADO.md`: variante
-(LASSO ou grupos), regra de sintonia, `J` padrão, e os números.
+(LASSO ou grupos), regra de sintonia, `J` padrão, e os números. Desde D32 e
+E1.7c a escolha de variante é entre o **LASSO limiarizado** e o sparse group
+LASSO, e E2.5 calibra também o limiar `t_n` (pergunta 11 do `ESTADO.md`).
+A grade padrão (`2:8`, D34) e a margem (`0`, D35) já estão decididas.
 
 **Critério de saída de E2:** testes de E2.1 a E2.3 passando; tabela do
 piloto; decisão registrada.
@@ -431,9 +439,16 @@ Figuras e tabelas com os nomes que o `.tex` vai referenciar; cópia para
 ### E5a. Seções que dependem só da teoria (abre quando E1.2 a E1.6 tiverem enunciado e L2 fechar)
 
 `manuscript/ms_1.tex`, `supp_1.tex`, `references_1.bib`. Seções 1 a 4 de
-`alvo-revista.md` §5: Introduction; Model and wavelet sieve; Theory
-(enunciados; provas no suplementar); Computation and tuning. Nome do método
-fixado aqui.
+`alvo-revista.md` §5: Introduction; Model and wavelet approximation space;
+Theory (enunciados; provas no suplementar); Computation and tuning. Nome do
+método fixado aqui. **Fechada em 2026-09-19.**
+
+### E5c. Versão `k = 2` (fechada em 2026-09-30)
+
+As edições acumuladas desde E5a, marcadas em `colR1` (D38 para a troca de
+"sieve"), e o Corolário 8 na §3.6 com a prova no `supp` (D32). `ms_2` em
+33 páginas e `supp_2` em 30; as pendências estão na pergunta 32 do
+`ESTADO.md`.
 
 ### E5b. Seções que dependem dos números (abre quando E4 e E6 fecharem)
 
@@ -506,5 +521,5 @@ interface nem se escreve a seção de computação em versão final.
 | A adaptatividade não aparece nos números | E2.4: WAFC não vence `mgcv` em bumps/blocks | `boundary = "interval"`, pesos adaptativos, limiarização em blocos; se persistir, o artigo é sobre seleção de estrutura (grupos) e o alvo muda para JCGS |
 | Sardy & Ma (2024) cobre mais do que parece | L2 | o peso vai para E1.4 (produtos) e para a aplicação |
 | Teto de 40 páginas, referências incluídas | `ms` passa | provas e tabelas secundárias ao suplementar; cenários da simulação reduzidos no corpo |
-| Custo do desenho em `p q 2^J` grande | `glmnet` lento em E4 com `p q = 50` | desenho esparso; `wtable()`; `J ≤ 5`; grade de `λ` curta |
+| Custo do desenho em `p q 2^J` grande | `glmnet` lento em E4 com `p q = 50` | desenho esparso; `wtable()`; grade de `λ` curta; a grade de `J` vai a 8 (D34), e o custo medido está no `ESTADO.md` (2026-09-28) |
 | Sem aplicação convincente | E6.1 sem candidato | decidir cedo (pergunta 2 do `ESTADO.md`); a EJS tolera aplicação mais leve |

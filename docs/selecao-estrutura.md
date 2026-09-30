@@ -95,6 +95,10 @@ Definir `Ŝ = {(ℓ, m) : ‖ĝ_{ℓm}‖_{L_2} > t_n}` e provar `P(Ŝ = S) → 
 
 ## Resultado (2026-09-20)
 
+**No manuscrito desde 2026-09-30** (E5c): o Corolário 8 é o Corollary 2 da
+§3.6 do `ms_2.tex`, com a hipótese de separação como Assumption 6, e o
+Lema 13 é o Lemma S7.1 do `supp_2.tex`.
+
 **(c) fechou** e é o Corolário 8 de `06-selecao-limiar.tex`: Lema 13
 determinístico mais a taxa do Corolário 4, sem condição de desenho nova. A
 separação entre **triagem** (eliminar bloco nulo, que não custa hipótese) e
