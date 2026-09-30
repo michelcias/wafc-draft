@@ -1921,8 +1921,14 @@ Ordenadas pelo que bloqueia mais.
      fica como resposta ao "why not block LASSO?".
    - (c) O fator do suave. Medido contra o `gam.matched`: 1,67 a 1,69
      (`smooth`) e 1,50 a 1,60 (`uneven`) para o LASSO; 1,45 a 1,61 e 1,31
-     a 1,38 para o `klopp`. Com 1,5, os dois reprovam no `smooth`.
-   - (d) **Catalogado como E2.5d** (2026-09-30). O `gam.matched` herda o
+     a 1,38 para o `klopp`. Com 1,5, os dois reprovam no `smooth`. **Contra
+     o `gam` autônomo com `k = 128` (E2.5d) o fator piora:** 1,58 a 1,92 e
+     1,59 a 1,81 para o LASSO; 1,47 a 1,68 e 1,38 a 1,63 para o
+     `klopp.free`.
+   - (d) **~~Catalogado como E2.5d~~ respondido por E2.5d (2026-09-30,
+     §2):** o `gam` autônomo empata com o `gam.matched` a 1% a 2% e o
+     veredito se mantém; a escolha do `gam` de E4 é a pergunta 36. Texto
+     original: o `gam.matched` herda o
      `J` da busca do WAFC na mesma réplica, e não é método autônomo; E4 precisa de um `gam` que escolha `k` sozinho
      (REML com `k` generoso é a prática usual, não medida aqui).
 
@@ -1953,6 +1959,32 @@ Ordenadas pelo que bloqueia mais.
    - (d) Hall, Kerkyacharian & Picard (1999, *Statist. Sinica* 9) e Zhou
      (2010, arXiv:1002.1583) não verificados; entram só se o manuscrito
      precisar.
+
+36. **Pendências de E2.5d** (2026-09-30), nenhuma bloqueando:
+   - (a) **Qual `gam` é o concorrente de E4 e da tabela do manuscrito.**
+     A tarefa propõe o `gam` autônomo com `k = 128` por moduladora: não
+     aperta, não diverge, é o que um usuário rodaria. O `gam.matched` fica
+     como a medição de E6.1a (base contra dimensão), não como concorrente.
+     O custo na `mixed` é de ~8 min por ajuste.
+   - (b) A `mixed` em 50 réplicas para o `gam` autônomo: pede um controle
+     como o `WAFC_REPS_MIXED` no `09-gam-autonomo.R` e ~6,5 h de
+     processador.
+   - (c) Guarda no `wafc_fit_gam()`: recusar, ou marcar, ajuste com `edf`
+     acima do número de coeficientes, que é a assinatura das duas
+     divergências de E2.5a. Toca `competitors.R`, arquivo de E2.5c.
+   - (d) A linha do `09-gam-autonomo.R` no `wafc/README.md` entra na
+     integração de E2.5c, que tem o arquivo: "`scripts/09-gam-autonomo.R`
+     ✓ | E2.5d | `Rscript wafc/scripts/09-gam-autonomo.R [n_rep] [partes]
+     [ncores] [ns] [células] [ks]` (padrão `50`, `fit,report`, `64,128`):
+     o `gam` autônomo ao lado do `gam.matched` refeito, no sorteio da parte
+     `competitors` do `04-pilot.R` (funções copiadas, o piloto intacto; a
+     `mixed` só nas 15 réplicas de E2.5a); `report` confere o `gam.matched`
+     contra E2.5a antes de qualquer tabela; lê `WAFC_E25A` e `WAFC_E25B`,
+     grava `<WAFC_TAG>-fits.rds`, `-edf.rds` e `-joined.rds` em
+     `WAFC_OUT`".
+   - (e) E2.5c pode ler o fator do suave contra o `gam.k128` de
+     `wafc/cache/e25d/e25d-fits.rds`, que cobre as mesmas réplicas (fora
+     as 35 da `mixed` além da 15ª).
 
 ---
 
@@ -1996,6 +2028,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-30 | E2.5d fechada e integrada: o `gam` autônomo (REML, `k = 64` e `128`) empata com o `gam.matched`, o veredito de E2.5a se mantém e o fator do suave piora (1,58 a 1,92 para o LASSO); o `klopp.free` é o único que o vence em alguma célula; duas divergências do `bam` em E2.5a; pergunta 36 |
 | 2026-09-30 | L5 fechada e integrada: `.bib` com 69 entradas; a partição da unidade ancorada em Mallat (2009); Cai (1999) confere com E1.11; Restrepo & Leaf não serve para a base; D39 aplicada; pergunta 35 |
 | 2026-09-30 | E2.5b fechada e integrada: o `klopp.free` vence o `wafc.lasso` em toda célula com componente e empata no nulo, reprodução exata de E2.5a; a `mixed` em 50 réplicas confirma o `gam.matched`; a máquina tem 8 núcleos físicos; E2.5c e E2.5d ganham regras de concorrência |
 | 2026-09-30 | E1.11 fechada e integrada: o oráculo de E1.5 transfere para o block LASSO com níveis livres sem cone, e o Corolário 5 ganha `(log n)^{2s'/(2s+1)}`, sem logaritmo em `π ≥ 2`; a teoria cobre pesos 1, e o `grpreg` usa `sqrt(\|G\|)` (pergunta 34) |

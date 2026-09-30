@@ -107,6 +107,7 @@ Rscript wafc/scripts/05-sondagem-aplicacao.R all           # a sondagem de E6.1a
 Rscript wafc/scripts/06-timing.R                             # só tempo, curto
 Rscript wafc/scripts/07-accel.R 20 staged,sgl 14             # pergunta 29: ~10 min + ~48 min em 14 núcleos
 Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 min em 14 núcleos
+WAFC_OUT=wafc/cache/e25d Rscript wafc/scripts/09-gam-autonomo.R 50 fit,report 12   # E2.5d: 1 h 18 min em 12 núcleos, pico de 1,3 GB por processo, ~11 GB no total
 ```
 
 ## 3. Onde o trabalho está (resumo de 2026-09-30; o `ESTADO.md` manda)
@@ -142,7 +143,7 @@ Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 
 - **Bibliografia:** 69 entradas verificadas (L1, L3, L4 e L5); pendências na pergunta 35 do `ESTADO.md`.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** E2.5c (os pesos do block LASSO) e E2.5d (o `gam` autônomo), em paralelo; E2.5b e L5 fecharam em 2026-09-30; E2.4c, E2.5a e E1.11 fecharam em 2026-09-30;
+- **Catálogo:** E2.5c (os pesos do block LASSO); E2.5b, E2.5d e L5 fecharam em 2026-09-30; E2.4c, E2.5a e E1.11 fecharam em 2026-09-30;
   detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
