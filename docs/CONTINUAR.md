@@ -99,8 +99,8 @@ Rscript wafc/scripts/03-tune-decomp.R           # ~2 min
 Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 min com a grade antiga (hoje o padrão é 2:8, D34)
 Rscript wafc/scripts/04-pilot.R 5 competitors 8 250 smooth   # fumaça do piloto, ~1 min
 Rscript wafc/scripts/04-pilot.R 50 all 12                    # o piloto inteiro de E2.4, ~3 h em 12 núcleos com a grade antiga
-WAFC_OUT=wafc/cache/e25a WAFC_TAG=e25a Rscript wafc/scripts/04-pilot.R 50 competitors 12 "" smooth,inhomogeneous,null,uneven   # E2.5a, parte 1
-WAFC_OUT=wafc/cache/e25a WAFC_TAG=e25a-mixed Rscript wafc/scripts/04-pilot.R 50 competitors 4 "" mixed                       # E2.5a, parte 2: até 4 GB por processo
+WAFC_OUT=wafc/cache/e25a WAFC_TAG=e25a Rscript wafc/scripts/04-pilot.R 50 competitors 12 "" smooth,inhomogeneous,null,uneven   # E2.5a, parte 1: ~4 h em 12 núcleos
+WAFC_OUT=wafc/cache/e25a WAFC_TAG=e25a-mixed Rscript wafc/scripts/04-pilot.R 50 competitors 4 "" mixed                       # E2.5a, parte 2: ~1 h em 4 núcleos, pico de 1,35 GB por processo
 Rscript wafc/scripts/05-sondagem-aplicacao.R all           # a sondagem de E6.1a, horas; baixa os dados
 Rscript wafc/scripts/06-timing.R                             # só tempo, curto
 Rscript wafc/scripts/07-accel.R 20 staged,sgl 14             # pergunta 29: ~10 min + ~48 min em 14 núcleos
@@ -124,9 +124,10 @@ Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 
   depois dos resultados.
 - **Código: E2.1 a E2.4c fechadas**, com o piloto, os sete concorrentes, o
   QUT, o cenário `uneven` e a tabela de tempo, e a revisão de 2026-09-28
-  (defeitos, memória, busca de nós) e D34 a D37; **674 testes passam**. Falta o
-  go/no-go (E2.5), que espera só a repetição da parte `competitors` do
-  piloto (`ESTADO.md` §5, item (c)); P1 e P2 foram ratificadas (D34, D35).
+  (defeitos, memória, busca de nós) e D34 a D37; **674 testes passam**.
+  E2.4c e E2.5a (a repetição do piloto) fecharam em 2026-09-30 com
+  **no-go para a variante LASSO** pelo critério literal; E2.5 espera a
+  decisão de rumo (pergunta 33 do `ESTADO.md`).
 - **Avaliação da base em estudo numérico:** tabela fixa (`wtable()` uma vez,
   passada em `wavelet.table`), que é o caminho rápido; a regra `auto` não
   dispara nos `n` do estudo e deixaria tudo no algoritmo lento (D31). A
@@ -139,7 +140,7 @@ Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 
 - **Bibliografia:** 63 entradas verificadas (L1, L3 e L4); nada pendente.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** E2.5a (a repetição do piloto; E2.4c fechou em 2026-09-30);
+- **Catálogo:** vazio (E2.4c e E2.5a fecharam em 2026-09-30);
   detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de

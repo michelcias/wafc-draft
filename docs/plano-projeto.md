@@ -332,10 +332,11 @@ incluir o **QUT** de Giacobino et al. (2017) como regra de `λ` sem `σ`
 **Fechada em 2026-09-20 (E2.4) e 2026-09-21 (emendas E2.4b):** números no
 `ESTADO.md` §2. O que ela deixou para E2.5 está no `ESTADO.md` §5.
 
-**E2.4c (fechada em 2026-09-30) e E2.5a (em curso):** a repetição da parte
+**E2.4c e E2.5a (fechadas em 2026-09-30):** a repetição da parte
 `competitors` com a grade `2:8` (D34), o `bsgl` na mesma grade (D36), o
 `gam` em dimensão casada por `bam` (`gam.matched`) e o cenário `uneven`
-(D30), que E2.5 espera antes de decidir.
+(D30). Resultado: **no-go para a variante LASSO** pelo critério abaixo; o
+rumo está na pergunta 33 do `ESTADO.md`.
 
 ### E2.5 Go/no-go e variante principal
 

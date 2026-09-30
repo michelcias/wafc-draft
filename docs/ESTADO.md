@@ -2,12 +2,12 @@
 
 **Última atualização:** 2026-09-30.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
-E1.10), E5a, E5c e E2.1 a E2.4c fechadas**, mais L1 a L4 e a sondagem E6.1a.
-Falta E2.5 (go/no-go) para fechar E2; P1 e P2 foram ratificadas (D34,
-D35), as perguntas 29 e 31 estão fechadas, e ela espera só a repetição do
-piloto (§5).
-**E2.4c fechada** (2026-09-30): o `04-pilot.R` está pronto; **E2.5a**
-(rodar a repetição) está catalogada e pode abrir. A decidir pelo
+E1.10), E5a, E5c e E2.1 a E2.5a fechadas**, mais L1 a L4 e a sondagem E6.1a.
+Falta E2.5 (go/no-go) para fechar E2, e **a repetição do piloto (E2.5a)
+devolveu, pelo critério literal, no-go para a variante LASSO**: o block
+LASSO de Klopp & Pensky no mesmo desenho vence no não homogêneo, e o `gam`
+em dimensão casada vence no suave por 1,5 a 1,7 em ISE (§2, pergunta 33).
+A decisão de rumo é do autor. Catálogo vazio. A decidir pelo
 autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
 (D21).
 **Versão viva do manuscrito:** `k = 2` (`manuscript/ms_2.tex`,
@@ -1242,6 +1242,71 @@ passam**, 0 falhas; a tarefa tocou só `wafc/scripts/04-pilot.R` e
 - A `uneven` entra também nas partes `lambda` e `j1`; `margin` e `jgrid`
   continuam restritas por nome.
 
+### 2026-09-30: E2.5a fechada, e o piloto devolve no-go para o LASSO
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina nos `.rds` de
+`wafc/cache/e25a/`: **6 450 linhas, 0 falhas**, e as razões centrais da
+tabela abaixo reproduzem. Duas chamadas, como o catálogo mandava: quatro
+células em 12 núcleos (4 h 08 min de relógio, 49,1 h de processador) e a
+`mixed` em 4 (1 h, 3,75 h). **O risco de memória de E2.4c não aconteceu**
+(pico de 1,35 GB por processo), porque o WAFC não escolhe `J = 8` na
+`mixed`.
+
+Razões dentro da réplica contra o `wafc.lasso` (mediana; `< 1` é o
+concorrente melhor), `rmse_f` / ISE, `n = 1000`:
+
+| célula | `klopp` | `gam.matched` | `gam` `k = 10` | `vcbart` | `bsgl` | `aspline` |
+|---|---|---|---|---|---|---|
+| smooth | 0.955 / 0.876 | 0.777 / 0.590 | 0.716 / 0.497 | 1.388 / — | 1.114 / 1.255 | 0.835 / 0.688 |
+| uneven | 0.946 / 0.879 | 0.791 / 0.626 | 2.766 / 7.477 | 1.262 / — | 1.117 / 1.278 | 0.866 / 0.772 |
+| inhomogeneous | 0.956 / 0.919 | 1.000 / 1.034 | 1.434 / 2.024 | 1.086 / — | 1.137 / 1.305 | 1.256 / 1.596 |
+| mixed | 1.082 / 1.174 | 0.924 / 0.844 | 1.254 / 1.558 | 0.972 / — | 1.016 / 1.037 | 1.130 / 1.266 |
+
+- **(b), margem no não homogêneo: não há.** O melhor concorrente em todo
+  `n` é o **`klopp`**, o block LASSO de K&P no mesmo desenho (0,947 a
+  0,956 em `rmse_f`, vencendo em 92% a 96% das réplicas); contra o
+  `gam.matched`, empate em `n = 1000` (1,000, 50% para cada lado) e derrota
+  pequena em 250 e 500. Na `mixed` (`q = 4`, o eixo do artigo), o
+  `gam.matched` vence em **15 de 15** em `n = 1000`. Tomando em cada
+  réplica o melhor dos seis concorrentes, o `wafc.lasso` o vence em 0% a
+  4% das réplicas de toda célula com componente.
+- **(a), o fator no suave: acima de 1,5.** `ISE(wafc.lasso)/ISE(gam.matched)`
+  é 1,67 a 1,69 no `smooth` e 1,50 a 1,60 no `uneven`, com o `gam.matched`
+  vencendo em 90% a 100% das réplicas. **D30 não se confirma em dimensão
+  casada:** no `uneven` o WAFC vence o `gam` de `k = 10` por 2,3 a 7,5 em
+  ISE e perde do casado por 1,5 a 1,6; é a lição de E6.1a, agora na
+  simulação.
+- **O que mudou desde E2.4 foi o `klopp`, não o WAFC.** No não homogêneo
+  em `n = 1000` os números absolutos se reproduzem (WAFC 0,841, `vcbart`
+  0,910, `gam` 1,189), mas o `klopp` foi de 0,997 a **0,807**, porque D34
+  deu a ele a mesma grade. **Lição de leitura:** o "7,8% melhor que o
+  melhor concorrente" de E2.4 era o `jgrid`, o WAFC contra si mesmo; um
+  padrão que corrige uma truncagem do WAFC vale para o concorrente no mesmo
+  desenho, e o veredito só se lê depois de os dois rodarem com ele.
+- **Por que o `klopp` ganha** (diagnóstico da tarefa, 10 réplicas,
+  `n = 1000`, fora do catálogo, reproduzindo o piloto exatamente): **é o
+  agrupamento em pedaços de `⌈log n⌉`**, não a padronização do `grpreg`
+  (o `cv.wafc` padronizado e o `klopp` de pedaço unitário coincidem com o
+  LASSO) nem a penalização dos níveis. **Com os níveis livres**
+  (`wafc_fit_klopp(penalize.levels = FALSE)`, já no código) o ganho se
+  mantém ou cresce: 0,940 / 0,882 no `smooth`, 0,913 / 0,840 no `uneven`,
+  0,965 / 0,930 no não homogêneo, vencendo em 90% a 100%. Não medido no
+  nulo nem na `mixed`. Mesmo assim o `klopp` não passa o fator do suave
+  contra o `gam.matched` (1,45 a 1,61 no `smooth`; 1,31 a 1,38 no `uneven`),
+  embora vença o `gam.matched` por 4% a 5% no não homogêneo em `n ≥ 500`.
+- **O `J` escolhido** não bate mais no topo da grade nas células com
+  componente, fora 10 de 50 réplicas do não homogêneo em `n = 1000`;
+  no suave fica em 3, no `uneven` em 4 e 5, no não homogêneo sobe de 5 a 7.
+- **Tempo:** o `wafc.sglasso` é 42% do processador da rodada (22,2 h); o
+  `wafc.lasso` custa de 7 a 26 s por ajuste com a busca; o tempo do
+  `gam.matched` **não inclui** a busca de `J`, que é a do `wafc.lasso`.
+- **Estrutura, de passagem:** com `cv.min` o `wafc.lasso` liga todos os
+  blocos nulos, como D20 já dizia; é assunto da limiarização (pergunta 11).
+- **Dois itens de script, sem edição:** o `bsgl` não registra a dimensão
+  escolhida (`J` sai `NA`, embora `extra$df` exista), e o cabeçalho do
+  `04-pilot.R` ainda descreve o custo da `mixed` com os números da grade
+  antiga.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1360,7 +1425,11 @@ Ordenadas pelo que bloqueia mais.
 7. **~~Posicionamento diante de Klopp & Pensky~~ decidido (D18):**
    extensão deles. O parágrafo aprovado e a lista de contribuições reescrita
    estão em `alvo-revista.md` §4, e L2a está cumprida.
-8. **A comparação com o `gam` foi em dimensão casada?** Não: o piloto usou
+8. **~~A comparação com o `gam` foi em dimensão casada?~~ Respondida por
+   E2.5a (2026-09-30, §2):** em dimensão casada o `gam` vence no suave
+   (1,67 a 1,69 em ISE) e na curvatura desigual (1,50 a 1,60), empata no
+   não homogêneo com `q = 2` e vence na `mixed`. O fator do critério
+   continua por fixar (pergunta 33). Texto original: não, o piloto usou
    o padrão `k = 10` de `wafc_fit_gam()`, e E6.1a mostrou que é isso que
    separa "o WAFC ganha 6 a 15%" de "empata". **E2.5 tem de remedir o
    cenário não homogêneo com `k` casado ao espaço de aproximação**, o que
@@ -1391,6 +1460,9 @@ Ordenadas pelo que bloqueia mais.
    precisa de nome e de uma frase dizendo o que exclui.
 14. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
+   **Com número desde E2.5a:** é o agrupamento que compra o ganho sobre o
+   LASSO, e com os níveis livres ele domina o LASSO em predição nas três
+   células medidas em `n = 1000`. A pergunta virou parte da 33.
 15. **~~Edições acumuladas para `k = 2`~~ aplicadas por E5c
    (2026-09-30, §2).** Texto original: (decidido: não tocar em `ms_1`
    avulso). **`k = 2` aberta em 2026-09-30; as edições são a tarefa E5c**,
@@ -1601,11 +1673,36 @@ Ordenadas pelo que bloqueia mais.
    - (h) A lista de contribuições da Introduction não menciona a
      recuperação de estrutura; acrescentar como quarta ou deixar?
 
+33. **O rumo depois do no-go de E2.5a** (2026-09-30), a mais importante
+   da lista. O plano (`plano-projeto.md` E2.5 e tabela de riscos) manda,
+   antes de mudar de rumo, testar `boundary = "interval"`, pesos
+   adaptativos e limiarização em blocos, e, se persistir, reposicionar o
+   artigo para seleção de estrutura e mudar o alvo para o JCGS. E2.5a
+   aponta um candidato anterior a esses: **o block LASSO de K&P com os
+   níveis livres**, que já está em `wafc_fit_klopp()` e é a penalidade de
+   D3 com o agrupamento de K&P. Quatro pontos a decidir, nesta ordem:
+   - (a) Medir o `klopp` de níveis livres em todas as células, inclusive o
+     nulo e a `mixed`, e a `mixed` com 50 réplicas (custo medido: ~12,5 h
+     de processador, 1 a 2 h em 12 núcleos). É medição, não decisão, e é o
+     que as outras três pedem.
+   - (b) O `klopp` conta como concorrente ou como variante do WAFC? Mesma
+     base, mesmo desenho, outra penalidade. Adotá-lo não contraria D18 (o
+     artigo já se diz extensão de K&P), mas muda o que "o WAFC" é, e a
+     teoria de E1.5 e E1.6 é do LASSO coordenado: a penalidade em blocos
+     pediria o oráculo em grupos (Lounici et al. 2011) no lugar do de E1.5.
+   - (c) O fator do suave. Medido contra o `gam.matched`: 1,67 a 1,69
+     (`smooth`) e 1,50 a 1,60 (`uneven`) para o LASSO; 1,45 a 1,61 e 1,31
+     a 1,38 para o `klopp`. Com 1,5, os dois reprovam no `smooth`.
+   - (d) O `gam.matched` herda o `J` da busca do WAFC na mesma réplica, e
+     não é método autônomo; E4 precisa de um `gam` que escolha `k` sozinho
+     (REML com `k` generoso é a prática usual, não medida aqui).
+
 ---
 
 ## 5. Próximos passos
 
-Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
+Tudo converge em E2.5 (go/no-go). A repetição do piloto (c) está feita e
+devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 - (a) **~~Conserto do repasse de `wavelet.table`~~ feito em 2026-09-28**
   (pergunta 10), com a revisão do código de `wafc/` (§2).
@@ -1625,10 +1722,12 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
   (o script ainda não tem a célula `uneven` nem o `gam` casado por `bam`:
   a parte `competitors` chama o `gam` com `k = 10`) seguida de E2.5a (a
   rodada), no `TAREFA.md` §3; E2.4c sem rodada de calibração, por decisão
-  do autor. **E2.4c fechou em 2026-09-30 (§2); falta E2.5a.**
-- (d) **E2.5**, com a calibração do limiar `t_n` (pergunta 11) e a escolha
-  entre LASSO limiarizado e sparse group LASSO, que E1.7c e a tabela de
-  tempo já inclinam para o primeiro.
+  do autor. **E2.4c e E2.5a fecharam em 2026-09-30 (§2).**
+- (d) **E2.5**, agora sobre o no-go de E2.5a: primeiro a pergunta 33
+  (medir o `klopp` de níveis livres em todas as células e decidir se ele
+  é variante do WAFC), depois a calibração do limiar `t_n` (pergunta 11)
+  e a escolha da variante. O sparse group LASSO chega a E2.5 sem ganho em
+  predição e com 42% do processador da rodada.
 - (e) **Autor, sem bloquear E2.5:** a saída da aplicação (pergunta 2) e as
   pendências de E5c (pergunta 32). `k = 2` foi aberta e E5c fechou em
   2026-09-30.
@@ -1640,6 +1739,7 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-30 | E2.5a fechada e integrada (6 450 linhas, 0 falhas, 5 h de relógio): no-go para a variante LASSO pelo critério literal; o `klopp` vence no não homogêneo porque D34 lhe deu a grade larga, e o ganho é do agrupamento; o `gam` casado vence no suave por 1,5 a 1,7 em ISE; D30 não se confirma; pergunta 33 |
 | 2026-09-30 | Documentos alinhados ao estado depois de E5c e E2.4c: frase-tese e respostas ao referee do `alvo-revista.md` passam à limiarização (D32) e à §4.3 do `ms_2`; E2.5 e E5c no `plano-projeto.md`; `notacao.md` sem "sieve" e com o `\E` em romano já feito; E1.9 no lugar de E1.8 na pergunta 20 |
 | 2026-09-30 | E2.4c fechada e integrada: `uneven` e `gam.matched` no `04-pilot.R`, `WAFC_TAG`, sementes independentes da restrição de células; o `gam.matched` em `J = 8` custa de 72 s a mais de 15 min e até 4 GB, e a `mixed` roda à parte em E2.5a |
 | 2026-09-30 | Este chat vira o orquestrador; documentos alinhados a D5, D8 e D34 a D37; E2.4c e E2.5a catalogadas; `k = 2` aberta; D38; E5c fechada e integrada: Corolário 8 no artigo (§3.6, S7), §4.2 alinhada a D35, "sieve" trocado, 33 e 30 páginas |
