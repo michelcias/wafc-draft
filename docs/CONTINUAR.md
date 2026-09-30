@@ -88,6 +88,7 @@ Rscript derivations/check/06-selecao-limiar.R       # ~7 min, precisa de glmnet 
 Rscript derivations/check/02-aproximacao-besov.R    # ~72 s (com a emenda E1.3b)
 Rscript derivations/check/05-taxas.R                # ~7 min
 Rscript derivations/check/07-rota-intervalo.R      # ~2 min
+Rscript derivations/check/08a-blocos.R             # ~1 min 30 s, a sondagem de E1.11
 ```
 
 E o código do método, que já existe:
@@ -140,7 +141,7 @@ Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 
 - **Bibliografia:** 63 entradas verificadas (L1, L3 e L4); nada pendente.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** E2.5b (medir o block LASSO com níveis livres) e E1.11 (a teoria com blocos), em paralelo; E2.4c e E2.5a fecharam em 2026-09-30;
+- **Catálogo:** E2.5b (medir o block LASSO com níveis livres); E2.4c, E2.5a e E1.11 fecharam em 2026-09-30;
   detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de

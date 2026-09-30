@@ -3,9 +3,9 @@
 Um resultado por arquivo, numerado na ordem de dependência do plano (E1):
 `01-identificabilidade.md`, `02-aproximacao-besov.tex` (com a emenda de
 E1.3b), `03-desenho-produtos.tex`, `04-oraculo.tex`, `05-taxas.tex`,
-`06-selecao-limiar.tex` (E1.7c), `07-rota-intervalo.tex` (E1.8), mais a
-sondagem `06a-sondagem-irrepresentabilidade.md`, que é veredito e não
-resultado. Cada um com
+`06-selecao-limiar.tex` (E1.7c), `07-rota-intervalo.tex` (E1.8), mais as
+sondagens `06a-sondagem-irrepresentabilidade.md` (E1.7a) e
+`08a-sondagem-blocos.md` (E1.11), que são veredito e não resultado. Cada um com
 enunciado, hipóteses, prova, "o que isso não cobre" e o parágrafo da
 conferência numérica. Documentos `article` autônomos que fazem
 `\input{macros}`; `macros.tex` implementa `docs/notacao.md` e é o único

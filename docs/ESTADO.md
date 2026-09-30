@@ -8,8 +8,9 @@ devolveu, pelo critério literal, no-go para a variante LASSO**: o block
 LASSO de Klopp & Pensky no mesmo desenho vence no não homogêneo, e o `gam`
 em dimensão casada vence no suave por 1,5 a 1,7 em ISE (§2, pergunta 33).
 A decisão de rumo é do autor; **E2.5b** (medir o block LASSO com níveis
-livres em todas as células, e a `mixed` com 50 réplicas) e **E1.11** (o que
-a teoria vira com a penalidade em blocos) estão catalogadas, em paralelo. A decidir pelo
+livres em todas as células, e a `mixed` com 50 réplicas) está em curso;
+**E1.11** fechou: a teoria transfere para os blocos e a taxa melhora, com
+pesos 1 (pergunta 34). A decidir pelo
 autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
 (D21).
 **Versão viva do manuscrito:** `k = 2` (`manuscript/ms_2.tex`,
@@ -1309,6 +1310,60 @@ concorrente melhor), `rmse_f` / ISE, `n = 1000`:
   `04-pilot.R` ainda descreve o custo da `mixed` com os números da grade
   antiga.
 
+### 2026-09-30: E1.11 fechada, a teoria com blocos transfere e melhora
+
+Chat de tarefa, integrado aqui. `derivations/08a-sondagem-blocos.md`
+(sondagem, sem numeração global, como a `06a`) e `check/08a-blocos.R`,
+que imprime `OK` nesta máquina em 1 min 30 s. **Veredito: a objeção teórica
+da pergunta 33(b) cai.**
+
+- **O oráculo de E1.5 transfere sem cone e com as mesmas constantes:** a
+  perfilagem não depende da penalidade, e o passo que dispensa o cone é
+  Cauchy-Schwarz sobre o autovalor cheio de E1.4. Muda só a calibração,
+  agora pela desigualdade de Hsu, Kakade & Zhang (2012) com união sobre os
+  pedaços: com pesos 1, `λ ≍ σ sqrt((b_n + log|𝒢|)/n)`, que é o `δ̂` de K&P
+  e o `λ` de Lounici et al. Conferido: cobertura 1,000 em 1 200 réplicas;
+  as três cotas do "Teorema 1 em blocos" valem em 360 ajustes, com
+  `γ̃ ≥ λ_min(Σ̂)` em todos. Não é o oráculo de Lounici et al. no lugar do de
+  E1.5: é o de E1.5 com a calibração em blocos.
+- **A compressibilidade vira o risco ideal por pedaços**, e a hipótese de
+  Besov de E1.3 ainda o implica sem hipótese nova (o Lema 9 com um Hölder
+  dentro do pedaço; o expoente é o do Lema 4 de K&P). Conferido em 864
+  sequências, razão máxima 0,786.
+- **A taxa ganha `(log n)^{2s'/(2s+1)}`:** fica
+  `n^{−2s/(2s+1)}(log n)^{(2/π−1)_+/(2s+1)}` no lugar de
+  `(log n/n)^{2s/(2s+1)}`, na mesma janela de `J_n`, e **sem logaritmo em
+  `π ≥ 2`**, o que atinge a cota inferior de K&P para `q = 1` e `X ⊥ U`. O
+  Teorema 2 perde o logaritmo; o Corolário 8 recebe `ρ_n = n^{−s'/(2s'+1)}`;
+  E1.4 não muda. Custo de escrever: ~5 páginas e 2 a 3 dias.
+- **O que não fecha é o `klopp` do piloto:** o `grpreg` usa pesos
+  `sqrt(|G|)` por padrão, e com eles o `λ` da teoria é ditado pelos pedaços
+  unitários do nível 0, o que devolve a cota à ordem do LASSO. A teoria
+  cobre pesos 1, os de K&P. No melhor `λ` de uma grade os pesos mudam o erro
+  em 10% a 20%, com sinal que depende da verdade (pergunta 34).
+- **Nos `n` do piloto o ganho é de constante:** o custo por coordenada de
+  um pedaço cheio é 0,35 do LASSO em `n = 500` e cai como `1/log n`; em
+  `n ≤ 1000`, `b_n` e `log(|𝒢|/α)` são parecidos (6 a 7).
+- **Posicionamento:** o Teorema 2 de K&P não cobre `p` fixo (a (A6) deles
+  exige `p ≥ (s + s_0)(1 + log n)`) e controla o viés pela norma dual, o que
+  lhes custa `r* ≥ 2` e `L + 1 ≥ n^{1/2}`; a arquitetura de E1.5 dispensa as
+  três.
+- **Lição de conferência:** neste desenho `X_1 ψ_{jk}(U_m)` e
+  `X_2 ψ_{jk}(U_m)` têm correlação 0,65; uma verdade que repete a mesma
+  wavelet em dois blocos mede o mau condicionamento, não a penalidade (a
+  razão erro/cota variou 2,9 vezes em `n`). Vale para qualquer conferência
+  futura de seleção ou de grupos.
+- **Duas referências a verificar**, que a tarefa não podia pôr no `.bib`:
+  Hsu, Kakade & Zhang (2012, *Electron. Commun. Probab.* 17, DOI
+  10.1214/ECP.v17-2079; faltam número do artigo e páginas), a única de que a
+  teoria em blocos depende; e Cai (1999, *Ann. Statist.* 27(3), DOI
+  10.1214/aos/1018031262), não lida, citada `[VERIFICAR]` como origem dos
+  blocos de tamanho `log n`. Vão para a frente curta da pergunta 32(e).
+- **Símbolos novos, só se a variante for adotada** (passam pelo
+  `notacao.md`): `𝒢`, `G`, `b_n`, `|𝒢|`, `w_G`, `‖θ‖_{𝒢,w}`, `𝒢_0`,
+  `W(𝒢_0)`, `Ψ̃_G`, `R_𝒢(θ; η)`, `λ_n^𝒢`; a lista com as razões está na §3
+  do handoff, reproduzida no `08a`.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1684,22 +1739,36 @@ Ordenadas pelo que bloqueia mais.
    níveis livres**, que já está em `wafc_fit_klopp()` e é a penalidade de
    D3 com o agrupamento de K&P. Quatro pontos a decidir, nesta ordem
    ((a) catalogado como **E2.5b** e a sondagem teórica de (b) como
-   **E1.11**, ambos em 2026-09-30, em paralelo):
+   **E1.11**, ambos em 2026-09-30, em paralelo; E1.11 fechou no mesmo dia):
    - (a) Medir o `klopp` de níveis livres em todas as células, inclusive o
      nulo e a `mixed`, e a `mixed` com 50 réplicas (custo medido: ~12,5 h
      de processador, 1 a 2 h em 12 núcleos). É medição, não decisão, e é o
      que as outras três pedem.
    - (b) O `klopp` conta como concorrente ou como variante do WAFC? Mesma
      base, mesmo desenho, outra penalidade. Adotá-lo não contraria D18 (o
-     artigo já se diz extensão de K&P), mas muda o que "o WAFC" é, e a
-     teoria de E1.5 e E1.6 é do LASSO coordenado: a penalidade em blocos
-     pediria o oráculo em grupos (Lounici et al. 2011) no lugar do de E1.5.
+     artigo já se diz extensão de K&P), mas muda o que "o WAFC" é.
+     **E1.11 (2026-09-30) tirou a objeção teórica:** o oráculo de E1.5
+     transfere sem cone com a calibração em blocos, e o Corolário 5 ganha
+     `(log n)^{2s'/(2s+1)}`, sem logaritmo em `π ≥ 2`; o custo de escrever é
+     de ~5 páginas e 2 a 3 dias, mais `k = 3`. A teoria cobre pesos 1, não os
+     `sqrt(|G|)` do `grpreg` (pergunta 34). Se não for adotado, a sondagem
+     fica como resposta ao "why not block LASSO?".
    - (c) O fator do suave. Medido contra o `gam.matched`: 1,67 a 1,69
      (`smooth`) e 1,50 a 1,60 (`uneven`) para o LASSO; 1,45 a 1,61 e 1,31
      a 1,38 para o `klopp`. Com 1,5, os dois reprovam no `smooth`.
    - (d) O `gam.matched` herda o `J` da busca do WAFC na mesma réplica, e
      não é método autônomo; E4 precisa de um `gam` que escolha `k` sozinho
      (REML com `k` generoso é a prática usual, não medida aqui).
+
+34. **Os pesos do block LASSO** (de E1.11, 2026-09-30). O `klopp` e o
+   `klopp.free` do código usam os pesos `sqrt(|G|)` do `grpreg`; a teoria
+   de E1.11 cobre pesos 1, os de K&P, e com `sqrt(|G|)` a cota volta à
+   ordem do LASSO. **E2.5b roda com `sqrt(|G|)`.** Antes de a pergunta 33
+   decidir pela variante em blocos, medir pesos 1, e talvez uma terceira
+   forma que junta num pedaço só os níveis com `2^j < b_n` de cada bloco
+   (tira os pedaços unitários sem mudar os pesos dos cheios), nas células de
+   E2.5b. É uma linha em `wafc_kp_groups()` ou `wafc_fit_klopp()`, arquivos
+   de E2.5b; abre depois dela.
 
 ---
 
@@ -1743,6 +1812,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-30 | E1.11 fechada e integrada: o oráculo de E1.5 transfere para o block LASSO com níveis livres sem cone, e o Corolário 5 ganha `(log n)^{2s'/(2s+1)}`, sem logaritmo em `π ≥ 2`; a teoria cobre pesos 1, e o `grpreg` usa `sqrt(\|G\|)` (pergunta 34) |
 | 2026-09-30 | E2.5a fechada e integrada (6 450 linhas, 0 falhas, 5 h de relógio): no-go para a variante LASSO pelo critério literal; o `klopp` vence no não homogêneo porque D34 lhe deu a grade larga, e o ganho é do agrupamento; o `gam` casado vence no suave por 1,5 a 1,7 em ISE; D30 não se confirma; pergunta 33 |
 | 2026-09-30 | Documentos alinhados ao estado depois de E5c e E2.4c: frase-tese e respostas ao referee do `alvo-revista.md` passam à limiarização (D32) e à §4.3 do `ms_2`; E2.5 e E5c no `plano-projeto.md`; `notacao.md` sem "sieve" e com o `\E` em romano já feito; E1.9 no lugar de E1.8 na pergunta 20 |
 | 2026-09-30 | E2.4c fechada e integrada: `uneven` e `gam.matched` no `04-pilot.R`, `WAFC_TAG`, sementes independentes da restrição de células; o `gam.matched` em `J = 8` custa de 72 s a mais de 15 min e até 4 GB, e a `mixed` roda à parte em E2.5a |
