@@ -68,7 +68,7 @@ que ler antes está aqui e no plano.
 | E5c manuscrito `k = 2` | **fechada** (2026-09-30): pergunta 15 aplicada e marcada, Corolário 8 no artigo (§3.6, S7); 33 e 30 páginas, `.bib` com 37 entradas | `manuscript/ms_2.tex`, `supp_2.tex`, `references_2.bib` |
 | E2.5b medir o block LASSO com níveis livres | **fechada** (2026-09-30): o `klopp.free` vence o `wafc.lasso` em toda célula com componente e empata no nulo; a `mixed` em 50 réplicas; `WAFC_METHODS` e `WAFC_REPS_MIXED`; 678 testes | `wafc/cache/e25b/` (não versionado), `ESTADO.md` §2 |
 | E1.11 sondagem da teoria com blocos | **fechada** (2026-09-30): transfere sem cone, ganha `(log n)^{2s'/(2s+1)}`, pesos do `grpreg` fora da teoria; conferência `OK` | `derivations/08a-sondagem-blocos.md` |
-| E2.5c os pesos do block LASSO | **catalogada** (2026-09-30), depois de E2.5b | §3 |
+| E2.5c os pesos do block LASSO | **fechada** (2026-09-30): os pesos 1 da teoria predizem pior; `grpreg` melhor no suave, níveis grossos juntos no não homogêneo e na `mixed`; 696 testes | `wafc/R/competitors.R`, `wafc/cache/e25c/` |
 | E2.5d o `gam` autônomo | **fechada** (2026-09-30): empata com o `gam.matched`, confirma E2.5a, fator do suave pior; reprodução exata | `wafc/scripts/09-gam-autonomo.R`, `wafc/cache/e25d/` |
 | L5 bibliografia curta | **fechada** (2026-09-30): 69 entradas; a partição da unidade ancorada em Mallat (2009); D39 aplicada | `referencias-verificadas.bib`, `literatura.md` |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
@@ -85,19 +85,21 @@ tarefa pode criar ou editar**.
 
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
-| **E2.5c** os pesos do block LASSO | a medição da pergunta 34 do `ESTADO.md`, **sem decisão de rumo**. (i) Em `wafc_fit_klopp()`: argumento de pesos por pedaço, com `"sqrt"` (o de hoje, `sqrt(\|G\|)` do `grpreg`, que é o padrão e não muda nenhum número de E2.5a nem de E2.5b) e `"unit"` (pesos 1, os de K&P e os que a teoria de E1.11 cobre), repassado como `group.multiplier`; e a opção de juntar num pedaço só os níveis com `2^j < b_n` de cada bloco (`wafc_kp_groups()`), que tira os pedaços unitários do nível 0 sem mudar os cheios. Teste de cada forma contra um vetor de grupos e de pesos montado à mão, e de que o padrão reproduz o ajuste atual a `1e-12`. (ii) No `04-pilot.R`: métodos `klopp.unit` e `klopp.merged` (níveis livres nos dois), ao lado do `klopp.free` de E2.5b. (iii) Rodar com `WAFC_OUT=wafc/cache/e25c` e `WAFC_METHODS` restrito aos dois métodos novos, nas cinco células, 50 réplicas (`WAFC_REPS_MIXED=50`), e juntar ao `wafc/cache/e25b/e25b-joined.rds`; a prova de que a junção é legítima é rodar também o `klopp.free` **numa célula só** (`smooth`, que é barata) e conferir que ele reproduz o de E2.5b linha a linha. E2.5b mostrou que restaurar o gerador antes de cada método torna isso exato. **Concorrência com a outra tarefa de medição (E2.5c e E2.5d rodam juntas):** (1) núcleos somados das duas no máximo 14, por exemplo 8 para E2.5c e 6 para E2.5d; a máquina tem **8 núcleos físicos** (16 fios), e acima de 8 processos cada um fica ~25% mais lento (E2.5b); (2) em E2.5d, a `mixed` numa chamada à parte, com 3 ou 4 núcleos, depois das outras células, porque o `gam` com `k = 128` e 16 suavizadores pode passar de 1,5 GB por processo (E2.4c mediu 3 a 4,1 GB com `k = 256`) e a máquina tem ~17 GB disponíveis; (3) o handoff diz que o tempo foi medido em concorrência e não é comparável ao de E2.5a; se o tempo importar, a tarefa roda sozinha depois. (iv) No handoff: razões de `rmse_f` e ISE das três formas contra o `wafc.lasso` e o `gam.matched` (lidos de E2.5a e E2.5b) e entre si, frações de vitória, o nulo, o fator do suave, a `mixed`, e o tempo | E2.5b integrada (mesmos arquivos) | `wafc/R/competitors.R`, `wafc/tests/test-competitors.R`, `wafc/scripts/04-pilot.R`, `wafc/README.md` (as linhas do `competitors.R` e do `04-pilot.R`), `docs/handoff-E2.5c.md`; os `.rds` ficam em `wafc/cache/e25c/`, não versionado |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**Catalogada: E2.5c** (2026-09-30); E2.5b fechou e foi integrada, então E2.5c pode abrir. E2.5d e L5 fecharam em 2026-09-30. E1.11, que corria em paralelo, fechou no mesmo dia. E2.4c e E2.5a fecharam no mesmo dia,
-e a repetição do piloto devolveu no-go para a variante LASSO. E2.5 é do chat
-principal e espera a decisão da pergunta 33 do `ESTADO.md`; E2.5b é o
-primeiro item dela, só medição. Rodar só dois métodos nas células `q = 2`
-é o que as sementes independentes de E2.4c permitem: os dados, as dobras e
-a amostra de teste são os de E2.5a, e o `wafc.lasso` refeito confere isso.
+**O catálogo está vazio** (2026-09-30). A repetição do piloto (E2.4c,
+E2.5a) devolveu no-go para a variante LASSO, e as medições que a pergunta
+33 do `ESTADO.md` pedia fecharam no mesmo dia: E2.5b (o block LASSO com
+níveis livres), E2.5c (os pesos), E2.5d (o `gam` autônomo), E1.11 (a
+teoria com blocos) e L5 (bibliografia). E2.5 é do chat principal e espera
+a decisão de rumo do autor. Para acrescentar um método às tabelas, o
+procedimento validado duas vezes é rodá-lo com `WAFC_METHODS` e conferir um
+método já existente numa célula barata antes de juntar ao
+`wafc/cache/e25c/e25c-joined.rds`.
 
 **Ao catalogar, o arquivo vai junto do item.** Duas tarefas seguidas
 esbarraram em coluna de arquivos que não cobria o que o próprio texto

@@ -1519,6 +1519,60 @@ réplicas, 1 935 ajustes, 0 falhas, 1 h 18 min em 12 núcleos, pico de
   a linha do `09-gam-autonomo.R` no `wafc/README.md`, que é arquivo de
   E2.5c e entra na integração dela.
 
+### 2026-09-30: E2.5c fechada, os pesos do block LASSO
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: **696 testes
+passam** (eram 678); `e25c-joined.rds` tem 9 750 linhas, e as razões
+contra o `klopp.free` em `n = 1000` reproduzem. O `klopp.free` refeito na
+`smooth` bate com E2.5b em toda coluna fora o tempo: é a segunda junção
+exata, e o procedimento está validado para acrescentar métodos. Rodada com
+a máquina só para ela: 1 500 ajustes, 1 h 14 min em 8 processos, pico de
+0,94 GB.
+
+Três formas do block LASSO com níveis livres: `klopp.free` (pesos
+`sqrt(|G|)` do `grpreg`), `klopp.unit` (pesos 1, os de K&P e os que E1.11
+cobre) e `klopp.merged` (os níveis grossos de cada bloco num pedaço só,
+pesos do `grpreg`). Razão contra o `klopp.free`, `rmse_f` / ISE, `n = 250`,
+`500`, `1000`:
+
+| célula | `klopp.unit` | `klopp.merged` |
+|---|---|---|
+| smooth | 1.023, 1.024, 1.046 / 1.052, 1.051, 1.102 | 1.046, 1.043, 1.033 / 1.111, 1.097, 1.068 |
+| uneven | 1.036, 1.080, 1.052 / 1.085, 1.165, 1.104 | 1.005, 1.001, 1.003 / 1.006, 1.003, 1.005 |
+| inhomogeneous | 1.038, 1.055, 1.045 / 1.066, 1.112, 1.088 | 0.988, 0.992, 0.998 / 0.973, 0.986, 0.994 |
+| null | 1.002, 0.995, 0.994 / 0.844, 0.866, 0.826 | 1.004, 1.000, 1.000 / 0.936, 0.986, 0.966 |
+| mixed | 1.028, 1.077, 1.063 / 1.065, 1.165, 1.116 | 0.980, 0.988, 0.993 / 0.956, 0.976, 0.985 |
+
+- **A pergunta 34 está respondida em medição: a forma que a teoria cobre
+  é a que pior prediz.** Os pesos 1 perdem para o `klopp.free` em toda
+  célula com componente, por 2% a 8% em `rmse_f` e 5% a 17% em ISE, e
+  escolhem `J` mais raso; no não homogêneo em `n ≥ 500` o ganho de E2.5b
+  sobre o `wafc.lasso` some (1,003 e 1,002). O padrão do `grpreg` é o
+  melhor no suave; a junção dos níveis grossos é o melhor no não homogêneo
+  e na `mixed`, por até 2% (melhor das três em 83% e 86% das réplicas).
+- **A escolha entre as formas é de segunda ordem** (1% a 8%) perto da de
+  blocos contra LASSO (4% a 10%, E2.5b). Nenhuma forma passa o fator 1,5
+  no `smooth` com `n ≥ 500`, nem contra o `gam.matched` nem contra o
+  `gam.k128`.
+- **Na `mixed`, o `klopp.merged` é o único método abaixo do `gam.matched`
+  nos três `n`** (0,980 a 0,990 em `rmse_f`, perto do empate: 56% a 60% das
+  réplicas); em `n = 1000`, medianas absolutas de `rmse_f`: `klopp.merged`
+  0,854, `klopp.free` 0,863, `gam.matched` 0,863, `klopp.unit` 0,921,
+  `wafc.lasso` 0,942.
+- **O `J` bimodal do `klopp` na `mixed`** (pendência de E2.5b) não aparece
+  em nenhuma forma com níveis livres, que escolhem `J = 6` a 8 e nunca 5:
+  indício de que a causa é a penalização dos níveis.
+- **Descompasso entre teoria e prática**, que a pergunta 33 tem de pesar:
+  se os blocos forem adotados, ou a teoria passa a cobrir os pesos do
+  `grpreg` (e, pelo argumento de E1.11, a cota volta à ordem do LASSO por
+  causa dos pedaços unitários), ou o artigo roda uma forma que perde 2% a
+  8%. A tarefa propõe, como conjectura não verificada, uma quarta forma
+  que talvez reconcilie as duas: juntar os níveis grossos e absorver a
+  sobra de cada nível no pedaço anterior, de modo que todo pedaço tenha
+  tamanho entre `b_n` e `2 b_n` e os pesos `sqrt(|G|)` fiquem a menos de
+  `sqrt(2)` dos pesos 1 reescalados. Custo de medir: ~40 min em 8 núcleos
+  e uma linha em `wafc_kp_groups()`.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1932,7 +1986,11 @@ Ordenadas pelo que bloqueia mais.
      `J` da busca do WAFC na mesma réplica, e não é método autônomo; E4 precisa de um `gam` que escolha `k` sozinho
      (REML com `k` generoso é a prática usual, não medida aqui).
 
-34. **Os pesos do block LASSO** (de E1.11, 2026-09-30). O `klopp` e o
+34. **~~Os pesos do block LASSO~~ medidos por E2.5c (2026-09-30, §2):** os
+   pesos 1 da teoria são a pior forma na predição; o padrão do `grpreg`
+   vence no suave e a junção dos níveis grossos no não homogêneo e na
+   `mixed`. A quarta forma que talvez reconcilie teoria e prática é
+   conjectura (§2). Texto original: (de E1.11, 2026-09-30) o `klopp` e o
    `klopp.free` do código usam os pesos `sqrt(|G|)` do `grpreg`; a teoria
    de E1.11 cobre pesos 1, os de K&P, e com `sqrt(|G|)` a cota volta à
    ordem do LASSO. **E2.5b roda com `sqrt(|G|)`.** Antes de a pergunta 33
@@ -1969,10 +2027,10 @@ Ordenadas pelo que bloqueia mais.
    - (b) A `mixed` em 50 réplicas para o `gam` autônomo: pede um controle
      como o `WAFC_REPS_MIXED` no `09-gam-autonomo.R` e ~6,5 h de
      processador.
-   - (c) Guarda no `wafc_fit_gam()`: recusar, ou marcar, ajuste com `edf`
+   - (c) Guarda no `wafc_fit_gam()` (livre desde que E2.5c fechou): recusar, ou marcar, ajuste com `edf`
      acima do número de coeficientes, que é a assinatura das duas
      divergências de E2.5a. Toca `competitors.R`, arquivo de E2.5c.
-   - (d) A linha do `09-gam-autonomo.R` no `wafc/README.md` entra na
+   - (d) **~~Feito na integração de E2.5c.~~** A linha do `09-gam-autonomo.R` no `wafc/README.md` entra na
      integração de E2.5c, que tem o arquivo: "`scripts/09-gam-autonomo.R`
      ✓ | E2.5d | `Rscript wafc/scripts/09-gam-autonomo.R [n_rep] [partes]
      [ncores] [ns] [células] [ks]` (padrão `50`, `fit,report`, `64,128`):
@@ -2028,6 +2086,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-30 | E2.5c fechada e integrada: os pesos 1 da teoria predizem pior que o padrão do `grpreg` (2% a 8%), a junção dos níveis grossos vence no não homogêneo e na `mixed`; a escolha entre formas é de segunda ordem; catálogo vazio, e a pergunta 33 tem todas as medições que pediu |
 | 2026-09-30 | E2.5d fechada e integrada: o `gam` autônomo (REML, `k = 64` e `128`) empata com o `gam.matched`, o veredito de E2.5a se mantém e o fator do suave piora (1,58 a 1,92 para o LASSO); o `klopp.free` é o único que o vence em alguma célula; duas divergências do `bam` em E2.5a; pergunta 36 |
 | 2026-09-30 | L5 fechada e integrada: `.bib` com 69 entradas; a partição da unidade ancorada em Mallat (2009); Cai (1999) confere com E1.11; Restrepo & Leaf não serve para a base; D39 aplicada; pergunta 35 |
 | 2026-09-30 | E2.5b fechada e integrada: o `klopp.free` vence o `wafc.lasso` em toda célula com componente e empata no nulo, reprodução exata de E2.5a; a `mixed` em 50 réplicas confirma o `gam.matched`; a máquina tem 8 núcleos físicos; E2.5c e E2.5d ganham regras de concorrência |

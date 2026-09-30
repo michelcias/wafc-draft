@@ -20,6 +20,9 @@
 ##              their norm (3.1) does and what decision D3 does not do. It
 ##              is the estimator their theory covers, run on the design the
 ##              WAFC uses, which is the question decision D18 invites.
+##              The weight of a chunk (the sqrt(|G|) of grpreg or their
+##              one) and the merging of the coarse levels into one chunk
+##              are options, measured in step E2.5c.
 ##   "aspline"  a spline with knots chosen adaptively per block, in the
 ##              spirit of Wang, Jiang and Liu (2024). Their knot search is
 ##              an exact dynamic program; the one here is greedy forward
@@ -566,6 +569,17 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
 #' size about \eqn{\log n} inside each functional coefficient" that keeps
 #' the block a set of neighbouring translates at one scale.
 #'
+#' The weight of a chunk in the penalty is the one open question 34 of
+#' \code{docs/ESTADO.md} asks about (step E2.5c). By default it is the one
+#' of grpreg, the square root of the size of the chunk, and then the
+#' penalty level the theory needs is set by the chunks of size one of the
+#' coarse levels, which brings the bound back to the order of the LASSO;
+#' their norm (3.1), and the theory of step E1.11, have weight one on every
+#' chunk. \code{merge.coarse} is the third reading: the coarse levels of a
+#' block, the ones with \eqn{2^j} below the chunk size, become one chunk,
+#' which removes the chunks of size one of level 0 without touching the
+#' weight of the full chunks.
+#'
 #' @param x,u,y The data.
 #' @param J Resolution level, or a vector of candidates scored by the same
 #'   cross-validated loss. \code{NULL} uses the grid of
@@ -576,6 +590,16 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
 #'   in Klopp and Pensky. \code{FALSE} gives the block LASSO with the
 #'   unpenalized levels of decision D3, which isolates the effect of the
 #'   grouping alone.
+#' @param chunk.weights Weight of each chunk. \code{"sqrt"}, the default, is
+#'   the default of grpreg, which is the square root of the rank of the
+#'   chunk once grpreg has dropped its null columns, that is
+#'   \eqn{\sqrt{|G|}} for a chunk of full rank; nothing is passed to
+#'   grpreg, so the fit is the one of before the argument existed.
+#'   \code{"unit"} gives weight one to every chunk, as their norm (3.1)
+#'   does.
+#' @param merge.coarse Whether the levels \eqn{j} of a block with
+#'   \eqn{2^j} below the chunk size are merged into one chunk; see
+#'   \code{wafc_kp_groups()}.
 #' @param nfolds,foldid Folds of the cross-validation.
 #' @param ... Passed to \code{\link{wafc_design}}.
 #'
@@ -591,11 +615,14 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
 #'
 #' @export
 wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
-                           penalize.levels = TRUE, nfolds = 10L,
+                           penalize.levels = TRUE,
+                           chunk.weights = c("sqrt", "unit"),
+                           merge.coarse = FALSE, nfolds = 10L,
                            foldid = NULL, ...) {
   if (!requireNamespace("grpreg", quietly = TRUE)) {
     stop("method = \"klopp\" needs the package 'grpreg'.", call. = FALSE)
   }
+  chunk.weights <- match.arg(chunk.weights)
   n <- nrow(x)
   p <- ncol(x)
   q <- ncol(u)
@@ -609,10 +636,19 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
   best <- NULL
   for (Ji in J) {
     des <- wafc_design(x, u, J = Ji, ...)
-    grp <- wafc_kp_groups(des, block.size, penalize.levels)
+    grp <- wafc_kp_groups(des, block.size, penalize.levels, merge.coarse)
     Z <- as.matrix(des[["Z"]])
-    cv <- grpreg::cv.grpreg(Z, y, group = grp, penalty = "grLasso",
-                            fold = foldid)
+    ## grpreg reads a missing group.multiplier as its default, and there is
+    ## no value that means "missing", hence the two calls. The groups are
+    ## numbered 1, ..., max(grp) with no gap, which is the order grpreg
+    ## expects the multipliers in.
+    cv <- if (chunk.weights == "unit") {
+      grpreg::cv.grpreg(Z, y, group = grp, penalty = "grLasso",
+                        fold = foldid, group.multiplier = rep(1, max(grp)))
+    } else {
+      grpreg::cv.grpreg(Z, y, group = grp, penalty = "grLasso",
+                        fold = foldid)
+    }
     val <- min(cv[["cve"]])
     if (is.null(best) || val < best[["cve"]]) {
       best <- list(cve = val, J = Ji, design = des, cv = cv, group = grp)
@@ -667,6 +703,8 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
        extra = list(J = best[["J"]], block.size = block.size,
                     ngroups = length(unique(best[["group"]][best[["group"]] > 0L])),
                     penalize.levels = penalize.levels,
+                    chunk.weights = chunk.weights,
+                    merge.coarse = merge.coarse,
                     lambda = best[["cv"]][["lambda.min"]], cve = best[["cve"]]))
 }
 
@@ -1136,7 +1174,15 @@ wafc_bs_design <- function(x, u, sp) {
 ## ordered by increasing j and then k (D12): a level with at most
 ## 'block.size' translates is a chunk, a finer level is cut into
 ## consecutive pieces of that size.
-wafc_kp_groups <- function(design, block.size, penalize.levels) {
+##
+## With merge.coarse = TRUE the levels with 2^j below 'block.size' are one
+## chunk instead of one chunk each (step E2.5c, open question 34): with the
+## default ceiling(log n) of 6 or 7 that is levels 0 to 2, seven columns,
+## and it removes the chunk of size one of level 0. The finer levels are cut
+## as before, so the full chunks, and the short piece at the end of a level
+## that the chunk size does not divide, are unchanged.
+wafc_kp_groups <- function(design, block.size, penalize.levels,
+                           merge.coarse = FALSE) {
   nvars <- design[["nvars"]]
   grp <- integer(nvars)
   g <- 0L
@@ -1150,7 +1196,17 @@ wafc_kp_groups <- function(design, block.size, penalize.levels) {
     idx <- design[["blocks"]][[nm]]
     pos <- 0L
     Jm <- j0 + as.integer(round(log2(length(idx) + 2^j0)))
-    for (j in j0:(Jm - 1L)) {
+    levs <- j0:(Jm - 1L)
+    if (merge.coarse) {
+      coarse <- levs[2^levs < block.size]
+      if (length(coarse) > 0L) {
+        pos <- as.integer(sum(2^coarse))
+        g <- g + 1L
+        grp[idx[seq_len(pos)]] <- g
+        levs <- setdiff(levs, coarse)
+      }
+    }
+    for (j in levs) {
       nj <- 2^j
       lev <- idx[pos + seq_len(nj)]
       pos <- pos + nj

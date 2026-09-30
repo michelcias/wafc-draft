@@ -129,8 +129,9 @@ WAFC_OUT=wafc/cache/e25d Rscript wafc/scripts/09-gam-autonomo.R 50 fit,report 12
   QUT, o cenário `uneven` e a tabela de tempo, e a revisão de 2026-09-28
   (defeitos, memória, busca de nós) e D34 a D37; **674 testes passam**.
   E2.4c e E2.5a (a repetição do piloto) fecharam em 2026-09-30 com
-  **no-go para a variante LASSO** pelo critério literal; E2.5 espera a
-  decisão de rumo (pergunta 33 do `ESTADO.md`).
+  **no-go para a variante LASSO** pelo critério literal; E2.5b a E2.5d
+  mediram o block LASSO de K&P, os pesos dele e o `gam` autônomo (**696
+  testes**), e E2.5 espera a decisão de rumo (pergunta 33 do `ESTADO.md`).
 - **Avaliação da base em estudo numérico:** tabela fixa (`wtable()` uma vez,
   passada em `wavelet.table`), que é o caminho rápido; a regra `auto` não
   dispara nos `n` do estudo e deixaria tudo no algoritmo lento (D31). A
@@ -143,7 +144,7 @@ WAFC_OUT=wafc/cache/e25d Rscript wafc/scripts/09-gam-autonomo.R 50 fit,report 12
 - **Bibliografia:** 69 entradas verificadas (L1, L3, L4 e L5); pendências na pergunta 35 do `ESTADO.md`.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** E2.5c (os pesos do block LASSO); E2.5b, E2.5d e L5 fecharam em 2026-09-30; E2.4c, E2.5a e E1.11 fecharam em 2026-09-30;
+- **Catálogo:** vazio; E2.4c, E2.5a a E2.5d, E1.11 e L5 fecharam em 2026-09-30, e E2.5 espera a decisão da pergunta 33 do `ESTADO.md`;
   detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de

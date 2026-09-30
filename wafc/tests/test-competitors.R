@@ -11,7 +11,10 @@
 ## coordinates as wafc(), which is what makes the table a comparison and
 ## not a list. The third checks the block LASSO of Klopp and Pensky against
 ## a group vector built by hand, since the whole point of that column is to
-## be their penalty and not another one. The fourth checks the quantile
+## be their penalty and not another one; since step E2.5c it also checks
+## the weight of each chunk and the merged coarse levels against vectors
+## built by hand, and the default against the call it replaced, to 1e-12.
+## The fourth checks the quantile
 ## universal threshold against its own definition: it is the quantile of
 ## the smallest penalty level that kills the penalized part under the null,
 ## so simulating from the null and solving for that level has to reproduce
@@ -189,6 +192,80 @@ test_that("the block LASSO zeroes a whole chunk at a time", {
     v <- b[grp == g & alive]
     if (length(v) == 0L) next
     expect_true(all(v == 0) || all(v != 0))
+  }
+})
+
+test_that("the weights and the merged coarse levels are the ones asked for", {
+  ## Step E2.5c, open question 34 of docs/ESTADO.md. At J = 4 a block has
+  ## the levels 0 to 3, with 1, 2, 4 and 8 columns in that order (D12).
+  skip_if_not(has("grpreg"))
+  des <- wafc_design(x0, u0, J = 4L)
+  nb <- length(des[["blocks"]])
+  by_hand <- function(one, levels.group) {
+    grp <- integer(des[["nvars"]])
+    off <- as.integer(levels.group)
+    if (levels.group) grp[des[["unpenalized"]]] <- 1L
+    for (b in seq_len(nb)) {
+      grp[des[["blocks"]][[b]]] <- one + off + (b - 1L) * max(one)
+    }
+    grp
+  }
+  ## chunks of 7: level 3 is cut into 7 + 1; merged, the levels 0 to 2
+  ## (1 + 2 + 4 = 7 columns) are one chunk and level 3 is cut as before
+  sep7 <- c(1L, 2L, 2L, 3L, 3L, 3L, 3L, rep(4L, 7L), 5L)
+  mrg7 <- c(rep(1L, 7L), rep(2L, 7L), 3L)
+  expect_identical(wafc_kp_groups(des, 7L, FALSE), by_hand(sep7, FALSE))
+  expect_identical(wafc_kp_groups(des, 7L, FALSE, merge.coarse = TRUE),
+                   by_hand(mrg7, FALSE))
+  expect_identical(wafc_kp_groups(des, 7L, TRUE, merge.coarse = TRUE),
+                   by_hand(mrg7, TRUE))
+  ## the merge takes 2^j strictly below the chunk size: with chunks of 4,
+  ## level 2 is a full chunk and stays one, and level 3 is two of them
+  mrg4 <- c(1L, 1L, 1L, rep(2L, 4L), rep(3L, 4L), rep(4L, 4L))
+  expect_identical(wafc_kp_groups(des, 4L, FALSE, merge.coarse = TRUE),
+                   by_hand(mrg4, FALSE))
+  ## a chunk size of 1 has no level below it, and the merge changes nothing
+  expect_identical(wafc_kp_groups(des, 1L, FALSE, merge.coarse = TRUE),
+                   wafc_kp_groups(des, 1L, FALSE))
+
+  ## The weights, read from the multiplier grpreg records it used: sqrt(|G|)
+  ## by default, one with chunk.weights = "unit", and sqrt(|G|) of the
+  ## merged chunks with merge.coarse = TRUE.
+  kp <- function(...) {
+    wafc_fit_klopp(x0, u0, y0, J = 4L, block.size = 7L,
+                   penalize.levels = FALSE, foldid = folds, ...)
+  }
+  mult <- function(fit) unname(as.numeric(fit[["fit"]][["fit"]][["group.multiplier"]]))
+  f_sqrt <- kp()
+  f_unit <- kp(chunk.weights = "unit")
+  f_mrg <- kp(merge.coarse = TRUE)
+  expect_equal(mult(f_sqrt), sqrt(rep(c(1, 2, 4, 7, 1), nb)))
+  expect_equal(mult(f_unit), rep(1, 5L * nb))
+  expect_equal(mult(f_mrg), sqrt(rep(c(7, 7, 1), nb)))
+  expect_identical(f_mrg[["extra"]][["ngroups"]], 3L * nb)
+  expect_identical(f_unit[["extra"]][["chunk.weights"]], "unit")
+  ## match.arg() translates its message, so only the error is checked
+  expect_error(kp(chunk.weights = "log"))
+  ## different weights are a different estimator
+  expect_false(isTRUE(all.equal(as.numeric(stats::coef(f_unit[["fit"]])),
+                                as.numeric(stats::coef(f_sqrt[["fit"]])))))
+
+  ## The default is the fit of before the two arguments existed, which
+  ## called grpreg with no multiplier on the groups of wafc_kp_groups(); this
+  ## is what keeps every number of steps E2.5a and E2.5b.
+  for (pl in c(TRUE, FALSE)) {
+    fit <- wafc_fit_klopp(x0, u0, y0, J = 3:4, penalize.levels = pl,
+                          foldid = folds)
+    des <- fit[["design"]]
+    ref <- grpreg::cv.grpreg(as.matrix(des[["Z"]]), y0,
+                             group = wafc_kp_groups(des, fit[["extra"]][["block.size"]], pl),
+                             penalty = "grLasso", fold = folds)
+    expect_equal(as.numeric(stats::coef(fit[["fit"]])),
+                 as.numeric(stats::coef(ref)), tolerance = 1e-12)
+    expect_equal(fit[["fit"]][["cve"]], ref[["cve"]], tolerance = 1e-12)
+    expect_equal(fit[["fitted"]],
+                 as.numeric(predict(ref, as.matrix(des[["Z"]]))),
+                 tolerance = 1e-12)
   }
 })
 
