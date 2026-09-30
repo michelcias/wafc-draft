@@ -1471,6 +1471,54 @@ nomes seguem D39.
   fórmula se lê na página renderizada. Com o `chicago.bst` os prenomes saem
   abreviados, de modo que D39 aparece no `.bib`, não no PDF.
 
+### 2026-09-30: E2.5d fechada, o `gam` autônomo confirma E2.5a
+
+Chat de tarefa, integrado aqui. `wafc/scripts/09-gam-autonomo.R` reproduz
+o sorteio da parte `competitors` sem editar o piloto e ajusta o `gam` com
+REML (`bam`, `select = TRUE`) e `k` fixo sem olhar o WAFC, 64 e 128 por
+moduladora. Conferido nesta máquina: o `gam.matched` refeito bate com
+E2.5a nas 600 linhas das células `q = 2` com diferença 0 (a tarefa
+conferiu as 645, com a `mixed`), e o fator do suave abaixo reproduz. 645
+réplicas, 1 935 ajustes, 0 falhas, 1 h 18 min em 12 núcleos, pico de
+1,3 GB por processo.
+
+- **A pergunta 33(d) está respondida: herdar o `J` do WAFC não dava
+  vantagem ao `gam`.** O autônomo fica a 1% a 2% do `gam.matched` em quase
+  toda célula, e é melhor onde o `J` pequeno do WAFC apertava a base
+  (`uneven` em `n = 250`: 0,91 / 0,82).
+- **O veredito de E2.5a se mantém com um concorrente autônomo, e o fator
+  do suave piora.** `ISE(wafc.lasso)/ISE(gam.k128)`: 1,58, 1,69 e 1,92 no
+  `smooth` e 1,81, 1,71 e 1,59 no `uneven`, com o `gam` vencendo em 88% a
+  100% das réplicas; para o `klopp.free`, 1,47 a 1,68 e 1,38 a 1,63. Com
+  1,5, o `klopp.free` passa só no `smooth` em `n = 250` e no `uneven` em
+  `n ≥ 500`.
+- **O `klopp.free` é o único método que vence o `gam` autônomo em alguma
+  célula:** no não homogêneo em `n ≥ 500` (2% e 5% em `rmse_f` contra o
+  `gam.k128`, 5% e 13% em ISE). Empata na `mixed` e perde no suave por 16%
+  a 21% em `rmse_f`. Contra o `wafc.lasso`, o `gam` autônomo vence no suave
+  (88% a 100% das réplicas), na `mixed` e no não homogêneo em 250 e 500, e
+  empata em `n = 1000`; no nulo o WAFC é melhor em 500 e 1000.
+- **O motor não é a causa:** `gam` com REML exato, sem discretização, dá o
+  mesmo número que o `bam` a 0,5% em 40 ajustes, a 20 a 90 vezes o custo.
+- **`k = 128` não aperta nos `n` do piloto** (`edf`/coeficientes do maior
+  suavizador ≤ 0,61); `k = 64` aperta no não homogêneo e na `mixed` em
+  `n = 1000` (até 0,74). O `gam.matched` apertava no suave (0,78 a 0,92).
+- **Achado em E2.5a: o `bam` com `k = 256` e `n = 1000` diverge sem
+  erro** em 2 de 38 ajustes (réplicas 12 e 14 do não homogêneo em
+  `n = 1000`: `rmse_f` de 451 e 910, `edf` na casa dos milhares). As
+  tabelas de E2.5a e E2.5b são medianas e não mudam, mas qualquer leitura
+  por média ou gráfico dos `.rds` tem de marcar as duas. **Lição:** "0
+  falhas" no piloto quer dizer "nenhum erro", não "nenhum ajuste absurdo";
+  concorrente de base grande pede a checagem `edf` ≤ coeficientes.
+- **Custo:** o `gam.k64` custa menos que a busca do WAFC nas células
+  `q = 2` (2,7 s contra 7 a 26 s); o `gam.k128` custa o mesmo ali e de 8 a
+  44 vezes mais na `mixed` (~8 min por ajuste com 12 processos). O tempo
+  medido em varredura paralela é cota superior.
+- **Pendências** (pergunta 36): qual `gam` entra em E4, a `mixed` em 50
+  réplicas para o `gam` autônomo, a guarda de `edf` no `wafc_fit_gam()` e
+  a linha do `09-gam-autonomo.R` no `wafc/README.md`, que é arquivo de
+  E2.5c e entra na integração dela.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
