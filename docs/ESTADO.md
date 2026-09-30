@@ -2,12 +2,12 @@
 
 **Última atualização:** 2026-09-30.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
-E1.10), E5a, E5c e E2.1 a E2.4b fechadas**, mais L1 a L4 e a sondagem E6.1a.
+E1.10), E5a, E5c e E2.1 a E2.4c fechadas**, mais L1 a L4 e a sondagem E6.1a.
 Falta E2.5 (go/no-go) para fechar E2; P1 e P2 foram ratificadas (D34,
 D35), as perguntas 29 e 31 estão fechadas, e ela espera só a repetição do
 piloto (§5).
-Catalogadas em 2026-09-30, em sequência: **E2.4c** (preparar o
-`04-pilot.R`, em curso) e **E2.5a** (rodar a repetição). A decidir pelo
+**E2.4c fechada** (2026-09-30): o `04-pilot.R` está pronto; **E2.5a**
+(rodar a repetição) está catalogada e pode abrir. A decidir pelo
 autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
 (D21).
 **Versão viva do manuscrito:** `k = 2` (`manuscript/ms_2.tex`,
@@ -1208,6 +1208,40 @@ catálogo. As perguntas 15 e 26 fecham.
 
 As oito perguntas que a tarefa deixou estão na pergunta 32 da §4.
 
+### 2026-09-30: E2.4c fechada, o piloto pronto para a repetição
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: **674 testes
+passam**, 0 falhas; a tarefa tocou só `wafc/scripts/04-pilot.R` e
+`wafc/README.md` (o `competitors.R` já repassava `k` e `engine` ao `gam`).
+
+- **O que mudou no `04-pilot.R`:** célula `uneven` (`p = 3`, `q = 2`, SNR 4,
+  50 réplicas), acrescentada **por último** para as quatro células de E2.4
+  manterem as sementes; método `gam.matched`, com `k = wafc_k_matched(u, J)`
+  no `J.min` do `wafc.lasso` da mesma réplica e motor `bam`, ao lado do
+  `gam` com `k = 10`; a coluna `J` na tabela de medianas; e `WAFC_TAG`
+  como prefixo de todo `.rds` (padrão `e24`).
+- **Conserto que não estava pedido:** a semente de cada réplica vinha da
+  posição da célula e do `n` nas listas **restritas** pelos argumentos, de
+  modo que rodar uma célula ou um `n` sozinho sorteava outros dados, contra
+  o que o cabeçalho prometia. Agora vem das listas completas; as rodadas
+  completas mantêm as sementes de antes.
+- **Fumaça**, 1 réplica, `n = 250`, as cinco células: 50 linhas, **0
+  falhas**, 123 s em 8 núcleos. No nulo, `gam` e `gam.matched` coincidem
+  na quinta casa, porque com `select = TRUE` o REML leva os suavizadores à
+  reta, onde `k` não importa.
+- **O risco de E2.5a é o `gam.matched` no topo da grade**, medido em
+  ajustes isolados: 0,1 a 1 s até `J = 6`, 5 s em `J = 7`, 72 s em `J = 8`
+  com `n = 250`, **522 s** no não homogêneo com `n = 1000` e `J = 8`, e
+  **mais de 15 min, com 3 a 4 GB de memória por processo**, na `mixed` com
+  `n = 1000` (interrompido). Como o `sweep_part` roda as 15 réplicas da
+  `mixed` num mesmo `n` juntas, 12 núcleos pediriam ~48 GB, contra 31 da
+  máquina. Daí E2.5a rodar a `mixed` à parte, com poucos núcleos, o que o
+  conserto das sementes permite sem mudar os dados.
+- **O tempo do `gam.matched` é só o do spline**; a busca que escolheu `J` é
+  contada na coluna do `wafc.lasso`, e a tabela de tempo tem de dizer isso.
+- A `uneven` entra também nas partes `lambda` e `j1`; `margin` e `jgrid`
+  continuam restritas por nome.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1591,7 +1625,7 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
   (o script ainda não tem a célula `uneven` nem o `gam` casado por `bam`:
   a parte `competitors` chama o `gam` com `k = 10`) seguida de E2.5a (a
   rodada), no `TAREFA.md` §3; E2.4c sem rodada de calibração, por decisão
-  do autor.
+  do autor. **E2.4c fechou em 2026-09-30 (§2); falta E2.5a.**
 - (d) **E2.5**, com a calibração do limiar `t_n` (pergunta 11) e a escolha
   entre LASSO limiarizado e sparse group LASSO, que E1.7c e a tabela de
   tempo já inclinam para o primeiro.
@@ -1606,6 +1640,7 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-30 | E2.4c fechada e integrada: `uneven` e `gam.matched` no `04-pilot.R`, `WAFC_TAG`, sementes independentes da restrição de células; o `gam.matched` em `J = 8` custa de 72 s a mais de 15 min e até 4 GB, e a `mixed` roda à parte em E2.5a |
 | 2026-09-30 | Este chat vira o orquestrador; documentos alinhados a D5, D8 e D34 a D37; E2.4c e E2.5a catalogadas; `k = 2` aberta; D38; E5c fechada e integrada: Corolário 8 no artigo (§3.6, S7), §4.2 alinhada a D35, "sieve" trocado, 33 e 30 páginas |
 | 2026-09-28 | Pergunta 31 investigada (`08-sgl-null.R`, reproduzido): o laço de dobras bate com o `cv.sparsegl`, não há vazamento (termo cruzado `t = 0,6`), e o sparse group LASSO no nulo cai numa faixa plana da curva por maldição do vencedor, com o mesmo custo em predição do LASSO e centenas de coeficientes falsos; D37: nenhuma aceleração entra |
 | 2026-09-28 | Pergunta 29 medida (`07-accel.R`, 384 réplicas): o prefixo do caminho é exato; em etapas passa no LASSO (255/255) com ganho de só 1,5×, reprova nos grupos (104/129); `1e-8` nos grupos reprova por uma réplica (128/129); e a validação cruzada do sparse group LASSO se engana no nulo com a grade funda (pergunta 31) |

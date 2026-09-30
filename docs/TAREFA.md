@@ -63,7 +63,8 @@ que ler antes está aqui e no plano.
 | Revisão de `wafc/` | **feita** (2026-09-28): cinco defeitos, `call` compacto, só o melhor ajuste no `cv.wafc`, busca de nós rápida; 672 testes passam, piloto idêntico | `wafc/R/`, `wafc/scripts/04-pilot.R`, `wafc/tests/` |
 | P1, P2 e perguntas 29 a 31 | **decididas** (2026-09-28): grade `2:8` (D34), margem `0` (D35), `bsgl` na mesma grade (D36), nenhuma aceleração (D37); 674 testes passam | `wafc/R/tune.R`, `wafc/R/design.R`, `wafc/R/competitors.R`, `wafc/scripts/07-accel.R`, `wafc/scripts/08-sgl-null.R` |
 | E6.1a sondagem de bases | **fechada** (2026-09-20): veredito negativo nas três candidatas | `docs/aplicacao-candidatas.md` |
-| E2.4c e E2.5a (repetição do piloto) | **catalogadas** (2026-09-30), em sequência | §3 |
+| E2.4c preparar o piloto | **fechada** (2026-09-30): célula `uneven`, `gam.matched` por `bam`, `WAFC_TAG`, sementes independentes da restrição; 674 testes, fumaça sem falha | `wafc/scripts/04-pilot.R` |
+| E2.5a repetir o piloto | **catalogada** (2026-09-30), pode abrir | §3 |
 | E5c manuscrito `k = 2` | **fechada** (2026-09-30): pergunta 15 aplicada e marcada, Corolário 8 no artigo (§3.6, S7); 33 e 30 páginas, `.bib` com 37 entradas | `manuscript/ms_2.tex`, `supp_2.tex`, `references_2.bib` |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
@@ -79,16 +80,15 @@ tarefa pode criar ou editar**.
 
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
-| **E2.4c** preparar o piloto | `04-pilot.R` pronto para o item (c) da §5 do `ESTADO.md`: (i) célula `uneven` (`p = 3`, `q = 2`, SNR 4, 50 réplicas) na lista de células; (ii) método novo `gam.matched`, com `k = wafc_k_matched(u, J)` tomando o `J.min` do `wafc.lasso` da mesma réplica e `engine = "bam"`, **mantendo** a coluna `gam` com `k = 10` para comparar com a tabela de E2.4; (iii) as tabelas impressas pela parte `competitors` incluindo a célula e o método novos; (iv) o nome do `.rds` de saída parametrizado (hoje é sempre `e24-competitors.rds`), para a repetição não sobrescrever a de E2.4. **Sem rodada de calibração** (decisão do autor): só a bateria de testes e a fumaça `04-pilot.R 1 competitors 8 250` em cada célula, para conferir que nenhum método vira linha de falha | nada | `wafc/scripts/04-pilot.R`, `wafc/tests/test-competitors.R` (só se tocar `wafc_competitor()`), `wafc/R/competitors.R` (idem, e só para o repasse de `k` e `engine` ao `gam`), `wafc/README.md` (a linha do `04-pilot.R`), `docs/handoff-E2.4c.md` |
-| **E2.5a** repetir o piloto | a parte `competitors` do `04-pilot.R` inteira, com os padrões de D34 a D36, 50 réplicas (15 na `mixed`) e `WAFC_OUT=wafc/cache/e25a`; no handoff, as tabelas de razões contra `wafc.lasso` por célula e `n` (`rmse_f` e ISE), a contagem de falhas por método, a mediana do `J` escolhido, o tempo por método e o tempo total da rodada, e a leitura contra o critério de E2.5 (`plano-projeto.md`): margem no cenário não homogêneo, fator contra o `gam.matched` no suave e no `uneven` | E2.4c | nenhum arquivo versionado além de `docs/handoff-E2.5a.md`; os `.rds` ficam em `wafc/cache/`, que não é versionado. Defeito achado no script vira item do handoff, não edição |
+| **E2.5a** repetir o piloto | a parte `competitors` do `04-pilot.R` inteira, com os padrões de D34 a D36 e 50 réplicas (15 na `mixed`), **em duas chamadas**, porque o `gam.matched` em `J = 8` chega a 4 GB por processo na `mixed` (E2.4c): `WAFC_OUT=wafc/cache/e25a WAFC_TAG=e25a Rscript wafc/scripts/04-pilot.R 50 competitors 12 "" smooth,inhomogeneous,null,uneven` e depois `WAFC_OUT=wafc/cache/e25a WAFC_TAG=e25a-mixed Rscript wafc/scripts/04-pilot.R 50 competitors 4 "" mixed`, em sequência e não juntas; baixar os núcleos se a memória apertar (as sementes não dependem disso); no handoff, as tabelas de razões contra `wafc.lasso` por célula e `n` (`rmse_f` e ISE), a contagem de falhas por método, a mediana do `J` escolhido, o tempo por método (dizendo que o do `gam.matched` não inclui a busca de `J`, contada no `wafc.lasso`) e o tempo total de cada chamada, e a leitura contra o critério de E2.5 (`plano-projeto.md`): margem no cenário não homogêneo, fator contra o `gam.matched` no suave e no `uneven` | E2.4c | nenhum arquivo versionado além de `docs/handoff-E2.5a.md`; os `.rds` ficam em `wafc/cache/`, que não é versionado. Defeito achado no script vira item do handoff, não edição |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**Catalogadas em 2026-09-30: E2.4c e E2.5a**, em sequência (E2.5a só abre
-com o handoff de E2.4c integrado). Elas são a repetição do piloto que E2.5
+**Catalogadas em 2026-09-30: E2.4c e E2.5a**, em sequência; E2.4c fechou
+no mesmo dia e **E2.5a pode abrir**. Elas são a repetição do piloto que E2.5
 (go/no-go) espera, e E2.5 propriamente dita continua sendo do chat
 principal, sobre o handoff de E2.5a. E2.5 **não abre antes dessa
 repetição**, isto é, da parte `competitors` com a grade `2:8`, `k` casado

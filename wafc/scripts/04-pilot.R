@@ -28,7 +28,16 @@
 ##                and reads what the extra levels buy and cost.
 ##
 ## 'ns' and 'cells' are comma separated and restrict the sweep, which is
-## how a part is rerun on one cell without rerunning the rest.
+## how a part is rerun on one cell without rerunning the rest. The seed of a
+## replicate is fixed by the position of its cell and of its n in the full
+## lists below, and not in the restricted ones, so a restricted run draws
+## the same data as the full run does for those cells.
+##
+## Two environment variables place the output: WAFC_OUT is the directory
+## (the working directory by default; created if missing, so that a long
+## run does not end on a failed saveRDS), and WAFC_TAG the prefix of every
+## file name ("e24" by default, the name of the files of step E2.4). The
+## rerun of step E2.5a sets both, and so leaves the files of E2.4 alone.
 ##
 ## Default: 50 replicates, every part, as many cores as the machine has
 ## minus two, with one exception that is measured and not guessed. The cell
@@ -39,7 +48,7 @@
 ## LASSO and 6.9 s on the block LASSO, and about 27 minutes of processor
 ## over the three sample sizes. Fifty replicates of that cell would be 23
 ## processor-hours, against 3 for the other three together, so it carries
-## its own budget, the 'reps' field of the list below. The two cells that
+## its own budget, the 'reps' field of the list below. The cells that
 ## carry the verdict of step E2.5 keep the 50 the plan asks for.
 ##
 ## The two parts that answer a question about the code rather than about
@@ -73,6 +82,9 @@ ncores <- if (length(args) >= 3L && nzchar(args[3L])) as.integer(args[3L]) else 
   max(1L, parallel::detectCores() - 2L)
 }
 out_dir <- Sys.getenv("WAFC_OUT", ".")
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+out_tag <- Sys.getenv("WAFC_TAG", "e24")
+out_file <- function(what) file.path(out_dir, paste0(out_tag, "-", what, ".rds"))
 seed0 <- 20260919L
 
 ## Decision D31: in repeated numerical work the basis is fixed and evaluated
@@ -89,9 +101,14 @@ wafc_pilot_table <- WaveBased::wtable(family = "Daublets", filter.size = 8L,
                                       prec.wavelet = 30L, check = FALSE)
 n_test <- 2000L
 n_grid <- 256L
+ns_default <- c(250L, 500L, 1000L)
 ns <- if (length(args) >= 4L && nzchar(args[4L])) {
   as.integer(strsplit(args[4L], ",", fixed = TRUE)[[1L]])
-} else c(250L, 500L, 1000L)
+} else ns_default
+## the position of n in the seeds: the default sizes keep theirs, and a size
+## outside them is numbered after them
+ns_all <- c(ns_default, setdiff(ns, ns_default))
+n_index <- function(n) match(n, ns_all)
 R_small <- min(R, 20L)
 
 ## The effective regularity s' each scenario declares (decision D27) is read
@@ -101,28 +118,44 @@ R_small <- min(R, 20L)
 ## function and had no entry for "uneven", so a cell of that scenario would
 ## have failed in the part 'lambda' and been dropped.
 
-## The four cells of the pilot. The third is the "mixture with half the
+## The five cells of the pilot. The third is the "mixture with half the
 ## components null" of plano-projeto.md E2.4, as far as dgp.R reaches:
 ## wafc_scenario() activates three blocks whatever p and q are, so p = 4 and
 ## q = 4 give 3 active blocks of 16, which is sparser than a half and not
 ## looser. Making the fraction a parameter is a change to dgp.R and is in
 ## the handoff.
-cells <- list(
+##
+## The fifth, "uneven", is the smooth scenario of uneven curvature decision
+## D30 asks for (step E2.4b): C-infinity components whose scale varies along
+## the domain, inside the hypothesis of the spline competitors, and the cell
+## on which the factor of the exit criterion of E2.5 in the smooth case is
+## to be fixed. It is appended last so that the four cells of E2.4 keep
+## their position, and with it their seeds.
+cells_all <- list(
   list(name = "smooth", scenario = "smooth", p = 3L, q = 2L, snr = 4),
   list(name = "inhomogeneous", scenario = "inhomogeneous", p = 3L, q = 2L,
        snr = 3),
   list(name = "mixed", scenario = "inhomogeneous", p = 4L, q = 4L, snr = 3,
        reps = 15L),
-  list(name = "null", scenario = "null", p = 3L, q = 2L, sigma = 0.62)
+  list(name = "null", scenario = "null", p = 3L, q = 2L, sigma = 0.62),
+  list(name = "uneven", scenario = "uneven", p = 3L, q = 2L, snr = 4)
 )
+cell_index <- function(cell) {
+  match(cell[["name"]], vapply(cells_all, `[[`, "", "name"))
+}
 
+cells <- cells_all
 if (length(args) >= 5L && nzchar(args[5L])) {
   want <- strsplit(args[5L], ",", fixed = TRUE)[[1L]]
   cells <- cells[vapply(cells, `[[`, "", "name") %in% want]
 }
 
-methods <- c("wafc.lasso", "wafc.sglasso", "gam", "bsgl", "klopp", "aspline",
-             "vcbart", "linear", "oracle")
+## 'gam' is mgcv at the default k = 10, the column of the table of E2.4,
+## kept to read the rerun against it; 'gam.matched' is the same model at the
+## dimension of the WAFC (step E6.1a showed that the difference between the
+## two can be the whole verdict). The order is the order of the tables.
+methods <- c("wafc.lasso", "wafc.sglasso", "gam", "gam.matched", "bsgl",
+             "klopp", "aspline", "vcbart", "linear", "oracle")
 
 ## ---------------------------------------------------------------------------
 ## Shared machinery
@@ -234,8 +267,7 @@ fail_row <- function(cell, n, r, method, dgp, active, err) {
 ## ---------------------------------------------------------------------------
 
 run_competitors <- function(cell, n, r) {
-  seed <- seed0 + 100000L * match(cell[["name"]], vapply(cells, `[[`, "", "name")) +
-    1000L * match(n, ns) + r
+  seed <- seed0 + 100000L * cell_index(cell) + 1000L * n_index(n) + r
   dgp <- draw_cell(cell, n, seed)
   test <- test_for(cell, dgp, seed)
   p <- cell[["p"]]
@@ -246,7 +278,9 @@ run_competitors <- function(cell, n, r) {
   rows <- list()
 
   ## The two WAFC variants, tuned by cross-validation over (J, lambda),
-  ## which decision D20 made the default rule.
+  ## which decision D20 made the default rule. The resolution the LASSO
+  ## selects is kept for 'gam.matched' below.
+  J_lasso <- NULL
   for (pen in c("lasso", "sglasso")) {
     t0 <- proc.time()[["elapsed"]]
     cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], penalty = pen,
@@ -258,6 +292,7 @@ run_competitors <- function(cell, n, r) {
       next
     }
     el <- proc.time()[["elapsed"]] - t0
+    if (pen == "lasso") J_lasso <- cv[["J.min"]]
     f <- cv[["wafc.fit"]]
     lam <- cv[["lambda.min"]]
     d_test <- wafc_design(test[["x"]], test[["u"]], spec = f[["design"]])
@@ -274,22 +309,43 @@ run_competitors <- function(cell, n, r) {
            nzero = sum(cf[-1L, 1L][-f[["design"]][["unpenalized"]]] != 0)))
   }
 
-  for (mth in c("gam", "bsgl", "klopp", "aspline", "vcbart", "linear",
-                "oracle")) {
-    f <- try(wafc_competitor(mth, dgp[["x"]], dgp[["u"]], dgp[["y"]],
-                             active = active, foldid = foldid,
-                             wavelet.table = wafc_pilot_table), silent = TRUE)
+  ## 'gam.matched' is mgcv with the basis dimension of each smooth matched to
+  ## the 2^J wavelet columns of a block at the J the WAFC with the LASSO
+  ## selected on this replicate (wafc_k_matched(), step E2.4b), fitted by
+  ## bam, which is what makes that dimension affordable (the note on
+  ## wafc_fit_gam()). Its row carries that J, and its time is the time of
+  ## the spline fit alone: the search that chose J is paid, and reported, in
+  ## the column of the WAFC. Without a J to match, it fails as a row.
+  for (lab in setdiff(methods, c("wafc.lasso", "wafc.sglasso"))) {
+    mth <- sub("\\.matched$", "", lab)
+    own <- list()
+    if (lab == "gam.matched") {
+      if (is.null(J_lasso)) {
+        err <- try(stop("wafc.lasso failed, so there is no J to match"),
+                   silent = TRUE)
+        rows[[length(rows) + 1L]] <- fail_row(cell, n, r, lab, dgp, active,
+                                              err)
+        next
+      }
+      own <- list(k = wafc_k_matched(dgp[["u"]], J_lasso), engine = "bam")
+    }
+    f <- try(do.call(wafc_competitor,
+                     c(list(mth, dgp[["x"]], dgp[["u"]], dgp[["y"]],
+                            active = active, foldid = foldid,
+                            wavelet.table = wafc_pilot_table), own)),
+             silent = TRUE)
     if (inherits(f, "try-error")) {
-      rows[[length(rows) + 1L]] <- fail_row(cell, n, r, mth, dgp, active, f)
+      rows[[length(rows) + 1L]] <- fail_row(cell, n, r, lab, dgp, active, f)
       next
     }
     gh <- wafc_grid_components(f, grid)
     rows[[length(rows) + 1L]] <- one_row(
-      cell, n, r, mth, dgp, test, grid,
+      cell, n, r, lab, dgp, test, grid,
       list(f_test = predict(f, test[["x"]], test[["u"]]),
            beta_test = f[["beta"]](test[["u"]]), time = f[["time"]]),
       active, f[["blocks"]], gh,
-      list(J = f[["extra"]][["J"]], lambda = f[["extra"]][["lambda"]]))
+      list(J = if (lab == "gam.matched") J_lasso else f[["extra"]][["J"]],
+           lambda = f[["extra"]][["lambda"]]))
   }
   do.call(rbind, rows)
 }
@@ -304,8 +360,7 @@ run_competitors <- function(cell, n, r) {
 ## cost of a rule is its error divided by that one.
 run_lambda <- function(cell, n, r) {
   seed <- seed0 + 200000L +
-    10000L * match(cell[["name"]], vapply(cells, `[[`, "", "name")) +
-    1000L * match(n, ns) + r
+    10000L * cell_index(cell) + 1000L * n_index(n) + r
   dgp <- draw_cell(cell, n, seed)
   test <- test_for(cell, dgp, seed)
   p <- cell[["p"]]
@@ -448,8 +503,7 @@ margin_grid <- function(J, L = 8L) {
 
 run_margin_fit <- function(cell, n, r) {
   seed <- seed0 + 300000L +
-    10000L * match(cell[["name"]], vapply(cells, `[[`, "", "name")) +
-    1000L * match(n, ns) + r
+    10000L * cell_index(cell) + 1000L * n_index(n) + r
   dgp <- draw_cell(cell, n, seed)
   test <- test_for(cell, dgp, seed)
   p <- cell[["p"]]
@@ -499,8 +553,7 @@ run_margin_fit <- function(cell, n, r) {
 ## 1:Jmax and once on 2:Jmax.
 run_j1 <- function(cell, n, r) {
   seed <- seed0 + 400000L +
-    10000L * match(cell[["name"]], vapply(cells, `[[`, "", "name")) +
-    1000L * match(n, ns) + r
+    10000L * cell_index(cell) + 1000L * n_index(n) + r
   dgp <- draw_cell(cell, n, seed)
   test <- test_for(cell, dgp, seed)
   set.seed(seed + 77L)
@@ -540,8 +593,7 @@ run_j1 <- function(cell, n, r) {
 ## inhomogeneous components need is above it.
 run_jgrid <- function(cell, n, r, deep = 8L) {
   seed <- seed0 + 600000L +
-    10000L * match(cell[["name"]], vapply(cells, `[[`, "", "name")) +
-    1000L * match(n, ns) + r
+    10000L * cell_index(cell) + 1000L * n_index(n) + r
   dgp <- draw_cell(cell, n, seed)
   test <- test_for(cell, dgp, seed)
   p <- cell[["p"]]
@@ -639,12 +691,13 @@ med <- function(d, vars, by) {
 
 if ("competitors" %in% parts) {
   res <- sweep_part(run_competitors, "competitors")
-  saveRDS(res, file.path(out_dir, "e24-competitors.rds"))
+  saveRDS(res, out_file("competitors"))
   res[["method"]] <- factor(res[["method"]], levels = methods)
   cat("\nmedians by cell, n and method (rmse_f out of sample, ISE of the",
-      "components, blocks kept of the active and of the null ones, s):\n")
+      "components, blocks kept of the active and of the null ones, the J",
+      "selected or matched, s):\n")
   print(med(res, c("rmse_f", "mse_beta", "ise", "ise_active", "ise_null",
-                   "n_true", "n_false", "time"),
+                   "n_true", "n_false", "J", "time"),
             c("cell", "n", "method")),
         row.names = FALSE, digits = 3)
   cat("\nrelative to the WAFC with the LASSO (rmse_f, median of the ratios",
@@ -665,7 +718,7 @@ if ("competitors" %in% parts) {
 
 if ("lambda" %in% parts) {
   res <- sweep_part(run_lambda, "lambda rules")
-  saveRDS(res, file.path(out_dir, "e24-lambda.rds"))
+  saveRDS(res, out_file("lambda"))
   cat("\nmedians by cell, n and rule:\n")
   print(med(res, c("J", "lambda", "nzero", "rmse_f", "ise", "n_true",
                    "n_false", "time"), c("cell", "n", "method")),
@@ -697,7 +750,7 @@ if ("margin" %in% parts) {
     }
   }
   gm <- do.call(rbind, gm)
-  saveRDS(gm, file.path(out_dir, "e24-gram.rds"))
+  saveRDS(gm, out_file("gram"))
   cat("\nlambda_min(G_eps):\n")
   print(stats::reshape(gm[c("J", "eps.rule", "lmin")], idvar = "J",
                        timevar = "eps.rule", direction = "wide"),
@@ -715,7 +768,7 @@ if ("margin" %in% parts) {
                     cells_used = cells[vapply(cells, `[[`, "", "name") %in%
                                          c("smooth", "inhomogeneous")],
                     ns_used = range(ns), reps = R_small)
-  saveRDS(res, file.path(out_dir, "e24-margin.rds"))
+  saveRDS(res, out_file("margin"))
   cat("\nmedians by cell, n, J and margin:\n")
   print(med(res, c("eps", "rmse_f", "ise", "ise_active", "nzero", "nullcol"),
             c("cell", "n", "J", "eps.rule")),
@@ -729,7 +782,7 @@ if ("margin" %in% parts) {
   sel <- unlist(lapply(split(seq_len(nrow(res)), key),
                        function(i) i[which.min(res[["cvm"]][i])]))
   at_cv <- res[sort(sel), ]
-  saveRDS(at_cv, file.path(out_dir, "e24-margin-atcv.rds"))
+  saveRDS(at_cv, out_file("margin-atcv"))
   cat("\nat the J the cross-validation picks for each margin:\n")
   print(med(at_cv, c("J", "eps", "rmse_f", "ise", "ise_active", "nzero",
                      "nullcol"),
@@ -750,7 +803,7 @@ if ("margin" %in% parts) {
 
 if ("j1" %in% parts) {
   res <- sweep_part(run_j1, "J = 1 in the grid", reps = R_small)
-  saveRDS(res, file.path(out_dir, "e24-j1.rds"))
+  saveRDS(res, out_file("j1"))
   cat("\nmedians by cell, n and lower end of the grid:\n")
   print(med(res, c("J", "cvm", "rmse_f", "time"), c("cell", "n", "from")),
         row.names = FALSE, digits = 3)
@@ -771,7 +824,7 @@ if ("jgrid" %in% parts) {
                     cells_used = cells[vapply(cells, `[[`, "", "name") %in%
                                          c("smooth", "inhomogeneous")],
                     reps = R_small)
-  saveRDS(res, file.path(out_dir, "e24-jgrid.rds"))
+  saveRDS(res, out_file("jgrid"))
   cat("\nmedians by cell, n and grid:\n")
   print(med(res, c("Jtop", "J", "lambda", "nzero", "cvm", "rmse_f", "ise",
                    "ise_active", "time"), c("cell", "n", "grid")),
