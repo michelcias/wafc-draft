@@ -1768,7 +1768,7 @@ Ordenadas pelo que bloqueia mais.
    forma que junta num pedaço só os níveis com `2^j < b_n` de cada bloco
    (tira os pedaços unitários sem mudar os pesos dos cheios), nas células de
    E2.5b. É uma linha em `wafc_kp_groups()` ou `wafc_fit_klopp()`, arquivos
-   de E2.5b; abre depois dela.
+   de E2.5b; abre depois dela. **Catalogada como E2.5c** (2026-09-30).
 
 ---
 
