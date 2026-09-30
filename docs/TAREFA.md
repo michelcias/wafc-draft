@@ -67,6 +67,7 @@ que ler antes está aqui e no plano.
 | E2.5a repetir o piloto | **fechada** (2026-09-30): 6 450 linhas, 0 falhas; no-go para a variante LASSO pelo critério literal (pergunta 33 do `ESTADO.md`) | `wafc/cache/e25a/` (não versionado), `ESTADO.md` §2 |
 | E5c manuscrito `k = 2` | **fechada** (2026-09-30): pergunta 15 aplicada e marcada, Corolário 8 no artigo (§3.6, S7); 33 e 30 páginas, `.bib` com 37 entradas | `manuscript/ms_2.tex`, `supp_2.tex`, `references_2.bib` |
 | E2.5b medir o block LASSO com níveis livres | **catalogada** (2026-09-30) | §3 |
+| E1.11 sondagem da teoria com blocos | **catalogada** (2026-09-30), em paralelo a E2.5b | §3 |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
@@ -81,6 +82,7 @@ tarefa pode criar ou editar**.
 
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
+| **E1.11** sondagem da teoria com blocos | veredito, **sem prova completa**, sobre o que a teoria de E1.4 a E1.7c vira se a penalidade passar a ser o block LASSO de Klopp & Pensky com os níveis livres (pergunta 33(b) do `ESTADO.md`), com blocos de `⌈log n⌉` coeficientes dentro de cada `(ℓ, m)` sem atravessar nível, como em `wafc_kp_groups()`: (i) se o oráculo de E1.5 sem condição de cone, pela perfilagem dos níveis não penalizados, transfere para a norma de blocos, e com qual `λ` (Lounici, Pontil, van de Geer & Tsybakov 2011; K&P 2015, Teorema 2); (ii) o que substitui o corolário de compressibilidade de E1.6 (weak-`ℓ_τ` por blocos, ou a classe de K&P) e se a hipótese de Besov ainda o implica sem custo, como no Lema 9; (iii) se a taxa do Corolário 5 se mantém, ganha ou perde fator logarítmico; (iv) o Corolário 8 com a norma de bloco no lugar da de coeficiente; (v) o que muda em E1.4 (nada, espera-se: a condição de desenho é de autovalor) e o custo estimado em páginas de prova e em dias. Conferência numérica curta, na forma densa com `n ≤ 500`, do que for afirmado com número (por exemplo, a escala do `λ` de blocos contra o do LASSO, ou a razão do erro à cota); nos scripts, `[[ ]]` com nome completo (`instrucoes.md` §5). Formato de E1.7a: o que fecha, o que não fecha, o que é conjectura, e a recomendação | nada (roda em paralelo a E2.5b) | `derivations/08a-sondagem-blocos.md`, `derivations/check/08a-blocos.R`, `docs/handoff-E1.11.md` |
 | **E2.5b** medir o block LASSO com níveis livres | a medição do item (a) da pergunta 33 do `ESTADO.md`, **sem decisão de rumo**. (i) No `04-pilot.R`: método novo `klopp.free` (`wafc_competitor("klopp", ..., penalize.levels = FALSE)`), ao lado do `klopp`; o `bsgl` passa a registrar a dimensão escolhida (hoje `J` sai `NA`, embora `extra$df` exista); o cabeçalho sai dos custos da grade antiga e passa aos medidos em E2.5a; e dois controles por ambiente, `WAFC_METHODS` (restringe os métodos rodados, sem mudar dados, dobras nem sementes) e `WAFC_REPS_MIXED` (sobrepõe as 15 réplicas da `mixed`). (ii) Rodar, com `WAFC_OUT=wafc/cache/e25b`: nas quatro células `q = 2`, só `wafc.lasso` e `klopp.free`, 50 réplicas, e conferir que o `wafc.lasso` reproduz o `e25a-competitors.rds` linha a linha antes de juntar os dois; na `mixed`, **todos** os métodos com 50 réplicas, conferindo as 15 primeiras contra o `e25a-mixed-competitors.rds`. (iii) No handoff: razões de `rmse_f` e ISE do `klopp.free` contra o `wafc.lasso`, o `klopp` e o `gam.matched` por célula e `n`, frações de vitória, o nulo (onde o `klopp` perdia por 1,31 a 1,43 por penalizar os níveis), o fator do suave contra o `gam.matched`, a tabela inteira da `mixed` em 50 réplicas, o `J` e a dimensão do `bsgl` escolhidos, tempos e memória | E2.5a (os `.rds` de `wafc/cache/e25a/`) | `wafc/scripts/04-pilot.R`, `wafc/R/competitors.R` (só o registro da dimensão do `bsgl` em `extra`), `wafc/tests/test-competitors.R` (idem), `wafc/README.md` (a linha do `04-pilot.R`), `docs/handoff-E2.5b.md`; os `.rds` e logs ficam em `wafc/cache/e25b/`, não versionado |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
@@ -88,7 +90,7 @@ catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**Catalogada em 2026-09-30: E2.5b.** E2.4c e E2.5a fecharam no mesmo dia,
+**Catalogadas em 2026-09-30: E2.5b e E1.11**, em paralelo; não dividem arquivo. E2.4c e E2.5a fecharam no mesmo dia,
 e a repetição do piloto devolveu no-go para a variante LASSO. E2.5 é do chat
 principal e espera a decisão da pergunta 33 do `ESTADO.md`; E2.5b é o
 primeiro item dela, só medição. Rodar só dois métodos nas células `q = 2`
