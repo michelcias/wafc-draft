@@ -142,6 +142,14 @@ Cuidados que já custaram compilações:
   remoção que cruze isso, marcar de outra forma ou perguntar.
 - Granularidade adaptativa: reescrita ampla tacha a frase inteira e insere a
   nova; troca pontual marca palavra a palavra.
+- `\textcolor` não atravessa parágrafo nem ambiente de teorema: inserção de
+  vários parágrafos, ou com enunciado, vai num grupo `{\color{colR1} ... }`
+  (E5c).
+- `\textcolor` em título de seção quebra a compilação quando o cabeçalho
+  corrente põe o título em maiúsculas (a cor vira `COLR1`): título curto em
+  `\section[...]{...}` e `\texorpdfstring` para os marcadores (E5c).
+- Cor dentro de `\citep{...}` não funciona; citação acrescentada ao lado de
+  uma existente vai por `\citetext` com `\citealp` (E5c).
 
 Exceção registrada: **uniformização de notação** aplicada por script sobre
 lista fechada de padrões pode entrar sem marcação, desde que o `ESTADO.md`

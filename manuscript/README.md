@@ -11,7 +11,8 @@ e carrega `ulem` para quando `k = 2` existir.
 
 **Versão viva: `k = 2`**, aberta em 2026-09-30 como cópia de `k = 1`
 (`ms_2.tex`, `supp_2.tex`, `references_2.bib`), com toda alteração marcada
-em `colR1`; as edições são da tarefa E5c.
+em `colR1`. Depois de E5c: 33 e 30 páginas, `.bib` com 37 entradas, e o
+mapa da numeração global no cabeçalho do `ms_2.tex`.
 
 | Pasta | O que é |
 |---|---|

@@ -2,19 +2,18 @@
 
 **Última atualização:** 2026-09-30.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
-E1.10), E5a e E2.1 a E2.4b fechadas**, mais L1 a L4 e a sondagem E6.1a.
+E1.10), E5a, E5c e E2.1 a E2.4b fechadas**, mais L1 a L4 e a sondagem E6.1a.
 Falta E2.5 (go/no-go) para fechar E2; P1 e P2 foram ratificadas (D34,
 D35), as perguntas 29 e 31 estão fechadas, e ela espera só a repetição do
 piloto (§5).
 Catalogadas em 2026-09-30, em sequência: **E2.4c** (preparar o
-`04-pilot.R`) e **E2.5a** (rodar a repetição); nenhum chat de tarefa em
-curso. A decidir pelo
+`04-pilot.R`, em curso) e **E2.5a** (rodar a repetição). A decidir pelo
 autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
 (D21).
 **Versão viva do manuscrito:** `k = 2` (`manuscript/ms_2.tex`,
 `supp_2.tex`, `references_2.bib`), aberta em 2026-09-30 por decisão do
-autor, cópia de `k = 1` compilando limpa em 28 e 26 páginas; as edições
-são de E5c.
+autor; E5c aplicou as edições acumuladas, marcadas, e os dois compilam
+limpos em **33 e 30 páginas**.
 **Cor da rodada corrente:** `colR1`, em uso desde `k = 2`.
 
 Este documento é o ponto de partida de cada sessão. Ele diz onde o trabalho
@@ -1159,6 +1158,56 @@ sparse group LASSO paga a mais é estrutura, não erro.**
   sparse group LASSO fica pior que o LASSO nisso. Estrutura se lê pela
   limiarização de E1.7c ou por `λ.1se`.
 
+### 2026-09-30: E5c fechada, o manuscrito em `k = 2`
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: `ms_2.tex` e
+`supp_2.tex` compilam com `latexmk` sem erro e **sem referência ou citação
+indefinida**, em **33 e 30 páginas** (eram 28 e 26); `references_2.bib` tem
+**37 entradas** (eram 30); a tarefa tocou só os arquivos da coluna do
+catálogo. As perguntas 15 e 26 fecham.
+
+- **"Sieve" (D33, marcado como D38):** 21 trocas no `ms` e 5 no `supp`, uma
+  menção retida na definição de `W_J` ("approximation space (the sieve)");
+  os rótulos `sec:sieve` e `thm:sieve` ficaram com o nome antigo, como em
+  E1.10. Quatro escolhas fora do dicionário: "sieve oracle" virou "oracle of
+  the approximation space" onde é definido e "oracle" no resto; "sieve
+  coefficients" do resumo virou "wavelet coefficients"; "approximation error
+  of the sieve" virou "of `W_J`"; o título da S3 virou "Approximation by the
+  wavelet spaces `W_J`".
+- **§4.3, a regra teórica, virou número:** a penalidade teórica é 7 a 13
+  vezes a que minimiza o erro realizado e é ela, mais que a resolução, que
+  torna a regra cara; `J_n` erra por até dois níveis, acima ou abaixo
+  conforme `s'`. Ficou um comentário `% E5b:` para ancorar em tabela.
+- **§4.2 alinhada a D23, D26 e D35:** o padrão é `ε = 0`, o cenário da
+  Seção 3; a margem fixa aparece como opção de amostra finita, com o preço
+  `ε^{−(s−1/π)}` do Lema 10 e as duas razões para ficar fora da teoria. Em
+  prosa, sem enunciado nem prova no `supp`.
+- **Software citado** (L4): lasso, `glmnet`, R, `WaveBased`, `sparsegl` e
+  Johnstone, mais Huang, Horowitz & Wei (2010) junto do novo corolário.
+- **Reprodutibilidade:** uma frase no fim do resumo, ainda sem endereço (D4
+  mantém `wafc/` privado).
+- **O Corolário 8 (D32) está no artigo:** nova §3.6, "Which modulators act
+  on which coefficients", com a **Assumption 6** (separação por bloco) e o
+  **Corollary 2** (triagem sem hipótese; recuperação sob a Assumption 6),
+  dizendo que é estimação seguida de limiar. No `supp`, a **Seção S7** com o
+  Lema 13 como **Lemma S7.1** e a prova. O parágrafo da variante estrutural
+  da §4.3 remete a ele.
+- **O mapa de numeração não existia no cabeçalho do `ms`**, ao contrário do
+  que o `TAREFA.md` dizia; E5c o criou no cabeçalho do `ms_2.tex`, com a
+  linha nova (Corolário 8 → Corollary 2, Hipótese S → Assumption 6, Lema 13 →
+  Lemma S7.1). Nenhum resultado existente mudou de número.
+- **Para D21:** o corpo cresceu 5 páginas (§3.6 ~2,5, §4.2 ~1, referências);
+  a projeção de 39 a 41 páginas feita no fecho de E5a sobe na mesma medida,
+  para ~44 a 46, acima do teto de 40.
+- **Três lições de composição**, registradas no §3 do `instrucoes.md`:
+  `\textcolor` em título de seção do `supp` quebra a compilação (o cabeçalho
+  corrente põe o título em maiúsculas e a cor vira `COLR1`); `\textcolor`
+  não atravessa parágrafo nem ambiente de teorema, e inserção longa vai num
+  grupo `{\color{colR1} ... }`; cor dentro de `\citep{...}` não funciona, e
+  citação acrescentada ao lado de outra vai por `\citetext` com `\citealp`.
+
+As oito perguntas que a tarefa deixou estão na pergunta 32 da §4.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1308,7 +1357,8 @@ Ordenadas pelo que bloqueia mais.
    precisa de nome e de uma frase dizendo o que exclui.
 14. **Block LASSO de K&P:** entra em `wafc()` como opção de penalidade, ao
    lado do sparse group LASSO de E2.2, ou fica só como concorrente em E2/E4?
-15. **Edições acumuladas para `k = 2`** (decidido: não tocar em `ms_1`
+15. **~~Edições acumuladas para `k = 2`~~ aplicadas por E5c
+   (2026-09-30, §2).** Texto original: (decidido: não tocar em `ms_1`
    avulso). **`k = 2` aberta em 2026-09-30; as edições são a tarefa E5c**,
    que acrescenta à lista a §4.2, cujo `ε` "da ordem de `2^{−J}`" contraria
    D35, e o Corolário 8 de D32 na Seção 3, com a prova no `supp` (decisão
@@ -1415,7 +1465,8 @@ Ordenadas pelo que bloqueia mais.
    (D26), onde a quina da cúbica na extensão periódica é real; com margem e
    extensão o mesmo cenário leria `s' = 4`, e é uma das coisas que a rota do
    intervalo (E1.8) tem de deixar escritas.
-26. **~~Cinco referências~~ fechadas por L4 (2026-09-19).** O que sobra é
+26. **~~Cinco referências~~ fechadas por L4 (2026-09-19)**, e as seis
+   citadas no manuscrito por E5c (2026-09-30). Texto original: o que sobra é
    pequeno e vai junto com `k = 2`: copiar as seis chaves novas para
    `references_1.bib` e citá-las onde L4 propôs (o lasso na Introduction e
    na seção do estimador; `glmnet` e R na computação; `WaveBased` onde as
@@ -1494,6 +1545,28 @@ Ordenadas pelo que bloqueia mais.
    pode dar um ajuste denso de variância baixa), e se a diferença de `cvm`
    entre `J = 2` e `J = 8` é maior que o ruído das dobras.
 
+32. **Pendências de E5c** (2026-09-30), nenhuma bloqueando:
+   - (a) **Colisão de símbolos na §3.6**, herdada de `06-selecao-limiar.tex`:
+     `N_{ℓm}` (norma do bloco) colide com `N` (momentos nulos) e com `N_J`;
+     `S` (conjunto de blocos) com o `S` de suporte genérico; `δ_n` com o
+     vetor `δ`. Proposta da tarefa: `ν_{ℓm}` ou a norma por extenso, e
+     `\mathcal{S}` para a estrutura. Passa pelo `notacao.md`.
+   - (b) O Corollary 2 enuncia só triagem e recuperação; a janela não
+     assintótica `D_n ≤ t < δ − D_n` ficou na prova. Subir ao enunciado?
+   - (c) O Corollary 2 cobre só o regime do Theorem 3 (aproximação linear);
+     a mesma prova daria a versão com `ρ_n = (log n/n)^{s/(2s+1)}` sob o
+     Theorem 1. Enunciado novo: acrescentar?
+   - (d) Levar o Lema 10 ao `supp` como Proposition S3.2, com o expoente
+     exato e a observação sobre a margem acoplada a `J`?
+   - (e) van de Geer, Bühlmann & Zhou (2011), o LASSO limiarizado, é a
+     âncora natural do procedimento em dois passos, mas não está verificado
+     (faltam as páginas). Frente curta de bibliografia?
+   - (f) A frase de reprodutibilidade ganha endereço quando houver (E3.3,
+     E4.1).
+   - (g) Os números da §4.3 precisam de tabela em E5b.
+   - (h) A lista de contribuições da Introduction não menciona a
+     recuperação de estrutura; acrescentar como quarta ou deixar?
+
 ---
 
 ## 5. Próximos passos
@@ -1522,8 +1595,9 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
 - (d) **E2.5**, com a calibração do limiar `t_n` (pergunta 11) e a escolha
   entre LASSO limiarizado e sparse group LASSO, que E1.7c e a tabela de
   tempo já inclinam para o primeiro.
-- (e) **Autor, sem bloquear E2.5:** a saída da aplicação (pergunta 2) e a
-  decisão de abrir `k = 2` com as edições acumuladas (pergunta 15).
+- (e) **Autor, sem bloquear E2.5:** a saída da aplicação (pergunta 2) e as
+  pendências de E5c (pergunta 32). `k = 2` foi aberta e E5c fechou em
+  2026-09-30.
 - (f) **Depois de E2.5:** E3 (consolidação e E3.3, o empacotamento), E4 e
   E6 em paralelo; a decisão sobre E1.9 (cota inferior, pergunta 20) espera
   os números de E2.5 e E4.
@@ -1532,6 +1606,7 @@ Tudo converge em E2.5 (go/no-go), que **não abre** antes de (c).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-09-30 | Este chat vira o orquestrador; documentos alinhados a D5, D8 e D34 a D37; E2.4c e E2.5a catalogadas; `k = 2` aberta; D38; E5c fechada e integrada: Corolário 8 no artigo (§3.6, S7), §4.2 alinhada a D35, "sieve" trocado, 33 e 30 páginas |
 | 2026-09-28 | Pergunta 31 investigada (`08-sgl-null.R`, reproduzido): o laço de dobras bate com o `cv.sparsegl`, não há vazamento (termo cruzado `t = 0,6`), e o sparse group LASSO no nulo cai numa faixa plana da curva por maldição do vencedor, com o mesmo custo em predição do LASSO e centenas de coeficientes falsos; D37: nenhuma aceleração entra |
 | 2026-09-28 | Pergunta 29 medida (`07-accel.R`, 384 réplicas): o prefixo do caminho é exato; em etapas passa no LASSO (255/255) com ganho de só 1,5×, reprova nos grupos (104/129); `1e-8` nos grupos reprova por uma réplica (128/129); e a validação cruzada do sparse group LASSO se engana no nulo com a grade funda (pergunta 31) |
 | 2026-09-28 | P1 e P2 ratificadas (D34, D35): grade padrão `2:8` e margem padrão `0`, já no código; a grade nova custa de 10 a 18 vezes no `cv.wafc` e até 13 no `klopp`, o que torna a pergunta 29 urgente; o `bsgl` passou a acompanhar a grade (D36), escolhendo 64 funções em `n = 1000` onde o teto era 16 |

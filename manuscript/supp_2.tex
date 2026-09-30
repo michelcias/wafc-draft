@@ -1,7 +1,7 @@
 % WAFC -- suplemento, versao k = 2 (E5c; copia de k = 1, alteracoes marcadas em colR1). Template da Statistica Sinica
 % (manuscript/ss-template/supp-temp_20240820.tex). Traz as provas dos
 % resultados de ms_2.tex e os lemas auxiliares. As fontes sao
-% derivations/01 a 05; o comentario acima de cada secao diz qual.
+% derivations/01 a 06; o comentario acima de cada secao diz qual.
 \documentclass[10pt]{book}
 \usepackage[sectionbib]{natbib}
 \usepackage{array,epsfig,fancyheadings,rotating}
@@ -145,8 +145,9 @@ This supplement contains the proofs of the results stated in the paper and
 the auxiliary lemmas they use. Section S1 fixes the notation and the objects.
 Section S2 proves the identification results of Section 2 of the paper,
 Section S3 the approximation lemma, Section S4 the bounds for the Gram matrix
-of the product design, Section S5 the oracle inequality, and Section S6 the
-rates. References to numbered results without a section prefix are to the
+of the product design, Section S5 the oracle inequality, \textcolor{gray}{\sout{and}} Section S6 the
+rates\textcolor{colR1}{, and Section S7 the recovery of the block structure by
+thresholding}. References to numbered results without a section prefix are to the
 paper; results numbered with the prefix S are stated and proved here.
 \par
 
@@ -169,10 +170,10 @@ $\varepsilon_i$; $\Gramhat = \bZ\T\bZ/n$ and $\Gram = \E(\bZ\bZ\T)$; and, for
 $a, h \in \R^n$, $\normn{a}^2 = n^{-1}\sum_i a_i^2$ and
 $\inner{a}{h}_n = n^{-1}\sum_i a_ih_i$.
 
-The sieve oracle is $\betastar = (\bc,\thetastar)$, with
+The \textcolor{colR1}{oracle of the approximation space} is $\betastar = (\bc,\thetastar)$, with
 $\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$
 for $\lev < J$, so that $f_J = \bZ\betastar$ is the best approximation of $f$
-in the sieve in the sense of Lemma 2; the deterministic residual is
+in the \textcolor{colR1}{approximation space} in the sense of Lemma 2; the deterministic residual is
 $\bb = f - f_J$, the oracle support is $\Szero = \supp(\thetastar)$ and
 $s_0 = |\Szero|$, and $v = \thetahat - \thetastar$. When $\Amat$ has rank $p$
 we write $\PA = \Amat(\Amat\T\Amat)^{-1}\Amat\T$, $\MA = I_n - \PA$,
@@ -306,7 +307,7 @@ $pq(2^{\jzero}-1)$ unpenalized parameters.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % derivations/02-aproximacao-besov.tex
-\section{Approximation by the wavelet sieve}
+\section[\texorpdfstring{Approximation by the wavelet spaces $\WJ$}{Approximation by the wavelet spaces W\_J}]{Approximation by the wavelet \texorpdfstring{\textcolor{colR1}{spaces $\WJ$}}{spaces W\_J}}
 \setcounter{equation}{0}
 
 \subsection*{Proof of Lemma 2}
@@ -631,7 +632,7 @@ gives the display. With $t = B_X^2C_U$ the exponent is
 $-3nB_X^2C_U/(8R'_J)$ and $R'_J \asymp 2^J$.
 \end{proof}
 
-\begin{lemma}[The $\ell_1$ norm of the sieve oracle]
+\begin{lemma}[The $\ell_1$ norm of the \textcolor{colR1}{oracle}]
 \label{lem:l1}
 Under Assumption 5, for every pair $(\cv,\md)$ and every level,
 $\sum_{\tsl}|\coefs{\cv}{\md}{\lev}{\tsl}| \le
@@ -1003,13 +1004,139 @@ $\pi<2$. \qed
 
 \begin{remark}[What compressibility buys]
 \label{rem:s0}
-Read at the oracle, Theorem 2(ii) has $s_0 = d$ and delivers the rate of the
-sieve; read at a sparse comparator, through Lemma S6.1, it delivers the rate
+Read at the oracle, Theorem 2(ii) has $s_0 = d$ and delivers the rate of
+\textcolor{colR1}{linear approximation}; read at a sparse comparator, through Lemma S6.1, it delivers the rate
 of Theorem 1. It is the same inequality in both cases, and neither says
 anything about $\supp(\thetahat)$: no minimal signal and no
 irrepresentability condition is used, and what is gained is a rate governed by
 the effective dimension $\Mstar_n$ rather than by $d_n$.
 \end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/06-selecao-limiar.tex (Lema 13 e Corolario 8 na numeracao
+% global; a Hipotese S e a Assumption 6 do artigo). Entrou em k = 2 (E5c).
+{\color{colR1}
+\section{Recovery of the block structure by thresholding}
+\setcounter{equation}{0}
+
+Throughout this section $N_{\cv\md}$, $\widehat{N}_{\cv\md}$, $S$,
+$\widehat{S}(t)$, $\rho_n$ and $\delta_n$ are as in Section 3.6 of the paper,
+$\delta = \min_{(\cv,\md)\in S}N_{\cv\md}$ for a fixed sample size, and
+\[
+  \Delta \;=\; \max_{\cv,\md}\,
+  \bigl\lVert \widehat{g}_{\cv\md} - \gcomp{\cv}{\md} \bigr\rVert_{L_2[0,1]}
+\]
+is the largest error over the blocks. The first statement is deterministic
+and knows nothing about the lasso.
+
+\begin{lemma}[Thresholding under a uniform block error]
+\label{lem:sandwich}
+Let $\{\gcomp{\cv}{\md}\}$ and $\{\widehat{g}_{\cv\md}\}$ be any two families
+of functions in $L_2[0,1]$ indexed by the blocks, with $N_{\cv\md}$,
+$\widehat{N}_{\cv\md}$, $S$, $\widehat{S}(t)$, $\Delta$ and $\delta$ defined
+from them as above, and let $D \ge \Delta$. Then, for every $t \ge 0$,
+\begin{equation}
+  \label{eq:sandwich}
+  \bigl\{(\cv,\md) :\; N_{\cv\md} > t + D\bigr\}
+  \;\subseteq\; \widehat{S}(t) \;\subseteq\;
+  \bigl\{(\cv,\md) :\; N_{\cv\md} > t - D\bigr\} .
+\end{equation}
+In particular: (i) if $t \ge D$, then $\widehat{S}(t) \subseteq S$, with no
+use of $\delta$; (ii) if $t < \delta - D$, then $S \subseteq \widehat{S}(t)$;
+and (iii) if $D \le t < \delta - D$, then $\widehat{S}(t) = S$, and such a $t$
+exists if and only if $\delta > 2D$.
+\end{lemma}
+
+\begin{proof}
+By the triangle inequality in $L_2[0,1]$, for every block,
+$|\widehat{N}_{\cv\md} - N_{\cv\md}| \le
+\lVert\widehat{g}_{\cv\md} - \gcomp{\cv}{\md}\rVert_{L_2[0,1]} \le \Delta \le D$.
+If $N_{\cv\md} > t + D$, then
+$\widehat{N}_{\cv\md} \ge N_{\cv\md} - D > t$, which is the left inclusion of
+\eqref{eq:sandwich}; if $\widehat{N}_{\cv\md} > t$, then
+$N_{\cv\md} \ge \widehat{N}_{\cv\md} - D > t - D$, which is the right one. For
+(i), $t - D \ge 0$ and the right inclusion give $\widehat{S}(t) \subseteq
+\{N_{\cv\md} > 0\} = S$. For (ii), every block of $S$ has
+$N_{\cv\md} \ge \delta > t + D$, and the left inclusion applies. Part (iii) is
+the conjunction of the two, and $[D, \delta - D)$ is nonempty exactly when
+$D < \delta - D$.
+\end{proof}
+
+\begin{remark}[The window is exact]
+\label{rem:window}
+The condition $\delta > 2D$ is not an artifact of the proof. Take two blocks,
+one active with $N_{11} = 2D$ and one null with $N_{21} = 0$, and fitted
+norms $\widehat{N}_{11} = \widehat{N}_{21} = D$, which is compatible with
+$\Delta \le D$: the two statistics tie and no threshold separates them. This
+says that the argument does not extend below $\delta = 2D$, not that no
+procedure does, which would be a lower bound and is not proved here.
+\end{remark}
+
+\subsection*{Proof of Corollary 2}
+
+\emph{A nonasymptotic bound on $\Delta$.} Work at $J = J_n$ and $\pen = \penn$,
+and intersect the four events of the proof of Corollary S5.1: $\mathcal{T}$,
+of probability at least $1-\alpha$, by Lemma S5.2;
+$\{\smax^2 \le 2B_X^2C_U\}$, by Lemma S5.3, which makes $\penn$ admissible;
+$\{\lmin(\Gramhat) \ge \gamma/2\}$, by Proposition 2(ii), which with
+\eqref{eq:schur} gives $\gtil \ge \gamma/2$; and
+$\{\normn{\bb}^2 \le \mathcal{B}^2_{J_n}/\alpha'\}$, by Markov's inequality and
+Lemma 2. On this event Theorem 2(ii) with $s_0 \le d_n$ gives
+\[
+  \norm{v}_2^2 \;\le\; \frac{64\penn^2d_n}{\gtil^2}
+  + \frac{16\normn{\bb}^2}{\gtil}
+  \;\le\; \frac{256\penn^2d_n}{\gamma^2}
+  + \frac{32\mathcal{B}^2_{J_n}}{\alpha'\gamma} .
+\]
+For a fixed block, the orthonormality of the wavelets of level below $J_n$
+gives $\lVert\widehat{g}_{\cv\md} - \PiJ\gcomp{\cv}{\md}\rVert_{L_2[0,1]} =
+\norm{v_{\cv\md,\cdot}}_2 \le \norm{v}_2$, and the first display of Lemma 2
+bounds $\lVert\PiJ\gcomp{\cv}{\md} - \gcomp{\cv}{\md}\rVert^2_{L_2[0,1]}$ by
+$C_g^2(1-2^{-2\seff})^{-1}2^{-2J_n\seff}$. By $(x+y)^2 \le 2x^2 + 2y^2$,
+\begin{equation}
+  \label{eq:Dn}
+  \Delta^2 \;\le\; D_n^2 \;=\; \frac{512\,\penn^2d_n}{\gamma^2}
+  + \frac{64\,\mathcal{B}^2_{J_n}}{\alpha'\gamma}
+  + \frac{2C_g^2}{1-2^{-2\seff}}\,2^{-2J_n\seff}
+\end{equation}
+with probability at least
+$1 - \alpha - \alpha' - \Prob\{\lmin(\Gramhat) < \gamma/2\} -
+\Prob\{\smax^2 > 2B_X^2C_U\}$, the last two terms tending to zero by
+Proposition 2(ii) and Lemma S5.3. By Lemma S7.1(iii), on that event
+$\widehat{S}(t) = S$ for every $t$ with $D_n \le t < \delta - D_n$, a window
+that is nonempty whenever $\delta > 2D_n$. The bound $D_n$ depends on the
+components only through the constants of Assumption 5, and the two residual
+probabilities do not depend on them at all, so everything above holds
+uniformly over the class, which is what allows the target to vary with $n$ in
+Assumption 6.
+
+\emph{The order of $D_n$.} At the resolution of Theorem 3 the three terms of
+\eqref{eq:Dn} are at most of order $\rho_n^2$: the first because
+$\penn^2d_n \asymp pq2^{J_n}J_n/n$, which is the quantity shown to be of order
+$(\log n/n)^{2\seff/(2\seff+1)}$ in the proof of Theorem 3, and the other two
+because $\mathcal{B}^2_{J_n} \asymp 2^{-2J_n\seff} \le
+(\log n/n)^{2\seff/(2\seff+1)}$ by the definition of $J_n$. Hence
+$D_n \le c(\alpha,\alpha')\rho_n$ with $c(\alpha,\alpha') < \infty$. Given $\epsilon > 0$,
+take $\alpha = \alpha' = \epsilon/4$ and $n$ large enough that the two
+residual probabilities add up to less than $\epsilon/2$; then
+$\Prob\{\Delta > c(\epsilon/4,\epsilon/4)\rho_n\} < \epsilon$, that is
+$\Delta = O_p(\rho_n)$.
+
+\emph{Part (i).} If $t_n/\rho_n \to \infty$, then
+$\Prob(\Delta \le t_n) \to 1$, and on that event Lemma S7.1(i) with
+$D = \Delta$ gives $\widehat{S}(t_n) \subseteq S$. No property of $\delta_n$
+has been used.
+
+\emph{Part (ii).} If $S$ is empty, part (ii) is part (i). Otherwise, the
+condition $\limsup_n t_n/\delta_n < 1$ gives $\eta > 0$ and $n_0$ with
+$\delta_n - t_n \ge \eta\,\delta_n$ for $n \ge n_0$, and Assumption 6 gives
+$(\delta_n - t_n)/\rho_n \ge \eta\,\delta_n/\rho_n \to \infty$. Hence
+$\Prob(\Delta \le t_n) \to 1$ and $\Prob(\Delta < \delta_n - t_n) \to 1$, and
+on the intersection of the two events Lemma S7.1(iii) with $D = \Delta$ gives
+$\widehat{S}(t_n) = S$. For the existence, $t_n = (\rho_n\delta_n)^{1/2}$ has
+$t_n/\rho_n = (\delta_n/\rho_n)^{1/2} \to \infty$ and
+$t_n/\delta_n = (\rho_n/\delta_n)^{1/2} \to 0$. \qed
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bibhang=1.7pc

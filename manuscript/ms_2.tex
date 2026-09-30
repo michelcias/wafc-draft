@@ -2,7 +2,24 @@
 % (manuscript/ss-template/SS-template-bib.tex), decisao D5.
 % Secoes 1 a 4; as Secoes 5 a 7 entram em E5b. As provas estao em supp_2.tex.
 % Notacao: docs/notacao.md, congelada em E1.1. Os enunciados vem de
-% derivations/01 a 05; o comentario acima de cada um diz de onde.
+% derivations/01 a 06; o comentario acima de cada um diz de onde.
+%
+% Mapa da numeracao global (docs/TAREFA.md, S5) para os rotulos deste arquivo:
+%   Proposicao 1            -> Proposition 1  (prop:identif)
+%   Lema 1                  -> Lemma 1        (lem:basis)
+%   Lema 2 e Corolario 1    -> Lemma 2        (lem:bias)
+%   Proposicao 3            -> Proposition 2  (prop:gram)
+%   Teorema 1               -> Theorem 2      (thm:oracle)
+%   Teorema 2               -> Theorem 3      (thm:sieve)
+%   Corolario 4             -> Corollary 1    (cor:components)
+%   Proposicao 4            -> Proposition 3  (prop:slow)
+%   Lema 9                  -> Lemma 3        (lem:weak)
+%   Corolario 5             -> Theorem 1      (thm:main; D16)
+%   Corolario 8, Hipotese S -> Corollary 2 (cor:threshold), Assumption 6
+%                              (ass:sep); o Lema 13 e o Lemma S7.1 do supp
+%                              (lem:sandwich). Entrou em k = 2 (E5c, D32).
+%   Os rotulos sec:sieve e thm:sieve ficaram com o nome antigo (D33 muda o
+%   texto, nao os rotulos).
 \documentclass[12pt]{article} %***
 \usepackage[sectionbib]{natbib}
 \usepackage{array,epsfig,fancyheadings,rotating}
@@ -154,7 +171,7 @@ $\ $\par
 We study a varying coefficient model in which the effect of each linear
 covariate is additive in several modulating covariates, and each additive
 component is expanded in a periodized wavelet basis. The resulting design is
-a sieve of products between a linear covariate and a wavelet evaluated at a
+\textcolor{colR1}{an approximation space} of products between a linear covariate and a wavelet evaluated at a
 modulator, and the components are estimated by a single lasso problem in
 which the levels of the coefficients are left unpenalized. Three results are
 established. The population Gram matrix of the product design has its
@@ -165,11 +182,13 @@ estimator satisfies a nonasymptotic oracle inequality that needs no cone
 condition, because the unpenalized levels are profiled out; and, at a
 resolution level chosen inside an explicit window, the prediction error and
 the componentwise error attain the rate of nonlinear wavelet approximation up
-to a logarithmic factor, under the same Besov condition that governs the
-linear sieve. The last result rests on the observation that the Besov
-condition already implies compressibility of the sieve coefficients, so that
+to a logarithmic factor, under the same Besov condition that governs
+\textcolor{colR1}{linear approximation}. The last result rests on the observation that the Besov
+condition already implies compressibility of the \textcolor{colR1}{wavelet} coefficients, so that
 adaptivity costs no additional assumption. The estimator is a single convex
 program and is fit by coordinate descent on a sparse design matrix.
+\textcolor{colR1}{An implementation in R and the code that reproduces every
+numerical result of the paper are made available with it.}
 
 \vspace{9pt}
 \noindent {\it Key words and phrases:}
@@ -210,7 +229,7 @@ The estimators available for this model are built from polynomial splines and
 from kernels, and are governed by a global smoothness index, so that a
 component with a peak, a jump or a change of regime is either oversmoothed or
 paid for everywhere in the domain. Wavelet bases combined with an $\ell_1$
-penalty are the standard answer to this difficulty, because a function whose
+penalty \textcolor{colR1}{\citep{tibshirani1996regression}} are the standard answer to this difficulty, because a function whose
 smoothness is inhomogeneous is still economically represented by a few large
 coefficients \citep{Donoho-Johnstone-1994, Donoho-Johnstone-1998,
 Antoniadis-Fan-2001}. They have been used for varying coefficients without an
@@ -242,7 +261,7 @@ modulators replaces a marginal second moment by a conditional one; and the
 unpenalized levels leave a term in the risk that block penalization does not
 incur. Our main result, Theorem~\ref{thm:main}, states that the estimator
 attains the rate of nonlinear wavelet approximation up to a logarithmic
-factor, under the same Besov assumption that governs the linear sieve, and it
+factor, under the same Besov assumption that governs \textcolor{colR1}{linear approximation}, and it
 reduces to the rate of Klopp and Pensky when a single modulator is present.
 
 We call the resulting procedure WAFC, for wavelet additive functional
@@ -257,15 +276,16 @@ cone condition, because the unpenalized levels are profiled out
 no assumption: the Besov condition on the components already implies that
 their wavelet coefficients lie in a weak $\ell_\tau$ ball with
 $\tau = (s+1/2)^{-1}$ (Lemma~\ref{lem:weak}), and it is this that separates
-the rate of the estimator from the rate of the linear sieve when the Besov
+the rate of the estimator from the rate of \textcolor{colR1}{linear approximation} when the Besov
 integrability index is smaller than two. The third is computational: the
 estimator is one convex program on a sparse design matrix, and the resolution
 level and the penalty are chosen jointly.
 
 The rest of the paper is organized as follows. Section~\ref{sec:model}
-introduces the model, its identification, the wavelet sieve and the estimator.
+introduces the model, its identification, the wavelet \textcolor{colR1}{approximation space} and the estimator.
 Section~\ref{sec:theory} states the assumptions and the theory, opening with
-the main rate and then giving the three results it rests on.
+the main rate and then giving the three results it rests on\textcolor{colR1}{, and
+closes with the recovery of the block structure by thresholding}.
 Section~\ref{sec:computation} describes the computation, the scale of the
 penalty and the tuning rules. Proofs are collected in the online Supplementary
 Material.
@@ -281,7 +301,7 @@ $S$, $\delta_S$ is the vector that agrees with $\delta$ on $S$ and vanishes
 elsewhere.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Model and Wavelet Sieve}
+\section{Model and Wavelet \texorpdfstring{\textcolor{colR1}{Approximation Space}}{Approximation Space}}
 \label{sec:model}
 
 \subsection{The additive functional coefficient model}
@@ -343,7 +363,7 @@ linear covariates that is a function of the modulators, and a modulator that
 is a function of the others. Both exclusions return in quantitative form in
 Section~\ref{sec:theory}.
 
-\subsection{The wavelet sieve}
+\subsection{The wavelet \texorpdfstring{\textcolor{colR1}{approximation space}}{approximation space}}
 \label{sec:sieve}
 
 Let $\phi$ and $\psi$ be the scaling function and the mother wavelet of an
@@ -362,7 +382,7 @@ $L_2[0,1]$ under Lebesgue measure and every wavelet in it integrates to zero
 \citep[Section 9.3]{Daubechies-1992}. We take the coarsest level to be
 $\jzero = 0$, so that the only scaling function is the constant
 $\phi_{00}\equiv 1$, and we discard it: it is already carried by the level
-$\lvl{\cv}$. The sieve of resolution $J$ is then
+$\lvl{\cv}$. The \textcolor{colR1}{approximation space (the sieve)} of resolution $J$ is then
 \[
   \WJ \;=\; \mathrm{span}\{\wav{\lev}{\tsl} : 0 \le \lev < J,\;
   0 \le \tsl < 2^{\lev}\},
@@ -372,7 +392,7 @@ the orthogonal complement of the constants inside the multiresolution space
 $\VJ$, and $\PiJ$ is the orthogonal projection onto it. Every element of $\WJ$
 integrates to zero, so that the identification constraint of
 \eqref{eq:additive} holds by construction, no numerical restriction is imposed
-on the fit, and the sieve is a plain linear space.
+on the fit, and the \textcolor{colR1}{approximation space} is a plain linear space.
 
 % derivations/01-identificabilidade.md, Lema 1 (numeracao global).
 \begin{lemma}[The basis carries the constraint]
@@ -434,7 +454,7 @@ $\thetahat$ by
   \widehat{\fcoef{\cv}}(u) = \widehat{c}_{\cv}
   + \sum_{\md=1}^{q}\widehat{g}_{\cv\md}(u_{\md}).
 \]
-Problem \eqref{eq:estimator} is a lasso with some coordinates unpenalized, so
+Problem \eqref{eq:estimator} is a lasso \textcolor{colR1}{\citep{tibshirani1996regression}} with some coordinates unpenalized, so
 it is convex, and it is strictly convex, hence uniquely solved, whenever the
 Gram matrix of $\bZ$ is nonsingular. Two structural variants are available at
 no conceptual cost and are discussed in Section~\ref{sec:computation}: a
@@ -503,8 +523,8 @@ coefficients rather than as membership in a function space, as in
 \citet{Klopp-Pensky-2015}; when $\psi$ has more than $s$ vanishing moments and
 enough Hölder regularity the two are equivalent, on the circle
 \citep[Section 3.6]{Cohen-2003}, and the implication that the proofs use needs
-only the vanishing moments. The index $\seff$ is the regularity that a linear
-sieve sees and $s$ is the one that nonlinear approximation sees; they differ
+only the vanishing moments. The index $\seff$ is the regularity that \textcolor{colR1}{linear
+approximation} sees and $s$ is the one that nonlinear approximation sees; they differ
 exactly when $\pi < 2$, which is the regime of inhomogeneous smoothness.
 
 \subsection{The main result}
@@ -545,8 +565,8 @@ as in \eqref{eq:lambda},
 \end{theorem}
 
 Three readings of Theorem~\ref{thm:main} matter. First, the exponent is the
-one of nonlinear wavelet approximation, $2s/(2s+1)$, and not the one of the
-linear sieve, $2\seff/(2\seff+1)$ of Theorem~\ref{thm:sieve} below; the two
+one of nonlinear wavelet approximation, $2s/(2s+1)$, and not the one of
+\textcolor{colR1}{linear approximation}, $2\seff/(2\seff+1)$ of Theorem~\ref{thm:sieve} below; the two
 agree when $\pi \ge 2$ and separate when $\pi < 2$, which is where the
 $\ell_1$ penalty pays for itself. Second, the rate is attained under
 Assumption~\ref{ass:besov} alone: no compressibility is assumed on top of it,
@@ -554,7 +574,7 @@ because the Besov condition already implies it, with
 $\tau = (s+1/2)^{-1}$, by Lemma~\ref{lem:weak}. Third, the rate
 $(\log n/n)^{2s/(2s+1)}$ is the minimax reference of the Gaussian sequence
 model over weak $\ell_\tau$ balls with per coordinate noise of order $\penn$
-\citep{Donoho-Johnstone-1998}; the logarithmic factor is the price of the
+\citetext{\citealp{Donoho-Johnstone-1998}\textcolor{colR1}{; \citealp{johnstone2019gaussian}}}; the logarithmic factor is the price of the
 single, nonadaptive penalty level \eqref{eq:lambda}, which takes a union bound
 over the $d_n$ columns. No lower bound is proved here for $q \ge 2$: the
 comparison is with the reference of the sequence model, and the minimax lower
@@ -562,16 +582,16 @@ bound of \citet{Klopp-Pensky-2015} covers the case of a single modulator with
 covariates independent of it.
 
 The proof combines three ingredients, given below: the approximation error of
-the sieve, the design condition, and a nonasymptotic oracle inequality.
+\textcolor{colR1}{$\WJ$}, the design condition, and a nonasymptotic oracle inequality.
 Section~\ref{sec:rates} assembles them, first at a dense reading of the
-estimation term, which gives the sieve rate, and then at a sparse comparator,
+estimation term, which gives the \textcolor{colR1}{rate of linear approximation}, and then at a sparse comparator,
 which gives Theorem~\ref{thm:main}.
 
 \subsection{Approximation and the design condition}
 \label{sec:approx}
 
 % derivations/02-aproximacao-besov.tex, Lema 2 e Corolario 1 (numeracao global).
-\begin{lemma}[Bias of the sieve]
+\begin{lemma}[\textcolor{colR1}{Approximation bias}]
 \label{lem:bias}
 Under Assumptions~\ref{ass:basis} and \ref{ass:besov}, for every pair
 $(\cv,\md)$ and every $J \ge 0$,
@@ -647,7 +667,7 @@ $s_0^{2}$ and of the cone.
 \subsection{A nonasymptotic oracle inequality}
 \label{sec:oracle}
 
-Let $\betastar = (\bc,\thetastar)$ be the sieve oracle, that is the vector
+Let $\betastar = (\bc,\thetastar)$ be the \textcolor{colR1}{oracle of the approximation space}, that is the vector
 whose components are the levels and the coefficients
 $\coefs{\cv}{\md}{\lev}{\tsl}$ of Assumption~\ref{ass:besov} for $\lev < J$,
 so that $f_J$ is its fit, and let
@@ -694,7 +714,7 @@ cone; they are profiled out, and the Schur complement transfers the full
 smallest eigenvalue of $\Gramhat$ to the residualized block,
 $\gtil \ge \lmin(\Gramhat)$, so that Proposition~\ref{prop:gram}(ii) is used
 as it stands and the constant does not depend on $\Szero$. The model is
-misspecified inside the sieve, and the deterministic residual $\bb$ is handled
+misspecified inside the \textcolor{colR1}{approximation space}, and the deterministic residual $\bb$ is handled
 by Young's inequality rather than by duality, which keeps the statement
 nonasymptotic and valid also when the bias dominates. The penalty is
 calibrated by the empirical column norms and not by $\max_{i,a}|Z_{ia}|$: the
@@ -710,13 +730,13 @@ everything else.
 \subsection{Rates}
 \label{sec:rates}
 
-Under Assumption~\ref{ass:besov} the sieve oracle is generically dense: the
+Under Assumption~\ref{ass:besov} the \textcolor{colR1}{oracle} is generically dense: the
 coefficients decay but do not vanish, so that $s_0 = d$ and part (ii) of
-Theorem~\ref{thm:oracle}, read at the oracle, delivers the rate of the linear
-sieve.
+Theorem~\ref{thm:oracle}, read at the oracle, delivers the rate of
+\textcolor{colR1}{linear approximation}.
 
 % derivations/05-taxas.tex, Teorema 2 (numeracao global).
-\begin{theorem}[Rate of the linear sieve]
+\begin{theorem}[Rate of \textcolor{colR1}{linear approximation}]
 \label{thm:sieve}
 Let Assumptions~\ref{ass:sample} to \ref{ass:besov} hold with $p$, $q$ and the
 constants fixed, and take
@@ -786,7 +806,7 @@ $\btheta^{(M)}$ retain the $M$ largest of them.
 \begin{lemma}[Besov regularity implies compressibility]
 \label{lem:weak}
 Under Assumptions~\ref{ass:basis} and \ref{ass:besov} with
-$\pi(s+1/2) > 1$, the sieve oracle satisfies, for every $J$ and every
+$\pi(s+1/2) > 1$, the \textcolor{colR1}{oracle} satisfies, for every $J$ and every
 $k \ge 1$,
 \[
   \theta^{*}_{(k)} \;\le\; C_\tau\,k^{-1/\tau},
@@ -814,11 +834,86 @@ $M^{1-2/\tau}$ from the truncation, gives the effective dimension
 and a bound of order $\penn^{2-\tau}$, which is the rate of
 Theorem~\ref{thm:main}. The three inequalities that define the window
 \eqref{eq:window} are, in order, that the minimum in $M$ be interior, that the
-bias of the sieve not dominate, and that the requirement of
+\textcolor{colR1}{approximation bias} not dominate, and that the requirement of
 Proposition~\ref{prop:gram}(ii) hold. Nothing in this argument says that the
 estimator selects $\Mstar_n$ coordinates: no minimal signal or
 irrepresentability condition is used, and what compressibility buys is a rate
 governed by $\Mstar_n$ rather than by $d_n$, not the recovery of a support.
+\textcolor{colR1}{The recovery that matters for the model is not of coordinates
+but of blocks, and it is taken up next.}
+
+% derivations/06-selecao-limiar.tex, Lema 13, Hipotese S e Corolario 8
+% (numeracao global); D32. O Lema 13 e a prova estao no supp (Secao S7).
+{\color{colR1}
+\subsection{Which modulators act on which coefficients}
+\label{sec:selection}
+
+The structure of the model is the set of blocks whose component does not
+vanish,
+\[
+  S \;=\; \bigl\{(\cv,\md) :\; N_{\cv\md} > 0\bigr\},
+  \qquad
+  N_{\cv\md} = \bigl\lVert \gcomp{\cv}{\md} \bigr\rVert_{L_2[0,1]},
+\]
+and to know it is to know which modulators act on which coefficients. The
+lasso is not claimed to recover it: under Assumption~\ref{ass:besov} the
+oracle is dense, and nothing prevents the fit from keeping nonzero
+coefficients in blocks whose component is zero. What the preceding results do give is that every block is
+estimated at the rate of Corollary~\ref{cor:components}, and that is enough to
+recover $S$ in a second step, by a threshold on the norms of the fitted
+components. The procedure is estimation followed by a threshold. By the
+orthonormality of the basis, the norm of a fitted component is the Euclidean
+norm of its block of coefficients,
+\[
+  \widehat{N}_{\cv\md}
+  = \bigl\lVert \widehat{g}_{\cv\md} \bigr\rVert_{L_2[0,1]}
+  = \norm{\thetahat_{\cv\md,\cdot}}_{2},
+  \qquad
+  \widehat{S}(t) = \bigl\{(\cv,\md) :\; \widehat{N}_{\cv\md} > t\bigr\},
+\]
+so that the statistic costs nothing once the estimator has been fit. Write
+$\rho_n = (\log n/n)^{\seff/(2\seff+1)}$ for the square root of the rate of
+Theorem~\ref{thm:sieve}.
+
+\begin{assumption}[Block separation]
+\label{ass:sep}
+The components may depend on $n$, within the class of
+Assumption~\ref{ass:besov} and with its constants fixed, and so may $S$; the
+smallest active block, $\delta_n = \min_{(\cv,\md)\in S} N_{\cv\md}$, with
+$\delta_n = \infty$ when $S$ is empty, satisfies $\delta_n/\rho_n \to \infty$.
+\end{assumption}
+
+\begin{corollary}[Block structure by thresholding]
+\label{cor:threshold}
+Let the assumptions of Theorem~\ref{thm:sieve} hold, with $J_n$ and $\penn$ as
+there.
+\begin{enumerate}
+\item[(i)] (Screening.) If the thresholds satisfy $t_n/\rho_n \to \infty$,
+then $\Prob\{\widehat{S}(t_n) \subseteq S\} \to 1$.
+\item[(ii)] (Recovery.) If, in addition, Assumption~\ref{ass:sep} holds and
+$\limsup_n t_n/\delta_n < 1$, then $\Prob\{\widehat{S}(t_n) = S\} \to 1$.
+Such thresholds always exist; one is $t_n = (\rho_n\delta_n)^{1/2}$.
+\end{enumerate}
+\end{corollary}
+
+Part (i) uses no separation: removing the null blocks is free, and
+Assumption~\ref{ass:sep} is spent entirely on not losing a small active block.
+Under a fixed target $\delta_n$ is a positive constant and the assumption holds
+automatically, because $\rho_n \to 0$; it carries content in a triangular
+array, where it says how fast the smallest active block may shrink. It bears
+on the components and not on $(\bX,\bU)$, so that no design condition beyond
+Proposition~\ref{prop:gram} and no irrepresentability condition enters; a
+separation condition on the components plays the same role in the selection
+of variables in nonparametric additive models \citep{Huang-Horowitz-Wei-2010}.
+The proof rests on a deterministic sandwich (Lemma~S7.1 in the Supplementary
+Material): if every component is estimated within $D$ in $L_2[0,1]$, then
+$\{N_{\cv\md} > t + D\} \subseteq \widehat{S}(t) \subseteq
+\{N_{\cv\md} > t - D\}$, so that every $t \in [D, \delta_n - D)$ recovers $S$,
+and that window cannot be widened by the argument. Two things are left out.
+The window involves $\sigma$, the design constant and $\seff$, so the
+corollary does not say how to choose $t_n$ from the data; and it says nothing
+about which wavelets are active inside a block.
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Computation and Tuning}
@@ -829,7 +924,8 @@ governed by $\Mstar_n$ rather than by $d_n$, not the recovery of a support.
 
 The design \eqref{eq:design} is built one block at a time: the $n \times \NJ$
 matrix of the wavelets of $U_{\md}$ is evaluated once per modulator, by the
-cascade algorithm of \citet{Daubechies-Lagarias-1991}, and then multiplied
+cascade algorithm of \citet{Daubechies-Lagarias-1991}\textcolor{colR1}{ as implemented in
+the \texttt{WaveBased} package \citep{Montoril-WaveBased-2026}}, and then multiplied
 rowwise by $X_{\cv}$. Since a compactly supported wavelet of level $\lev$ is
 nonzero on an interval of length $(L-1)2^{-\lev}$, at most $L-1$ of the
 $2^{\lev}$ columns of a level are nonzero at a given observation, so a block
@@ -840,7 +936,8 @@ simulation.
 
 Problem \eqref{eq:estimator} is then a lasso with $p$ unpenalized coordinates,
 which coordinate descent solves along a path of penalty levels; we use the
-\texttt{glmnet} package. Two points of scale deserve care, because they are
+\texttt{glmnet} package\textcolor{colR1}{ \citep{friedman2010regularization} of R
+\citep{RCoreTeam-2026}}. Two points of scale deserve care, because they are
 what ties the software to the theory. First, the penalty level reported for a
 fit is the $\pen$ of \eqref{eq:estimator} and not the one of the solver, which
 rescales its own by the ratio between the total number of columns and the
@@ -856,13 +953,30 @@ recovered after the intercept is added back to it.
 \label{sec:boundary}
 
 The theory places $\bU$ in $[0,1]^q$ by assumption. In practice each modulator
-is mapped to that interval by a monotone transformation, and, as in the
+is mapped to that interval by a monotone transformation\textcolor{gray}{\sout{, and,}}\textcolor{colR1}{.
+By default the image is $[0,1]$ itself, which is the setting of
+Section~\ref{sec:theory}. Optionally,} as in the
 wavelet estimators of \citet*{Montoril-Chang-Vidakovic-2019}, the image is
-$[\epsilon, 1-\epsilon]$ with $\epsilon$ of the order $2^{-J}$, which keeps the
-observations away from the strip where the periodization of
-\eqref{eq:periodized} leaves an artifact; the price is that the fitted
+$[\epsilon, 1-\epsilon]$ with $\epsilon$ \textcolor{gray}{\sout{of the order $2^{-J}$}}\textcolor{colR1}{fixed}, which keeps the
+observations away from the \textcolor{gray}{\sout{strip}}\textcolor{colR1}{point} where the periodization of
+\eqref{eq:periodized} \textcolor{gray}{\sout{leaves an artifact}}\textcolor{colR1}{joins the two ends of the interval}; the price is that the fitted
 component integrates to zero over the rescaled range and not over $[0,1]$, a
-shift of level and not of shape. The alternative is the basis adapted to the
+shift of level and not of shape. \textcolor{colR1}{The margin is a finite sample
+device, and the reason to allow it is approximation: with the data away from
+the ends, a component needs to be regular only on its support, where it can be
+replaced by a periodic extension that matches at $0 \equiv 1$, built from a
+bounded extension operator \citep[Chapter~3]{Triebel-1983}. This removes the
+stall of Proposition~S3.1 and restores the bias of Lemma~\ref{lem:bias}, with
+a Besov constant of order $\epsilon^{-(s-1/\pi)}$, an order that, by the
+embedding of Besov into H\"older spaces, cannot be improved when the component
+takes different values at the two ends of its support. Two features keep the
+margin out of the theory. It has to be fixed, since with $\epsilon$ of the
+order $2^{-J}$ the exponent guaranteed for the bias is no better than that of
+periodization without a margin; and it degrades the design, since the
+wavelets supported inside the margin are invisible to the data, and the
+smallest eigenvalue of the Gram matrix of the basis restricted to the support
+of the data vanishes as soon as $2^{J} \ge (L-1)/(2\epsilon)$, so that
+Proposition~\ref{prop:gram} does not hold as stated.} The alternative is the basis adapted to the
 interval of \citet*{cohen1993wavelets}, which reproduces polynomials on $[0,1]$
 and characterizes Besov regularity without any periodicity
 \citep[Section 3.9]{Cohen-2003}, so that Lemma~\ref{lem:bias} holds with the
@@ -889,9 +1003,18 @@ levels, which is the usual unbiased count for the lasso.
 The theory supplies a fourth rule, since \eqref{eq:Jn} and \eqref{eq:lambda}
 are explicit. It is not a practical competitor as it stands, because it needs
 $\sigma$, which has to be estimated, and $\seff$, which is unknown, and
-because it is a statement about order, so that at moderate sample sizes it can
+because it is a statement about order\textcolor{gray}{\sout{, so that at moderate sample sizes it can
 sit above the resolution that minimizes the realized error, the pre-asymptotic
-regime being wide when $\seff$ is small. Its interest is as a reference for
+regime being wide when $\seff$ is small}}\textcolor{colR1}{. In our experiments the penalty
+\eqref{eq:lambda} is 7 to 13 times the one that minimizes the realized error,
+and it is the penalty, more than the resolution, that makes the rule costly;
+the resolution \eqref{eq:Jn} misses the best one by up to two levels, above
+or below according to $\seff$}.
+% E5b: ancorar os numeros acima numa tabela da Secao 5 ou do suplemento
+% (E2.3: lambda_n de 7 a 13 vezes o otimo; no nao homogeneo, J_n sozinho
+% custa 2% e 18%, lambda_n sozinho 30% e 54%; J_n dois niveis abaixo com
+% s' = 3/2, dois acima com s' = 1/4 em E1.6).
+Its interest is as a reference for
 what the cross validated choice ought to approach, and the difference between
 the two is a finite sample quantity worth measuring. The four rules are
 compared in the simulation study.
@@ -899,9 +1022,12 @@ compared in the simulation study.
 A remark on the structural variant. Replacing $\norm{\btheta}_1$ in
 \eqref{eq:estimator} by the sparse group lasso penalty of
 \citet{Simon-Friedman-Hastie-Tibshirani-2013}, with one group per block
-$(\cv,\md)$, adds a second tuning parameter and removes entire components
+$(\cv,\md)$\textcolor{colR1}{ and fit with the \texttt{sparsegl} package
+\citep{Liang-Cohen-SolonHeinsfeld-Pestilli-McDonald-2024}}, adds a second tuning parameter and removes entire components
 rather than isolated coefficients, which is what a reader interested in
-knowing which modulators act on which coefficients would want. It is a
+knowing which modulators act on which coefficients would want\textcolor{colR1}{, although for
+the lasso itself that question is already answered by thresholding the block
+norms (Corollary~\ref{cor:threshold})}. It is a
 different estimator, with a different oracle inequality
 \citep{Lounici-Pontil-vandeGeer-Tsybakov-2011}, and the theory above does not
 cover it; the choice between the two is settled empirically.
@@ -915,7 +1041,8 @@ identification argument and the properties of the periodized basis, the
 approximation lemmas in $L_2$ and in the supremum norm and the proposition on
 the cost of periodization, the population and empirical bounds for the Gram
 matrix of the product design, the four lemmas behind the oracle inequality,
-and the two lemmas behind the rates.
+\textcolor{gray}{\sout{and}} the two lemmas behind the rates\textcolor{colR1}{, and the lemma behind
+the recovery of the block structure by thresholding}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section*{Acknowledgements}
