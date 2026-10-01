@@ -92,7 +92,7 @@ catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**O catálogo está vazio** (2026-10-01); E2.5e fechou, e o procedimento de junção agora junta ao `wafc/cache/e25e/e25e-joined.rds`. A repetição do piloto (E2.4c,
+**O catálogo está vazio** (2026-10-01); E2.5e fechou. A repetição do piloto (E2.4c,
 E2.5a) devolveu no-go para a variante LASSO, e as medições que a pergunta
 33 do `ESTADO.md` pedia fecharam no mesmo dia: E2.5b (o block LASSO com
 níveis livres), E2.5c (os pesos), E2.5d (o `gam` autônomo), E1.11 (a
@@ -100,7 +100,7 @@ teoria com blocos) e L5 (bibliografia). E2.5 é do chat principal e espera
 a decisão de rumo do autor. Para acrescentar um método às tabelas, o
 procedimento validado duas vezes é rodá-lo com `WAFC_METHODS` e conferir um
 método já existente numa célula barata antes de juntar ao
-`wafc/cache/e25c/e25c-joined.rds`.
+`wafc/cache/e25e/e25e-joined.rds` (10 500 linhas, a tabela mais recente).
 
 **Ao catalogar, o arquivo vai junto do item.** Duas tarefas seguidas
 esbarraram em coluna de arquivos que não cobria o que o próprio texto
