@@ -1809,6 +1809,39 @@ Lema 1 de K&P, que conferem no *Annals*, e o `03` não cita K&P).
   `busca-novidade.md` l. 45 com as condições do arXiv; e uma marca no
   `05-taxas.tex` não se resolve com número (pergunta 35(f)).
 
+### 2026-10-01: L8 fechada, as referências do `mgcv` e da escolha da dimensão
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina:
+`referencias-verificadas.bib` com **82 entradas** (eram 69), 82 `\bibitem`
+e zero erro ou aviso de BibTeX com `plain` e com `chicago`; sete linhas
+novas no `literatura.md`, numa seção "Splines penalizadas e escolha da
+dimensão da base" e no fim da do LASSO. Entraram o `mgcv` 1.9-4 e o que o
+`gam` do piloto usa (Wood 2017, 2003, 2011; Wood, Goude & Shaw 2015; Wood,
+Li, Shaddick & Augustin 2017; Marra & Wood 2011), a escolha da dimensão
+(Ruppert & Carroll 2000; Ruppert 2002; Kauermann & Opsomer 2011; Pya &
+Wood 2016, `misc` do arXiv, sem versão publicada) e os graus de liberdade
+do LASSO (Zou, Hastie & Tibshirani 2007; Tibshirani & Taylor 2012, com as
+páginas tiradas do `journal_ref` das cópias que o IMS depositou no arXiv).
+
+- **Kauermann & Opsomer (2011) usam ML, não REML:** maximizam em `K` a
+  log-verossimilhança perfilada do modelo misto (eq. (3), pp. 226–227) e
+  não mencionam REML. Quem diz que a busca equivale à REML é Pya & Wood
+  (2016, p. 1). O catálogo da E2.5h foi corrigido: o `gam.reml` é o método
+  3 de Pya & Wood (§2.3), e o ML de Kauermann & Opsomer é a variante fiel
+  ao artigo deles.
+- **Ruppert (2002) no modelo aditivo usa um `K` comum a todas as
+  componentes, só até 40** (§6, p. 751, `K ∈ {5, 10, 20, 40}`). A grade da
+  E2.5h, `k` por moduladora até 120, é extensão da dele, e tem de ser dita
+  assim.
+- **Pya & Wood (2016)** viram a busca por REML escolher `k` maior, com erro
+  maior, no seno com `n = 100` (§3, p. 4): é o sinal a olhar no `gam.reml`.
+- **Lições de ferramenta:** as páginas do *Annals* saem do `journal_ref` da
+  cópia que o IMS deposita no arXiv, sem o Project Euclid; o Crossref do
+  livro da CRC só tem a data do e-book (o ano vem da página de créditos);
+  o DOI do CRAN tem `published-print` na primeira versão do pacote (2000 no
+  `mgcv`), não na usada; o Crossref abrevia prenomes de Kauermann &
+  Opsomer, outro caso de D39.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -2296,8 +2329,8 @@ Ordenadas pelo que bloqueia mais.
      (**Catalogada como E2.5h e E2.5i** em 2026-10-01: o `gam` com `k`
      escolhido por REML e por GCV (E2.5h, com o GCV do WAFC; 6 a 17 h em 8
      núcleos) e por validação cruzada nas dobras do WAFC (E2.5i, 27 a 41 h,
-     ou 13 a 19 h com 15 réplicas na `mixed`), na grade de Ruppert (2002) e
-     não em potências de 2. Wood
+     com 50 réplicas também na `mixed`, por decisão do autor), na grade de
+     Ruppert (2002) e não em potências de 2. Wood
      (2017, §5.9) recomenda `k` generoso conferido pelo `k.check()`, não
      busca, o que apoia o `gam.k128`; a busca é a versão simétrica ao `J`
      do WAFC. As referências vão ao `.bib` por L8, catalogada no mesmo
@@ -2357,6 +2390,32 @@ Ordenadas pelo que bloqueia mais.
    - (d) Se o `+ls` entrar (é a melhor regra de estrutura que não vê a
      verdade), entra só no suporte, não no bloco inteiro.
 
+39. **Pendências de L8** (2026-10-01), nenhuma bloqueando:
+   - (a) **PDFs que fecham três `[VERIFICAR]` no `.bib`:** Zou, Hastie &
+     Tibshirani (2007) e Tibshirani & Taylor (2012), o teorema que dá os
+     graus de liberdade do LASSO e se o caso com colunas não penalizadas
+     (os `p` níveis do WAFC) está enunciado. **É a justificativa do `df` do
+     GCV da E2.5h**, e tem de estar resolvido antes de o GCV ir ao
+     manuscrito; e Marra & Wood (2011), a seção da dupla penalidade. Como
+     `refs/zou2007.pdf`, `refs/tibshirani2012.pdf`, `refs/marra2011.pdf`.
+     Opcionais, só para D39: `wood2003`, `wood2011`, `wood2015`,
+     `wood2017jasa`.
+   - (b) **As duas do `citation("mgcv")` que ficaram fora**, já conferidas
+     no Crossref para entrarem sem nova rodada se o handoff da E2.5h disser
+     que o código as usa: Wood (2004, *JASA* 99(467), 673–686), se o
+     `gam.gcv` for pelo `bam` com `GCV.Cp`; e Wood, Pya & Säfken (2016,
+     *JASA* 111(516), 1548–1563 sem a discussão), que hoje não se usa.
+   - (c) **Três candidatas que a ajuda do `mgcv` cita**, conferidas só para
+     registro: Wood (2008, *JRSS-B* 70(3), 495–518), se o `gam.gcv` cair no
+     `gam()`; Li & Wood (2020, *Stat. Comput.* 30(1), 19–25), junto do
+     `discrete = TRUE`; e Wood (2025, *Annu. Rev. Stat. Appl.*), não
+     conferida.
+   - (d) O `chicago.bst` não imprime o `eprint` de um `misc`: na cópia
+     para o `references_{k}.bib` do manuscrito, as entradas do arXiv
+     (Pya & Wood e as duas de Schnaidt Grez & Vidakovic) precisam de
+     `howpublished`. É da próxima rodada do `.tex`, que copia também as 13
+     entradas novas.
+
 ---
 
 ## 5. Próximos passos
@@ -2400,6 +2459,8 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | L8 fechada e integrada: `.bib` com 82 entradas; Kauermann & Opsomer usam ML, não REML, e o catálogo da E2.5h foi corrigido; o Ruppert aditivo usa um `K` comum até 40; pergunta 39 |
+| 2026-10-01 | E2.5h e E2.5i catalogadas (o `gam` por REML e GCV, e por validação cruzada, na grade de Ruppert; o GCV do WAFC); E2.5i com 50 réplicas em todas as células, por decisão do autor; L8 catalogada |
 | 2026-10-01 | E2.5g fechada e integrada (921 testes, 24 750 linhas, quinta junção exata): o limiar do Corolário 8 passa o fator do suave pela primeira vez (1,31 a 1,37 no `wafc.lasso+max`), o que sobra é ISE ativo; `c = 0,15` não generaliza ao não homogêneo, `c = 0,4` sim; pergunta 38 |
 | 2026-10-01 | L7 fechada e integrada: a numeração de K&P e Lounici et al. conferida no *Annals*; o Teorema 2 de K&P mudou de condições entre o arXiv e o *Annals*, e os Lemas 2 a 4 foram para o suplemento; perguntas 35(f) e 35(g) |
 | 2026-10-01 | L6 catalogada e fechada ao lado da E2.5g: as correções de L5 nas três derivações, sem mudança de matemática; o "§2.3" de Hsu et al. no `08a` não existia; quatro marcas fora de L5 ficam na pergunta 35(e) |

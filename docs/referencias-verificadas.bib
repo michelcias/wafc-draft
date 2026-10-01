@@ -7,6 +7,19 @@
 % redigitar; nelas só se acrescentou a linha `doi`, conferida no Crossref.
 % Nada daqui leva mais a nota "[L1: confirmar]".
 %
+% Quinta rodada (L8, 2026-10-01): entraram as referências do `gam` de
+% E2.4 a E2.5h e da escolha da dimensão da base que E2.5h mede, mais as
+% dos graus de liberdade do LASSO que o GCV do WAFC usa. As do `mgcv`
+% (o pacote, o livro, a base thin plate, o REML, o `bam` e o `discrete`)
+% vão à seção de software, por D25; as de escolha da dimensão e o
+% `select = TRUE` ficam numa seção própria; Zou et al. (2007) e Tibshirani
+% & Taylor (2012) vão ao fim da seção do LASSO. Ruppert (2002), Ruppert &
+% Carroll (2000), Kauermann & Opsomer (2011), Pya & Wood (2016) e o livro
+% de Wood (2017) foram lidos no PDF (refs/); as outras oito, só no
+% Crossref, e os nomes delas são os do Crossref, na falta da folha de
+% rosto (D39). As páginas das duas do Annals, que o Crossref não guarda,
+% vêm do `journal_ref` da cópia que o IMS depositou no arXiv.
+%
 % Quarta rodada (L5, 2026-09-30): entraram as duas referências de que a
 % sondagem de E1.11 depende (Hsu, Kakade & Zhang 2012; Cai 1999), a
 % referência de forma do Corolário 8 de E1.7c (van de Geer, Bühlmann &
@@ -721,6 +734,46 @@
   doi     = {10.1214/17-EJS1366}
 }
 
+% L8 (2026-10-01). O Crossref confere título, autores, 35(5), DOI e
+% `published-print` 2007-10, mas não guarda páginas; "2173--2192" vem do
+% `journal_ref` do arXiv:0712.0881v1, que é a cópia publicada depositada
+% pelo IMS ("Published in ... the Annals of Statistics ... by the Institute
+% of Mathematical Statistics"). PDF não lido. O que o projeto usa: o número
+% de coeficientes não nulos como estimador não viesado dos graus de
+% liberdade do LASSO, e o seu uso em Cp, AIC, BIC e GCV, que é a contagem
+% de `wafc_bic()` (D19) e do GCV de E2.5h [VERIFICAR: número do teorema e
+% da seção, PDF não lido].
+@article{Zou-Hastie-Tibshirani-2007,
+  author  = {Zou, Hui and Hastie, Trevor and Tibshirani, Robert},
+  title   = {On the ``degrees of freedom'' of the lasso},
+  journal = {The Annals of Statistics},
+  year    = {2007},
+  volume  = {35},
+  number  = {5},
+  pages   = {2173--2192},
+  doi     = {10.1214/009053607000000127}
+}
+
+% L8 (2026-10-01). Ryan J. Tibshirani (cf. `Tibshirani-2013`). O Crossref
+% confere título, autores, 40(2), DOI e `published-print` 2012-04, sem
+% páginas; "1198--1232" vem do `journal_ref` do arXiv:1111.0653v4, a cópia
+% publicada depositada pelo IMS. PDF não lido. O que o projeto usa: a
+% extensão do resultado de Zou et al. (2007) a matriz de desenho qualquer,
+% em que os graus de liberdade são a esperança do posto das colunas
+% ativas, o que cobre as colunas não penalizadas dos níveis `p` na contagem
+% do GCV de E2.5h [VERIFICAR: número do teorema e se o caso com colunas
+% não penalizadas está enunciado, PDF não lido].
+@article{Tibshirani-Taylor-2012,
+  author  = {Tibshirani, Ryan J. and Taylor, Jonathan},
+  title   = {Degrees of freedom in lasso problems},
+  journal = {The Annals of Statistics},
+  year    = {2012},
+  volume  = {40},
+  number  = {2},
+  pages   = {1198--1232},
+  doi     = {10.1214/12-AOS1003}
+}
+
 % ---------------------------------------------------------------------
 % Wavelets, espaços de função e desigualdades matriciais
 % (fontes citadas pelas derivações E1.2 a E1.5; entraram em L3)
@@ -916,6 +969,109 @@
   pages   = {1456--1490},
   doi     = {10.1214/13-EJS815}
 }
+
+% ---------------------------------------------------------------------
+% Splines penalizadas e escolha da dimensão da base
+% (o `gam` concorrente e a sintonia de E2.5h; entraram em L8)
+% ---------------------------------------------------------------------
+
+% L8 (2026-10-01), lido no PDF. O Crossref confere tudo, inclusive 42(2),
+% 205--223 e `published-print` 2000-06, e prefixa o título com a rubrica
+% "Theory & Methods:", que não é parte dele (o cabeçalho imprime
+% "Spatially-adaptive penalties for spline fitting"). Nomes como no
+% cabeçalho (D39). O que o projeto usa: o primeiro algoritmo automático de
+% escolha do número de nós (§3, pp. 208--209), que percorre
+% K = 10, 20, 40, 80, 120 e para quando o GCV não cai abaixo de 0,98 vez o
+% anterior; é a origem da grade de Ruppert (2002). Na p. 206, nós nos
+% quantis amostrais e a observação de que 5 a 40 nós bastam nos dados reais.
+@article{Ruppert-Carroll-2000,
+  author  = {Ruppert, David and Carroll, Raymond J.},
+  title   = {Spatially-adaptive penalties for spline fitting},
+  journal = {Australian \& New Zealand Journal of Statistics},
+  year    = {2000},
+  volume  = {42},
+  number  = {2},
+  pages   = {205--223},
+  doi     = {10.1111/1467-842X.00119}
+}
+
+% L8 (2026-10-01), lido no PDF (a folha de rosto da Taylor & Francis e o
+% artigo digitalizado). O Crossref confere tudo; `published-print` 2002-12
+% (o on-line, 2012-01, é a digitalização). O que o projeto usa: a grade
+% K em {5, 10, 20, 40, 80, 120}, só com os valores menores que n - p - 1,
+% e n trocado pelo número de valores distintos de x quando há repetição
+% (§3, pp. 740--741); o algoritmo míope e o de busca completa, que escolhe
+% o K de menor GCV na grade (p. 741); no modelo aditivo, um K comum a
+% todas as componentes e a busca completa só até 40 (§6, p. 751); e as
+% conclusões da §7 (p. 753): há um K mínimo adequado, acima dele o custo é
+% pequeno, e a busca completa é mais segura que a míope. É a grade de E2.5h.
+@article{Ruppert-2002,
+  author  = {Ruppert, David},
+  title   = {Selecting the number of knots for penalized splines},
+  journal = {Journal of Computational and Graphical Statistics},
+  year    = {2002},
+  volume  = {11},
+  number  = {4},
+  pages   = {735--757},
+  doi     = {10.1198/106186002853}
+}
+
+% L8 (2026-10-01), lido no PDF. O Crossref confere tudo, inclusive 98(1),
+% 225--230 e `published-print` 2011-03, mas abrevia os prenomes ("G.",
+% "J. D."); o cabeçalho imprime "Göran Kauermann" e "Jean D. Opsomer", que
+% é o que fica (D39). O que o projeto usa: escolher a dimensão da base
+% maximizando em K a log-verossimilhança perfilada do modelo misto, eq. (3)
+% (§2, pp. 226--227). O critério é a verossimilhança (ML), não a REML: o
+% artigo não menciona REML; quem diz que a abordagem equivale à REML é Pya
+% & Wood (2016, p. 1). Na E2.5h, o `gam.reml` pela busca do REML é a
+% versão de Pya & Wood, e a de Kauermann & Opsomer é a com ML.
+@article{Kauermann-Opsomer-2011,
+  author  = {Kauermann, G{\"o}ran and Opsomer, Jean D.},
+  title   = {Data-driven selection of the spline dimension in penalized spline regression},
+  journal = {Biometrika},
+  year    = {2011},
+  volume  = {98},
+  number  = {1},
+  pages   = {225--230},
+  doi     = {10.1093/biomet/asq081}
+}
+
+% L8 (2026-10-01), lido no PDF (arXiv:1602.06696v1, 22 fev. 2016, a única
+% versão). Sem versão publicada: o Crossref não devolve registro com este
+% título em 2026-10-01, e a API do arXiv não registra `journal_ref` nem
+% DOI; conferir de novo antes da submissão. O cabeçalho imprime "Simon N
+% Wood", sem ponto; o ponto da inicial fica, como nas outras entradas do
+% autor. O que o projeto usa: os três modos de conferir `k` (§2, p. 2), e o
+% terceiro, a busca de `k` pelo critério da suavização, GCV ou REML, com o
+% modelo inteiro reajustado a cada valor (§2.3, p. 3), que é o `gam.reml`
+% e o `gam.gcv` de E2.5h; na simulação (§3, p. 4), a grade 10, 20, 40, 80 e
+% a REML escolhendo `k` maior e com EQM maior no seno com n = 100.
+@misc{Pya-Wood-2016,
+  author        = {Pya, Natalya and Wood, Simon N.},
+  title         = {A note on basis dimension selection in generalized additive modelling},
+  year          = {2016},
+  eprint        = {1602.06696},
+  archivePrefix = {arXiv},
+  primaryClass  = {stat.ME}
+}
+
+% L8 (2026-10-01). O Crossref confere tudo, inclusive 55(7), 2372--2387 e
+% `published-print` 2011-07. PDF não lido; nomes do Crossref (D39). O que
+% o projeto usa: a penalidade extra no espaço nulo de cada suavizador, que
+% permite zerar o termo inteiro e é o `select = TRUE` do `gam` concorrente
+% desde E2.4 (o help de `mgcv::gam.selection` cita este artigo para isso)
+% [VERIFICAR: seção, PDF não lido].
+@article{Marra-Wood-2011,
+  author  = {Marra, Giampiero and Wood, Simon N.},
+  title   = {Practical variable selection for generalized additive models},
+  journal = {Computational Statistics \& Data Analysis},
+  year    = {2011},
+  volume  = {55},
+  number  = {7},
+  pages   = {2372--2387},
+  doi     = {10.1016/j.csda.2011.02.004}
+}
+
 % ---------------------------------------------------------------------
 % O próprio grupo
 % ---------------------------------------------------------------------
@@ -1033,4 +1189,105 @@
   year         = {2026},
   howpublished = {R package version 2.6-0, \url{https://github.com/michelcias/WaveBased}},
   url          = {https://github.com/michelcias/WaveBased}
+}
+
+% L8 (2026-10-01). O pacote do `gam` concorrente (E2.4 a E2.5h), versão
+% instalada 1.9-4, publicada no CRAN em 2025-11-07 (`DESCRIPTION` e página
+% do CRAN). O DOI do CRAN não é de versão: o Crossref o registra como
+% `dataset`, com `published-print` 2000-10-04, que é a data da primeira
+% versão; por isso o ano é o da versão usada, como na entrada do R. Tipo
+% `misc` pela razão da entrada do `WaveBased`. O `citation("mgcv")` pede
+% cinco referências; entram três, as que o código usa: Wood (2017), Wood
+% (2003) e Wood (2011). Ficam fora Wood, Pya & Säfken (2016), a família
+% além da exponencial, e Wood (2004), o GCV por iteração de desempenho,
+% até a E2.5h mostrar que o código as usa (o `gam.gcv` pode tocar a
+% segunda; lista em docs/handoff-L8.md).
+@misc{Wood-mgcv-2025,
+  author       = {Wood, Simon},
+  title        = {{mgcv}: {M}ixed {GAM} {C}omputation {V}ehicle with {A}utomatic {S}moothness {E}stimation},
+  year         = {2025},
+  howpublished = {R package version 1.9-4, \url{https://CRAN.R-project.org/package=mgcv}},
+  doi          = {10.32614/CRAN.package.mgcv},
+  url          = {https://CRAN.R-project.org/package=mgcv}
+}
+
+% L8 (2026-10-01), lido no PDF (refs/). O DOI é o do e-book; o Crossref
+% registra só `published-online` 2017-05-18, sem `published-print`; a
+% página de créditos dá "© 2017", "Version Date: 20170307" e o ISBN da
+% capa dura, que é o que fica. Nome como na folha de rosto (D39). Páginas
+% impressas (no PDF de refs/, somar 21). O que o projeto usa: a escolha da
+% dimensão da base (§5.9, pp. 242--243): `k` só limita a flexibilidade,
+% basta não ser pequeno demais, e a conferência é pelos resíduos
+% (`gam.check`, `k.check`), não por busca; e o suavizador adaptativo
+% `bs = "ad"` (§5.3.5, pp. 207--208).
+@book{Wood-2017,
+  author    = {Wood, Simon N.},
+  title     = {Generalized Additive Models: An Introduction with {R}},
+  edition   = {Second},
+  year      = {2017},
+  publisher = {Chapman and Hall/CRC},
+  address   = {Boca Raton, FL},
+  isbn      = {978-1-4987-2833-1},
+  doi       = {10.1201/9781315370279}
+}
+
+% L8 (2026-10-01). O Crossref confere tudo, inclusive 65(1), 95--114 e
+% `published-print` 2003-02. PDF não lido; nome do Crossref (D39). A base
+% thin plate de posto reduzido, que é o `bs = "tp"` padrão do `s()` e a
+% base do `gam` concorrente.
+@article{Wood-2003,
+  author  = {Wood, Simon N.},
+  title   = {Thin plate regression splines},
+  journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+  year    = {2003},
+  volume  = {65},
+  number  = {1},
+  pages   = {95--114},
+  doi     = {10.1111/1467-9868.00374}
+}
+
+% L8 (2026-10-01). O Crossref confere tudo, inclusive 73(1), 3--36 e
+% `published-print` 2011-01 (on-line em 2010-09). PDF não lido; nome do
+% Crossref (D39). A REML que escolhe a suavização no `gam(method = "REML")`
+% do concorrente.
+@article{Wood-2011,
+  author  = {Wood, Simon N.},
+  title   = {Fast stable restricted maximum likelihood and marginal likelihood estimation of semiparametric generalized linear models},
+  journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+  year    = {2011},
+  volume  = {73},
+  number  = {1},
+  pages   = {3--36},
+  doi     = {10.1111/j.1467-9868.2010.00749.x}
+}
+
+% L8 (2026-10-01). O Crossref confere tudo, inclusive 64(1), 139--155 e
+% `published-print` 2015-01 (on-line em 2014-05). PDF não lido; nomes do
+% Crossref (D39). O `bam` e a sua REML rápida (`method = "fREML"`), o motor
+% do `gam` concorrente desde E2.4b.
+@article{Wood-Goude-Shaw-2015,
+  author  = {Wood, Simon N. and Goude, Yannig and Shaw, Simon},
+  title   = {Generalized additive models for large data sets},
+  journal = {Journal of the Royal Statistical Society: Series C (Applied Statistics)},
+  year    = {2015},
+  volume  = {64},
+  number  = {1},
+  pages   = {139--155},
+  doi     = {10.1111/rssc.12068}
+}
+
+% L8 (2026-10-01). O Crossref confere tudo, inclusive 112(519), 1199--1210
+% e `published-print` 2017-07 (on-line em 2017-04). PDF não lido; nomes do
+% Crossref (D39). A discretização das covariáveis, o `discrete = TRUE` do
+% `bam` concorrente. O help de `mgcv::bam` cita também Li & Wood (2020,
+% Stat. Comput.) para o `discrete`, não catalogada (docs/handoff-L8.md).
+@article{Wood-Li-Shaddick-Augustin-2017,
+  author  = {Wood, Simon N. and Li, Zheyuan and Shaddick, Gavin and Augustin, Nicole H.},
+  title   = {Generalized additive models for gigadata: Modeling the {U.K.} {B}lack {S}moke {N}etwork daily data},
+  journal = {Journal of the American Statistical Association},
+  year    = {2017},
+  volume  = {112},
+  number  = {519},
+  pages   = {1199--1210},
+  doi     = {10.1080/01621459.2016.1195744}
 }
