@@ -2293,6 +2293,12 @@ Ordenadas pelo que bloqueia mais.
 
 36. **Pendências de E2.5d** (2026-09-30), nenhuma bloqueando:
    - (a) **Qual `gam` é o concorrente de E4 e da tabela do manuscrito.**
+     (**Catalogada como E2.5h** em 2026-10-01: o `gam` com `k` escolhido
+     por REML, por validação cruzada nas dobras do WAFC e por GCV, na grade
+     de Ruppert (2002) e não em potências de 2, mais o GCV do WAFC. Wood
+     (2017, §5.9) recomenda `k` generoso conferido pelo `k.check()`, não
+     busca, o que apoia o `gam.k128`; a busca é a versão simétrica ao `J`
+     do WAFC.)
      A tarefa propõe o `gam` autônomo com `k = 128` por moduladora: não
      aperta, não diverge, é o que um usuário rodaria. O `gam.matched` fica
      como a medição de E6.1a (base contra dimensão), não como concorrente.

@@ -149,7 +149,7 @@ WAFC_OUT=wafc/cache/e25g WAFC_TAG=e25g WAFC_METHODS=wafc.lasso,klopp.balanced WA
 - **Bibliografia:** 69 entradas verificadas (L1, L3, L4 e L5), e as citações das derivações conferidas nas fontes publicadas (L6, L7); os PDFs ficam em `refs/`, não versionado, e não viajam; pendências na pergunta 35 do `ESTADO.md`.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** vazio. E2.5f, E2.5g, L6 e L7 fecharam em 2026-10-01; E2.4c, E2.5a a E2.5e, E1.11 e L5 em 2026-09-30 e 10-01; E2.5 espera a decisão das perguntas 33 e 38 do `ESTADO.md`;
+- **Catálogo:** E2.5h (o `gam` sintonizado nos termos dele e o GCV do WAFC; a rodada espera o aviso do autor). E2.5f, E2.5g, L6 e L7 fecharam em 2026-10-01; E2.4c, E2.5a a E2.5e, E1.11 e L5 em 2026-09-30 e 10-01; E2.5 espera a decisão das perguntas 33 e 38 do `ESTADO.md`;
   detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de
