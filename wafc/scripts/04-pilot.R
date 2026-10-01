@@ -77,6 +77,21 @@
 ## 750 jobs, in 6.0 processor-hours (46 min on 8 cores), with a peak of
 ## 0.67 GB per process.
 ##
+## Step E2.5g adds, in the part 'competitors', the estimator of Corollary 8
+## (estimation followed by a threshold on the blocks, wafc_threshold() of
+## wafc/R/threshold.R) on two of the methods, 'wafc.lasso' and
+## 'klopp.balanced': from the one fit of the replicate, one row per rule of
+## the threshold ("max", "cv", "oracle"), without refit and with the two
+## least squares refits ("+ls" on the support of the blocks kept, "+lsb" on
+## their every column), labelled "<method>+<rule>[+ls|+lsb]". The rows of the
+## methods themselves are not touched, so they still coincide with the ones
+## of the earlier runs. The time of a thresholded row is the time of the
+## fit plus the time of the threshold (and of the fold fits, for "cv"). Two
+## side tables go beside the rows: '<tag>-thr-norms.rds', the norm of every
+## block of the fit before the threshold with its truth, from which the
+## curve of recovery against t is read, and '<tag>-thr-t.rds', the t and
+## the fraction c = t / max norm each thresholded row used.
+##
 ## The two parts that answer a question about the code rather than about
 ## the method, 'margin' and 'j1', are capped at 20 replicates:
 ## what they measure is a ranking of margins and a frequency of selection,
@@ -217,6 +232,18 @@ methods <- c("wafc.lasso", "wafc.sglasso", "gam", "gam.matched", "bsgl",
              "klopp", "klopp.free", "klopp.unit", "klopp.merged",
              "klopp.balanced", "klopp.freecoarse", "aspline", "vcbart",
              "linear", "oracle")
+## Step E2.5g: the thresholded rows of 'wafc.lasso' and 'klopp.balanced'.
+thr_bases <- c("wafc.lasso", "klopp.balanced")
+thr_rules <- c("max", "cv", "oracle")
+thr_refits <- c(none = "", support = "+ls", block = "+lsb")
+thr_labels <- function(base) {
+  unlist(lapply(names(thr_refits), function(rf) {
+    paste0(base, "+", thr_rules, thr_refits[[rf]])
+  }))
+}
+method_levels <- unlist(lapply(methods, function(m) {
+  c(m, if (m %in% thr_bases) thr_labels(m))
+}))
 run_methods <- methods
 if (nzchar(Sys.getenv("WAFC_METHODS", ""))) {
   run_methods <- strsplit(Sys.getenv("WAFC_METHODS"), ",", fixed = TRUE)[[1L]]
@@ -337,6 +364,63 @@ fail_row <- function(cell, n, r, method, dgp, active, err) {
     stringsAsFactors = FALSE)
 }
 
+## The thresholded rows of one fit (step E2.5g): every rule and refit of
+## thr_rules and thr_refits, the folds refitted once for the three "cv"
+## rows. Besides the rows, two side tables: the norm of every block of the
+## fit, with its truth, and the t of every row.
+thr_rows <- function(cell, n, r, base, obj, base_time, dgp, test, grid,
+                     active, foldid) {
+  rows <- list()
+  tt <- list()
+  truth <- list(x = test[["x"]], u = test[["u"]], f = test[["f"]])
+  t0 <- proc.time()[["elapsed"]]
+  ff <- try(wafc_threshold_folds(obj, y = dgp[["y"]], foldid = foldid),
+            silent = TRUE)
+  ff_time <- proc.time()[["elapsed"]] - t0
+  if (inherits(ff, "try-error")) ff <- NULL
+  nrm <- NULL
+  for (rf in names(thr_refits)) {
+    for (rule in thr_rules) {
+      lab <- paste0(base, "+", rule, thr_refits[[rf]])
+      th <- try(wafc_threshold(obj, rule = rule, refit = rf, y = dgp[["y"]],
+                               foldid = foldid, truth = truth,
+                               fold.fits = ff), silent = TRUE)
+      if (inherits(th, "try-error")) {
+        rows[[length(rows) + 1L]] <- fail_row(cell, n, r, lab, dgp, active,
+                                              th)
+        next
+      }
+      ex <- th[["extra"]]
+      if (is.null(nrm)) nrm <- ex[["norm"]]
+      rows[[length(rows) + 1L]] <- one_row(
+        cell, n, r, lab, dgp, test, grid,
+        list(f_test = predict(th, test[["x"]], test[["u"]]),
+             beta_test = th[["beta"]](test[["u"]]),
+             time = base_time + th[["time"]] +
+               if (rule == "cv") ff_time else 0),
+        active, th[["blocks"]], wafc_grid_components(th, grid),
+        list(J = ex[["J"]], lambda = ex[["lambda"]], nzero = ex[["nzero"]]))
+      tt[[length(tt) + 1L]] <- data.frame(
+        cell = cell[["name"]], n = n, rep = r, method = lab, t = ex[["t"]],
+        c = ex[["c"]], stringsAsFactors = FALSE)
+    }
+  }
+  side <- list(
+    "thr-t" = if (length(tt)) do.call(rbind, tt) else NULL,
+    "thr-norms" = if (is.null(nrm)) NULL else data.frame(
+      cell = cell[["name"]], n = n, rep = r, method = base,
+      l = as.vector(row(nrm)), m = as.vector(col(nrm)),
+      active = active, norm = as.vector(nrm),
+      stringsAsFactors = FALSE))
+  list(rows = rows, side = side)
+}
+
+## Appends the side tables of a job to the ones it already has.
+side_add <- function(side, more) {
+  for (nm in names(more)) side[[nm]] <- rbind(side[[nm]], more[[nm]])
+  side
+}
+
 ## ---------------------------------------------------------------------------
 ## Part "competitors"
 ## ---------------------------------------------------------------------------
@@ -351,6 +435,7 @@ run_competitors <- function(cell, n, r) {
   set.seed(seed + 77L)
   foldid <- sample(rep_len(1:10, n))
   rows <- list()
+  side <- list()
   ## Every method starts from the random stream left by the folds, so that
   ## what one method draws (vcbart is the one that draws) does not depend on
   ## which methods ran before it: that is what lets WAFC_METHODS restrict the
@@ -391,6 +476,12 @@ run_competitors <- function(cell, n, r) {
       list(f_test = fh, beta_test = bh, time = el), active, blk, gh,
       list(J = cv[["J.min"]], lambda = lam,
            nzero = sum(cf[-1L, 1L][-f[["design"]][["unpenalized"]]] != 0)))
+    if (paste0("wafc.", pen) %in% thr_bases) {
+      tr <- thr_rows(cell, n, r, paste0("wafc.", pen), cv, el, dgp, test,
+                     grid, active, foldid)
+      rows <- c(rows, tr[["rows"]])
+      side <- side_add(side, tr[["side"]])
+    }
   }
 
   ## 'gam.matched' is mgcv with the basis dimension of each smooth matched to
@@ -447,8 +538,16 @@ run_competitors <- function(cell, n, r) {
       list(J = if (lab == "gam.matched") J_lasso else f[["extra"]][["J"]],
            lambda = f[["extra"]][["lambda"]],
            nzero = if (fc) f[["extra"]][["nzero"]] else NULL))
+    if (lab %in% thr_bases) {
+      tr <- thr_rows(cell, n, r, lab, f, f[["time"]], dgp, test, grid,
+                     active, foldid)
+      rows <- c(rows, tr[["rows"]])
+      side <- side_add(side, tr[["side"]])
+    }
   }
-  do.call(rbind, rows)
+  out <- do.call(rbind, rows)
+  attr(out, "side") <- side
+  out
 }
 
 ## ---------------------------------------------------------------------------
@@ -770,7 +869,17 @@ sweep_part <- function(fun, label, cells_used = cells, ns_used = ns,
     cat(sprintf("   %d of %d job(s) failed as a whole and left no row\n",
                 sum(!ok), length(jobs)))
   }
-  out <- do.call(rbind, res[ok])
+  ## the side tables a job may carry (step E2.5g) are bound apart from the
+  ## rows, and the rows are bound without them
+  side <- list()
+  for (z in res[ok]) {
+    side <- side_add(side, attr(z, "side"))
+  }
+  out <- do.call(rbind, lapply(res[ok], function(z) {
+    attr(z, "side") <- NULL
+    z
+  }))
+  if (length(side)) attr(out, "side") <- side
   if (!is.null(out[["error"]]) && any(!is.na(out[["error"]]))) {
     bad <- out[!is.na(out[["error"]]), c("method", "error")]
     cat("   failed fits, kept as rows with no numbers:\n")
@@ -792,8 +901,11 @@ med <- function(d, vars, by) {
 
 if ("competitors" %in% parts) {
   res <- sweep_part(run_competitors, "competitors")
+  side <- attr(res, "side")
+  attr(res, "side") <- NULL
   saveRDS(res, out_file("competitors"))
-  res[["method"]] <- factor(res[["method"]], levels = methods)
+  for (nm in names(side)) saveRDS(side[[nm]], out_file(nm))
+  res[["method"]] <- factor(res[["method"]], levels = method_levels)
   cat("\nmedians by cell, n and method (rmse_f out of sample, ISE of the",
       "components, blocks kept of the active and of the null ones, the J",
       "selected or matched, s):\n")
@@ -816,6 +928,19 @@ if ("competitors" %in% parts && "wafc.lasso" %in% run_methods) {
   cmp[["r_ise"]] <- ifelse(cmp[["ise0"]] > 0, cmp[["ise"]] / cmp[["ise0"]],
                            NA_real_)
   print(med(cmp, c("r_rmse", "r_ise"), c("cell", "n", "method")),
+        row.names = FALSE, digits = 3)
+}
+if ("competitors" %in% parts) {
+  cat("\nstructure recovered: fraction of replicates with S-hat = S, and",
+      "mean false positives and false negatives (blocks):\n")
+  ok <- !is.na(res[["n_true"]])
+  st <- res[ok, ]
+  st[["exact"]] <- st[["n_true"]] == st[["n_active"]] & st[["n_false"]] == 0L
+  st[["fp"]] <- st[["n_false"]]
+  st[["fn"]] <- st[["n_active"]] - st[["n_true"]]
+  a <- stats::aggregate(st[c("exact", "fp", "fn")],
+                        st[c("cell", "n", "method")], FUN = mean)
+  print(a[do.call(order, unname(as.list(a[c("cell", "n", "method")]))), ],
         row.names = FALSE, digits = 3)
 }
 

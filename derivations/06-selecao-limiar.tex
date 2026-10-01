@@ -563,8 +563,12 @@ Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
   \item Bühlmann, P.\ e van de Geer, S. (2011). \emph{Statistics for
     High-Dimensional Data}. Springer. (\texttt{buhlmann2011statistics},
     verificada em L1.) Fonte do Teorema~1 de E1.5, que é tudo o que este
-    arquivo consome de LASSO. O tratamento do LASSO limiarizado está no
-    livro. \textsc{[verificar numeração da seção]}
+    arquivo consome de LASSO. O LASSO limiarizado está na Seção~2.9
+    (p.~33, com o reajuste por mínimos quadrados e $\delta$ escolhido por
+    validação cruzada depois de $\lambda_{\mathrm{init}}$), definido na
+    Seção~7.6.2 (eq.~(7.5), p.~205), com o resultado no Teorema~7.8
+    (Seção~7.8.2, pp.~211--212) e a comparação com o LASSO adaptativo na
+    Seção~7.8.4. Conferido no PDF da editora em L7.
   \item van de Geer, S., Bühlmann, P.\ e Zhou, S. (2011). The adaptive and
     the thresholded Lasso for potentially misspecified models (and a lower
     bound for the Lasso). \emph{Electronic Journal of Statistics} 5,
@@ -578,7 +582,11 @@ Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
     nonparametric additive models. \emph{The Annals of Statistics} 38(4),
     2282--2313. (\texttt{Huang-Horowitz-Wei-2010}, verificada em L1.)
     Condição de separação em nível de componente no mesmo papel da
-    Hipótese~\ref{ass:sep}. \textsc{[verificar numeração do resultado]}
+    Hipótese~\ref{ass:sep}: é a (A1), $\min_{j\le q}\norm{f_j}_2 \ge c_f$
+    (§3, p.~2287), e o resultado de seleção que a usa é o Teorema~4(i)
+    (p.~2290), com o group LASSO como estimador inicial no Corolário~2
+    (p.~2291); o Teorema~2(ii) (p.~2289) dá a parte sem falsos negativos
+    para o group LASSO sozinho. Conferido no PDF da editora em L7.
   \item Wei, F., Huang, J.\ e Li, H. (2011). Variable selection and
     estimation in high-dimensional varying-coefficient models.
     \emph{Statistica Sinica} 21(4), 1515--1540.

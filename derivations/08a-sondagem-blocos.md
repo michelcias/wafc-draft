@@ -71,8 +71,13 @@ antes de E2.5 decidir (§9).
 
 ### 1.1 Klopp & Pensky (2015)
 
-Lido no arXiv 1312.4087v2 (a versão que L2 leu); a numeração abaixo é a do
-arXiv, e a do *Annals* não foi conferida.
+Lido no arXiv 1312.4087v2 (a versão que L2 leu) e conferido no *Annals*
+(L7); a numeração abaixo é a do *Annals*. A norma (3.1) e o estimador (3.2)
+estão na p. 1280, a Observação 1 na p. 1281, a (A3) e a (A6) na §2.2
+(p. 1278), o Lema 1 na p. 1282 e o Teorema 2 na p. 1283. Os Lemas 2, 3 e 4 não estão no
+artigo, e sim no suplemento (DOI `10.1214/15-AOS1309SUPP`, a referência
+[21] deles); a prova do Teorema 2 os cita com esses números, e o suplemento
+não foi relido.
 
 - **A norma (3.1)** é `‖A‖_block = Σ_j Σ_{l=0}^{M} ‖a_{jl}‖_2`, sem pesos: para
   cada função `f_j`, o bloco 0 é só o coeficiente da constante e os demais são
@@ -80,35 +85,44 @@ arXiv, e a do *Annals* não foi conferida.
   base**, isto é, atravessando níveis (a Observação 1 deles ajusta os tamanhos
   para `d` ou `d + 1` quando `L/d` não é inteiro). O estimador (3.2) minimiza
   `n^{−1}‖Y − Bα‖² + δ‖α‖_block`; na nossa normalização, `δ = 2λ`.
-- **A escolha de `δ`** que precede o Teorema 2 é
-  `δ̂ = 2(σ C_ω K sqrt(μ) + 1) sqrt((1 + h) φ_max ω_max(1) log p / n)`, com
-  `p^μ ≥ 2n` entre as condições do Teorema 2. Com `p` fixo,
-  `μ log p ≥ log(2n)`, e `δ̂/2 ≍ σ sqrt(log n/n)`: o `log p` do enunciado
-  esconde um `log n`.
-- **O Teorema 2** exige `min_k(r_k ∧ r'_k) ≥ 2` e `L + 1 ≥ n^{1/2}`, e a
-  prova (pelo Lema 3 deles) usa a (A6), `(s + s_0)(1 + log n) ≤ p`. As duas
-  primeiras existem porque o termo de viés é controlado pela norma dual, como
-  o de ruído (Lema 2(ii) deles); a (A6) é de alta dimensão e **falha para `p`
+- **A escolha de `δ`** é a eq. (3.14),
+  `δ̂ = (C_K K sqrt(μ) + 1) sqrt((1 + h) φ_max ω_max(1) log p / n)`, com
+  `C_K` dependendo só da lei do ruído e `K` o parâmetro sub-gaussiano da
+  (A4) (`K = σ` no caso gaussiano); o Teorema 2 usa `δ = 2δ̂`, isto é,
+  `λ = δ̂` na nossa normalização. A (3.16) põe `p^μ ≥ 2n` entre as condições
+  do Teorema 2. Com `p` fixo, `μ log p ≥ log(2n)`, e `λ = δ̂ ≍ σ sqrt(log n/n)`:
+  o `log p` do enunciado esconde um `log n`.
+- **O Teorema 2** exige `L + 1 = n^ς` com `1/2 ≤ ς < 1` e
+  `r* = min_k(r_k ∧ r'_k) ≥ r_0* > (2ς)^{−1}` (eq. 3.13, p. 1283; o par
+  `r* ≥ 2`, `L + 1 = n^{1/2}` do arXiv é o caso `ς = 1/2` da Observação 2),
+  e a prova (pelo Lema 3 do suplemento) usa a (A6), `(s + s_0)(1 + log n) ≤ p`.
+  As duas primeiras controlam o viés: o de truncamento cai de
+  `C_a² s n^{−2r*ς}` a `C_a² s/n` (p. 1294), e o termo de viés no ajuste é
+  controlado pela norma dual, como o de ruído (eq. (5.25) do Lema 2 do
+  suplemento); a (A6) é de alta dimensão e **falha para `p`
   fixo e `n` grande**, que é o regime de E1.6. A taxa do teorema, com `μ log p ≍ log n`, é
   `(σ²/n)^{2r/(2r+1)} (log n)^{(2−ν)_+/(ν(2r+1))}`, que é exatamente a de §4
   com `(r, ν) = (s, π)`.
-- **O Lema 4 deles** (risco ideal por blocos sob a classe (A3)) é
+- **O Lema 4 do suplemento** (risco ideal por blocos sob a classe (A3)) é
   `Σ_l min(‖a_l‖², εd) ≤ C_a^{2/(2r+1)} ε^{2r/(2r+1)} d^{(2−ν)_+/(ν(2r+1))}`,
   e é o que a §3 reproduz sob a hipótese de E1.3.
 
 ### 1.2 Lounici, Pontil, van de Geer & Tsybakov (2011)
 
-Lido no arXiv 1007.1771v3 (numeração do arXiv). O group LASSO deles é
+Lido no arXiv 1007.1771v3 e conferido no *Annals* (L7): a numeração é a
+mesma nas duas versões. O group LASSO deles é
 `min N^{−1}‖Xβ − y‖² + 2 Σ_j λ_j ‖β^j‖`, com um `λ_j` por grupo, que é a
-nossa normalização. O **Lema 3.1** calibra, com ruído gaussiano,
+nossa normalização. O **Lema 3.1** (eq. 3.1, p. 2173) calibra, com ruído gaussiano,
 `λ_j ≥ (2σ/sqrt N) sqrt(tr Ψ_j + 2‖Ψ_j‖(2q log M + sqrt(K_j q log M)))`,
 `Ψ_j = X_{G_j}'X_{G_j}/N`, com probabilidade `1 − 2M^{1−q}`; o **Teorema 3.1**
 dá `N^{−1}‖X(β̂ − β*)‖² ≤ (16/κ²) Σ_{j ∈ J(β*)} λ_j²` sob a condição RE em
-grupos, e o **Teorema 3.2**, a versão com viés. O **Teorema 7.1** é a cota
+grupos (eq. 3.10, pp. 2176–2177), e o **Teorema 3.2** (p. 2177), a versão
+com viés, cuja prova o *Annals* omite e remete ao arXiv. O **Teorema 7.1**
+(p. 2187) é a cota
 inferior para o LASSO com o `λ` universal: ele paga `σ² log K / N` por
 coeficiente selecionado, que é o logaritmo que o group LASSO evita quando o
-tamanho do grupo passa de `log M`. A seção 8 estende ao ruído não gaussiano
-sob uma hipótese técnica; aqui o ruído sub-gaussiano entra pela desigualdade
+tamanho do grupo passa de `log M`. A seção 8 (p. 2189) estende ao ruído não
+gaussiano, no modelo multitarefa, sob a Hipótese 8.1; aqui o ruído sub-gaussiano entra pela desigualdade
 de Hsu, Kakade & Zhang (2012), Teorema 2.1.
 
 ### 1.3 O código
@@ -671,17 +685,20 @@ a direção prevista, mas nos `n` do piloto a vantagem da cota é de constante
   Statistics* 43(3), 1273--1299. `Klopp-Pensky-2015`, verificada em L1. Lido
   aqui no arXiv 1312.4087v2 (código-fonte da versão reenviada): norma (3.1),
   estimador (3.2), a escolha de `δ̂` e o Teorema 2 com as condições
-  `min(r ∧ r') ≥ 2`, `L + 1 ≥ n^{1/2}` e (A6), o Lema 1 (Gram restrita), o
+  `min(r ∧ r') ≥ 2`, `L + 1 ≥ n^{1/2}` e (A6) (no *Annals*, `L + 1 = n^ς` e
+  `r* > (2ς)^{−1}`, §1.1), o Lema 1 (Gram restrita), o
   Lema 2 (termos aleatório e de viés pela norma dual, com Hanson-Wright), o
-  Lema 4 (risco ideal por blocos) e o Corolário 1. A numeração do *Annals*
-  não foi conferida.
+  Lema 4 (risco ideal por blocos) e o Corolário 1. Numeração conferida no
+  *Annals* em L7: a mesma, com `δ̂` na eq. (3.14) e os Lemas 2, 3 e 4 no
+  suplemento (`10.1214/15-AOS1309SUPP`), que não foi relido.
 - **Lounici, K., Pontil, M., van de Geer, S. and Tsybakov, A. B. (2011).**
   Oracle inequalities and optimal inference under group sparsity. *The
   Annals of Statistics* 39(4), 2164--2204.
   `Lounici-Pontil-vandeGeer-Tsybakov-2011`, verificada em L3. Lido aqui no
   arXiv 1007.1771v3: o estimador com `λ_j` por grupo, o Lema 3.1, os
   Teoremas 3.1 e 3.2, o Teorema 7.1 (cota inferior para o LASSO) e a seção 8
-  (ruído não gaussiano). A numeração do *Annals* não foi conferida.
+  (ruído não gaussiano). Numeração conferida no *Annals* em L7: a mesma,
+  com as páginas da §1.2.
 - **Hsu, D., Kakade, S. M. and Zhang, T. (2012).** A tail inequality for
   quadratic forms of subgaussian random vectors. *Electronic Communications
   in Probability* 17, no. 52, 1--6. DOI `10.1214/ECP.v17-2079`.
@@ -702,6 +719,12 @@ a direção prevista, mas nos `n` do piloto a vantagem da cota é de constante
   não a citam.
 - **Bühlmann, P. and van de Geer, S. (2011)** e **Donoho, D. L. and
   Johnstone, I. M. (1998)**: usados só por meio de E1.5 e E1.6.
+- **Donoho, D. L. and Johnstone, I. M. (1994).** Ideal spatial adaptation by
+  wavelet shrinkage. *Biometrika* 81(3), 425--455. DOI
+  `10.1093/biomet/81.3.425`. `Donoho-Johnstone-1994`, verificada em L1 e
+  lida no PDF da editora em L7. Usada na §12: a VisuShrink é a Definição 2
+  (§4.2, p. 445), e os níveis abaixo de `j_0` deixados intocados, em número
+  fixo, com o custo `2^{j_0}σ²/n`, vêm da §2.4 (p. 440).
 - **`grpreg` 3.6.0**, instalado nesta máquina: a padronização, a
   ortonormalização por grupo e o `group.multiplier = sqrt(|G|)` padrão foram
   lidos no código da função interna `newXG`.
@@ -943,7 +966,9 @@ base periódica centrada os níveis `0` a `j*` geram o mesmo espaço que as
 funções de escala do nível `j* + 1` menos a constante, e a forma livre é a
 convenção clássica da limiarização de wavelets, que deixa intocados os
 coeficientes abaixo de um nível inicial `j_0` (a VisuShrink de Donoho &
-Johnstone, 1994, com `j_0` fixo **[VERIFICAR: não relido]**), aqui com
+Johnstone, 1994, Definição 2, §4.2, p. 445, com `j_0` fixo; a razão, que os
+coeficientes abaixo de `j_0` são "a fixed number, independent of n", e o
+custo `2^{j_0}σ²/n` estão na §2.4, p. 440), aqui com
 `j_0 = j* + 1 ≍ log_2 b_n`. A diferença para E1.8 é que lá `p_0`
 não depende de `n` e aqui cresce como `b_n ≍ log n`. Nos `n` do piloto,
 `2^{j*+1} − 1 = 7` (`b_n = 6` e `7`, `j* = 2`), `p_0 = 45` nas células

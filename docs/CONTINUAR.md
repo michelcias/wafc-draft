@@ -94,7 +94,7 @@ Rscript derivations/check/08a-blocos.R             # ~1 min 30 s, a sondagem de 
 E o código do método, que já existe:
 
 ```bash
-Rscript -e 'testthat::test_dir("wafc/tests")'   # 674 passam, ~45 s
+Rscript -e 'testthat::test_dir("wafc/tests")'   # 921 passam, ~66 s
 Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
 Rscript wafc/scripts/03-tune-decomp.R           # ~2 min
 Rscript wafc/scripts/02-tune.R 20               # a comparação de E2.3, ~31 min com a grade antiga (hoje o padrão é 2:8, D34)
@@ -108,9 +108,10 @@ Rscript wafc/scripts/06-timing.R                             # só tempo, curto
 Rscript wafc/scripts/07-accel.R 20 staged,sgl 14             # pergunta 29: ~10 min + ~48 min em 14 núcleos
 Rscript wafc/scripts/08-sgl-null.R curve,cross,cost 14       # pergunta 31: ~25 min em 14 núcleos
 WAFC_OUT=wafc/cache/e25d Rscript wafc/scripts/09-gam-autonomo.R 50 fit,report 12   # E2.5d: 1 h 18 min em 12 núcleos, pico de 1,3 GB por processo, ~11 GB no total
+WAFC_OUT=wafc/cache/e25g WAFC_TAG=e25g WAFC_METHODS=wafc.lasso,klopp.balanced WAFC_REPS_MIXED=50 Rscript wafc/scripts/04-pilot.R 50 competitors 8   # E2.5g, os limiares: 1 h 59 min em 8 núcleos, pico de 0,86 GB por processo
 ```
 
-## 3. Onde o trabalho está (resumo de 2026-09-30; o `ESTADO.md` manda)
+## 3. Onde o trabalho está (resumo de 2026-10-01; o `ESTADO.md` manda)
 
 - **E0 fechada.** Código em `wafc/` (D4); alvo *Statistica Sinica* (D5,
   confirmada Q1 no SCImago) e método chamado **WAFC** (D8); instruções da
@@ -132,7 +133,10 @@ WAFC_OUT=wafc/cache/e25d Rscript wafc/scripts/09-gam-autonomo.R 50 fit,report 12
   **no-go para a variante LASSO** pelo critério literal; E2.5b a E2.5d
   mediram o block LASSO de K&P, os pesos dele e o `gam` autônomo (**696
   testes**; 730 depois de E2.5e, que achou a forma do block LASSO que a
-  teoria cobre), e E2.5 espera a decisão de rumo (pergunta 33 do `ESTADO.md`).
+  teoria cobre). E2.5f mediu os níveis grossos livres (não pagam) e E2.5g o
+  limiar do Corolário 8 (`wafc/R/threshold.R`), que passa o fator do suave;
+  **921 testes**. E2.5 espera a decisão de rumo (perguntas 33 e 38 do
+  `ESTADO.md`).
 - **Avaliação da base em estudo numérico:** tabela fixa (`wtable()` uma vez,
   passada em `wavelet.table`), que é o caminho rápido; a regra `auto` não
   dispara nos `n` do estudo e deixaria tudo no algoritmo lento (D31). A
@@ -142,10 +146,10 @@ WAFC_OUT=wafc/cache/e25d Rscript wafc/scripts/09-gam-autonomo.R 50 fit,report 12
   `supp_2.tex` compilam limpos, em 33 e 30 páginas, com as edições de E5c
   marcadas em `colR1` (inclusive o Corolário 8 na §3.6); as pendências
   dela são a pergunta 32 do `ESTADO.md`.
-- **Bibliografia:** 69 entradas verificadas (L1, L3, L4 e L5); pendências na pergunta 35 do `ESTADO.md`.
+- **Bibliografia:** 69 entradas verificadas (L1, L3, L4 e L5), e as citações das derivações conferidas nas fontes publicadas (L6, L7); os PDFs ficam em `refs/`, não versionado, e não viajam; pendências na pergunta 35 do `ESTADO.md`.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** E2.5g (estimação seguida de limiar, e a calibração de `t_n`) e L7 (numeração conferida nas fontes publicadas, espera PDFs do autor em `refs/`); E2.5f e L6 fecharam em 2026-10-01; E2.4c, E2.5a a E2.5e, E1.11 e L5 fecharam em 2026-09-30 e 10-01, e E2.5 espera a decisão da pergunta 33 do `ESTADO.md`;
+- **Catálogo:** vazio. E2.5f, E2.5g, L6 e L7 fecharam em 2026-10-01; E2.4c, E2.5a a E2.5e, E1.11 e L5 em 2026-09-30 e 10-01; E2.5 espera a decisão das perguntas 33 e 38 do `ESTADO.md`;
   detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de

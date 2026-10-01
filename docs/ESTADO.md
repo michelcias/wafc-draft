@@ -1,19 +1,16 @@
 # Estado do trabalho, handoff de continuidade
 
 **Última atualização:** 2026-10-01.
-**Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
-E1.10), E5a, E5c e E2.1 a E2.5a fechadas**, mais L1 a L4 e a sondagem E6.1a.
-Falta E2.5 (go/no-go) para fechar E2, e **a repetição do piloto (E2.5a)
-devolveu, pelo critério literal, no-go para a variante LASSO**: o block
-LASSO de Klopp & Pensky no mesmo desenho vence no não homogêneo, e o `gam`
-em dimensão casada vence no suave por 1,5 a 1,7 em ISE (§2, pergunta 33).
-A decisão de rumo é do autor; **E2.5b** (medir o block LASSO com níveis
-livres em todas as células, e a `mixed` com 50 réplicas) **fechou**: o
-block LASSO de níveis livres vence o LASSO em toda célula com componente;
-**E1.11** fechou: a teoria transfere para os blocos e a taxa melhora, com
-pesos 1 (pergunta 34). A decidir pelo
-autor: a saída da aplicação (pergunta 2). O teto de páginas fica para o fim
-(D21).
+**Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8,
+E1.10 e E1.11), E5a, E5c e E2.1 a E2.5g fechadas**, mais L1 a L7 e a
+sondagem E6.1a. Falta E2.5 (go/no-go) para fechar E2. O LASSO puro levou
+no-go pelo critério literal em E2.5a; E2.5b a E2.5f mediram cinco formas
+do block LASSO (a balanceada é a que a teoria cobre e a melhor fora do
+suave); e **E2.5g mostrou que o limiar do Corolário 8 é o que derruba o
+fator do suave abaixo de 1,5** (1,31 a 1,37 no `wafc.lasso+max` contra o
+`gam.matched`). As medições que a pergunta 33 pedia estão feitas; a decisão
+de rumo é do autor (perguntas 33 e 38). A decidir também: a saída da
+aplicação (pergunta 2). O teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 2` (`manuscript/ms_2.tex`,
 `supp_2.tex`, `references_2.bib`), aberta em 2026-09-30 por decisão do
 autor; E5c aplicou as edições acumuladas, marcadas, e os dois compilam
@@ -1706,6 +1703,112 @@ aviso. A tarefa releu cada localização nos PDFs de `refs/`.
   por bloco. É a frase que um referee pode pedir na §3.6 do `ms`.
 - **Sobram quatro marcas de verificação**, fora de L5 (pergunta 35(e)).
 
+### 2026-10-01: E2.5g fechada, o limiar do Corolário 8 passa o fator do suave
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: **921 testes
+passam** (eram 807), 0 falhas; `e25g-joined.rds` tem **24 750 linhas**
+(as 11 250 de E2.5f mais 13 500 limiarizadas), 0 falhas; as 1 500 linhas
+de `wafc.lasso` e `klopp.balanced` coincidem com as de E2.5f com diferença
+0 em toda coluna fora o tempo (**quinta junção exata**); e as razões
+abaixo marcadas reproduzem. Rodada: 750 ajustes, 1 h 59 min em 8
+processos, 15,9 h de processador, pico de 0,86 GB.
+
+**O estimador:** `wafc_threshold()` (`wafc/R/threshold.R`) zera os blocos
+com `N̂_{ℓm} ≤ t` num ajuste do WAFC ou do `klopp`, sem reajuste (o
+Corolário 8) ou com mínimos quadrados no suporte (`+ls`, van de Geer et
+al.) ou no bloco inteiro (`+lsb`). Três regras: `max` (`t = c·max N̂`,
+`c = 0,15` de E1.7c), `cv` (`t` absoluto, escolhido nas mesmas dobras no
+`(J, λ)` já escolhido) e `oracle` (referência). Os candidatos são
+exaustivos, porque o ajuste limiarizado é constante entre normas
+consecutivas; em `t = 0` o erro de validação cruzada é o `cvm.min` a
+`1e-10`.
+
+- **O fator do suave passa com limiar, pela primeira vez.**
+  `ISE / ISE(gam.matched)` no `smooth`, `n = 250, 500, 1000`: o
+  `wafc.lasso` vai de 1,67, 1,68, 1,69 (reproduzido) a **1,31, 1,37, 1,36**
+  com `+max` (reproduzido) e 1,34, 1,40, 1,48 com `+cv`; o `klopp.balanced`
+  de 1,68, 1,73, 1,64 a 1,46, 1,45, 1,32 com `+max`. No `uneven`, 1,23 a
+  1,38 para as duas formas. Contra o `gam.k128`, só o `+max` fica abaixo de
+  1,5 nos três `n` (1,22, 1,37, 1,45 no `wafc.lasso`); o `+cv` chega a 1,68
+  em `n = 1000`.
+- **O que sobra é ISE ativo.** O limiar sem reajuste não toca os blocos
+  mantidos (razão de ISE ativo 1,000, reproduzido): o resto do fator é
+  1,38 a 1,41 no `wafc.lasso` e 1,48 a 1,50 no `klopp.balanced`, que é o
+  teto de um limiar perfeito; `+max` e `+oracle` já estão nele no suave. Isso
+  confirma a estimativa feita aqui sobre os `.rds` de E2.5f.
+- **Contra o próprio ajuste**, em `rmse_f`: `+max` ganha 8% a 10% no
+  `smooth` (100% das réplicas) e nada no não homogêneo; `+cv` ganha 2% a 6%
+  no não homogêneo e na `mixed`.
+- **Contra o `gam.matched`**, em `rmse_f`: o `klopp.balanced+cv` vence no
+  não homogêneo (0,951, 0,924, **0,906**, reproduzido; 82% a 90% das
+  réplicas) e na `mixed` (0,944 a 0,971, 74% a 84%); o `wafc.lasso+cv`
+  vence no não homogêneo em `n = 1000` (0,937) e perde na `mixed` (1,044,
+  1,051, 1,025, reproduzido). **Com limiar, o LASSO passa à frente dos
+  blocos no `smooth` em `n ≤ 500`** (`klopp.balanced+cv / wafc.lasso+cv`
+  1,025 e 1,046), e os blocos continuam à frente no não homogêneo, no
+  `uneven` e na `mixed` (0,91 a 0,98).
+- **Estrutura**, `P(Ŝ = S)`: sem limiar, 0 em toda célula com componente.
+  Com `+max`, 0,86, 1, 1 no `smooth` (reproduzido) e 0,52 a 1 no `uneven`,
+  mas **0,02 a 0,42 no não homogêneo e 0 a 0,68 na `mixed`**. O `+cv+ls` é a
+  melhor regra que não vê a verdade: 0,88 a 1 no suave e no `uneven`, 0,52
+  a 0,98 no não homogêneo, 0,44 a 0,98 na `mixed`. O `gam.matched` acerta
+  0,18 a 0,34 no suave e 0 na `mixed`.
+- **A pergunta 11, medida:** o `c = 0,15` de E1.7c serve ao suave e não ao
+  não homogêneo, onde a validação cruzada leva `J` a 5, 6 e 7 e a folga
+  entre o menor bloco ativo e o maior nulo cai a 0,26, 0,44 e 0,57 da maior
+  norma (0,80 a 0,90 no suave); que a causa seja o `J` mais fundo é
+  leitura, não medida. **`c = 0,4` acerta 0,88 a 1 em `n ≥ 500`** nas quatro
+  células com componente; o platô do não homogêneo e da `mixed` é estreito e
+  fecha dos dois lados. **Nenhuma regra relativa zera o nulo** (o maior
+  bloco fica sempre); `t = 0,3` absoluto zera, mas depende da escala do
+  sinal e fica como conjectura.
+- **Os reajustes:** o `+ls` ajuda o WAFC no suave (0,87 a 0,90 do ajuste) e,
+  com `cv`, na `mixed`, e piora o `klopp.balanced` fora do suave; com `max`
+  ele é desastroso no nulo (2,2 a 3,1 em `rmse_f`), porque o maior bloco
+  nulo é reajustado inteiro. O `+lsb` é instável fora do suave (até 2,7) e
+  custa quase todo o acréscimo de processador da rodada (170 a 190 s por
+  ajuste na `mixed` em `n = 1000`). Nenhuma forma com reajuste passa o
+  fator contra o `gam.k128` em `n = 1000`.
+- **Custo do limiar:** `max` e `oracle`, menos de 0,01 s; `cv`, 0,06 a 0,7 s
+  com `q = 2` e 2,7 s (`wafc.lasso`) e 10 s (`klopp.balanced`) na `mixed` em
+  `n = 1000`, contra 24 e 48 s do ajuste.
+- **Lições:** o limiar sem reajuste não mexe no ISE ativo, e a tabela com
+  ISE ativo e inativo separados (lição de E2.5f) mostra isso de uma vez; o
+  reajuste no bloco inteiro é caro e instável com `q = 4`, e se entrar em
+  E4 é só no suporte.
+
+As quatro perguntas da tarefa estão na pergunta 38.
+
+### 2026-10-01: L7 fechada, a numeração conferida nas fontes publicadas
+
+Chat de tarefa, integrado aqui, ao lado da E2.5g. Conferido nesta máquina:
+o diff só toca citações, e o `06-selecao-limiar.pdf` recompila em 7
+páginas sem referência indefinida. Os cinco PDFs foram postos em `refs/`
+pelo autor (`klopp2015`, `lounici2011`, `huang2010`, `donoho1994`,
+`buhlmann2011`); o `03` e o `04` não mudaram (o `04` cita a eq. (1.8) e o
+Lema 1 de K&P, que conferem no *Annals*, e o `03` não cita K&P).
+
+- **Klopp & Pensky no *Annals* não é o arXiv a menos de revisão no
+  Teorema 2:** as condições `r* ≥ 2` e `L + 1 ≥ n^{1/2}` viraram a família
+  `L + 1 = n^ς`, `1/2 ≤ ς < 1`, `r* > (2ς)^{−1}` (eq. 3.13), da qual o par
+  antigo é o caso `ς = 1/2`; a escolha de `δ` é a (3.14), com `λ = δ̂` e não
+  `δ̂/2`; e os Lemas 2 a 4 foram para o suplemento, que não foi lido. A
+  ordem `σ sqrt(log n/n)` e as conclusões do `08a` não mudam, e o
+  posicionamento de E1.11 continua de pé (K&P precisam de alguma
+  regularidade mínima e de `L` polinomial em `n`, e a arquitetura de E1.5
+  não), mas **quem citar K&P no manuscrito cita a forma do *Annals***.
+- **Lounici et al.:** numeração idêntica; o *Annals* omite a prova do
+  Teorema 3.2, e a seção 8 é no modelo multitarefa.
+- **Resolvidos:** a VisuShrink de Donoho & Johnstone (1994) na §12 do
+  `08a` (Definição 2, p. 445, e §2.4, p. 440); o LASSO limiarizado em
+  Bühlmann & van de Geer (2011), Seção 2.9 e Teorema 7.8, com `δ` por
+  validação cruzada, que é a regra `cv` de E2.5g; a condição de separação
+  de Huang, Horowitz & Wei (2010), a (A1), com a seleção no Teorema 4(i).
+- **As ocorrências fora da coluna conferem** (`busca-novidade.md`,
+  `plano-projeto.md`, `notacao.md` §7, `ms_2`), fora a frase de
+  `busca-novidade.md` l. 45 com as condições do arXiv; e uma marca no
+  `05-taxas.tex` não se resolve com número (pergunta 35(f)).
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1844,8 +1947,11 @@ Ordenadas pelo que bloqueia mais.
    método vira linha com a mensagem em vez de sumir. Os números já
    registrados **não** são afetados (foram produzidos antes do ajuste a
    D31, e estão na tabela de razões da análise de E2.4).
-11. **Calibração do limiar `t_n`** (**catalogada como E2.5g** em
-   2026-10-01, junto com a medição do limiar no piloto; nova, de E1.7c): o Corolário 8 é
+11. **Calibração do limiar `t_n`: ~~catalogada como E2.5g~~ medida por
+   E2.5g (2026-10-01, §2):** `c = 0,15` serve ao suave e não ao não
+   homogêneo; `c = 0,4` acerta 0,88 a 1 em `n ≥ 500`; nenhuma regra
+   relativa zera o nulo. A escolha da regra é a pergunta 38. Texto
+   original: (nova, de E1.7c) o Corolário 8 é
    explícito em que `t_n` depende de constantes desconhecidas, e a regra
    grosseira `t = 0.15 max_{ℓm} ‖ĝ_{ℓm}‖` acertou 1.00 e 0.90 nos dois
    cenários em `n = 1000`. Calibrar é de E2.4/E2.5, com a curva de acerto
@@ -2119,6 +2225,14 @@ Ordenadas pelo que bloqueia mais.
      original: o `gam.matched` herda o
      `J` da busca do WAFC na mesma réplica, e não é método autônomo; E4 precisa de um `gam` que escolha `k` sozinho
      (REML com `k` generoso é a prática usual, não medida aqui).
+   - (e) **O limiar, medido por E2.5g (2026-10-01, §2):** é ele que passa
+     o fator do suave (1,31 a 1,37 no `wafc.lasso+max` contra o
+     `gam.matched`, 1,22 a 1,45 contra o `gam.k128`); com limiar o LASSO
+     volta à frente dos blocos no suave em `n ≤ 500`, e os blocos ficam à
+     frente no não homogêneo, no `uneven` e na `mixed`, onde o
+     `klopp.balanced+cv` vence o `gam.matched` e o `wafc.lasso+cv` perde
+     dele. A escolha entre LASSO e blocos é agora de célula, não de
+     método; é o que a decisão de rumo tem de pesar.
 
 34. **~~Os pesos do block LASSO~~ medidos por E2.5c e E2.5e (§2):** a
    forma balanceada (E2.5e) é coberta pela teoria com os pesos do `grpreg`
@@ -2156,13 +2270,26 @@ Ordenadas pelo que bloqueia mais.
    - (d) Hall, Kerkyacharian & Picard (1999, *Statist. Sinica* 9) e Zhou
      (2010, arXiv:1002.1583) não verificados; entram só se o manuscrito
      precisar.
-   - (e) **Marcas de verificação que L6 achou e não eram dela**
-     (**catalogadas como L7** em 2026-10-01, que acrescenta a eq. (1.8) e o
-     Lema 1 de K&P em `03` e `04`): Donoho & Johnstone (1994) com `j_0` fixo, no `08a`
+   - (e) **~~Marcas de verificação que L6 achou~~ resolvidas por L7
+     (2026-10-01, §2).** Texto original: Donoho & Johnstone (1994) com `j_0` fixo, no `08a`
      (`[VERIFICAR: não relido]`); no `06-selecao-limiar.tex`, a seção do
      LASSO limiarizado em Bühlmann & van de Geer (2011) e o número do
      resultado de Huang, Horowitz & Wei (2010); e, no `08a`, a numeração do
      *Annals* de Klopp & Pensky e de Lounici et al., lidos no arXiv.
+   - (f) **A marca que L7 achou e não resolve com número:** o
+     `05-taxas.tex` (l. 835) atribui a Donoho & Johnstone (1994) "a forma
+     original" do risco minimax sobre bolas weak-`ℓ_τ`, e o artigo não trata
+     disso; o mais próximo é a desigualdade oráculo (Teorema 1, p. 437;
+     Corolário 1, p. 440). Ou a frase vira "a desigualdade oráculo que a
+     precede", ou a entrada sai. E a frase de `busca-novidade.md` l. 45 com
+     as condições do arXiv de K&P, que no *Annals* são `L + 1 = n^ς` e
+     `r* > (2ς)^{−1}`. As duas são edição curta; a primeira recompila o PDF.
+   - (g) **Dois pontos de K&P que só o arXiv ou o suplemento resolvem:** o
+     Corolário 1 do *Annals* (3.21) tem um fator 2 no expoente do log que a
+     (3.17) e a (3.20) não têm, e o `08a` §4.3 o lê sem o 2 (parece erro de
+     impressão, não conferido no arXiv); e o enunciado dos Lemas 2 a 4, que
+     estão no suplemento (`10.1214/15-AOS1309SUPP`). Opcional; se o autor
+     baixar o suplemento, entra como `refs/klopp2015-supp.pdf`.
 
 36. **Pendências de E2.5d** (2026-09-30), nenhuma bloqueando:
    - (a) **Qual `gam` é o concorrente de E4 e da tabela do manuscrito.**
@@ -2203,6 +2330,24 @@ Ordenadas pelo que bloqueia mais.
    penalização conjunta desses níveis, e custar no nulo. Medir: uma opção
    em `wafc_kp_groups()` e ~40 min em 8 núcleos.
 
+38. **Pendências de E2.5g** (2026-10-01), que entram na decisão de rumo:
+   - (a) **Qual regra de `t` vai ao artigo e a E4.** O `max` com
+     `c = 0,15` é o melhor no suave e falha no não homogêneo e na `mixed`;
+     um `c` de 0,3 a 0,4 teria de ser fixado sem olhar a verdade, ou por
+     uma regra mista (o `c` relativo escolhido por validação cruzada), que
+     não foi medida. A tarefa escolheu `t` absoluto na regra `cv`; a escala
+     relativa talvez corrija os falsos positivos do suave (uma opção em
+     `wafc_threshold()` e ~1 h de processador sem o `+lsb`).
+   - (b) **O nulo:** nenhuma regra relativa o zera. Acrescentar uma porta
+     de "tudo zero" antes do limiar, por exemplo o QUT de
+     `wafc_lambda_qut()`, que já mata o nulo?
+   - (c) **O limiar entra só como seleção de estrutura (D32) ou também como
+     o estimador de predição da variante?** No suave os números pesam para
+     a segunda leitura; no manuscrito, o Corollary 2 da §3.6 já é
+     "estimação seguida de limiar".
+   - (d) Se o `+ls` entrar (é a melhor regra de estrutura que não vê a
+     verdade), entra só no suporte, não no bloco inteiro.
+
 ---
 
 ## 5. Próximos passos
@@ -2229,11 +2374,12 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
   a parte `competitors` chama o `gam` com `k = 10`) seguida de E2.5a (a
   rodada), no `TAREFA.md` §3; E2.4c sem rodada de calibração, por decisão
   do autor. **E2.4c e E2.5a fecharam em 2026-09-30 (§2).**
-- (d) **E2.5**, agora sobre o no-go de E2.5a: primeiro a pergunta 33
-  (medir o `klopp` de níveis livres em todas as células e decidir se ele
-  é variante do WAFC), depois a calibração do limiar `t_n` (pergunta 11)
-  e a escolha da variante. O sparse group LASSO chega a E2.5 sem ganho em
-  predição e com 42% do processador da rodada.
+- (d) **E2.5**, agora sobre o no-go de E2.5a: **todas as medições estão
+  feitas** (E2.5b a E2.5g; a calibração de `t_n` da pergunta 11 por
+  E2.5g). Falta a decisão do autor: a pergunta 33 (o que o WAFC é: LASSO,
+  blocos, e com qual limiar) e a 38 (a regra de `t` e o papel do limiar).
+  O sparse group LASSO chega a E2.5 sem ganho em predição e com 42% do
+  processador da rodada.
 - (e) **Autor, sem bloquear E2.5:** a saída da aplicação (pergunta 2) e as
   pendências de E5c (pergunta 32). `k = 2` foi aberta e E5c fechou em
   2026-09-30.
@@ -2245,6 +2391,8 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | E2.5g fechada e integrada (921 testes, 24 750 linhas, quinta junção exata): o limiar do Corolário 8 passa o fator do suave pela primeira vez (1,31 a 1,37 no `wafc.lasso+max`), o que sobra é ISE ativo; `c = 0,15` não generaliza ao não homogêneo, `c = 0,4` sim; pergunta 38 |
+| 2026-10-01 | L7 fechada e integrada: a numeração de K&P e Lounici et al. conferida no *Annals*; o Teorema 2 de K&P mudou de condições entre o arXiv e o *Annals*, e os Lemas 2 a 4 foram para o suplemento; perguntas 35(f) e 35(g) |
 | 2026-10-01 | L6 catalogada e fechada ao lado da E2.5g: as correções de L5 nas três derivações, sem mudança de matemática; o "§2.3" de Hsu et al. no `08a` não existia; quatro marcas fora de L5 ficam na pergunta 35(e) |
 | 2026-10-01 | E2.5f fechada e integrada: os níveis grossos livres melhoram os blocos ativos e pioram os inativos, e perdem em toda célula; medido aqui que, com os blocos inativos zerados, o fator do suave do `klopp.balanced` cairia abaixo de 1,5, o que aponta para o limiar do Corolário 8 |
 | 2026-10-01 | E2.5e fechada e integrada: a forma balanceada do block LASSO é coberta pela teoria com os pesos do `grpreg` (`ρ² ≤ 1,67`) e é a melhor das quatro fora do `smooth`; nenhuma forma passa o fator 1,5 no suave; pergunta 37 |
