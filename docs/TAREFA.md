@@ -73,6 +73,7 @@ que ler antes está aqui e no plano.
 | L5 bibliografia curta | **fechada** (2026-09-30): 69 entradas; a partição da unidade ancorada em Mallat (2009); D39 aplicada | `referencias-verificadas.bib`, `literatura.md` |
 | E2.5e pedaços balanceados | **fechada** (2026-10-01): coberta pela teoria com os pesos do `grpreg` (`ρ² ≤ 1,67`), melhor das quatro formas fora do `smooth`; 730 testes | `wafc/R/competitors.R`, `derivations/08a-sondagem-blocos.md` §11, `wafc/cache/e25e/` |
 | E2.5f níveis grossos livres | **fechada** (2026-10-01): não paga; a pior das cinco formas; teoria cobre com `σ²p_0/n`; 807 testes | `wafc/R/competitors.R`, `derivations/08a-sondagem-blocos.md` §12, `wafc/cache/e25f/` |
+| E2.5g estimação seguida de limiar | **catalogada** (2026-10-01) | §3 |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
@@ -87,13 +88,14 @@ tarefa pode criar ou editar**.
 
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
+| **E2.5g** estimação seguida de limiar | a medição do Corolário 8 (D32) e da calibração de `t_n` (pergunta 11), **sem decisão de rumo**. (i) Função `wafc_threshold()` em arquivo novo `wafc/R/threshold.R`: recebe um ajuste do WAFC ou do `klopp` (qualquer forma), zera os blocos `(ℓ, m)` com norma de coeficientes abaixo de `t` (a de `wafc_blocks()`, exata em `eps = 0`) e devolve predição, `β(u)`, componentes e estrutura no formato que o piloto já lê; **sem reajuste**, que é o estimador do Corolário 8, e com reajuste por mínimos quadrados dos blocos mantidos como opção secundária (o de van de Geer, Bühlmann & Zhou 2011). Três regras de `t`: `"max"` (`t = c · max‖ĝ_{ℓm}‖`, `c = 0,15` de E1.7c, com `c` como argumento); `"cv"` (`t` escolhido por validação cruzada nas mesmas dobras, refazendo o ajuste de cada dobra no `(J, λ)` já escolhido, sem nova busca, e limiarizando cada um); e `"oracle"` (o melhor `t` de uma grade contra a verdade, só como referência e rotulado assim). Testes em `wafc/tests/test-threshold.R`: `t = 0` devolve o ajuste original a `1e-12`; um `t` acima da maior norma zera tudo; o sanduíche do Lema 13 em um caso montado à mão; a regra `"cv"` reproduzível com dobras fixas. (ii) No `04-pilot.R`: para `wafc.lasso` e `klopp.balanced`, um ajuste por réplica e uma linha por regra (`wafc.lasso+max`, `+cv`, `+oracle`, e o mesmo para o `klopp.balanced`; o reajuste em linhas próprias), **sem alterar** as linhas sem limiar, que provam a junção ao `wafc/cache/e25f/e25f-joined.rds` por coincidirem com as de lá. (iii) Rodar com `WAFC_OUT=wafc/cache/e25g`, `WAFC_METHODS` restrito a esses dois, as cinco células, 50 réplicas (`WAFC_REPS_MIXED=50`), 8 processos, sem outra rodada na máquina. (iv) No handoff: as formas limiarizadas contra as mesmas sem limiar, contra o `gam.matched` e o `gam.k128`, por célula e `n`, `rmse_f` e ISE (com ISE ativo e inativo separados, a lição de E2.5f); o fator do suave refeito; o acerto de estrutura (`P(Ŝ = S)`, falsos positivos e negativos) por regra; a curva de acerto contra `t` nos cenários de E1.7c, que é a calibração da pergunta 11; o nulo; a `mixed`; o tempo | E2.5f (os `.rds` de `wafc/cache/e25f/`) | `wafc/R/threshold.R` (novo), `wafc/R/load.R` (só se ele não carregar arquivo novo sozinho), `wafc/tests/test-threshold.R` (novo), `wafc/scripts/04-pilot.R`, `wafc/README.md` (as linhas desses arquivos), `docs/handoff-E2.5g.md`; os `.rds` em `wafc/cache/e25g/`, não versionado |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**O catálogo está vazio** (2026-10-01); E2.5e e E2.5f fecharam. A repetição do piloto (E2.4c,
+**Catalogada: E2.5g** (2026-10-01), estimação seguida de limiar; E2.5e e E2.5f fecharam. A repetição do piloto (E2.4c,
 E2.5a) devolveu no-go para a variante LASSO, e as medições que a pergunta
 33 do `ESTADO.md` pedia fecharam no mesmo dia: E2.5b (o block LASSO com
 níveis livres), E2.5c (os pesos), E2.5d (o `gam` autônomo), E1.11 (a

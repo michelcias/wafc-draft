@@ -1817,7 +1817,8 @@ Ordenadas pelo que bloqueia mais.
    método vira linha com a mensagem em vez de sumir. Os números já
    registrados **não** são afetados (foram produzidos antes do ajuste a
    D31, e estão na tabela de razões da análise de E2.4).
-11. **Calibração do limiar `t_n`** (nova, de E1.7c): o Corolário 8 é
+11. **Calibração do limiar `t_n`** (**catalogada como E2.5g** em
+   2026-10-01, junto com a medição do limiar no piloto; nova, de E1.7c): o Corolário 8 é
    explícito em que `t_n` depende de constantes desconhecidas, e a regra
    grosseira `t = 0.15 max_{ℓm} ‖ĝ_{ℓm}‖` acertou 1.00 e 0.90 nos dois
    cenários em `n = 1000`. Calibrar é de E2.4/E2.5, com a curva de acerto
