@@ -71,7 +71,9 @@
 ## WAFC chose J = 8 in none of the 150 jobs. Step E2.5c ran 'klopp.unit'
 ## and 'klopp.merged' alone, five cells with 50 replicates each, in 9.7
 ## processor-hours (1 h 14 min on 8 cores, alone on the machine), with a
-## peak of 0.94 GB per process.
+## peak of 0.94 GB per process. Step E2.5e ran 'klopp.balanced' alone, the
+## same 750 jobs, in 4.8 processor-hours (36 min on 8 cores), with a peak of
+## 0.67 GB per process.
 ##
 ## The two parts that answer a question about the code rather than about
 ## the method, 'margin' and 'j1', are capped at 20 replicates:
@@ -193,13 +195,18 @@ if (length(args) >= 5L && nzchar(args[5L])) {
 ## question 34 of docs/ESTADO.md (step E2.5c): weight one on every chunk,
 ## which is their norm (3.1) and the one the theory of step E1.11 covers,
 ## and the coarse levels of each block merged into one chunk with the
-## sqrt(|G|) of grpreg kept. The order is the order of the
+## sqrt(|G|) of grpreg kept. 'klopp.balanced' is the fourth form, the one
+## step E2.5c proposed and step E2.5e measures: the coarse levels merged
+## and the short piece at the end of each finer level absorbed into the
+## chunk before it, so that every chunk of a finer level has between b_n
+## and 2 b_n - 1 columns and the sqrt(|G|) of grpreg stay within a bounded
+## ratio of one another. The order is the order of the
 ## tables; a method added later goes after the one it varies, which changes
 ## no seed, since the random stream of every method is the one it would
 ## start from alone (run_competitors()).
 methods <- c("wafc.lasso", "wafc.sglasso", "gam", "gam.matched", "bsgl",
-             "klopp", "klopp.free", "klopp.unit", "klopp.merged", "aspline",
-             "vcbart", "linear", "oracle")
+             "klopp", "klopp.free", "klopp.unit", "klopp.merged",
+             "klopp.balanced", "aspline", "vcbart", "linear", "oracle")
 run_methods <- methods
 if (nzchar(Sys.getenv("WAFC_METHODS", ""))) {
   run_methods <- strsplit(Sys.getenv("WAFC_METHODS"), ",", fixed = TRUE)[[1L]]
@@ -384,16 +391,19 @@ run_competitors <- function(cell, n, r) {
   ## the spline fit alone: the search that chose J is paid, and reported, in
   ## the column of the WAFC. Without a J to match, it fails as a row.
   ## 'klopp.free' is 'klopp' with penalize.levels = FALSE, and the two
-  ## variants of step E2.5c keep the levels free as well.
+  ## variants of step E2.5c and the one of step E2.5e keep the levels free
+  ## as well.
   for (lab in setdiff(run_methods, c("wafc.lasso", "wafc.sglasso"))) {
     from_start()
-    mth <- sub("\\.(matched|free|unit|merged)$", "", lab)
+    mth <- sub("\\.(matched|free|unit|merged|balanced)$", "", lab)
     own <- switch(lab,
                   klopp.free = list(penalize.levels = FALSE),
                   klopp.unit = list(penalize.levels = FALSE,
                                     chunk.weights = "unit"),
                   klopp.merged = list(penalize.levels = FALSE,
                                       merge.coarse = TRUE),
+                  klopp.balanced = list(penalize.levels = FALSE,
+                                        balanced = TRUE),
                   list())
     if (lab == "gam.matched") {
       if (is.null(J_lasso)) {

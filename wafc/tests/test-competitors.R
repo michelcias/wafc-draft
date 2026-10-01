@@ -13,7 +13,11 @@
 ## a group vector built by hand, since the whole point of that column is to
 ## be their penalty and not another one; since step E2.5c it also checks
 ## the weight of each chunk and the merged coarse levels against vectors
-## built by hand, and the default against the call it replaced, to 1e-12.
+## built by hand, and the default against the call it replaced, to 1e-12;
+## since step E2.5e, the balanced chunks against vectors built by hand at
+## the chunk sizes 6 and 7 of the pilot, and the three earlier forms
+## against a frozen copy of the grouping of before that step, the groups
+## bit for bit and the fits to 1e-12.
 ## The fourth checks the quantile
 ## universal threshold against its own definition: it is the quantile of
 ## the smallest penalty level that kills the penalized part under the null,
@@ -266,6 +270,168 @@ test_that("the weights and the merged coarse levels are the ones asked for", {
     expect_equal(fit[["fitted"]],
                  as.numeric(predict(ref, as.matrix(des[["Z"]]))),
                  tolerance = 1e-12)
+  }
+})
+
+## The grouping of wafc_kp_groups() as it was at the end of step E2.5c,
+## frozen here so that the forms measured in steps E2.5a to E2.5c can be
+## checked against it once the function has the balanced chunks.
+kp_groups_e25c <- function(design, block.size, penalize.levels,
+                           merge.coarse = FALSE) {
+  nvars <- design[["nvars"]]
+  grp <- integer(nvars)
+  g <- 0L
+  unp <- design[["unpenalized"]]
+  if (penalize.levels) {
+    g <- g + 1L
+    grp[unp] <- g
+  }
+  j0 <- design[["j0"]]
+  for (nm in names(design[["blocks"]])) {
+    idx <- design[["blocks"]][[nm]]
+    pos <- 0L
+    Jm <- j0 + as.integer(round(log2(length(idx) + 2^j0)))
+    levs <- j0:(Jm - 1L)
+    if (merge.coarse) {
+      coarse <- levs[2^levs < block.size]
+      if (length(coarse) > 0L) {
+        pos <- as.integer(sum(2^coarse))
+        g <- g + 1L
+        grp[idx[seq_len(pos)]] <- g
+        levs <- setdiff(levs, coarse)
+      }
+    }
+    for (j in levs) {
+      nj <- 2^j
+      lev <- idx[pos + seq_len(nj)]
+      pos <- pos + nj
+      for (start in seq(1L, nj, by = block.size)) {
+        g <- g + 1L
+        grp[lev[start:min(start + block.size - 1L, nj)]] <- g
+      }
+    }
+  }
+  grp
+}
+
+test_that("the balanced chunks are the ones asked for", {
+  ## Step E2.5e. At J = 6 a block has the levels 0 to 5, with 1, 2, 4, 8,
+  ## 16 and 32 columns in that order (D12).
+  des <- wafc_design(x0, u0, J = 6L)
+  nb <- length(des[["blocks"]])
+  by_hand <- function(sizes, levels.group, d = des) {
+    one <- rep(seq_along(sizes), sizes)
+    grp <- integer(d[["nvars"]])
+    off <- as.integer(levels.group)
+    if (levels.group) grp[d[["unpenalized"]]] <- 1L
+    for (b in seq_along(d[["blocks"]])) {
+      grp[d[["blocks"]][[b]]] <- one + off + (b - 1L) * length(sizes)
+    }
+    grp
+  }
+  ## b_n = 6, the chunk size at n = 250: levels 0 to 2 are one chunk of
+  ## 1 + 2 + 4 = 7; level 3 is 6 + 2, one chunk of 8 once the 2 is
+  ## absorbed; level 4 is 6 + 6 + 4, so 6 and 10; level 5 is 5 x 6 + 2, so
+  ## four of 6 and one of 8
+  bal6 <- c(7L, 8L, 6L, 10L, 6L, 6L, 6L, 6L, 8L)
+  ## b_n = 7, at n = 500 and 1000: level 3 is 7 + 1, so 8; level 4 is
+  ## 7 + 7 + 2, so 7 and 9; level 5 is 4 x 7 + 4, so three of 7 and one
+  ## of 11
+  bal7 <- c(7L, 8L, 7L, 9L, 7L, 7L, 7L, 11L)
+  expect_identical(wafc_kp_groups(des, 6L, FALSE, balanced = TRUE),
+                   by_hand(bal6, FALSE))
+  expect_identical(wafc_kp_groups(des, 7L, FALSE, balanced = TRUE),
+                   by_hand(bal7, FALSE))
+  expect_identical(wafc_kp_groups(des, 6L, TRUE, balanced = TRUE),
+                   by_hand(bal6, TRUE))
+  expect_identical(wafc_kp_groups(des, 7L, TRUE, balanced = TRUE),
+                   by_hand(bal7, TRUE))
+  ## balanced merges the coarse levels whatever merge.coarse says
+  expect_identical(wafc_kp_groups(des, 7L, FALSE, merge.coarse = TRUE,
+                                  balanced = TRUE),
+                   wafc_kp_groups(des, 7L, FALSE, balanced = TRUE))
+  ## the two cases in which the coarse chunk falls below the chunk size: a
+  ## power of two (4: levels 0 and 1, 3 columns, and every finer level cut
+  ## exactly), and 2^J at most the chunk size (J = 2 with 6: one chunk of 3)
+  expect_identical(wafc_kp_groups(des, 4L, FALSE, balanced = TRUE),
+                   by_hand(c(3L, rep(4L, 15L)), FALSE))
+  d2 <- wafc_design(x0, u0, J = 2L)
+  expect_identical(wafc_kp_groups(d2, 6L, FALSE, balanced = TRUE),
+                   by_hand(3L, FALSE, d2))
+  ## when the chunk size divides every finer level there is nothing to
+  ## absorb, and with chunks of one there is nothing to merge either
+  expect_identical(wafc_kp_groups(des, 8L, FALSE, balanced = TRUE),
+                   wafc_kp_groups(des, 8L, FALSE, merge.coarse = TRUE))
+  expect_identical(wafc_kp_groups(des, 1L, FALSE, balanced = TRUE),
+                   wafc_kp_groups(des, 1L, FALSE))
+  ## the sizes the roxygen of wafc_fit_klopp() states, for every chunk size
+  ## from 2 to 70 at J = 6: the coarse chunk has 2^(j* + 1) - 1 columns,
+  ## j* the finest level with 2^j below the chunk size, and every chunk of
+  ## a finer level has between the chunk size and twice it minus one
+  idx <- des[["blocks"]][[1L]]
+  as_stated <- vapply(2:70, function(bs) {
+    grp <- wafc_kp_groups(des, bs, FALSE, balanced = TRUE)[idx]
+    sizes <- as.integer(table(grp)[as.character(unique(grp))])
+    js <- max(which(2^(0:5) < bs)) - 1L
+    sizes[1L] == 2^(js + 1L) - 1L &&
+      all(sizes[-1L] >= bs & sizes[-1L] <= 2L * bs - 1L)
+  }, logical(1))
+  expect_true(all(as_stated))
+
+  ## The weights grpreg uses are sqrt(|G|) of the balanced chunks: at J = 5
+  ## and chunks of 7, the coarse 7, level 3 as 8 and level 4 as 7 + 9.
+  skip_if_not(has("grpreg"))
+  f_bal <- wafc_fit_klopp(x0, u0, y0, J = 5L, block.size = 7L,
+                          penalize.levels = FALSE, foldid = folds,
+                          balanced = TRUE)
+  mult <- unname(as.numeric(f_bal[["fit"]][["fit"]][["group.multiplier"]]))
+  expect_equal(mult, sqrt(rep(c(7, 8, 7, 9), nb)))
+  expect_identical(f_bal[["extra"]][["ngroups"]], 4L * nb)
+  expect_true(f_bal[["extra"]][["balanced"]])
+  expect_true(f_bal[["extra"]][["merge.coarse"]])
+})
+
+test_that("the forms of before the balanced chunks do not move", {
+  ## The grouping of the three earlier forms is the frozen one, bit for bit,
+  ## over resolutions, chunk sizes and both treatments of the levels.
+  same <- logical(0)
+  for (J in 2:7) {
+    des <- wafc_design(x0, u0, J = J)
+    for (bs in c(1:9, 16L, 64L)) {
+      for (pl in c(TRUE, FALSE)) {
+        for (mc in c(FALSE, TRUE)) {
+          same <- c(same,
+                    identical(wafc_kp_groups(des, bs, pl, merge.coarse = mc),
+                              kp_groups_e25c(des, bs, pl, merge.coarse = mc)))
+        }
+      }
+    }
+  }
+  expect_length(same, 264L)
+  expect_true(all(same))
+  ## and the fits of the three forms are grpreg on the frozen groups, to
+  ## 1e-12, with the levels penalized (klopp) and free (the forms of steps
+  ## E2.5b and E2.5c)
+  skip_if_not(has("grpreg"))
+  forms <- list(sqrt = list(), unit = list(chunk.weights = "unit"),
+                merged = list(merge.coarse = TRUE))
+  for (nm in names(forms)) {
+    for (pl in c(TRUE, FALSE)) {
+      fit <- do.call(wafc_fit_klopp,
+                     c(list(x0, u0, y0, J = 3:4, penalize.levels = pl,
+                            foldid = folds), forms[[nm]]))
+      des <- fit[["design"]]
+      grp <- kp_groups_e25c(des, fit[["extra"]][["block.size"]], pl,
+                            merge.coarse = isTRUE(forms[[nm]][["merge.coarse"]]))
+      args <- list(as.matrix(des[["Z"]]), y0, group = grp,
+                   penalty = "grLasso", fold = folds)
+      if (nm == "unit") args[["group.multiplier"]] <- rep(1, max(grp))
+      ref <- do.call(grpreg::cv.grpreg, args)
+      expect_equal(as.numeric(stats::coef(fit[["fit"]])),
+                   as.numeric(stats::coef(ref)), tolerance = 1e-12)
+      expect_equal(fit[["fit"]][["cve"]], ref[["cve"]], tolerance = 1e-12)
+      expect_false(fit[["extra"]][["balanced"]])
+    }
   }
 })
 

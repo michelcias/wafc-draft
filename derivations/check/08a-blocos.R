@@ -26,7 +26,11 @@
 #      lambda da teoria e no melhor lambda de uma grade;
 #   C. Besov implica a cota do risco ideal por blocos (a forma do Lema 4 de
 #      K&P, arXiv v2), sem hipótese nova, e o expoente de b que ela prevê;
-#   D. a aritmética dos expoentes das taxas (LASSO contra blocos).
+#   D. a aritmética dos expoentes das taxas (LASSO contra blocos);
+#   E. (E2.5e, §11 do documento) pesos de razão limitada: a calibração com os
+#      pedaços balanceados e pesos 1, sqrt(|G|) e aleatórios, o custo contra o
+#      dos pesos 1, o Teorema 1 em blocos com sqrt(|G|), e o risco ideal da
+#      §3.2 com os pedaços balanceados.
 #
 # Nos scripts de conferência, elemento de lista se acessa com [[ ]] e nome
 # completo (instrucoes.md, §5).
@@ -616,6 +620,292 @@ cat(sprintf("  %d pares (s, pi): identidades a menos de %.1e; ganho (log n)^{2s'
 chk(max(eD[, c("e1", "e2", "e3")]) < 1e-14,
     "1 - tau/2 = 2s/(2s+1); tau(1/pi - 1/2) = (2/pi - 1)/(2s+1); diferença dos expoentes = 2s'/(2s+1)")
 chk(all(eD[, "ganho"] > 0), "o expoente do ganho é positivo sempre que s' > 0")
+
+## ===========================================================================
+cat("\nPARTE E. (E2.5e) Pesos de razão limitada e os pedaços balanceados\n")
+## ===========================================================================
+
+# A pergunta de E2.5e: o argumento de E1.11 aceita pesos w_G com
+# rho = max_G w_G / min_G w_G limitado, e com que constante? O que a §11 do
+# documento afirma com número, conferido aqui:
+#   E1. a calibração não depende dos pesos: o evento por pedaço
+#       {||(B~'eps/n)_G|| <= lambda_{0,G} para todo G} está contido em
+#       T_{G,w} = {max_G ||(B~'eps/n)_G|| / w_G <= lambda_w / 2}, com
+#       lambda_w = 2 max_G lambda_{0,G} / w_G, para todo w; cobertura com os
+#       pedaços balanceados e pesos 1, sqrt(|G|) (euclidiana, exata e forma
+#       fechada, e branca) e aleatórios de razão até 2, forma densa, n <= 500;
+#   E2. o custo: (lambda_w w_G)^2 <= rho^2 lambda_1^2 para todo G, com
+#       lambda_1 = 2 max_G lambda_{0,G} o de pesos 1, logo
+#       lambda_w^2 W(G_0) <= rho^2 lambda_1^2 |G_0|; e, com sqrt(|G|) nos
+#       pedaços balanceados, o custo por coordenada volta a ficar abaixo do
+#       LASSO (com os pedaços de E1.11 ele era 1,26 a 1,30 do LASSO, Parte A);
+#   E3. o Teorema 1 em blocos com pesos sqrt(|G|) nos pedaços balanceados:
+#       as três cotas com W = soma de w_G^2 sobre os pedaços ativos e lambda_w;
+#   E4. o lema do risco ideal por pedaços (§3.2) com os pedaços balanceados,
+#       com b = b_n (o tamanho mínimo de um pedaço fino), nas formas da Parte C.
+set.seed(20261001)
+
+# Os pedaços balanceados de wafc_kp_groups(balanced = TRUE) (E2.5e): os
+# níveis com 2^j < b num pedaço só; cada nível mais fino cortado em pedaços
+# de b, com a sobra absorvida no pedaço anterior do mesmo nível.
+bal_sizes <- function(Jl, b) {
+  levs <- 0:(Jl - 1L)
+  co <- levs[2^levs < b]
+  out <- if (length(co) > 0L) sum(2L^co) else integer(0)
+  for (jj in setdiff(levs, co)) {
+    nj <- 2L^jj
+    k <- nj %/% b
+    sz <- rep(b, k)
+    sz[k] <- sz[k] + nj - k * b
+    out <- c(out, sz)
+  }
+  as.integer(out)
+}
+kp_groups_bal <- function(Jl, b, nblocks = p * q) {
+  sz <- bal_sizes(Jl, b)
+  one <- rep(seq_along(sz), sz)
+  as.integer(unlist(lapply(seq_len(nblocks), function(bb) one + (bb - 1L) * length(sz))))
+}
+chk(identical(bal_sizes(6L, 6L), c(7L, 8L, 6L, 10L, 6L, 6L, 6L, 6L, 8L)) &&
+      identical(bal_sizes(6L, 7L), c(7L, 8L, 7L, 9L, 7L, 7L, 7L, 11L)) &&
+      identical(bal_sizes(6L, 4L), c(3L, rep(4L, 15L))),
+    "os pedaços balanceados são os do teste de wafc/tests (b = 6, 7 e 4, J = 6)")
+rho2_bal <- vapply(2:200, function(b) {
+  vapply(2:12, function(Jl) {
+    sz <- bal_sizes(Jl, b)
+    fine <- if (length(sz) > 1L) sz[-1L] else integer(0)
+    c(max(sz) / min(sz) <= (2 * b - 1) / (b - 1) + 1e-12,
+      all(fine >= b & fine <= 2 * b - 1))
+  }, logical(2))
+}, logical(22))
+chk(all(rho2_bal),
+    "b = 2..200, J = 2..12: pedaços finos entre b e 2b - 1, e max|G|/min|G| <= (2b - 1)/(b - 1)")
+
+## ---- E1 e E2: a calibração e o custo -------------------------------------
+
+cenE <- list(list(n = 50L, J = 4L), list(n = 100L, J = 5L),
+             list(n = 200L, J = 5L), list(n = 500L, J = 6L))
+RE <- 300L
+tabE <- t(vapply(cenE, function(cc) {
+  n <- cc[["n"]]
+  Jl <- cc[["J"]]
+  b <- as.integer(ceiling(log(n)))
+  grp <- kp_groups_bal(Jl, b)
+  M <- max(grp)
+  gsize <- as.numeric(table(grp))
+  d <- length(grp)
+  ws <- sqrt(gsize)
+  w1 <- rep(1, M)
+  wr <- runif(M, 1, 2)                       # pesos arbitrários de razão até 2
+  lam_w <- function(l0, w) 2 * max(l0 / w)
+  inside <- function(stat, l0, w) max(stat / w) <= lam_w(l0, w) / 2
+  res <- t(vapply(seq_len(RE), function(r) {
+    U <- matrix(runif(n * q), n, q)
+    X <- draw_X(U)
+    Z <- design(X, U, Jl)
+    rp <- resid_pen(Z)
+    Bt <- rp[["Bt"]]
+    eps <- rnorm(n, sd = sig)
+    sc <- as.numeric(crossprod(Bt, eps)) / n
+    smax <- sqrt(max(colSums(rp[["B"]]^2) / n))
+    gs <- group_stats(Bt, grp)
+    Lhat <- max(gs[["op"]])
+    nrm <- sqrt(as.numeric(rowsum(sc^2, grp)))
+    white <- vapply(seq_len(M), function(g) sqrt(sum(crossprod(gs[["Q"]][[g]], eps)^2)), 1) / sqrt(n)
+    l0 <- sig / sqrt(n) * (sqrt(gs[["tr"]]) + sqrt(2 * gs[["op"]] * log(M / alpha)))  # HKZ, exato
+    l0c <- lam0_g(n, M, gsize, smax, Lhat)                                           # forma fechada
+    l0w <- lam0_white(n, M, gsize)
+    ev <- all(nrm <= l0)
+    cU <- inside(nrm, l0, w1)
+    cS <- inside(nrm, l0, ws)
+    cSc <- inside(nrm, l0c, ws)
+    cR <- inside(nrm, l0, wr)
+    cW <- inside(white, l0w, ws)
+    l1 <- lam_w(l0c, w1)
+    lS <- lam_w(l0c, ws)
+    lR <- lam_w(l0c, wr)
+    lL <- lam_lasso(n, d, smax)
+    c(ev = ev, cU = cU, cS = cS, cSc = cSc, cR = cR, cW = cW,
+      fura = ev && !(cU && cS && cSc && cR),
+      custoS = max((lS * ws)^2) / l1^2, custoR = max((lR * wr)^2) / l1^2,
+      rho2star = (max(l0c / ws) / min(l0c / ws))^2, rho2star1 = (max(l0c) / min(l0c))^2,
+      pcS = lS^2 / lL^2, pc1min = l1^2 / min(gsize) / lL^2, pc1max = l1^2 / max(gsize) / lL^2)
+  }, numeric(14)))
+  c(n = n, J = Jl, b = b, d = d, M = M, bmin = min(gsize), bmax = max(gsize),
+    rho2S = max(gsize) / min(gsize), rho2R = (max(wr) / min(wr))^2,
+    cobEv = mean(res[, "ev"]), cobU = mean(res[, "cU"]), cobS = mean(res[, "cS"]),
+    cobSc = mean(res[, "cSc"]), cobR = mean(res[, "cR"]), cobW = mean(res[, "cW"]),
+    fura = sum(res[, "fura"]),
+    custoS = max(res[, "custoS"]), custoS_med = median(res[, "custoS"]),
+    rho2star = max(res[, "rho2star"]), star_ok = max(abs(res[, "custoS"] - res[, "rho2star"])),
+    rho2star1 = max(res[, "rho2star1"]),
+    custoR = max(res[, "custoR"]),
+    pcS = median(res[, "pcS"]), pc1min = median(res[, "pc1min"]), pc1max = median(res[, "pc1max"]))
+}, numeric(25)))
+print(round(tabE[, c("n", "J", "b", "d", "M", "bmin", "bmax", "cobEv", "cobU", "cobS", "cobSc", "cobR", "cobW", "fura")], 3))
+print(round(tabE[, c("n", "J", "rho2S", "rho2star", "rho2star1", "custoS", "custoS_med", "rho2R", "custoR", "pcS", "pc1min", "pc1max")], 3))
+chk(all(tabE[, c("cobEv", "cobU", "cobS", "cobSc", "cobR", "cobW")] >= 1 - alpha),
+    "pedaços balanceados: a calibração tem a probabilidade nominal com pesos 1, sqrt(|G|) (exata, fechada, branca) e aleatórios")
+chk(all(tabE[, "fura"] == 0),
+    "o evento por pedaço, que não depende dos pesos, está contido em T_{G,w} para os quatro pesos euclidianos em toda réplica")
+chk(all(tabE[, "custoS"] <= tabE[, "rho2S"] + 1e-12) && all(tabE[, "custoR"] <= tabE[, "rho2R"] + 1e-12),
+    "(lambda_w w_G)^2 <= rho^2 lambda_1^2 em todo pedaço e toda réplica, com rho^2 = max|G|/min|G| e com os pesos aleatórios")
+chk(all(tabE[, "star_ok"] < 1e-12) && all(tabE[, "rho2star"] < tabE[, "rho2S"]),
+    "com sqrt(|G|), max_G (lambda_w w_G)^2 / lambda_1^2 é igual a rho_*^2 = [max(lambda_0G/w_G)/min(lambda_0G/w_G)]^2 réplica a réplica, e rho_* < rho")
+chk(all(tabE[, "pcS"] < 1),
+    "com sqrt(|G|) nos pedaços balanceados o custo por coordenada fica abaixo do LASSO (era 1,26 a 1,30 com os pedaços de E1.11, Parte A)")
+
+## ---- E3: o Teorema 1 em blocos com pesos sqrt(|G|) nos pedaços balanceados --
+
+JE <- 5L
+bE <- 6L
+szE <- bal_sizes(JE, bE)                      # por bloco: 7 (níveis 0 a 2), 8 (nível 3), 6 e 10 (nível 4)
+grpE <- kp_groups_bal(JE, bE)
+ME <- max(grpE)
+dE <- length(grpE)
+NJE <- 2L^JE - 1L
+wE <- sqrt(as.numeric(table(grpE)))
+posE3 <- function(bb, k) (bb - 1L) * NJE + k
+set.seed(12)
+thE_cheio <- numeric(dE)                      # dois pedaços cheios: o 1.º do nível 4 em (1,1), o nível 3 em (2,2)
+thE_cheio[posE3(1L, 16:21)] <- sample(c(-1, 1), 6, TRUE)
+thE_cheio[posE3(4L, 8:15)] <- sample(c(-1, 1), 8, TRUE)
+thE_sin_blk <- drop(crossprod(psi_block(ug, JE), gsin(ug))) / length(ug)
+thE_sin <- numeric(dE)
+thE_sin[posE3(1L, 1:NJE)] <- thE_sin_blk
+gE_res <- function(u) gsin(u) - drop(psi_block(u, JE) %*% thE_sin_blk)
+truthsE <- list(cheio = list(th = thE_cheio, extra = NULL),
+                seno = list(th = thE_sin, extra = gE_res))
+one_E <- function(n, tr) {
+  th <- tr[["th"]]
+  U <- matrix(runif(n * q), n, q)
+  X <- draw_X(U)
+  Z <- design(X, U, JE)
+  fJ <- as.numeric(Z %*% c(c_true, th))
+  f <- if (is.null(tr[["extra"]])) fJ else fJ + X[, 1] * tr[["extra"]](U[, 1])
+  y <- f + rnorm(n, sd = sig)
+  rp <- resid_pen(Z)
+  Bt <- rp[["Bt"]]
+  smax <- sqrt(max(colSums(rp[["B"]]^2) / n))
+  gs <- group_stats(Bt, grpE)
+  l0c <- lam0_g(n, ME, wE^2, smax, max(gs[["op"]]))
+  lamW <- 2 * max(l0c / wE)
+  lam1 <- 2 * max(l0c)
+  pe <- prep_fit(rp, y, grpE, "euclid")
+  thW <- gl_fit(pe[["G"]], pe[["h"]], grpE, wE, lamW)
+  kk <- kkt_gl(pe[["G"]], pe[["h"]], grpE, wE, lamW, thW)
+  v <- thW - th
+  gt <- min(eigen(crossprod(Bt) / n, symmetric = TRUE, only.values = TRUE)[["values"]])
+  lsig <- min(eigen(crossprod(Z) / n, symmetric = TRUE, only.values = TRUE)[["values"]])
+  WS <- Wset(th, grpE, wE)
+  kS <- Wset(th, grpE, rep(1, ME))
+  bn <- mean((f - fJ)^2)
+  nv <- sqrt(as.numeric(rowsum(v^2, grpE)))
+  c(Btv = mean((Bt %*% v)^2), bound = 64 * lamW^2 * WS / gt + 16 * bn,
+    l2 = sum(v^2), l2b = 64 * lamW^2 * WS / gt^2 + 16 * bn / gt,
+    penv = sum(wE * nv), penb = 40 * lamW * WS / gt + 10 * bn / lamW,
+    gt = gt, lsig = lsig, kkt = max(kk), custo = lamW^2 * WS / (lam1^2 * kS))
+}
+# n >= 250: com J = 5 o desenho tem p + d = 126 colunas, e em n = 125 a Gram
+# é singular (gamma_til < 0), fora da hipótese do teorema.
+nsE <- c(250L, 375L, 500L)
+tabE3 <- do.call(rbind, lapply(names(truthsE), function(nm) {
+  t(vapply(nsE, function(n) {
+    rr <- t(vapply(seq_len(40L), function(r) one_E(n, truthsE[[nm]]), numeric(10)))
+    c(n = n, viola = sum(rr[, "Btv"] > rr[, "bound"]), folga = min(rr[, "bound"] / rr[, "Btv"]),
+      viola_l2 = sum(rr[, "l2"] > rr[, "l2b"]), viola_pen = sum(rr[, "penv"] > rr[, "penb"]),
+      schur = sum(rr[, "gt"] < rr[, "lsig"] - 1e-10), kkt = max(rr[, "kkt"]),
+      custo = median(rr[, "custo"]), custo_max = max(rr[, "custo"]))
+  }, numeric(9)))
+}))
+rownames(tabE3) <- paste(rep(names(truthsE), each = length(nsE)), paste0("n=", nsE))
+cat(sprintf("  E3: J = %d, b = %d, pedaços por bloco {%s}, M = %d, pesos sqrt(|G|), rho^2 = %.3f\n",
+            JE, bE, paste(szE, collapse = ","), ME, max(wE^2) / min(wE^2)))
+print(signif(tabE3, 4))
+chk(max(tabE3[, "kkt"]) < 1e-7, "E3: o FISTA resolve o objetivo com pesos sqrt(|G|) (KKT a 1e-7 de lambda)")
+chk(all(tabE3[, "schur"] == 0), "E3: gamma_til >= lambda_min(Sigma_hat) em todas as réplicas")
+chk(all(tabE3[, c("viola", "viola_l2", "viola_pen")] == 0),
+    "E3: as três cotas do Teorema 1(ii) em blocos com W = soma de w_G^2 e lambda_w valem em todas as réplicas")
+chk(all(tabE3[, "custo_max"] <= max(wE^2) / min(wE^2) + 1e-12),
+    "E3: lambda_w^2 W(G_0) <= rho^2 lambda_1^2 |G_0| em todas as réplicas")
+
+## ---- E4: o risco ideal com os pedaços balanceados --------------------------
+
+# Energias dos pedaços balanceados de um bloco com JC níveis, nas formas
+# "uniforme" e "aleatoria" da Parte C: a do pedaço grosso e as dos pedaços
+# finos, que não dependem de eta. A "espiga" põe um pico de altura sqrt(eta)
+# por pedaço fino, em tantos pedaços quanto o orçamento ell_pi do nível
+# permite, e conta o pedaço grosso como eta, o máximo que ele pode custar.
+energies_bal <- function(s, pii, Cg, Jl, b, shape, lev_vals = NULL) {
+  levs <- 0:(Jl - 1L)
+  co <- levs[2^levs < b]
+  e_lev <- function(jj) {
+    if (shape == "uniforme") return(rep((budget_of(s, pii, Cg, jj) / (2^jj)^(1 / pii))^2, 2^jj))
+    lev_vals[[jj + 1L]]^2
+  }
+  fine <- unlist(lapply(setdiff(levs, co), function(jj) {
+    nj <- 2L^jj
+    k <- nj %/% b
+    sz <- rep(b, k)
+    sz[k] <- sz[k] + nj - k * b
+    if (shape == "uniforme") return(sz * e_lev(jj)[1L])
+    as.numeric(rowsum(e_lev(jj), rep(seq_len(k), sz)))
+  }))
+  list(coarse = if (length(co) > 0L) sum(unlist(lapply(co, e_lev))) else 0, fine = fine)
+}
+R_bal <- function(s, pii, Cg, Jl, b, eta, shape, en = NULL) {
+  levs <- 0:(Jl - 1L)
+  co <- levs[2^levs < b]
+  if (shape == "espiga") {
+    rf <- vapply(setdiff(levs, co), function(jj) {
+      min((2^jj) %/% b, floor((budget_of(s, pii, Cg, jj) / sqrt(eta))^pii)) * eta
+    }, 1)
+    return((length(co) > 0L) * eta + sum(rf))
+  }
+  min(en[["coarse"]], eta) + sum(pmin(en[["fine"]], eta))
+}
+# A mesma cota com o termo (x_+ + 1) eta dos pedaços grossos trocado por um
+# eta: com os pedaços balanceados, os níveis com 2^j < b são um pedaço só.
+bound_sharp <- function(s, pii, Cg, b, eta) {
+  tau <- 1 / (s + 0.5)
+  x <- if (pii <= 2) log2(b^(tau / pii) * Cg^tau * eta^(-tau / 2)) else
+    log2((Cg^2 * b / eta)^(1 / (2 * s + 1)))
+  bound_C(s, pii, Cg, b, eta) - (max(x, 0) + 1) * eta + eta
+}
+violE4 <- 0
+violE4s <- 0
+maxrE4 <- 0
+maxrE4s <- 0
+for (i in seq_len(nrow(grid_sp))) {
+  s <- grid_sp[i, "s"]
+  pii <- grid_sp[i, "pi"]
+  set.seed(100L + i)
+  lv <- lapply(0:(JC - 1L), function(jj) {
+    a <- rnorm(2^jj)
+    budget_of(s, pii, 1, jj) * a / sum(abs(a)^pii)^(1 / pii)
+  })
+  for (b in c(2L, 3L, 4L, 6L, 7L, 12L, 32L)) {
+    en <- list(uniforme = energies_bal(s, pii, 1, JC, b, "uniforme"),
+               aleatoria = energies_bal(s, pii, 1, JC, b, "aleatoria", lev_vals = lv))
+    for (eta in 10^c(-9, -7, -5, -3)) {
+      B <- bound_C(s, pii, 1, b, eta)
+      Bs <- bound_sharp(s, pii, 1, b, eta)
+      for (shape in c("uniforme", "aleatoria", "espiga")) {
+        R <- R_bal(s, pii, 1, JC, b, eta, shape, en = en[[shape]])
+        maxrE4 <- max(maxrE4, R / B)
+        maxrE4s <- max(maxrE4s, R / Bs)
+        if (R > B) violE4 <- violE4 + 1
+        if (R > Bs) violE4s <- violE4s + 1
+      }
+    }
+  }
+}
+nE4 <- nrow(grid_sp) * 7L * 4L * 3L
+cat(sprintf("  E4: %d sequências (pedaços balanceados, b em {2,3,4,6,7,12,32}): maior R/cota %.3f (%d violações);",
+            nE4, maxrE4, violE4),
+    sprintf("com o termo (x_+ + 1) eta trocado por eta: %.3f (%d violações)\n", maxrE4s, violE4s))
+chk(violE4 == 0, "E4: a cota do risco ideal da §3.2 vale com os pedaços balanceados e b = b_n")
+chk(violE4s == 0, "E4: e vale com o termo dos pedaços grossos reduzido a um eta por bloco")
 
 cat("\n")
 if (ok) cat("OK\n") else stop("E1.11: conferência numérica FALHOU (ver linhas acima)")

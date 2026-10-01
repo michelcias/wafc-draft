@@ -1573,6 +1573,68 @@ pesos do `grpreg`). Razão contra o `klopp.free`, `rmse_f` / ISE, `n = 250`,
   `sqrt(2)` dos pesos 1 reescalados. Custo de medir: ~40 min em 8 núcleos
   e uma linha em `wafc_kp_groups()`.
 
+### 2026-10-01: E2.5e fechada, os pedaços balanceados reconciliam teoria e prática em parte
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: **730 testes
+passam** (eram 696); `08a-blocos.R` imprime `OK`; `e25e-joined.rds` tem
+10 500 linhas, e as razões do `klopp.balanced` em `n = 1000` reproduzem. A
+junção é exata pela terceira vez (`klopp.free` refeito na `smooth`). 750
+ajustes, 0 falhas, 36 min em 8 processos, pico de 0,67 GB.
+
+**A forma:** `klopp.balanced` junta num pedaço os níveis com `2^j < b_n`
+de cada bloco e absorve a sobra de cada nível fino no pedaço anterior, de
+modo que todo pedaço fino tenha entre `b_n` e `2b_n − 1` colunas; níveis
+livres e pesos do `grpreg`.
+
+Razão `klopp.balanced` / referência, `rmse_f` / ISE, `n = 250`, `500`,
+`1000` (`< 1` é a forma balanceada melhor):
+
+| célula | `klopp.free` | `wafc.lasso` | `gam.matched` |
+|---|---|---|---|
+| smooth | 1.048, 1.039, 1.020 / 1.111, 1.092, 1.042 | 1.003, 1.009, 0.958 / 0.999, 1.008, 0.901 | 1.267, 1.315, 1.278 / 1.678, 1.733, 1.643 |
+| uneven | 0.983, 0.995, 0.995 / 0.967, 0.984, 0.988 | 0.918, 0.900, 0.942 / 0.844, 0.803, 0.895 | 1.097, 1.130, 1.168 / 1.249, 1.296, 1.357 |
+| inhomogeneous | 0.977, 0.990, 1.000 / 0.955, 0.984, 1.000 | 0.923, 0.937, 0.960 / 0.865, 0.886, 0.925 | 0.969, 0.949, 0.941 / 0.935, 0.892, 0.866 |
+| null | 1.001, 0.982, 0.980 / 0.966, 0.758, 0.743 | 0.972, 0.999, 0.964 / 0.528, 0.825, 0.522 | 0.993, 0.938, 0.929 / 0.879, 0.423, 0.697 |
+| mixed (50) | 0.967, 0.982, 0.993 / 0.934, 0.963, 0.986 | 0.911, 0.891, 0.908 / 0.825, 0.791, 0.823 | 0.991, 0.980, 0.982 / 0.976, 0.969, 0.989 |
+
+- **A teoria cobre a forma balanceada com os pesos do `grpreg`** (§11 do
+  `08a`, Parte E da conferência): o argumento de E1.11 aceita pesos de
+  razão limitada pagando `ρ²` só no termo de estimação, e aqui
+  `ρ² ≤ (2b_n − 1)/(b_n − 1) ≤ 3`, isto é 1,67 em `n = 250` e 1,57 em
+  `n = 500` e `1000`. A taxa não muda. O `klopp.free` (`ρ² = b_n`) e o
+  `klopp.merged` (sobra de uma coluna) não são cobertos. Conferido:
+  cobertura de 0,997 a 1,000 em seis esquemas de peso; as três cotas do
+  Teorema 1 em blocos com `sqrt(|G|)` valem em 240 ajustes; o risco ideal
+  vale com os pedaços balanceados em 1 008 sequências.
+- **E prediz bem fora do `smooth`:** é a melhor das quatro formas no
+  `uneven`, no não homogêneo em `n ≤ 500` e na `mixed` (0,5% a 3% sobre o
+  `klopp.free` em `rmse_f`, 56% a 94% das réplicas); empata no não
+  homogêneo em `n = 1000`. Na `mixed`, tem a menor mediana de `rmse_f` nos
+  três `n` entre os métodos que não conhecem a estrutura, mas contra o
+  `gam.matched` é empate (0,98 a 0,99, 56% a 62%). No não homogêneo vence o
+  `gam` autônomo nos três `n` (0,953 a 0,972, 64% a 82%).
+- **No `smooth` perde do `klopp.free` por 2% a 5%**, e isso é a junção dos
+  níveis grossos, não a absorção da sobra: em `J = 3` o bloco inteiro é um
+  pedaço de 7 e ela coincide com o `klopp.merged` (76%, 60% e 32% das
+  réplicas). Contra o `wafc.lasso` empata no `smooth` em `n ≤ 500` e vence
+  em 1000.
+- **O fator do suave não passa:** 1,64 a 1,73 contra o `gam.matched` e
+  1,64 a 1,79 contra o `gam.k128` no `smooth`; no `uneven`, 1,25 a 1,36 e
+  1,38 a 1,53. Nenhuma das quatro formas passa 1,5 no `smooth` com
+  `n ≥ 500`.
+- **Um achado que não favorece a leitura óbvia:** nestes `n`, os pesos 1
+  ficam mais perto dos de Lounici et al. que os `sqrt(|G|)`; a vantagem de
+  predição dos `sqrt(|G|)` com `λ` por validação cruzada não sai da cota.
+- **Conjectura da tarefa, não medida** (pergunta 37): deixar livres os
+  níveis com `2^j < b_n`, que a forma balanceada penaliza juntos. Na
+  teoria iriam para o bloco não penalizado, com `σ²p_0/n`,
+  `p_0 ≍ pq b_n`, de ordem `log n/n`, menor que a taxa. Pode recuperar o
+  `smooth` e custar no nulo.
+- **Lições:** a junção por `WAFC_METHODS` com prova numa célula barata
+  funcionou três vezes e está madura para E4; um vigia
+  `until ! pgrep -f "<script>"` casa com a própria linha de comando e
+  nunca termina, então vigiar por PID ou arquivo de fim.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1986,7 +2048,10 @@ Ordenadas pelo que bloqueia mais.
      `J` da busca do WAFC na mesma réplica, e não é método autônomo; E4 precisa de um `gam` que escolha `k` sozinho
      (REML com `k` generoso é a prática usual, não medida aqui).
 
-34. **~~Os pesos do block LASSO~~ medidos por E2.5c (2026-09-30, §2):** os
+34. **~~Os pesos do block LASSO~~ medidos por E2.5c e E2.5e (§2):** a
+   forma balanceada (E2.5e) é coberta pela teoria com os pesos do `grpreg`
+   (`ρ² ≤ 1,67` no piloto) e é a melhor fora do `smooth`; reconcilia em
+   parte. Medição de E2.5c: os
    pesos 1 da teoria são a pior forma na predição; o padrão do `grpreg`
    vence no suave e a junção dos níveis grossos no não homogêneo e na
    `mixed`. A quarta forma que talvez reconcilie teoria e prática é
@@ -2046,6 +2111,15 @@ Ordenadas pelo que bloqueia mais.
      `wafc/cache/e25d/e25d-fits.rds`, que cobre as mesmas réplicas (fora
      as 35 da `mixed` além da 15ª).
 
+37. **Uma quinta forma do block LASSO** (conjectura de E2.5e, não medida
+   nem escrita): deixar livres os níveis com `2^j < b_n` de cada bloco, que
+   a forma balanceada penaliza juntos. Na teoria eles iriam para o bloco
+   não penalizado `A`, como os coeficientes de escala da Proposição 5 de
+   E1.8, com `σ²p_0/n` e `p_0 ≍ pq b_n`, de ordem `log n/n`; os pedaços
+   restantes têm `ρ² < 2`. Pode recuperar o `smooth`, onde a perda é a
+   penalização conjunta desses níveis, e custar no nulo. Medir: uma opção
+   em `wafc_kp_groups()` e ~40 min em 8 núcleos.
+
 ---
 
 ## 5. Próximos passos
@@ -2088,6 +2162,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | E2.5e fechada e integrada: a forma balanceada do block LASSO é coberta pela teoria com os pesos do `grpreg` (`ρ² ≤ 1,67`) e é a melhor das quatro fora do `smooth`; nenhuma forma passa o fator 1,5 no suave; pergunta 37 |
 | 2026-09-30 | E2.5c fechada e integrada: os pesos 1 da teoria predizem pior que o padrão do `grpreg` (2% a 8%), a junção dos níveis grossos vence no não homogêneo e na `mixed`; a escolha entre formas é de segunda ordem; catálogo vazio, e a pergunta 33 tem todas as medições que pediu |
 | 2026-09-30 | E2.5d fechada e integrada: o `gam` autônomo (REML, `k = 64` e `128`) empata com o `gam.matched`, o veredito de E2.5a se mantém e o fator do suave piora (1,58 a 1,92 para o LASSO); o `klopp.free` é o único que o vence em alguma célula; duas divergências do `bam` em E2.5a; pergunta 36 |
 | 2026-09-30 | L5 fechada e integrada: `.bib` com 69 entradas; a partição da unidade ancorada em Mallat (2009); Cai (1999) confere com E1.11; Restrepo & Leaf não serve para a base; D39 aplicada; pergunta 35 |

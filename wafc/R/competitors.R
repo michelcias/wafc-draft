@@ -22,7 +22,10 @@
 ##              WAFC uses, which is the question decision D18 invites.
 ##              The weight of a chunk (the sqrt(|G|) of grpreg or their
 ##              one) and the merging of the coarse levels into one chunk
-##              are options, measured in step E2.5c.
+##              are options, measured in step E2.5c; the balanced chunks,
+##              in which every chunk of a finer level has between the
+##              chunk size and twice it, are a third, measured in step
+##              E2.5e.
 ##   "aspline"  a spline with knots chosen adaptively per block, in the
 ##              spirit of Wang, Jiang and Liu (2024). Their knot search is
 ##              an exact dynamic program; the one here is greedy forward
@@ -562,10 +565,11 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
 #' terms \eqn{c_\ell} are penalized as a block of their own, where the WAFC
 #' leaves them free.
 #'
-#' The chunks respect the order of decision D12, so a chunk never straddles
-#' two resolution levels: the levels \eqn{j} with \eqn{2^j} at most the
-#' chunk size are chunks of their own, and a finer level is cut into
-#' consecutive pieces of the chunk size. That is the reading of "blocks of
+#' By default the chunks respect the order of decision D12, so a chunk
+#' never straddles two resolution levels (the coarse chunk of
+#' \code{merge.coarse} and \code{balanced}, below, is the exception): the
+#' levels \eqn{j} with \eqn{2^j} at most the chunk size are chunks of their
+#' own, and a finer level is cut into consecutive pieces of the chunk size. That is the reading of "blocks of
 #' size about \eqn{\log n} inside each functional coefficient" that keeps
 #' the block a set of neighbouring translates at one scale.
 #'
@@ -579,6 +583,27 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
 #' block, the ones with \eqn{2^j} below the chunk size, become one chunk,
 #' which removes the chunks of size one of level 0 without touching the
 #' weight of the full chunks.
+#'
+#' \code{balanced} is the fourth reading (step E2.5e): the coarse levels
+#' are merged as with \code{merge.coarse}, and the short piece at the end
+#' of each finer level, the part the chunk size \eqn{b_n} does not divide,
+#' is absorbed into the chunk before it in the same level. Every chunk of a
+#' finer level then has between \eqn{b_n} and \eqn{2 b_n - 1} columns.
+#' The coarse chunk has \eqn{2^{j^* + 1} - 1} columns, with \eqn{j^*} the
+#' finest level of the block with \eqn{2^{j^*} < b_n}; that is at most
+#' \eqn{2 b_n - 3}, and it falls below \eqn{b_n} exactly when
+#' \eqn{2^{j^* + 1} \le b_n}, which happens in two cases: \eqn{b_n} a power
+#' of two (the chunk has \eqn{b_n - 1} columns), and a block with no level
+#' of \eqn{2^j \ge b_n} and \eqn{2^J \le b_n}, which is then one chunk of
+#' \eqn{2^J - 1} columns (with the \eqn{b_n} of 6 and 7 of the pilot, only
+#' \eqn{J = 2}, a chunk of 3). With the weights of grpreg the ratio of the
+#' largest weight of a wavelet chunk to the smallest is then at most
+#' \eqn{\sqrt{(2 b_n - 1)/(b_n - 1)}}, bounded in \eqn{n}, where the other
+#' two readings can leave a chunk of one column next to chunks of
+#' \eqn{b_n} or more (the default always does, at level 0), a ratio of the
+#' order of \eqn{\sqrt{b_n}} that is not bounded in \eqn{n}; whether the
+#' theory of step E1.11 accepts weights of bounded ratio is answered in
+#' \code{derivations/08a-sondagem-blocos.md}, section 11.
 #'
 #' @param x,u,y The data.
 #' @param J Resolution level, or a vector of candidates scored by the same
@@ -600,6 +625,9 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
 #' @param merge.coarse Whether the levels \eqn{j} of a block with
 #'   \eqn{2^j} below the chunk size are merged into one chunk; see
 #'   \code{wafc_kp_groups()}.
+#' @param balanced Whether the chunks are balanced as described above. It
+#'   merges the coarse levels whatever \code{merge.coarse} says, and the
+#'   object records \code{merge.coarse = TRUE} then.
 #' @param nfolds,foldid Folds of the cross-validation.
 #' @param ... Passed to \code{\link{wafc_design}}.
 #'
@@ -617,12 +645,13 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
 wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
                            penalize.levels = TRUE,
                            chunk.weights = c("sqrt", "unit"),
-                           merge.coarse = FALSE, nfolds = 10L,
-                           foldid = NULL, ...) {
+                           merge.coarse = FALSE, balanced = FALSE,
+                           nfolds = 10L, foldid = NULL, ...) {
   if (!requireNamespace("grpreg", quietly = TRUE)) {
     stop("method = \"klopp\" needs the package 'grpreg'.", call. = FALSE)
   }
   chunk.weights <- match.arg(chunk.weights)
+  merge.coarse <- merge.coarse || balanced
   n <- nrow(x)
   p <- ncol(x)
   q <- ncol(u)
@@ -636,7 +665,8 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
   best <- NULL
   for (Ji in J) {
     des <- wafc_design(x, u, J = Ji, ...)
-    grp <- wafc_kp_groups(des, block.size, penalize.levels, merge.coarse)
+    grp <- wafc_kp_groups(des, block.size, penalize.levels, merge.coarse,
+                          balanced)
     Z <- as.matrix(des[["Z"]])
     ## grpreg reads a missing group.multiplier as its default, and there is
     ## no value that means "missing", hence the two calls. The groups are
@@ -704,7 +734,7 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
                     ngroups = length(unique(best[["group"]][best[["group"]] > 0L])),
                     penalize.levels = penalize.levels,
                     chunk.weights = chunk.weights,
-                    merge.coarse = merge.coarse,
+                    merge.coarse = merge.coarse, balanced = balanced,
                     lambda = best[["cv"]][["lambda.min"]], cve = best[["cve"]]))
 }
 
@@ -1181,8 +1211,15 @@ wafc_bs_design <- function(x, u, sp) {
 ## and it removes the chunk of size one of level 0. The finer levels are cut
 ## as before, so the full chunks, and the short piece at the end of a level
 ## that the chunk size does not divide, are unchanged.
+##
+## With balanced = TRUE (step E2.5e) the coarse levels are merged as above,
+## whatever merge.coarse says, and that short piece is absorbed into the
+## chunk before it in the same level, so every chunk of a finer level has
+## between 'block.size' and 2 'block.size' - 1 columns. A level with 2^j
+## at least 'block.size' always has one full chunk to absorb into. The
+## sizes of the coarse chunk are in the note on wafc_fit_klopp().
 wafc_kp_groups <- function(design, block.size, penalize.levels,
-                           merge.coarse = FALSE) {
+                           merge.coarse = FALSE, balanced = FALSE) {
   nvars <- design[["nvars"]]
   grp <- integer(nvars)
   g <- 0L
@@ -1197,7 +1234,7 @@ wafc_kp_groups <- function(design, block.size, penalize.levels,
     pos <- 0L
     Jm <- j0 + as.integer(round(log2(length(idx) + 2^j0)))
     levs <- j0:(Jm - 1L)
-    if (merge.coarse) {
+    if (merge.coarse || balanced) {
       coarse <- levs[2^levs < block.size]
       if (length(coarse) > 0L) {
         pos <- as.integer(sum(2^coarse))
@@ -1210,9 +1247,14 @@ wafc_kp_groups <- function(design, block.size, penalize.levels,
       nj <- 2^j
       lev <- idx[pos + seq_len(nj)]
       pos <- pos + nj
-      for (start in seq(1L, nj, by = block.size)) {
+      starts <- seq(1L, nj, by = block.size)
+      if (balanced && length(starts) > 1L && nj %% block.size != 0) {
+        starts <- starts[-length(starts)]
+      }
+      ends <- c(starts[-1L] - 1L, nj)
+      for (i in seq_along(starts)) {
         g <- g + 1L
-        grp[lev[start:min(start + block.size - 1L, nj)]] <- g
+        grp[lev[starts[i]:ends[i]]] <- g
       }
     }
   }

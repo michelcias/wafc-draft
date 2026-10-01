@@ -17,6 +17,12 @@ novos da §1.4 são proposta e estão listados no handoff.
 
 ## 0. Veredito
 
+> **Nota de 2026-10-01 (E2.5e):** onde esta seção e a §9 dizem que a
+> teoria não cobre os pesos `sqrt(|G|)` do `grpreg`, vale a ressalva da
+> §11: com os pedaços balanceados (todo pedaço fino entre `b_n` e
+> `2b_n − 1`) ela os cobre, ao preço de uma constante `ρ² ≤ 3` (1,57 a
+> 1,67 nos `n` do piloto) no termo de estimação.
+
 **A teoria transfere, e a taxa melhora por um fator logarítmico. O que não
 fecha é o estimador que o código roda, não a teoria.** Um item por linha do
 catálogo:
@@ -694,3 +700,209 @@ a direção prevista, mas nos `n` do piloto a vantagem da cota é de constante
 - **`grpreg` 3.6.0**, instalado nesta máquina: a padronização, a
   ortonormalização por grupo e o `group.multiplier = sqrt(|G|)` padrão foram
   lidos no código da função interna `newXG`.
+
+---
+
+## 11. Adendo de E2.5e: pesos de razão limitada
+
+Seção acrescentada por E2.5e (2026-09-30), sem mudar as anteriores. A
+pergunta é o item (iv) de E2.5e no `docs/TAREFA.md`: o argumento das §2 a §5,
+escrito para pesos 1, aceita pesos `w_G` com `ρ = max_G w_G / min_G w_G`
+limitado, e com que constante? A razão de perguntar é E2.5c: os pesos 1 são
+a forma do block LASSO que pior prediz, e a forma balanceada do código
+(`wafc_kp_groups(balanced = TRUE)`: os níveis com `2^j < b_n` de cada bloco
+num pedaço só, e a sobra de cada nível mais fino absorvida no pedaço
+anterior do mesmo nível) põe todo pedaço fino entre `b_n` e `2b_n − 1`
+colunas, de modo que os pesos `sqrt(|G|)` do `grpreg` ficam a razão
+limitada. Conferência: Parte E de [`check/08a-blocos.R`](check/08a-blocos.R).
+
+**Veredito: aceita, e a constante é `ρ²`, só no termo de estimação.** A
+calibração não vê os pesos, o Teorema 1 em blocos já estava escrito para
+pesos quaisquer, e o custo `λ² W(𝒢_0)` com pesos `w` e o `λ` que a
+calibração pede é no máximo `ρ²` vezes o dos pesos 1. A taxa da §4 fica,
+com a constante multiplicada por no máximo `ρ²`, desde que `ρ` seja limitado
+em `n`. **Os pedaços balanceados com os pesos do `grpreg` têm
+`ρ² = max|G|/min|G| ≤ (2b_n − 1)/(b_n − 1) ≤ 3`** (1,67 e 1,57 nos `n` do
+piloto) **e passam a ser cobertos**; o `klopp.free` e o `klopp.merged` têm
+`ρ²` da ordem de `b_n`, que come o logaritmo que os blocos ganham. É o "volta à ordem do LASSO" da §2.4, dito em termos de `ρ`.
+
+### 11.1 O argumento
+
+Pesos `w_G > 0` quaisquer, `ρ = max_G w_G / min_G w_G`, e `λ_{0,G}` o do
+lema de calibração da §2.3.
+
+1. **O Teorema 1 em blocos (§2.2) já é para pesos quaisquer.** Nenhum dos
+   seis passos da §2.1 usa `w_G = 1`: o peso entra só na norma dual,
+   `max_G ‖z_G‖_2 / w_G`, e em `W(𝒢_0) = Σ_{G ∈ 𝒢_0} w_G²` (Passo 5).
+2. **A calibração não depende dos pesos.** O lema da §2.3 controla o evento
+   por pedaço `ℰ = {‖(B̃'ε/n)_G‖_2 ≤ λ_{0,G} para todo G}`, com
+   `P(ℰ) ≥ 1 − α`, e `ℰ` não sabe de peso. Com
+
+   ```
+   λ_w = 2 max_G λ_{0,G} / w_G ,
+   ```
+
+   vale `ℰ ⊂ 𝒯_{𝒢,w}` para todo `w`, porque em `ℰ` cada
+   `‖(B̃'ε/n)_G‖_2 / w_G ≤ λ_{0,G}/w_G ≤ λ_w/2`. O peso só escolhe qual
+   pedaço dita o `λ`: o de maior `λ_{0,G}/w_G`.
+3. **O custo.** As cotas consomem `λ_w² W(𝒢_0) = Σ_{G ∈ 𝒢_0} (λ_w w_G)²`, e
+   para todo `G`
+
+   ```
+   λ_w w_G  =  2 max_{G'} λ_{0,G'} w_G / w_{G'}  ≤  ρ · 2 max_{G'} λ_{0,G'}  =  ρ λ_1 ,
+   ```
+
+   com `λ_1 = 2 max_G λ_{0,G}` o `λ` dos pesos 1. Logo
+   `λ_w² W(𝒢_0) ≤ ρ² λ_1² |𝒢_0|`.
+
+**O que isso dá em cada frente**, com `λ = λ_w`, no evento `ℰ`:
+
+- **(i) Teorema 1(ii) em blocos:** `‖B̃v‖_n² ≤ 64 ρ² λ_1² |𝒢_0|/γ̃ + 16‖𝐛‖_n²`,
+  e o mesmo fator na cota de `‖v‖_2²`. A cota de `‖v‖_{𝒢,w}` fica na norma
+  ponderada, que está entre `w_min ‖v‖_{𝒢,1}` e `w_max ‖v‖_{𝒢,1}`.
+- **(ii) Risco ideal (§3.1):** com o comparador em
+  `T = {G : ‖θ*_G‖² > ρ² η_1}`, `η_1 = 1,6 λ_1²/(Λγ̃)` o limiar dos pesos 1,
+  a parcela de estimação é `192 λ_w² W(T)/γ̃ ≤ 120 Λ ρ² η_1 |T|`, e o resto,
+  `120 Λ Σ_{G ∉ T} ‖θ*_G‖²`, vem do viés do comparador no Lema 8 de E1.6,
+  que não vê a penalidade. Como `min(u, ρ²η) ≤ ρ² min(u, η)` para `ρ ≥ 1`,
+
+  ```
+  ‖f̂ − f‖_n²  ≤  120 Λ ρ² R_𝒢(θ*; η_1) + 120 ‖𝐛‖_n² + 3 ‖P_A ε‖_n² .
+  ```
+
+- **(iii) Taxa (§4):** `η_n` vira `ρ² η_n`. Com `ρ` limitado em `n`, a ordem
+  `n^{−2s/(2s+1)} (log n)^{(2/π−1)_+/(2s+1)}` fica, e a constante cresce no
+  máximo `ρ²` (no termo principal, `ρ^{4s/(2s+1)}`, porque a cota da §3.2 é
+  homogênea de grau `2s/(2s+1)` em `η`). A condição da §4.1, pedaço ao menos
+  do tamanho de `log|𝒢|`, continua valendo, e o pedaço maior entra em
+  `λ_1² ≍ σ²(b_max + log|𝒢|)/n`, de modo que `b_max ≤ 2b_n − 1` não muda a
+  ordem.
+- **(iv) Corolário 8 (§5):** a primeira parcela de `D_n²` ganha o fator
+  `ρ²`; `ρ_n^𝒢` não muda de ordem.
+- **A variante branca (§2.4)**, a que o `grpreg` resolve: o mesmo argumento,
+  com os `λ_{0,G}` pivotais dela; o fator `Λ̂` do Passo 5 não muda.
+
+**`ρ²` é o preço, não folga da prova.** Com pedaços de uma coluna ao lado de
+pedaços de `b_n` e pesos `sqrt(|G|)`, `ρ² = b_n`; o `λ_w` é ditado pelo
+pedaço unitário, `λ_w ≍ σ n^{−1/2}(σ̂_max + sqrt(2Λ log(|𝒢|/α)))`, e um
+pedaço cheio custa `λ_w² b_n ≍ σ² b_n log|𝒢| / n`, contra
+`λ_1² ≍ σ²(b_n + log|𝒢|)/n` com pesos 1. Como `b_n ≍ log|𝒢|`, a razão é da
+ordem de `b_n`: a cota atinge `ρ²` a menos de constante, e é a conta da
+§2.4.
+
+**Um pouco melhor que `ρ²`.** Como `λ_w w_G ≤ ρ_* · 2λ_{0,G} ≤ ρ_* λ_1`, com
+`ρ_* = max_G(λ_{0,G}/w_G) / min_G(λ_{0,G}/w_G)`, a constante pode ser
+`min(ρ, ρ_*)²`, e com `sqrt(|G|)` nos pedaços balanceados o custo atinge
+`ρ_*²` (§11.4). `ρ_* = 1` são os pesos de Lounici et al.
+(`w_G ∝ λ_{0,G}`), os que igualam o custo de cada pedaço a `4λ_{0,G}²`. Na
+forma fechada da §2.3, `λ_{0,G} ≤ σ n^{−1/2}(a sqrt|G| + c)`, com
+`a = B_X sqrt(2C_U)` e `c = sqrt(2Λ log(|𝒢|/α))`, e os pesos `sqrt(|G|)`
+têm `ρ_* = (a + c/sqrt(b_min)) / (a + c/sqrt(b_max)) < ρ`. Os pesos 1 têm
+`ρ_* = (a sqrt(b_max) + c)/(a sqrt(b_min) + c)`, também maior que 1 quando os
+pedaços têm tamanhos diferentes: nenhum dos dois é o de Lounici et al., e
+qual fica mais perto depende de `a sqrt|G|` contra `c` (números na §11.4).
+
+### 11.2 As quatro formas do piloto
+
+`ρ² = max|G|/min|G|` entre os pedaços de wavelet de um bloco (os de `c_ℓ`
+ficam livres, D3), com `J` a partir de 5 (`b_n = 6`) e 6 (`b_n = 7`); em
+`J` menor os valores são menores ou iguais.
+
+| forma | pedaços | pesos | `ρ²`, `n = 250` (`b_n = 6`) | `ρ²`, `n = 500` e `1000` (`b_n = 7`) | limitado em `n` | coberta |
+|---|---|---|---|---|---|---|
+| `klopp.unit` | dentro do nível, sobra no fim | 1 | 1 | 1 | sim | sim (§2 a §5) |
+| `klopp.free` | dentro do nível, sobra no fim | `sqrt(\|G\|)` | 6 | 7 | não, `= b_n` | não |
+| `klopp.merged` | níveis grossos juntos, sobra no fim | `sqrt(\|G\|)` | 3,5 | 7 | não | não |
+| `klopp.balanced` | níveis grossos juntos, sobra absorvida | `sqrt(\|G\|)` | 1,67 | 1,57 | sim, `≤ (2b_n − 1)/(b_n − 1) ≤ 3` | **sim** |
+
+- **`klopp.free`:** o nível 0 é um pedaço de uma coluna, e `ρ² = b_n`.
+- **`klopp.merged`:** tira o pedaço unitário do nível 0, mas a sobra do fim
+  de cada nível, `2^j mod b_n`, continua. Com `b_n` ímpar ela vale 1 sempre
+  que `j` é múltiplo da ordem de 2 módulo `b_n` (em `b_n = 7`, nos níveis 3
+  e 6), e então `ρ²` é o tamanho do pedaço grosso, até `2b_n − 3`.
+- **`klopp.balanced`:** o pedaço fino maior tem até `2b_n − 1` colunas e o
+  grosso, `2^{j*+1} − 1 ≥ b_n − 1`, com `j*` o nível mais fino com
+  `2^{j*} < b_n`. Fica abaixo de `b_n` só com `b_n` potência de 2 (`b_n − 1`
+  colunas) e no bloco sem nível fino (um pedaço só, `ρ = 1`). A cota
+  `(2b_n − 1)/(b_n − 1)` é 3 em `b_n = 2`, 2,2 em `b_n = 6` e tende a 2.
+
+### 11.3 A §3.2 com os pedaços balanceados
+
+O lema do risco ideal por pedaços vale como está, com `b = b_n`, o tamanho
+mínimo de um pedaço fino. A cabeça usa só que o nível `j` tem no máximo
+`2^j/b_n` pedaços (agora `⌊2^j/b_n⌋`, menos que antes); a cauda usa só o
+Hölder dentro de um pedaço contido num nível, e os pedaços finos estão; e o
+pedaço grosso custa no máximo `η` por bloco, o que pode substituir o termo
+`(x_+ + 1)η`. O tamanho máximo, até `2b_n − 1`, não entra no lema; entra só
+em `λ_1`, pela §11.1(iii).
+
+### 11.4 Números (Parte E)
+
+Mesmo desenho da Parte A (`p = 2` com `X_1 ≡ 1`, `q = 2`, Daublets de
+filtro 8, `U` uniforme, `σ = 0,5`, `α = 0,05`, `b_n = ⌈log n⌉`), com os
+pedaços balanceados; o script inteiro imprime `OK` em 65 a 69 s nesta máquina.
+
+**Calibração e custo** (300 réplicas por linha; `ρ²` dos pesos `sqrt(|G|)`
+é `max|G|/min|G|`; os máximos são sobre as réplicas; o custo por coordenada
+é `λ_w²` sobre o `λ²` do LASSO, a coluna que na Parte A dava 1,26 a 1,30
+com os pedaços de E1.11):
+
+| `n` | `J` | `b_n` | tamanhos | cobertura, 6 esquemas | `ρ²` | `max_G (λ_w w_G)²/λ_1²` | `ρ_*²`, `sqrt(\|G\|)` / pesos 1 | custo por coordenada, `sqrt(\|G\|)` | pesos aleatórios: `ρ²` / `max_G (λ_w w_G)²/λ_1²` |
+|---|---|---|---|---|---|---|---|---|---|
+| 50 | 4 | 4 | 3 a 4 | 1,000 | 1,33 | 1,21 | 1,21 / 1,11 | **0,57** | 2,72 / 2,72 |
+| 100 | 5 | 5 | 5 a 8 | ≥ 0,997 | 1,60 | 1,33 | 1,33 / 1,23 | **0,39** | 3,89 / 3,89 |
+| 200 | 5 | 6 | 6 a 10 | 1,000 | 1,67 | 1,34 | 1,34 / 1,26 | **0,34** | 2,93 / 2,64 |
+| 500 | 6 | 7 | 7 a 11 | 1,000 | 1,57 | 1,30 | 1,30 / 1,23 | **0,31** | 3,78 / 3,24 |
+
+- **A calibração não vê os pesos:** os seis esquemas (o evento por pedaço,
+  sem peso; pesos 1; `sqrt(|G|)` com `λ_{0,G}` exato e na forma fechada;
+  pesos aleatórios de razão até 2; e `sqrt(|G|)` na variante branca) têm
+  cobertura de 0,997 a 1,000, e o evento por pedaço está contido nos quatro
+  eventos ponderados euclidianos em todas as 1 200 réplicas.
+- **O custo fica abaixo de `ρ²`, e atinge `ρ_*²`:** com `sqrt(|G|)`,
+  `max_G (λ_w w_G)²/λ_1²` é 1,21 a 1,34, contra `ρ²` de 1,33 a 1,67, e é
+  igual a `ρ_*²` réplica a réplica, porque o pedaço maior é ao mesmo tempo o
+  de maior `λ_{0,G}` e o de menor `λ_{0,G}/w_G`. Com os pesos aleatórios a
+  cota `ρ²` vale em toda réplica.
+- **Com os pedaços balanceados, os pesos do `grpreg` recuperam o ganho dos
+  blocos:** o custo por coordenada cai de 1,26 a 1,30 do LASSO (Parte A,
+  pedaços de E1.11) para 0,31 a 0,57; com pesos 1 ele é 0,24 a 0,47 no
+  pedaço maior e 0,38 a 0,63 no menor.
+- **Nestes `n`, os pesos 1 ficam mais perto dos de Lounici et al. que os
+  `sqrt(|G|)`** (`ρ_*²` de 1,11 a 1,26 contra 1,21 a 1,34). A vantagem de
+  predição dos `sqrt(|G|)` medida em E2.5c, com `λ` por validação cruzada,
+  não é explicada por esta cota.
+
+**O Teorema 1 em blocos com `sqrt(|G|)`** (`J = 5`, `b = 6`, pedaços
+`{7, 8, 6, 10}` por bloco, `ρ² = 1,67`; duas verdades, dois pedaços cheios
+de 6 e 8 coeficientes, e `g_{11} = sin(2πu)` com viés fora de `W_5`;
+`n ∈ {250, 375, 500}`, 40 réplicas; em `n = 125` o desenho tem 126 colunas
+e `γ̃ < 0`, fora da hipótese): **as três cotas valem nos 240 ajustes**, com
+folga mínima de 598 vezes, `γ̃ ≥ λ_min(Σ̂)` em todos e KKT a menos de
+`10^{−9}`. A razão realizada `λ_w² W(𝒢_0)/(λ_1² |𝒢_0|)` é 0,93 (os pedaços
+ativos têm 6 e 8 colunas, menos que o maior, de 10) e 1,03 (seno), bem
+abaixo de `ρ²`.
+
+**O risco ideal (§11.3)**, nas três formas de sequência da Parte C, com os
+pedaços balanceados e `b ∈ {2, 3, 4, 6, 7, 12, 32}` (1 008 sequências): a
+cota da §3.2 vale em todas, com razão máxima 0,783 (era 0,786 na Parte C), e
+continua valendo com o termo `(x_+ + 1)η` trocado por `η` (razão máxima
+0,794).
+
+### 11.5 O que isto não cobre
+
+- **O `λ` por validação cruzada**, que é o que o `klopp.balanced` do piloto
+  usa. Como em toda a sondagem, a teoria é para `λ` determinístico:
+  "coberta", na tabela da §11.2, quer dizer que o estimador com os mesmos
+  pedaços e pesos e `λ = λ_w` tem a taxa da §4, a menos de `ρ²`.
+- **O `grpreg` exato** padroniza as colunas e ortonormaliza cada pedaço
+  antes de pesar por `sqrt(posto)`: é a variante branca, coberta pelo mesmo
+  argumento, com `ρ² = max|G|/min|G|` quando todo pedaço tem posto cheio.
+- **Pesos que dependem dos dados** (por exemplo `w_G` estimados de `Ψ̃_G`):
+  o argumento pede `ρ` determinístico, ou limitado num evento de
+  probabilidade alta; não foi escrito.
+- **Não é prova**, como o resto do documento: a §11.1 é álgebra de três
+  linhas sobre as §2.2 e §2.3, e a §11.3 é a releitura da §3.2; as duas
+  estão conferidas na Parte E.
+- **Se a forma balanceada prediz como o `klopp.free`** é a medição de E2.5e,
+  relatada no `docs/handoff-E2.5e.md`, não nesta seção.
