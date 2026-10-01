@@ -149,18 +149,22 @@ Lebesgue.
 e `ψ^{per}_{jk}(u) = Σ_{l∈ℤ} 2^{j/2} ψ(2^j (u + l) − k)`, somas finitas em
 cada `u` porque os suportes são compactos. A primeira é a partição da
 unidade `Σ_l φ(x − l) ≡ 1`, válida para toda função de escala ortonormal de
-suporte compacto com `∫ φ = 1` (a periodização de `φ` é a §9.3 de Daubechies
-1992, "Wavelets for `L^p([0,1])`", p. 304; a identidade em si não aparece
-enunciada lá, e L3 não achou fonte verificada para ela — item do handoff);
-o `wbasis()` devolve essa coluna igual a `1` até a última
-casa decimal (§7). Para a segunda, trocando soma e integral (soma finita),
+suporte compacto com `∫ φ = 1`: Mallat (2009, §7.5.1, p. 319) afirma que a
+única função de escala periodizada do nível mais grosso é identicamente `1`,
+e a prova é o Teorema 7.4 (p. 284) com `k = 0`, que dá `Σ_l φ(x − l)`
+constante, igual a `∫_0^1 Σ_l φ(x − l) dx = ∫ φ = 1` (a periodização de
+`φ` é também a §9.3 de Daubechies 1992, "Wavelets for `L^p([0,1])`",
+p. 304, que não enuncia a identidade); o `wbasis()` devolve essa coluna
+igual a `1` até a última casa decimal (§7). Para a segunda, trocando soma e integral (soma finita),
 `∫_0^1 ψ^{per}_{jk} = ∫_ℝ 2^{j/2} ψ(2^j t − k) dt = 2^{−j/2} ∫_ℝ ψ = 0` pelo
 momento nulo de ordem zero. Que `{1} ∪ {ψ^{per}_{jk}}` seja base ortonormal
 de `L_2[0,1]` é a construção padrão da análise de multirresolução
 periodizada (Daubechies 1992, §9.3; Härdle, Kerkyacharian, Picard &
-Tsybakov 1998), e é o que o WALL assume (`ms_theo_1.tex`,
-§2.2). Como `dim V_J = 2^J` e as `2^J − 1` wavelets de nível `< J` são
-ortogonais a `1`, `W_J` é exatamente o complemento das constantes em `V_J`,
+Tsybakov 1998); o Teorema 7.16 de Mallat (2009, §7.5.1, p. 318) a enuncia
+para todo nível grosso, inclusive `j_0 = 0`, em que resta só a função de
+escala constante (o `j` de Mallat é o `−j` daqui). É o que o WALL assume
+(`ms_theo_1.tex`, §2.2). Como `dim V_J = 2^J` e as `2^J − 1` wavelets de
+nível `< J` são ortogonais a `1`, `W_J` é exatamente o complemento das constantes em `V_J`,
 e toda `g ∈ W_J` tem integral zero. ∎
 
 **Prova do Lema 1(ii).** Suponha `f_{c,θ} = f_{c̃,θ̃}` `P_{X,U}`-q.c. As
@@ -316,10 +320,16 @@ Todas estão em `docs/referencias-verificadas.bib` desde L3 (2026-09-19):
 (*Ten Lectures on Wavelets*, CBMS-NSF 61, SIAM), `hardle1998wavelets`
 (Härdle, Kerkyacharian, Picard & Tsybakov 1998, copiada do WALL) e
 `Tibshirani-2013` (Ryan J. Tibshirani, "The lasso problem and uniqueness",
-*Electron. J. Statist.* 7, 1456–1490 — **Ryan**, não Robert).
+*Electron. J. Statist.* 7, 1456–1490 — **Ryan**, não Robert). Desde L5
+(2026-09-30), também `Mallat-2009` (*A Wavelet Tour of Signal Processing:
+The Sparse Way*, 3ª ed., Academic Press), a âncora da partição da unidade e
+da base periodizada com `j_0 = 0` na prova do Lema 1(i).
 
-O que L3 não conseguiu conferir: a partição da unidade `Σ_l φ(x − l) ≡ 1`
-atribuída ao cap. 5 de Daubechies (1992). A expressão "partition of unity"
-não ocorre no livro (busca de texto integral no Google Books), e a §9.3, que
-constrói a base periodizada, não a enuncia. A âncora ficou provisória e está
-no handoff de L3.
+A partição da unidade `Σ_l φ(x − l) ≡ 1` estava atribuída ao cap. 5 de
+Daubechies (1992), e L3 não a achou lá: a expressão "partition of unity" não
+ocorre no livro, e a §9.3 constrói a base periodizada sem enunciá-la. L5
+fixou a âncora em Mallat (2009, Teorema 7.16 e p. 319, com a prova no
+Teorema 7.4 com `k = 0`), e L6 a levou à prova. Restrepo & Leaf (1997),
+que a dão como propriedade sem prova, não servem de âncora: afirmam como
+base ortonormal as funções de escala de todos os níveis, o que é falso
+(comentário da entrada `Restrepo-Leaf-1997` no `.bib`).

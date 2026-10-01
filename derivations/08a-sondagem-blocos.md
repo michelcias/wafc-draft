@@ -109,7 +109,7 @@ inferior para o LASSO com o `λ` universal: ele paga `σ² log K / N` por
 coeficiente selecionado, que é o logaritmo que o group LASSO evita quando o
 tamanho do grupo passa de `log M`. A seção 8 estende ao ruído não gaussiano
 sob uma hipótese técnica; aqui o ruído sub-gaussiano entra pela desigualdade
-de Hsu, Kakade & Zhang (2012), §2.3.
+de Hsu, Kakade & Zhang (2012), Teorema 2.1.
 
 ### 1.3 O código
 
@@ -202,11 +202,13 @@ P( existe G:  ‖(B̃'ε/n)_G‖_2 > λ_{0,G} )  ≤  α,
 
 *Esboço.* Condicione em `(X, U)`. Pela Hipótese 2 e pela independência da
 amostra, `E[exp(a'ε) | X, U] ≤ exp(σ²‖a‖²/2)` para todo `a ∈ ℝ^n`, que é a
-hipótese do Teorema 1 de Hsu, Kakade & Zhang (2012) com `μ = 0`. Tome a
-matriz deles como `A = B̃_G'/n`, de modo que `(B̃'ε/n)_G = Aε` e
+hipótese (2.1) do Teorema 2.1 de Hsu, Kakade & Zhang (2012) com `μ = 0`.
+Tome a matriz deles como `A = B̃_G'/n`, de modo que `(B̃'ε/n)_G = Aε` e
 `Σ = A'A = B̃_G B̃_G'/n²` tem `tr Σ = tr Ψ̃_G / n` e `‖Σ‖ = ‖Ψ̃_G‖/n`. O
 teorema dá `‖Aε‖² ≤ σ²(tr Σ + 2 sqrt(tr(Σ²) t) + 2‖Σ‖t)` com probabilidade
-`1 − e^{−t}`.
+`1 − e^{−t}`. O enunciado publicado toma `A` quadrada (`n × n`), e esta é
+`|G| × n`; não muda nada, porque só `Σ = A'A` entra: `‖Aε‖ = ‖Σ^{1/2}ε‖`, e
+`Σ^{1/2}` é quadrada com o mesmo `Σ`.
 Como `tr(Σ²) ≤ ‖Σ‖ tr Σ`, o lado direito é no máximo
 `σ²(sqrt(tr Σ) + sqrt(2‖Σ‖t))²`. Tome `t = log(|𝒢|/α)` e some sobre os
 `|𝒢|` pedaços. ∎
@@ -423,8 +425,9 @@ Para `q = 1` e `X ⊥ U`, a cota inferior do Teorema 1 de K&P é
 ótima a menos de constante**, e em `π < 2` fica a
 `(log n)^{(2/π−1)/(2s+1)}` dela, que é o Corolário 1 de K&P lido com `p`
 fixo, e é também o expoente da limiarização em blocos de wavelets de Cai
-(1999) **[VERIFICAR: não lido]**. O LASSO de E1.6 fica a
-`(log n)^{2s/(2s+1)}`, e o Teorema 7.1 de
+(1999, Teorema 4, eq. 5.4, p. 908), que vale com `α ≥ 1/p` (no nosso
+símbolo, `s ≥ 1/π`) e no modelo de sequência, não no desenho de produtos.
+O LASSO de E1.6 fica a `(log n)^{2s/(2s+1)}`, e o Teorema 7.1 de
 Lounici et al. diz que esse logaritmo não é artefato da cota superior, ao
 menos no modelo multitarefa deles (não se transpôs aquele argumento ao
 desenho de produtos). Para `q ≥ 2` a cota inferior continua não existindo
@@ -681,20 +684,22 @@ a direção prevista, mas nos `n` do piloto a vantagem da cota é de constante
   (ruído não gaussiano). A numeração do *Annals* não foi conferida.
 - **Hsu, D., Kakade, S. M. and Zhang, T. (2012).** A tail inequality for
   quadratic forms of subgaussian random vectors. *Electronic Communications
-  in Probability* 17. DOI `10.1214/ECP.v17-2079`. Conferida no Crossref em
-  2026-09-30 (título, autores, veículo, volume, ano, DOI); o Crossref e o
-  OpenAlex não registram páginas nem número do artigo
-  **[VERIFICAR: número do artigo e páginas]**. O enunciado usado (Teorema 1,
-  com `μ = 0`) foi lido no arXiv 1110.2842. Não está no `.bib`.
-  Chave sugerida: `Hsu-Kakade-Zhang-2012`.
+  in Probability* 17, no. 52, 1--6. DOI `10.1214/ECP.v17-2079`.
+  `Hsu-Kakade-Zhang-2012`, verificada em L5 (o número do artigo e as
+  páginas vêm do cabeçalho do PDF, que o Crossref não guarda). O enunciado
+  usado é o **Teorema 2.1**, com `μ = 0` (Observação 2.2); este arquivo o
+  leu primeiro no arXiv 1110.2842, onde é o "Theorem 1" e toma `A` de
+  `m × n`. O publicado toma `A` quadrada, o que não muda a §2.1: só
+  `Σ = A'A` entra.
 - **Cai, T. T. (1999).** Adaptive wavelet estimation: a block thresholding
-  and oracle inequality approach. *The Annals of Statistics* 27(3). DOI
-  `10.1214/aos/1018031262`. Conferida no Crossref em 2026-09-30 (título,
-  autor, veículo, volume, número, ano, DOI), sem páginas. **Não lida**: é a
-  origem clássica de blocos de tamanho `log n` em limiarização de wavelets e
-  do mesmo expoente residual em `π < 2`, citada aqui de memória
-  **[VERIFICAR: páginas e o enunciado]**. K&P não a citam. Não está no `.bib`.
-  Chave sugerida: `Cai-1999`.
+  and oracle inequality approach. *The Annals of Statistics* 27(3),
+  898--924. DOI `10.1214/aos/1018031262`. `Cai-1999`, verificada em L5 e
+  lida no PDF da editora. É a origem dos blocos de tamanho `log n` em
+  limiarização de wavelets (o BlockJS das seções 3 e 4), e o **Teorema 4**
+  (eq. 5.4, p. 908) dá, em Besov com `1 ≤ p < 2` e `α ≥ 1/p`, a taxa
+  minimax a menos de `(log n)^{(2/p−1)/(1+2α)}`, o mesmo expoente da §4.3;
+  é um resultado no modelo de sequência, não no desenho de produtos. K&P
+  não a citam.
 - **Bühlmann, P. and van de Geer, S. (2011)** e **Donoho, D. L. and
   Johnstone, I. M. (1998)**: usados só por meio de E1.5 e E1.6.
 - **`grpreg` 3.6.0**, instalado nesta máquina: a padronização, a

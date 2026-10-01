@@ -1,6 +1,6 @@
 # Estado do trabalho, handoff de continuidade
 
-**Última atualização:** 2026-09-30.
+**Última atualização:** 2026-10-01.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8 e
 E1.10), E5a, E5c e E2.1 a E2.5a fechadas**, mais L1 a L4 e a sondagem E6.1a.
 Falta E2.5 (go/no-go) para fechar E2, e **a repetição do piloto (E2.5a)
@@ -1679,6 +1679,33 @@ medição de limiar; mas aponta para o Corolário 8, que já está no artigo
 (D32), como o passo que falta à comparação: estimação seguida de limiar,
 que é também a calibração de `t_n` da pergunta 11.
 
+### 2026-10-01: L6 fechada, as correções de L5 nas derivações
+
+Chat de tarefa, integrado aqui, correndo ao lado da E2.5g sem arquivo em
+comum. Conferido nesta máquina: o diff toca só texto de citação (nenhum
+enunciado, hipótese, número de resultado nem `\label`), e o
+`06-selecao-limiar.pdf` recompila em 7 páginas sem referência indefinida nem
+aviso. A tarefa releu cada localização nos PDFs de `refs/`.
+
+- **`01-identificabilidade.md`:** a partição da unidade passa a Mallat
+  (2009, §7.5.1, p. 319), com a prova no Teorema 7.4 (p. 284) com `k = 0`;
+  a base periodizada com `j_0 = 0` ganha o Teorema 7.16 (p. 318), com a
+  nota de que o `j` de Mallat é o `−j` daqui. Daubechies (1992, §9.3) fica
+  só para a periodização; Restrepo & Leaf (1997) registrado como âncora que
+  não serve.
+- **`08a-sondagem-blocos.md`:** Hsu, Kakade & Zhang como Teorema 2.1
+  (hipótese (2.1), `μ = 0`, Observação 2.2), com a nota de que a `A`
+  retangular não muda nada porque só `Σ = A'A` entra; o "§2.3" que o
+  arquivo citava não existe no artigo publicado e saiu. Cai (1999) com o
+  Teorema 4 (eq. 5.4, p. 908), a ressalva `s ≥ 1/π` e o modelo de
+  sequência; o `[VERIFICAR]` dele sai.
+- **`06-selecao-limiar.tex`:** van de Geer, Bühlmann & Zhou (2011) com
+  688–749, eq. (1.3) p. 691 e Teorema 3.2 p. 698, e as três diferenças para
+  o Corolário 8: eles reajustam por mínimos quadrados, limiarizam
+  coordenadas e não pedem beta-min, onde a Hipótese S é condição desse tipo
+  por bloco. É a frase que um referee pode pedir na §3.6 do `ms`.
+- **Sobram quatro marcas de verificação**, fora de L5 (pergunta 35(e)).
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -2113,7 +2140,7 @@ Ordenadas pelo que bloqueia mais.
    de E2.5b; abre depois dela. **Catalogada como E2.5c** (2026-09-30).
 
 35. **Pendências de L5** (2026-09-30), nenhuma bloqueando:
-   - (a) (**catalogada como L6** em 2026-10-01) Levar as correções bibliográficas aos `derivations/`: Mallat
+   - (a) **~~Fechada por L6~~ (2026-10-01, §2).** Texto original: levar as correções bibliográficas aos `derivations/`: Mallat
      (2009, §7.5.1) na prova do Lema 1(i) do `01-identificabilidade.md`;
      Hsu et al. como Teorema 2.1, com a nota da `A` quadrada, e Cai com
      páginas e Teorema 4 no `08a-sondagem-blocos.md`; páginas e Teorema 3.2
@@ -2129,6 +2156,12 @@ Ordenadas pelo que bloqueia mais.
    - (d) Hall, Kerkyacharian & Picard (1999, *Statist. Sinica* 9) e Zhou
      (2010, arXiv:1002.1583) não verificados; entram só se o manuscrito
      precisar.
+   - (e) **Marcas de verificação que L6 achou e não eram dela** (candidatas
+     a uma L7 curta): Donoho & Johnstone (1994) com `j_0` fixo, no `08a`
+     (`[VERIFICAR: não relido]`); no `06-selecao-limiar.tex`, a seção do
+     LASSO limiarizado em Bühlmann & van de Geer (2011) e o número do
+     resultado de Huang, Horowitz & Wei (2010); e, no `08a`, a numeração do
+     *Annals* de Klopp & Pensky e de Lounici et al., lidos no arXiv.
 
 36. **Pendências de E2.5d** (2026-09-30), nenhuma bloqueando:
    - (a) **Qual `gam` é o concorrente de E4 e da tabela do manuscrito.**
@@ -2211,6 +2244,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | L6 catalogada e fechada ao lado da E2.5g: as correções de L5 nas três derivações, sem mudança de matemática; o "§2.3" de Hsu et al. no `08a` não existia; quatro marcas fora de L5 ficam na pergunta 35(e) |
 | 2026-10-01 | E2.5f fechada e integrada: os níveis grossos livres melhoram os blocos ativos e pioram os inativos, e perdem em toda célula; medido aqui que, com os blocos inativos zerados, o fator do suave do `klopp.balanced` cairia abaixo de 1,5, o que aponta para o limiar do Corolário 8 |
 | 2026-10-01 | E2.5e fechada e integrada: a forma balanceada do block LASSO é coberta pela teoria com os pesos do `grpreg` (`ρ² ≤ 1,67`) e é a melhor das quatro fora do `smooth`; nenhuma forma passa o fator 1,5 no suave; pergunta 37 |
 | 2026-09-30 | E2.5c fechada e integrada: os pesos 1 da teoria predizem pior que o padrão do `grpreg` (2% a 8%), a junção dos níveis grossos vence no não homogêneo e na `mixed`; a escolha entre formas é de segunda ordem; catálogo vazio, e a pergunta 33 tem todas as medições que pediu |

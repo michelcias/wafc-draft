@@ -414,7 +414,14 @@ em um passo.
   \item \textbf{Transposto:} a ideia de ``estimar bem e limiarizar seleciona''
     é clássica em LASSO, e a referência mais próxima em forma é van de Geer,
     Bühlmann e Zhou (2011), que estudam o LASSO limiarizado exatamente como um
-    segundo passo sobre um estimador com taxa; em modelos aditivos, Huang,
+    segundo passo sobre um estimador com taxa (eq.~(1.3), p.~691, e
+    Teorema~3.2, p.~698). O procedimento deles difere do daqui em três
+    pontos: reajustam por mínimos quadrados os coeficientes mantidos depois
+    do limiar, que o Corolário~\ref{cor:limiar} não faz; limiarizam
+    coordenadas, não blocos $(\cv,\md)$; e o Teorema~3.2 controla predição,
+    erros $\ell_1$ e $\ell_2$ e falsos positivos sem condição beta-min,
+    enquanto a Hipótese~\ref{ass:sep} é uma condição desse tipo em nível de
+    bloco. Em modelos aditivos, Huang,
     Horowitz e Wei (2010) usam uma condição de separação em nível de
     \emph{componente} no mesmo papel que a Hipótese~\ref{ass:sep} aqui.
   \item \textbf{Novo, no sentido em que este projeto usa a palavra:} o
@@ -560,12 +567,13 @@ Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
     livro. \textsc{[verificar numeração da seção]}
   \item van de Geer, S., Bühlmann, P.\ e Zhou, S. (2011). The adaptive and
     the thresholded Lasso for potentially misspecified models (and a lower
-    bound for the Lasso). \emph{Electronic Journal of Statistics} 5.
-    \texttt{10.1214/11-EJS624}. Conferida no Crossref em 2026-09-20 (autores,
-    título, veículo, volume, ano e DOI); não está no \texttt{.bib} e o
-    intervalo de páginas não consta do registro
-    \textsc{[verificar páginas]}. Referência de forma do procedimento de
-    dois passos.
+    bound for the Lasso). \emph{Electronic Journal of Statistics} 5,
+    688--749. \texttt{10.1214/11-EJS624}.
+    (\texttt{vandeGeer-Buhlmann-Zhou-2011}, verificada em L5; as páginas vêm
+    do cabeçalho do PDF, que o Crossref não guarda.) Referência de forma do
+    procedimento de dois passos: o LASSO limiarizado com reajuste é a
+    eq.~(1.3), p.~691, e o resultado com ruído é o Teorema~3.2, p.~698; as
+    três diferenças estão na seção anterior.
   \item Huang, J., Horowitz, J.~L.\ e Wei, F. (2010). Variable selection in
     nonparametric additive models. \emph{The Annals of Statistics} 38(4),
     2282--2313. (\texttt{Huang-Horowitz-Wei-2010}, verificada em L1.)
