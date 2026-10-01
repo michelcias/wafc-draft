@@ -72,6 +72,7 @@ que ler antes está aqui e no plano.
 | E2.5d o `gam` autônomo | **fechada** (2026-09-30): empata com o `gam.matched`, confirma E2.5a, fator do suave pior; reprodução exata | `wafc/scripts/09-gam-autonomo.R`, `wafc/cache/e25d/` |
 | L5 bibliografia curta | **fechada** (2026-09-30): 69 entradas; a partição da unidade ancorada em Mallat (2009); D39 aplicada | `referencias-verificadas.bib`, `literatura.md` |
 | E2.5e pedaços balanceados | **fechada** (2026-10-01): coberta pela teoria com os pesos do `grpreg` (`ρ² ≤ 1,67`), melhor das quatro formas fora do `smooth`; 730 testes | `wafc/R/competitors.R`, `derivations/08a-sondagem-blocos.md` §11, `wafc/cache/e25e/` |
+| E2.5f níveis grossos livres | **catalogada** (2026-10-01) | §3 |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
@@ -86,13 +87,14 @@ tarefa pode criar ou editar**.
 
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
+| **E2.5f** níveis grossos livres | a quinta forma do block LASSO (pergunta 37 do `ESTADO.md`), **sem decisão de rumo**. (i) Em `wafc_kp_groups()` e `wafc_fit_klopp()`: opção que deixa **sem penalidade** os níveis com `2^j < b_n` de cada bloco (grupo 0 do `grpreg`, ou o equivalente), mantendo os pedaços finos balanceados de E2.5e e os pesos do `grpreg`; teste contra vetores montados à mão em `b_n = 6` e `7`, e de que as formas anteriores não mudam a `1e-12`. (ii) No `04-pilot.R`: método `klopp.freecoarse`. (iii) Rodar com `WAFC_OUT=wafc/cache/e25f`, `WAFC_METHODS=klopp.freecoarse`, as cinco células, 50 réplicas (`WAFC_REPS_MIXED=50`), 8 processos, sem outra rodada na máquina, e o `klopp.free` refeito só na `smooth` para provar a junção ao `wafc/cache/e25e/e25e-joined.rds`. (iv) **Parte teórica, curta:** seção nova no fim de `derivations/08a-sondagem-blocos.md` dizendo o que muda no Teorema 1 em blocos quando esses níveis vão para o bloco não penalizado (o termo `σ²p_0/n` com `p_0 = p + pq(2^{j*+1} − 1)`, como na Proposição 5 de E1.8; a perfilagem; o `ρ²` dos pedaços restantes) e se a taxa da §4 se mantém; conferir numericamente o que for afirmado com número na Parte F de `check/08a-blocos.R`. (v) No handoff: o `klopp.freecoarse` contra `klopp.balanced`, `klopp.free`, `wafc.lasso`, `gam.matched` e `gam.k128`, por célula e `n`, `rmse_f` e ISE, frações de vitória, **o nulo** (blocos falsos ligados e réplicas com tudo zerado, já que os níveis livres não se zeram), o fator do suave, a `mixed`, o `J`, o tempo, e o veredito teórico | E2.5e (os `.rds` de `wafc/cache/e25e/`) | `wafc/R/competitors.R`, `wafc/tests/test-competitors.R`, `wafc/scripts/04-pilot.R`, `wafc/README.md` (as linhas desses três), `derivations/08a-sondagem-blocos.md` (só a seção nova), `derivations/check/08a-blocos.R` (só a Parte F nova, e o `OK` final continua valendo), `docs/handoff-E2.5f.md`; os `.rds` em `wafc/cache/e25f/`, não versionado |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**O catálogo está vazio** (2026-10-01); E2.5e fechou. A repetição do piloto (E2.4c,
+**Catalogada: E2.5f** (2026-10-01), a quinta forma do block LASSO; E2.5e fechou. A repetição do piloto (E2.4c,
 E2.5a) devolveu no-go para a variante LASSO, e as medições que a pergunta
 33 do `ESTADO.md` pedia fecharam no mesmo dia: E2.5b (o block LASSO com
 níveis livres), E2.5c (os pesos), E2.5d (o `gam` autônomo), E1.11 (a

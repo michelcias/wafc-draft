@@ -2111,7 +2111,8 @@ Ordenadas pelo que bloqueia mais.
      `wafc/cache/e25d/e25d-fits.rds`, que cobre as mesmas réplicas (fora
      as 35 da `mixed` além da 15ª).
 
-37. **Uma quinta forma do block LASSO** (conjectura de E2.5e, não medida
+37. **Uma quinta forma do block LASSO** (**catalogada como E2.5f** em
+   2026-10-01; conjectura de E2.5e, não medida
    nem escrita): deixar livres os níveis com `2^j < b_n` de cada bloco, que
    a forma balanceada penaliza juntos. Na teoria eles iriam para o bloco
    não penalizado `A`, como os coeficientes de escala da Proposição 5 de
