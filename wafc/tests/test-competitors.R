@@ -17,7 +17,11 @@
 ## since step E2.5e, the balanced chunks against vectors built by hand at
 ## the chunk sizes 6 and 7 of the pilot, and the three earlier forms
 ## against a frozen copy of the grouping of before that step, the groups
-## bit for bit and the fits to 1e-12.
+## bit for bit and the fits to 1e-12; since step E2.5f, the free coarse
+## levels against vectors built by hand at 6 and 7, the least squares fit
+## of a resolution with nothing to penalize against lm() and against the
+## scale of cv.grpreg, and the four earlier forms against a frozen copy of
+## the grouping of step E2.5e, the same way.
 ## The fourth checks the quantile
 ## universal threshold against its own definition: it is the quantile of
 ## the smallest penalty level that kills the penalized part under the null,
@@ -431,6 +435,242 @@ test_that("the forms of before the balanced chunks do not move", {
                    as.numeric(stats::coef(ref)), tolerance = 1e-12)
       expect_equal(fit[["fit"]][["cve"]], ref[["cve"]], tolerance = 1e-12)
       expect_false(fit[["extra"]][["balanced"]])
+    }
+  }
+})
+
+## The grouping of wafc_kp_groups() as it was at the end of step E2.5e,
+## frozen here so that the four forms measured in steps E2.5a to E2.5e can
+## be checked against it once the function has the free coarse levels.
+kp_groups_e25e <- function(design, block.size, penalize.levels,
+                            merge.coarse = FALSE, balanced = FALSE) {
+  nvars <- design[["nvars"]]
+  grp <- integer(nvars)
+  g <- 0L
+  unp <- design[["unpenalized"]]
+  if (penalize.levels) {
+    g <- g + 1L
+    grp[unp] <- g
+  }
+  j0 <- design[["j0"]]
+  for (nm in names(design[["blocks"]])) {
+    idx <- design[["blocks"]][[nm]]
+    pos <- 0L
+    Jm <- j0 + as.integer(round(log2(length(idx) + 2^j0)))
+    levs <- j0:(Jm - 1L)
+    if (merge.coarse || balanced) {
+      coarse <- levs[2^levs < block.size]
+      if (length(coarse) > 0L) {
+        pos <- as.integer(sum(2^coarse))
+        g <- g + 1L
+        grp[idx[seq_len(pos)]] <- g
+        levs <- setdiff(levs, coarse)
+      }
+    }
+    for (j in levs) {
+      nj <- 2^j
+      lev <- idx[pos + seq_len(nj)]
+      pos <- pos + nj
+      starts <- seq(1L, nj, by = block.size)
+      if (balanced && length(starts) > 1L && nj %% block.size != 0) {
+        starts <- starts[-length(starts)]
+      }
+      ends <- c(starts[-1L] - 1L, nj)
+      for (i in seq_along(starts)) {
+        g <- g + 1L
+        grp[lev[starts[i]:ends[i]]] <- g
+      }
+    }
+  }
+  grp
+}
+
+test_that("the free coarse levels are the ones asked for", {
+  ## Step E2.5f, open question 37. At J = 6 a block has the levels 0 to 5,
+  ## with 1, 2, 4, 8, 16 and 32 columns in that order (D12); with chunks of
+  ## 6 or 7 the levels 0 to 2 (7 columns) are coarse, and with free.coarse
+  ## they go to group 0 while the finer levels keep the balanced chunks of
+  ## step E2.5e.
+  des <- wafc_design(x0, u0, J = 6L)
+  nb <- length(des[["blocks"]])
+  by_hand <- function(ncoarse, sizes, levels.group, d = des) {
+    one <- c(integer(ncoarse), rep(seq_along(sizes), sizes))
+    grp <- integer(d[["nvars"]])
+    off <- as.integer(levels.group)
+    if (levels.group) grp[d[["unpenalized"]]] <- 1L
+    for (b in seq_along(d[["blocks"]])) {
+      grp[d[["blocks"]][[b]]] <- ifelse(one > 0L,
+                                        one + off + (b - 1L) * length(sizes),
+                                        0L)
+    }
+    grp
+  }
+  ## b_n = 6: the balanced chunks of before, 7 | 8 | 6, 10 | 6, 6, 6, 6, 8,
+  ## without the coarse 7; b_n = 7: 7 | 8 | 7, 9 | 7, 7, 7, 11, likewise
+  fc6 <- c(8L, 6L, 10L, 6L, 6L, 6L, 6L, 8L)
+  fc7 <- c(8L, 7L, 9L, 7L, 7L, 7L, 11L)
+  expect_identical(wafc_kp_groups(des, 6L, FALSE, balanced = TRUE,
+                                  free.coarse = TRUE),
+                   by_hand(7L, fc6, FALSE))
+  expect_identical(wafc_kp_groups(des, 7L, FALSE, balanced = TRUE,
+                                  free.coarse = TRUE),
+                   by_hand(7L, fc7, FALSE))
+  expect_identical(wafc_kp_groups(des, 6L, TRUE, balanced = TRUE,
+                                  free.coarse = TRUE),
+                   by_hand(7L, fc6, TRUE))
+  expect_identical(wafc_kp_groups(des, 7L, TRUE, balanced = TRUE,
+                                  free.coarse = TRUE),
+                   by_hand(7L, fc7, TRUE))
+  ## the free coarse levels override the merge, and without 'balanced' the
+  ## finer levels keep the short piece at the end: 7 + 1, 7 + 7 + 2, ...
+  expect_identical(wafc_kp_groups(des, 7L, FALSE, merge.coarse = TRUE,
+                                  balanced = TRUE, free.coarse = TRUE),
+                   by_hand(7L, fc7, FALSE))
+  expect_identical(wafc_kp_groups(des, 7L, FALSE, free.coarse = TRUE),
+                   by_hand(7L, c(7L, 1L, 7L, 7L, 2L, 7L, 7L, 7L, 7L, 4L),
+                           FALSE))
+  ## the columns in group 0 are the p level terms (when free) and the
+  ## p q (2^(j* + 1) - 1) coarse ones, j* the finest level with 2^j < b_n:
+  ## that is p_0 of section 12 of derivations/08a-sondagem-blocos.md
+  for (bs in c(2L, 3L, 4L, 6L, 7L, 9L, 17L)) {
+    js <- max(which(2^(0:5) < bs)) - 1L
+    g <- wafc_kp_groups(des, bs, FALSE, balanced = TRUE, free.coarse = TRUE)
+    expect_identical(sum(g == 0L), as.integer(p + p * q * (2^(js + 1L) - 1L)))
+  }
+  ## a block with no level of 2^j at least the chunk size is wholly free: at
+  ## J = 3 with 6 or 7 nothing is penalized, and at J = 4 with 7 level 3 is
+  ## one chunk of 8
+  d3 <- wafc_design(x0, u0, J = 3L)
+  expect_true(all(wafc_kp_groups(d3, 6L, FALSE, balanced = TRUE,
+                                 free.coarse = TRUE) == 0L))
+  d4 <- wafc_design(x0, u0, J = 4L)
+  expect_identical(wafc_kp_groups(d4, 7L, FALSE, balanced = TRUE,
+                                  free.coarse = TRUE),
+                   by_hand(7L, 8L, FALSE, d4))
+
+  skip_if_not(has("grpreg"))
+  ## The fit is grpreg on those groups, with the sqrt(|G|) of grpreg on the
+  ## fine chunks alone: at J = 5 and chunks of 7, 8 | 7, 9 per block.
+  fc <- function(J, bs = 7L) {
+    wafc_fit_klopp(x0, u0, y0, J = J, block.size = bs,
+                   penalize.levels = FALSE, foldid = folds, balanced = TRUE,
+                   free.coarse = TRUE)
+  }
+  f5 <- fc(5L)
+  mult <- unname(as.numeric(f5[["fit"]][["fit"]][["group.multiplier"]]))
+  expect_equal(mult, sqrt(rep(c(8, 7, 9), nb)))
+  expect_identical(f5[["extra"]][["ngroups"]], 3L * nb)
+  expect_true(f5[["extra"]][["free.coarse"]])
+  d5 <- f5[["design"]]
+  grp5 <- wafc_kp_groups(d5, 7L, FALSE, balanced = TRUE, free.coarse = TRUE)
+  ref <- grpreg::cv.grpreg(as.matrix(d5[["Z"]]), y0, group = grp5,
+                           penalty = "grLasso", fold = folds)
+  expect_equal(as.numeric(stats::coef(f5[["fit"]])),
+               as.numeric(stats::coef(ref)), tolerance = 1e-12)
+  ## the coarse coefficients are never zero, so every block is in the
+  ## estimate; the selection is the penalized part, and nzero counts it
+  b5 <- as.numeric(stats::coef(f5[["fit"]]))[-1L]
+  expect_true(all(f5[["blocks"]]))
+  for (nm in names(d5[["blocks"]])) {
+    idx <- d5[["blocks"]][[nm]]
+    expect_true(all(b5[idx[1:7]] != 0))
+  }
+  fine <- unlist(lapply(d5[["blocks"]], function(idx) idx[-(1:7)]))
+  expect_identical(f5[["extra"]][["nzero"]], sum(b5[fine] != 0))
+  bf <- vapply(d5[["blocks"]], function(idx) any(b5[idx[-(1:7)]] != 0), TRUE)
+  expect_identical(as.logical(t(f5[["extra"]][["blocks.fine"]])),
+                   unname(bf))
+
+  ## With nothing to penalize the fit is least squares, scored by the
+  ## squared error cv.grpreg reports: exactly the least squares of each
+  ## fold, and what grpreg gives at a vanishing penalty (the last of the
+  ## two levels) on one extra column of noise.
+  f3 <- fc(3L)
+  d3 <- f3[["design"]]
+  Z3 <- as.matrix(d3[["Z"]])
+  expect_true(is.na(f3[["extra"]][["lambda"]]))
+  expect_identical(f3[["extra"]][["ngroups"]], 0L)
+  expect_identical(f3[["extra"]][["nzero"]], 0L)
+  ls <- stats::lm(y0 ~ Z3)
+  expect_equal(f3[["fitted"]], unname(stats::fitted(ls)), tolerance = 1e-10)
+  err <- numeric(n)
+  for (k in unique(folds)) {
+    o <- folds == k
+    fk <- stats::lm(y0[!o] ~ Z3[!o, ])
+    bk <- stats::coef(fk)
+    bk[is.na(bk)] <- 0
+    err[o] <- (y0[o] - cbind(1, Z3[o, ]) %*% bk)^2
+  }
+  expect_equal(f3[["extra"]][["cve"]], mean(err), tolerance = 1e-10)
+  set.seed(5)
+  zn <- stats::rnorm(n)
+  g0 <- grpreg::cv.grpreg(cbind(Z3, zn), y0, group = c(integer(ncol(Z3)), 1L),
+                          penalty = "grLasso", fold = folds,
+                          lambda = c(1e-6, 1e-9), eps = 1e-10)
+  expect_equal(g0[["cve"]][2L],
+               wafc_kp_cv_ols(cbind(Z3, zn), y0, folds)[["cve"]],
+               tolerance = 1e-8)
+  ## and the search over J compares the two kinds of candidate on that one
+  ## scale: J = 3:5 keeps the one with the smaller error
+  f35 <- fc(3:5)
+  expect_identical(f35[["extra"]][["J"]],
+                   c(3L, 5L)[which.min(c(f3[["extra"]][["cve"]],
+                                         f5[["extra"]][["cve"]]))])
+})
+
+test_that("the forms of before the free coarse levels do not move", {
+  ## The four earlier forms group as the frozen copy of step E2.5e, bit for
+  ## bit, over resolutions, chunk sizes, both treatments of the levels, the
+  ## merge and the balance; and their fits are grpreg on the frozen groups
+  ## to 1e-12.
+  same <- logical(0)
+  for (J in 2:7) {
+    des <- wafc_design(x0, u0, J = J)
+    for (bs in c(1:9, 16L, 64L)) {
+      for (pl in c(TRUE, FALSE)) {
+        for (mc in c(FALSE, TRUE)) {
+          for (bal in c(FALSE, TRUE)) {
+            same <- c(same,
+                      identical(wafc_kp_groups(des, bs, pl, merge.coarse = mc,
+                                               balanced = bal),
+                                kp_groups_e25e(des, bs, pl, merge.coarse = mc,
+                                               balanced = bal)),
+                      identical(wafc_kp_groups(des, bs, pl, mc, bal, FALSE),
+                                kp_groups_e25e(des, bs, pl, mc, bal)))
+          }
+        }
+      }
+    }
+  }
+  expect_length(same, 1056L)
+  expect_true(all(same))
+  skip_if_not(has("grpreg"))
+  forms <- list(sqrt = list(), unit = list(chunk.weights = "unit"),
+                merged = list(merge.coarse = TRUE),
+                balanced = list(balanced = TRUE))
+  for (nm in names(forms)) {
+    for (pl in c(TRUE, FALSE)) {
+      fit <- do.call(wafc_fit_klopp,
+                     c(list(x0, u0, y0, J = 4:5, penalize.levels = pl,
+                            foldid = folds), forms[[nm]]))
+      des <- fit[["design"]]
+      grp <- kp_groups_e25e(des, fit[["extra"]][["block.size"]], pl,
+                            merge.coarse = isTRUE(forms[[nm]][["merge.coarse"]]),
+                            balanced = isTRUE(forms[[nm]][["balanced"]]))
+      args <- list(as.matrix(des[["Z"]]), y0, group = grp,
+                   penalty = "grLasso", fold = folds)
+      if (nm == "unit") args[["group.multiplier"]] <- rep(1, max(grp))
+      ref <- do.call(grpreg::cv.grpreg, args)
+      expect_equal(as.numeric(stats::coef(fit[["fit"]])),
+                   as.numeric(stats::coef(ref)), tolerance = 1e-12)
+      expect_equal(fit[["fit"]][["cve"]], ref[["cve"]], tolerance = 1e-12)
+      expect_equal(fit[["fitted"]],
+                   as.numeric(predict(ref, as.matrix(des[["Z"]]))),
+                   tolerance = 1e-12)
+      expect_false(fit[["extra"]][["free.coarse"]])
+      ## with no column of a block in group 0, the two readings of the
+      ## selection coincide
+      expect_identical(fit[["extra"]][["blocks.fine"]], fit[["blocks"]])
     }
   }
 })

@@ -31,6 +31,10 @@
 #      pedaços balanceados e pesos 1, sqrt(|G|) e aleatórios, o custo contra o
 #      dos pesos 1, o Teorema 1 em blocos com sqrt(|G|), e o risco ideal da
 #      §3.2 com os pedaços balanceados.
+#   F. (E2.5f, §12 do documento) os níveis grossos livres: os tamanhos e o
+#      rho^2 dos pedaços finos, a perfilagem com os níveis grossos em A e o
+#      termo sigma^2 p_0 / n, o Teorema 1 em blocos nessa forma (com a cota
+#      dos coeficientes grossos e o custo no nulo), e a ordem do termo novo.
 #
 # Nos scripts de conferência, elemento de lista se acessa com [[ ]] e nome
 # completo (instrucoes.md, §5).
@@ -906,6 +910,263 @@ cat(sprintf("  E4: %d sequências (pedaços balanceados, b em {2,3,4,6,7,12,32})
     sprintf("com o termo (x_+ + 1) eta trocado por eta: %.3f (%d violações)\n", maxrE4s, violE4s))
 chk(violE4 == 0, "E4: a cota do risco ideal da §3.2 vale com os pedaços balanceados e b = b_n")
 chk(violE4s == 0, "E4: e vale com o termo dos pedaços grossos reduzido a um eta por bloco")
+
+## ===========================================================================
+cat("\nPARTE F. (E2.5f) Os níveis grossos livres\n")
+## ===========================================================================
+
+# A pergunta de E2.5f (§12 do documento): o que muda no Teorema 1 em blocos
+# quando os níveis com 2^j < b_n de cada bloco saem da penalidade e vão para
+# o bloco não penalizado A, ao lado dos c_l, como os coeficientes de escala
+# da Proposição 5 de E1.8; e se a taxa da §4 fica. O que a §12 afirma com
+# número, conferido aqui:
+#   F1. os pedaços que sobram (os finos dos pedaços balanceados) têm entre b
+#       e 2b - 1 colunas, logo rho^2 <= (2b - 1)/b < 2; cada bloco solta
+#       2^(j*+1) - 1 colunas, entre b - 1 e 2b - 3, e p_0 = p + pq(2^(j*+1) - 1);
+#   F2. a perfilagem com o A maior: gamma_til(livre) >= gamma_til(balanceada)
+#       >= lambda_min(Sigma_hat), e E||P_A eps||_n^2 = sigma^2 p_0 / n;
+#   F3. o Teorema 1 em blocos com A = (níveis, níveis grossos): as três cotas
+#       de (ii) com W sobre os pedaços finos ativos e o lambda_w calibrado só
+#       neles, a (iii) com o P_A eps do A maior, e a cota dos coeficientes
+#       grossos, ||c_hat - c*||_2 <= (||B v||_n + ||b||_n + ||P_A eps||_n) /
+#       sqrt(lambda_min(A'A/n)); e o custo no nulo, ||f_hat - f||_n^2 perto
+#       de sigma^2 p_0 / n, contra sigma^2 p / n da forma balanceada;
+#   F4. a aritmética da taxa: sigma^2 p_0 / n = O(log n / n), de ordem menor
+#       que a taxa da §4 em todo (s, pi) da grade.
+# Tempo desta parte nesta máquina: cerca de 1 min.
+set.seed(20261002)
+
+fine_sizes <- function(Jl, b) {
+  sz <- bal_sizes(Jl, b)
+  levs <- 0:(Jl - 1L)
+  if (any(2^levs < b)) sz <- sz[-1L]
+  sz
+}
+n_free <- function(Jl, b) {
+  levs <- 0:(Jl - 1L)
+  as.integer(sum(2^levs[2^levs < b]))
+}
+
+## ---- F1: os tamanhos, determinístico -------------------------------------
+
+F1 <- vapply(2:200, function(b) {
+  js <- max(which(2^(0:12) < b)) - 1L
+  nf <- 2L^(js + 1L) - 1L
+  ok_sizes <- vapply(2:12, function(Jl) {
+    fs1 <- fine_sizes(Jl, b)
+    nfr <- n_free(Jl, b)
+    if (length(fs1) == 0L) return(nfr == 2L^Jl - 1L)  # bloco sem nível fino: todo livre
+    all(fs1 >= b & fs1 <= 2L * b - 1L) &&
+      max(fs1) / min(fs1) <= (2 * b - 1) / b + 1e-12 && nfr == nf
+  }, logical(1))
+  c(all(ok_sizes), nf >= b - 1L && nf <= 2L * b - 3L)
+}, logical(2))
+chk(all(F1[1L, ]),
+    "F1: b = 2..200, J = 2..12: pedaços finos entre b e 2b - 1, rho^2 <= (2b - 1)/b < 2, e 2^(j*+1) - 1 colunas livres por bloco")
+chk(all(F1[2L, ]),
+    "F1: as colunas livres por bloco, 2^(j*+1) - 1, ficam entre b - 1 e 2b - 3")
+for (bb in c(6L, 7L)) {
+  cat(sprintf("  F1: b = %d: livres por bloco %d; finos em J = 5..8: {%s}; rho^2 %.3f; p_0 = %d (p = 3, q = 2), %d (p = q = 4)\n",
+              bb, n_free(8L, bb), paste(sort(unique(fine_sizes(8L, bb))), collapse = ","),
+              max(fine_sizes(8L, bb)) / min(fine_sizes(8L, bb)),
+              3L + 6L * n_free(8L, bb), 4L + 16L * n_free(8L, bb)))
+}
+chk(n_free(8L, 6L) == 7L && n_free(8L, 7L) == 7L &&
+      abs(max(fine_sizes(8L, 6L)) / min(fine_sizes(8L, 6L)) - 10 / 6) < 1e-12 &&
+      abs(max(fine_sizes(8L, 7L)) / min(fine_sizes(8L, 7L)) - 11 / 7) < 1e-12,
+    "F1: nos b_n do piloto (6 e 7), 7 colunas livres por bloco e rho^2 de 1,67 e 1,57, os da forma balanceada")
+
+## ---- desenho com os níveis grossos em A ------------------------------------
+
+# Colunas de Z na ordem de D12: os p níveis, depois os blocos de 2^J - 1
+# colunas; as nf primeiras de cada bloco são os níveis grossos.
+cols_free <- function(Jl, b) {
+  NJ <- 2L^Jl - 1L
+  nf <- n_free(Jl, b)
+  c(seq_len(p), unlist(lapply(seq_len(p * q), function(bb) p + (bb - 1L) * NJ + seq_len(nf))))
+}
+resid_A <- function(Z, colsA) {
+  A <- Z[, colsA, drop = FALSE]
+  Bm <- Z[, -colsA, drop = FALSE]
+  qa <- qr(A)
+  list(A = A, B = Bm, Bt = Bm - qr.fitted(qa, Bm), proj = function(v) qr.fitted(qa, v))
+}
+grp_fine <- function(Jl, b) {
+  sz <- fine_sizes(Jl, b)
+  one <- rep(seq_along(sz), sz)
+  as.integer(unlist(lapply(seq_len(p * q), function(bb) one + (bb - 1L) * length(sz))))
+}
+
+## ---- F2: a perfilagem e o termo de A -----------------------------------------
+
+cenF <- list(list(n = 250L, J = 5L), list(n = 500L, J = 6L), list(n = 1000L, J = 6L))
+RF <- 2000L
+tabF2 <- t(vapply(cenF, function(cc) {
+  n <- cc[["n"]]
+  Jl <- cc[["J"]]
+  b <- as.integer(ceiling(log(n)))
+  cA <- cols_free(Jl, b)
+  sch <- t(vapply(seq_len(20L), function(r) {
+    U <- matrix(runif(n * q), n, q)
+    X <- draw_X(U)
+    Z <- design(X, U, Jl)
+    rf <- resid_A(Z, cA)
+    rb <- resid_pen(Z)
+    c(gf = min(eigen(crossprod(rf[["Bt"]]) / n, symmetric = TRUE, only.values = TRUE)[["values"]]),
+      gb = min(eigen(crossprod(rb[["Bt"]]) / n, symmetric = TRUE, only.values = TRUE)[["values"]]),
+      ls = min(eigen(crossprod(Z) / n, symmetric = TRUE, only.values = TRUE)[["values"]]),
+      rk = qr(rf[["A"]])[["rank"]])
+  }, numeric(4)))
+  U <- matrix(runif(n * q), n, q)
+  X <- draw_X(U)
+  Z <- design(X, U, Jl)
+  QA <- qr.Q(qr(Z[, cA, drop = FALSE]))
+  E <- matrix(rnorm(n * RF, sd = sig), n, RF)
+  pa <- colSums(crossprod(QA, E)^2) / n
+  p0 <- length(cA)
+  c(n = n, J = Jl, b = b, p0 = p0, rank_ok = all(sch[, "rk"] == p0),
+    schur_ok = sum(sch[, "gf"] < sch[, "gb"] - 1e-10 | sch[, "gb"] < sch[, "ls"] - 1e-10),
+    gf = median(sch[, "gf"]), gb = median(sch[, "gb"]), ls = median(sch[, "ls"]),
+    PA = mean(pa), prev = sig^2 * p0 / n, razao = mean(pa) / (sig^2 * p0 / n),
+    se = sd(pa) / sqrt(RF) / (sig^2 * p0 / n), prev_p = sig^2 * p / n)
+}, numeric(14)))
+print(signif(tabF2, 4))
+chk(all(tabF2[, "rank_ok"] == 1),
+    "F2: A = (níveis, níveis grossos) tem posto p_0 = p + pq(2^(j*+1) - 1) em todas as réplicas")
+chk(all(tabF2[, "schur_ok"] == 0),
+    "F2: gamma_til(livre) >= gamma_til(balanceada) >= lambda_min(Sigma_hat) em todas as réplicas")
+chk(all(abs(tabF2[, "razao"] - 1) < 4 * tabF2[, "se"]),
+    "F2: E||P_A eps||_n^2 = sigma^2 p_0 / n (a menos de 4 erros-padrão em 2 000 sorteios)")
+
+## ---- F3: o Teorema 1 em blocos com os níveis grossos em A ------------------
+
+JF <- 5L
+bF <- 6L
+cAF <- cols_free(JF, bF)
+grpF <- grp_fine(JF, bF)                       # por bloco: 8 (nível 3), 6 e 10 (nível 4)
+MF <- max(grpF)
+wF <- sqrt(as.numeric(table(grpF)))
+NJF <- 2L^JF - 1L
+nfF <- n_free(JF, bF)
+fineF <- setdiff(seq_len(p + p * q * NJF), cAF) - p   # posições das finas no theta inteiro
+# verdades no theta inteiro (pq NJ coeficientes): a cheio de E3, a mesma com
+# os níveis grossos de (1,1) e (2,1) ligados, o seno de E3 e o nulo
+thF_grosso <- thE_cheio
+thF_grosso[posE3(1L, 1:7)] <- c(1.5, -1, 1, -0.8, 0.8, -0.6, 0.6)
+thF_grosso[posE3(3L, 1:7)] <- c(-1.2, 0.9, -0.7, 0.7, -0.5, 0.5, -0.4)
+truthsF <- list(cheio = list(th = thE_cheio, extra = NULL),
+                grosso = list(th = thF_grosso, extra = NULL),
+                seno = list(th = thE_sin, extra = gE_res),
+                nulo = list(th = numeric(dE), extra = NULL))
+grpB_bal <- kp_groups_bal(JF, bF)
+wB_bal <- sqrt(as.numeric(table(grpB_bal)))
+one_F <- function(n, tr) {
+  th <- tr[["th"]]
+  U <- matrix(runif(n * q), n, q)
+  X <- draw_X(U)
+  Z <- design(X, U, JF)
+  fJ <- as.numeric(Z %*% c(c_true, th))
+  f <- if (is.null(tr[["extra"]])) fJ else fJ + X[, 1] * tr[["extra"]](U[, 1])
+  y <- f + rnorm(n, sd = sig)
+  bn <- mean((f - fJ)^2)
+  ## a forma livre: A com os níveis grossos, pedaços finos, sqrt(|G|)
+  rf <- resid_A(Z, cAF)
+  thf <- th[fineF]
+  smax <- sqrt(max(colSums(rf[["B"]]^2) / n))
+  gs <- group_stats(rf[["Bt"]], grpF)
+  l0c <- lam0_g(n, MF, wF^2, smax, max(gs[["op"]]))
+  lamW <- 2 * max(l0c / wF)
+  pe <- prep_fit(rf, y, grpF, "euclid")
+  thh <- gl_fit(pe[["G"]], pe[["h"]], grpF, wF, lamW)
+  kk <- kkt_gl(pe[["G"]], pe[["h"]], grpF, wF, lamW, thh)
+  v <- thh - thf
+  ch <- qr.coef(qr(rf[["A"]]), y - rf[["B"]] %*% thh)
+  cstar <- c(c_true, th)[cAF]
+  fh <- as.numeric(rf[["A"]] %*% ch + rf[["B"]] %*% thh)
+  eps <- y - f
+  PAe <- sqrt(mean(rf[["proj"]](eps)^2))
+  gt <- min(eigen(crossprod(rf[["Bt"]]) / n, symmetric = TRUE, only.values = TRUE)[["values"]])
+  lA <- min(eigen(crossprod(rf[["A"]]) / n, symmetric = TRUE, only.values = TRUE)[["values"]])
+  WS <- Wset(thf, grpF, wF)
+  nv <- sqrt(as.numeric(rowsum(v^2, grpF)))
+  Btv <- sqrt(mean((rf[["Bt"]] %*% v)^2))
+  ## a forma balanceada (E2.5e), mesmos dados, para o custo no nulo
+  rb <- resid_pen(Z)
+  smb <- sqrt(max(colSums(rb[["B"]]^2) / n))
+  gsb <- group_stats(rb[["Bt"]], grpB_bal)
+  l0b <- lam0_g(n, max(grpB_bal), wB_bal^2, smb, max(gsb[["op"]]))
+  lamB <- 2 * max(l0b / wB_bal)
+  pb <- prep_fit(rb, y, grpB_bal, "euclid")
+  thb <- gl_fit(pb[["G"]], pb[["h"]], grpB_bal, wB_bal, lamB)
+  fb <- as.numeric(Z %*% coef_full(rb, y, thb))
+  c(Btv2 = Btv^2, bound = 64 * lamW^2 * WS / gt + 16 * bn,
+    l2 = sum(v^2), l2b = 64 * lamW^2 * WS / gt^2 + 16 * bn / gt,
+    penv = sum(wF * nv), penb = 40 * lamW * WS / gt + 10 * bn / lamW,
+    pred = sqrt(mean((fh - f)^2)), predb = Btv + 2 * sqrt(bn) + PAe,
+    cerr = sqrt(sum((ch - cstar)^2)),
+    cbound = (sqrt(mean((rf[["B"]] %*% v)^2)) + sqrt(bn) + PAe) / sqrt(lA),
+    kkt = max(kk), err_f = mean((fh - f)^2), err_b = mean((fb - f)^2),
+    p0n = sig^2 * length(cAF) / n, pn = sig^2 * p / n)
+}
+nsF <- c(250L, 375L, 500L)
+tabF3 <- do.call(rbind, lapply(names(truthsF), function(nm) {
+  t(vapply(nsF, function(n) {
+    rr <- t(vapply(seq_len(40L), function(r) one_F(n, truthsF[[nm]]), numeric(15)))
+    c(n = n, viola = sum(rr[, "Btv2"] > rr[, "bound"]), folga = min(rr[, "bound"] / rr[, "Btv2"]),
+      viola_l2 = sum(rr[, "l2"] > rr[, "l2b"]), viola_pen = sum(rr[, "penv"] > rr[, "penb"]),
+      viola_pred = sum(rr[, "pred"] > rr[, "predb"] + 1e-12),
+      viola_c = sum(rr[, "cerr"] > rr[, "cbound"] + 1e-12), kkt = max(rr[, "kkt"]),
+      err_livre = mean(rr[, "err_f"]), err_bal = mean(rr[, "err_b"]),
+      livre_sobre_p0n = unname(mean(rr[, "err_f"]) / rr[1L, "p0n"]),
+      bal_sobre_pn = unname(mean(rr[, "err_b"]) / rr[1L, "pn"]))
+  }, numeric(12)))
+}))
+rownames(tabF3) <- paste(rep(names(truthsF), each = length(nsF)), paste0("n=", nsF))
+cat(sprintf("  F3: J = %d, b = %d, %d colunas livres por bloco, p_0 = %d, pedaços finos por bloco {%s}, M = %d, rho^2 = %.3f\n",
+            JF, bF, nfF, length(cAF), paste(fine_sizes(JF, bF), collapse = ","), MF,
+            max(wF^2) / min(wF^2)))
+print(signif(tabF3, 4))
+chk(max(tabF3[, "kkt"]) < 1e-7, "F3: o FISTA resolve o objetivo nos pedaços finos (KKT a 1e-7 de lambda)")
+chk(all(tabF3[, c("viola", "viola_l2", "viola_pen")] == 0),
+    "F3: as três cotas do Teorema 1(ii) em blocos valem com os níveis grossos em A, W e lambda_w só nos pedaços finos")
+chk(all(tabF3[, "viola_pred"] == 0),
+    "F3: ||f_hat - f||_n <= ||B~v||_n + 2||b||_n + ||P_A eps||_n com o A maior (Teorema 1(iii))")
+chk(all(tabF3[, "viola_c"] == 0),
+    "F3: ||c_hat - c*||_2 <= (||B v||_n + ||b||_n + ||P_A eps||_n)/sqrt(lambda_min(A'A/n)), os coeficientes grossos incluídos")
+nul <- tabF3[grepl("^nulo", rownames(tabF3)), , drop = FALSE]
+chk(all(abs(nul[, "livre_sobre_p0n"] - 1) < 0.25) && all(nul[, "err_bal"] < nul[, "err_livre"] / 3),
+    "F3: no nulo o erro da forma livre fica a 25% de sigma^2 p_0 / n, e o da balanceada abaixo de um terço dele")
+
+## ---- F4: a aritmética da taxa ------------------------------------------------
+
+# r(n) = (p_0 / n) / (n^(-2s/(2s+1)) (log n)^((2/pi - 1)_+/(2s+1))), p_0 do
+# piloto (p = 3, q = 2, b_n = ceil(log n)): é O(log n n^(-1/(2s+1))), de ordem
+# menor, mas devagar quando s é grande. Sem as constantes da taxa (C_g, pq,
+# Lambda), r mede só a ordem, não qual termo domina num n dado.
+p0_of <- function(n) {
+  b <- ceiling(log(n))
+  3 + 6 * (2^(floor(log2(b - 1)) + 1) - 1)    # 2^(j*+1) - 1, com 2^j* < b <= 2^(j*+1)
+}
+r_of <- function(n, s, pii) {
+  (p0_of(n) / n) / (n^(-2 * s / (2 * s + 1)) * log(n)^(max(2 / pii - 1, 0) / (2 * s + 1)))
+}
+F4 <- vapply(seq_len(nrow(grid_sp)), function(i) {
+  s <- grid_sp[i, "s"]
+  pii <- grid_sp[i, "pi"]
+  r_of(1e40, s, pii) < r_of(1e3, s, pii) / 10
+}, logical(1))
+tabF4 <- t(vapply(c(0.8, 1.5, 3), function(s) {
+  c(s = s, n250 = r_of(250, s, 1), n1000 = r_of(1000, s, 1), n1e6 = r_of(1e6, s, 1),
+    n1e12 = r_of(1e12, s, 1), n1e40 = r_of(1e40, s, 1))
+}, numeric(6)))
+cat("  F4: r(n) com pi = 1 (p_0 = 45 nos n do piloto):\n")
+print(signif(tabF4, 3))
+chk(all(F4),
+    "F4: sigma^2 p_0 / n sobre a taxa da §4 cai por mais de 10 vezes de n = 1e3 a 1e40 nos 12 pares (s, pi)")
+chk(all(vapply(2:200, function(b) {
+  2^(floor(log2(b - 1)) + 1) - 1 == n_free(12L, b)
+}, logical(1))),
+    "F4: a forma fechada 2^(floor(log2(b - 1)) + 1) - 1 dá as colunas livres por bloco (b = 2..200)")
 
 cat("\n")
 if (ok) cat("OK\n") else stop("E1.11: conferência numérica FALHOU (ver linhas acima)")

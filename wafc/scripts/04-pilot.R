@@ -73,6 +73,8 @@
 ## processor-hours (1 h 14 min on 8 cores, alone on the machine), with a
 ## peak of 0.94 GB per process. Step E2.5e ran 'klopp.balanced' alone, the
 ## same 750 jobs, in 4.8 processor-hours (36 min on 8 cores), with a peak of
+## 0.67 GB per process. Step E2.5f ran 'klopp.freecoarse' alone, the same
+## 750 jobs, in 6.0 processor-hours (46 min on 8 cores), with a peak of
 ## 0.67 GB per process.
 ##
 ## The two parts that answer a question about the code rather than about
@@ -200,13 +202,21 @@ if (length(args) >= 5L && nzchar(args[5L])) {
 ## and the short piece at the end of each finer level absorbed into the
 ## chunk before it, so that every chunk of a finer level has between b_n
 ## and 2 b_n - 1 columns and the sqrt(|G|) of grpreg stay within a bounded
-## ratio of one another. The order is the order of the
+## ratio of one another. 'klopp.freecoarse' is the fifth (step E2.5f, open
+## question 37): the balanced chunks on the finer levels, and the coarse
+## levels of each block, the ones the balanced form penalizes together,
+## left unpenalized with the level terms. No block of it is ever zero, so
+## its n_true and n_false count the blocks whose penalized part is nonzero
+## (extra$blocks.fine), and its nzero is the number of nonzero penalized
+## coefficients, as for the WAFC; at J <= 3 nothing is penalized, the fit is
+## least squares and its lambda is NA. The order is the order of the
 ## tables; a method added later goes after the one it varies, which changes
 ## no seed, since the random stream of every method is the one it would
 ## start from alone (run_competitors()).
 methods <- c("wafc.lasso", "wafc.sglasso", "gam", "gam.matched", "bsgl",
              "klopp", "klopp.free", "klopp.unit", "klopp.merged",
-             "klopp.balanced", "aspline", "vcbart", "linear", "oracle")
+             "klopp.balanced", "klopp.freecoarse", "aspline", "vcbart",
+             "linear", "oracle")
 run_methods <- methods
 if (nzchar(Sys.getenv("WAFC_METHODS", ""))) {
   run_methods <- strsplit(Sys.getenv("WAFC_METHODS"), ",", fixed = TRUE)[[1L]]
@@ -391,11 +401,11 @@ run_competitors <- function(cell, n, r) {
   ## the spline fit alone: the search that chose J is paid, and reported, in
   ## the column of the WAFC. Without a J to match, it fails as a row.
   ## 'klopp.free' is 'klopp' with penalize.levels = FALSE, and the two
-  ## variants of step E2.5c and the one of step E2.5e keep the levels free
-  ## as well.
+  ## variants of step E2.5c, the one of step E2.5e and the one of step
+  ## E2.5f keep the levels free as well.
   for (lab in setdiff(run_methods, c("wafc.lasso", "wafc.sglasso"))) {
     from_start()
-    mth <- sub("\\.(matched|free|unit|merged|balanced)$", "", lab)
+    mth <- sub("\\.(matched|free|unit|merged|balanced|freecoarse)$", "", lab)
     own <- switch(lab,
                   klopp.free = list(penalize.levels = FALSE),
                   klopp.unit = list(penalize.levels = FALSE,
@@ -404,6 +414,9 @@ run_competitors <- function(cell, n, r) {
                                       merge.coarse = TRUE),
                   klopp.balanced = list(penalize.levels = FALSE,
                                         balanced = TRUE),
+                  klopp.freecoarse = list(penalize.levels = FALSE,
+                                          balanced = TRUE,
+                                          free.coarse = TRUE),
                   list())
     if (lab == "gam.matched") {
       if (is.null(J_lasso)) {
@@ -425,13 +438,15 @@ run_competitors <- function(cell, n, r) {
       next
     }
     gh <- wafc_grid_components(f, grid)
+    fc <- lab == "klopp.freecoarse"
     rows[[length(rows) + 1L]] <- one_row(
       cell, n, r, lab, dgp, test, grid,
       list(f_test = predict(f, test[["x"]], test[["u"]]),
            beta_test = f[["beta"]](test[["u"]]), time = f[["time"]]),
-      active, f[["blocks"]], gh,
+      active, if (fc) f[["extra"]][["blocks.fine"]] else f[["blocks"]], gh,
       list(J = if (lab == "gam.matched") J_lasso else f[["extra"]][["J"]],
-           lambda = f[["extra"]][["lambda"]]))
+           lambda = f[["extra"]][["lambda"]],
+           nzero = if (fc) f[["extra"]][["nzero"]] else NULL))
   }
   do.call(rbind, rows)
 }

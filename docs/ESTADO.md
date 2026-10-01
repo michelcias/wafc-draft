@@ -1635,6 +1635,50 @@ Razão `klopp.balanced` / referência, `rmse_f` / ISE, `n = 250`, `500`,
   `until ! pgrep -f "<script>"` casa com a própria linha de comando e
   nunca termina, então vigiar por PID ou arquivo de fim.
 
+### 2026-10-01: E2.5f fechada, os níveis grossos livres não pagam
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: **807 testes
+passam** (eram 730); `08a-blocos.R` imprime `OK`; `e25f-joined.rds` tem
+11 250 linhas, e as razões contra o `klopp.balanced` reproduzem. Junção
+exata pela quarta vez. 750 ajustes, 0 falhas, 46 min em 8 processos.
+
+**A conjectura de E2.5e não se confirma.** O `klopp.freecoarse` (níveis
+com `2^j < b_n` sem penalidade, pedaços finos balanceados) é a pior das
+cinco formas em quase toda célula e perde do `klopp.balanced` em todas:
+em `rmse_f`, 1,06 a 1,22 no `smooth`, 1,05 a 1,10 no `uneven`, 1,01 a 1,09
+no não homogêneo, 1,11 a 1,45 na `mixed` e 2,0 a 2,4 no nulo.
+
+- **O mecanismo:** soltar os níveis grossos melhora os blocos ativos no
+  `smooth` (ISE ativo 26% menor em `n = 1000`), mas os mesmos níveis ficam
+  livres nos blocos inativos, que nunca zeram; o ISE deles sobe 3 a 6
+  vezes. No nulo a validação cruzada escolhe `J = 2` em 98% das réplicas
+  (mínimos quadrados em 21 colunas) e o erro é exatamente `σ²p_0/n`.
+- **A teoria cobre a forma e a taxa fica** (§12 do `08a`, Parte F): o
+  Teorema 1 em blocos vale com os níveis grossos no bloco não penalizado,
+  `p_0 = p + pq(2^{j*+1} − 1)`, como na Proposição 5 de E1.8; o `ρ²` dos
+  pedaços restantes fica abaixo de 2. A cota favorece soltar porque compara
+  o custo por bloco ativo; a medição mostra que o `σ²p_0/n` dos blocos
+  inativos decide.
+- **O fator do suave da forma nova é o pior:** 1,88 a 2,61. Nenhuma das
+  cinco formas passa 1,5 no `smooth` com `n ≥ 500`.
+- **Lições:** um método que deixa colunas livres em todo bloco se lê com o
+  ISE separado em blocos ativos e inativos, não só em `rmse_f`; o `grpreg`
+  não aceita problema sem grupo penalizado (a tarefa ajusta por mínimos
+  quadrados quando nada sobra).
+
+**Medido no chat principal, sobre os mesmos `.rds`: onde está a perda no
+suave.** Separando o ISE do `klopp.balanced` por bloco no `smooth`, os
+blocos inativos respondem por ~13% do ISE dele (medianas de 0,0124,
+0,0069 e 0,0045), contra ~2% no `gam.matched`, que com `select = TRUE`
+leva os inativos a quase zero (0,0030, 0,0005 e 0,0004). **Se os blocos
+inativos fossem zerados, o fator do suave do `klopp.balanced` cairia de
+1,64 a 1,73 para 1,41, 1,45 e 1,32** (`ISE ativo / ISE do gam.matched`,
+mediana dentro da réplica), e no `uneven` de 1,25 a 1,36 para 1,10 a 1,21:
+abaixo de 1,5 nos dois. Isso é o limite de um limiar perfeito, não uma
+medição de limiar; mas aponta para o Corolário 8, que já está no artigo
+(D32), como o passo que falta à comparação: estimação seguida de limiar,
+que é também a calibração de `t_n` da pergunta 11.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -2111,7 +2155,10 @@ Ordenadas pelo que bloqueia mais.
      `wafc/cache/e25d/e25d-fits.rds`, que cobre as mesmas réplicas (fora
      as 35 da `mixed` além da 15ª).
 
-37. **Uma quinta forma do block LASSO** (**catalogada como E2.5f** em
+37. **~~Uma quinta forma do block LASSO~~ medida por E2.5f (2026-10-01,
+   §2): não paga**, e sai da lista de candidatas; a forma balanceada
+   continua sendo a que a teoria cobre e a que melhor prediz fora do
+   `smooth`. Texto original: (**catalogada como E2.5f** em
    2026-10-01; conjectura de E2.5e, não medida
    nem escrita): deixar livres os níveis com `2^j < b_n` de cada bloco, que
    a forma balanceada penaliza juntos. Na teoria eles iriam para o bloco
@@ -2163,6 +2210,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | E2.5f fechada e integrada: os níveis grossos livres melhoram os blocos ativos e pioram os inativos, e perdem em toda célula; medido aqui que, com os blocos inativos zerados, o fator do suave do `klopp.balanced` cairia abaixo de 1,5, o que aponta para o limiar do Corolário 8 |
 | 2026-10-01 | E2.5e fechada e integrada: a forma balanceada do block LASSO é coberta pela teoria com os pesos do `grpreg` (`ρ² ≤ 1,67`) e é a melhor das quatro fora do `smooth`; nenhuma forma passa o fator 1,5 no suave; pergunta 37 |
 | 2026-09-30 | E2.5c fechada e integrada: os pesos 1 da teoria predizem pior que o padrão do `grpreg` (2% a 8%), a junção dos níveis grossos vence no não homogêneo e na `mixed`; a escolha entre formas é de segunda ordem; catálogo vazio, e a pergunta 33 tem todas as medições que pediu |
 | 2026-09-30 | E2.5d fechada e integrada: o `gam` autônomo (REML, `k = 64` e `128`) empata com o `gam.matched`, o veredito de E2.5a se mantém e o fator do suave piora (1,58 a 1,92 para o LASSO); o `klopp.free` é o único que o vence em alguma célula; duas divergências do `bam` em E2.5a; pergunta 36 |

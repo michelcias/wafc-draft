@@ -25,7 +25,8 @@
 ##              are options, measured in step E2.5c; the balanced chunks,
 ##              in which every chunk of a finer level has between the
 ##              chunk size and twice it, are a third, measured in step
-##              E2.5e.
+##              E2.5e; the coarse levels left unpenalized beside those
+##              balanced chunks are a fourth, measured in step E2.5f.
 ##   "aspline"  a spline with knots chosen adaptively per block, in the
 ##              spirit of Wang, Jiang and Liu (2024). Their knot search is
 ##              an exact dynamic program; the one here is greedy forward
@@ -605,6 +606,25 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
 #' theory of step E1.11 accepts weights of bounded ratio is answered in
 #' \code{derivations/08a-sondagem-blocos.md}, section 11.
 #'
+#' \code{free.coarse} is the fifth reading (step E2.5f, open question 37):
+#' the coarse levels of each block, the ones with \eqn{2^j} below the chunk
+#' size, are left unpenalized, in group 0 of grpreg beside the level terms
+#' when those are free, instead of being one penalized chunk. With
+#' \code{balanced = TRUE} the finer levels keep the balanced chunks. In the
+#' theory those \eqn{2^{j^* + 1} - 1} columns per block join the
+#' unpenalized part, as the scaling coefficients of step E1.8 do; see
+#' \code{derivations/08a-sondagem-blocos.md}, section 12. The price is that
+#' no block is ever zero: a block with a coarse level always has a nonzero
+#' coefficient, so \code{blocks} marks every block, and the selection is
+#' read from \code{extra$blocks.fine}, the blocks whose penalized part is
+#' nonzero, and \code{extra$nzero}, the number of nonzero penalized
+#' coefficients. A resolution at which no block has a level with
+#' \eqn{2^j} at least the chunk size (with the chunk sizes 6 and 7 of the
+#' pilot, \eqn{J \le 3}) has nothing to penalize; grpreg does not fit
+#' that, and the candidate is fitted by least squares instead, scored by the
+#' same cross-validated squared error grpreg reports, with \code{lambda}
+#' recorded as \code{NA}.
+#'
 #' @param x,u,y The data.
 #' @param J Resolution level, or a vector of candidates scored by the same
 #'   cross-validated loss. \code{NULL} uses the grid of
@@ -628,6 +648,9 @@ wafc_fit_bsgl <- function(x, u, y, df = 2L^(2:8), nfolds = 10L,
 #' @param balanced Whether the chunks are balanced as described above. It
 #'   merges the coarse levels whatever \code{merge.coarse} says, and the
 #'   object records \code{merge.coarse = TRUE} then.
+#' @param free.coarse Whether the coarse levels are left unpenalized, as
+#'   described above. It overrides the merge of the coarse levels, which
+#'   then are not a chunk, and leaves the finer levels to \code{balanced}.
 #' @param nfolds,foldid Folds of the cross-validation.
 #' @param ... Passed to \code{\link{wafc_design}}.
 #'
@@ -646,6 +669,7 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
                            penalize.levels = TRUE,
                            chunk.weights = c("sqrt", "unit"),
                            merge.coarse = FALSE, balanced = FALSE,
+                           free.coarse = FALSE,
                            nfolds = 10L, foldid = NULL, ...) {
   if (!requireNamespace("grpreg", quietly = TRUE)) {
     stop("method = \"klopp\" needs the package 'grpreg'.", call. = FALSE)
@@ -666,8 +690,18 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
   for (Ji in J) {
     des <- wafc_design(x, u, J = Ji, ...)
     grp <- wafc_kp_groups(des, block.size, penalize.levels, merge.coarse,
-                          balanced)
+                          balanced, free.coarse)
     Z <- as.matrix(des[["Z"]])
+    ## Nothing penalized (free.coarse at a coarse J): least squares, scored
+    ## as cv.grpreg scores, in the slot the cv.grpreg object would take.
+    if (max(grp) == 0L) {
+      cv <- wafc_kp_cv_ols(Z, y, foldid)
+      if (is.null(best) || cv[["cve"]] < best[["cve"]]) {
+        best <- list(cve = cv[["cve"]], J = Ji, design = des, cv = cv,
+                     group = grp)
+      }
+      next
+    }
     ## grpreg reads a missing group.multiplier as its default, and there is
     ## no value that means "missing", hence the two calls. The groups are
     ## numbered 1, ..., max(grp) with no gap, which is the order grpreg
@@ -685,7 +719,8 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
     }
   }
   des <- best[["design"]]
-  b <- as.numeric(stats::coef(best[["cv"]]))
+  ols <- max(best[["group"]]) == 0L
+  b <- if (ols) best[["cv"]][["coef"]] else as.numeric(stats::coef(best[["cv"]]))
   a0 <- b[1L]
   b <- b[-1L]
   cc <- b[des[["unpenalized"]]]
@@ -696,9 +731,13 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
     a0 <- 0
   }
   nz <- matrix(FALSE, p, q, dimnames = list(xn, un))
+  nz_fine <- nz
+  pen <- best[["group"]] > 0L
   for (l in seq_len(p)) {
     for (m in seq_len(q)) {
-      nz[l, m] <- any(b[des[["blocks"]][[wafc_block_name(des, l, m)]]] != 0)
+      idx <- des[["blocks"]][[wafc_block_name(des, l, m)]]
+      nz[l, m] <- any(b[idx] != 0)
+      nz_fine[l, m] <- any(b[idx[pen[idx]]] != 0)
     }
   }
   g_of <- function(newu) {
@@ -735,7 +774,32 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
                     penalize.levels = penalize.levels,
                     chunk.weights = chunk.weights,
                     merge.coarse = merge.coarse, balanced = balanced,
-                    lambda = best[["cv"]][["lambda.min"]], cve = best[["cve"]]))
+                    free.coarse = free.coarse,
+                    lambda = best[["cv"]][["lambda.min"]], cve = best[["cve"]],
+                    blocks.fine = nz_fine,
+                    nzero = sum(b[pen & seq_along(b) %in% unlist(des[["blocks"]])] != 0)))
+}
+
+## Least squares with an intercept, the fit of the block LASSO when no
+## column is penalized, scored as cv.grpreg scores a gaussian fit: the
+## squared error of each observation predicted from the folds without it,
+## averaged over the n observations. Columns aliased with the intercept
+## (the constant covariate) get coefficient zero, which leaves the fitted
+## values as they are. 'coef' is (intercept, coefficients of Z), the order
+## of coef() on a cv.grpreg object, and lambda.min is NA.
+wafc_kp_cv_ols <- function(Z, y, foldid) {
+  ls_coef <- function(Zs, ys) {
+    b <- stats::lm.fit(cbind(1, Zs), ys)[["coefficients"]]
+    b[is.na(b)] <- 0
+    unname(b)
+  }
+  err <- numeric(length(y))
+  for (k in unique(foldid)) {
+    out <- foldid == k
+    b <- ls_coef(Z[!out, , drop = FALSE], y[!out])
+    err[out] <- (y[out] - b[1L] - Z[out, , drop = FALSE] %*% b[-1L])^2
+  }
+  list(cve = mean(err), coef = ls_coef(Z, y), lambda.min = NA_real_)
 }
 
 #' Spline with adaptive knots, one knot set per block
@@ -1218,8 +1282,14 @@ wafc_bs_design <- function(x, u, sp) {
 ## between 'block.size' and 2 'block.size' - 1 columns. A level with 2^j
 ## at least 'block.size' always has one full chunk to absorb into. The
 ## sizes of the coarse chunk are in the note on wafc_fit_klopp().
+##
+## With free.coarse = TRUE (step E2.5f) the coarse levels are not a chunk
+## but group 0, unpenalized, whatever merge.coarse says; the finer levels
+## are cut as 'balanced' says. A block with no level of 2^j at least
+## 'block.size' is then wholly in group 0.
 wafc_kp_groups <- function(design, block.size, penalize.levels,
-                           merge.coarse = FALSE, balanced = FALSE) {
+                           merge.coarse = FALSE, balanced = FALSE,
+                           free.coarse = FALSE) {
   nvars <- design[["nvars"]]
   grp <- integer(nvars)
   g <- 0L
@@ -1234,12 +1304,14 @@ wafc_kp_groups <- function(design, block.size, penalize.levels,
     pos <- 0L
     Jm <- j0 + as.integer(round(log2(length(idx) + 2^j0)))
     levs <- j0:(Jm - 1L)
-    if (merge.coarse || balanced) {
+    if (merge.coarse || balanced || free.coarse) {
       coarse <- levs[2^levs < block.size]
       if (length(coarse) > 0L) {
         pos <- as.integer(sum(2^coarse))
-        g <- g + 1L
-        grp[idx[seq_len(pos)]] <- g
+        if (!free.coarse) {
+          g <- g + 1L
+          grp[idx[seq_len(pos)]] <- g
+        }
         levs <- setdiff(levs, coarse)
       }
     }

@@ -906,3 +906,181 @@ continua valendo com o termo `(x_+ + 1)η` trocado por `η` (razão máxima
   estão conferidas na Parte E.
 - **Se a forma balanceada prediz como o `klopp.free`** é a medição de E2.5e,
   relatada no `docs/handoff-E2.5e.md`, não nesta seção.
+
+## 12. Adendo de E2.5f: os níveis grossos livres
+
+Seção acrescentada por E2.5f (2026-10-01), sem mudar as anteriores. A
+pergunta é o item (iv) de E2.5f no `docs/TAREFA.md` (pergunta 37 do
+`docs/ESTADO.md`): se os níveis com `2^j < b_n` de cada bloco, que a forma
+balanceada da §11 penaliza juntos num pedaço, saem da penalidade e vão para
+o bloco não penalizado `A`, ao lado dos `c_ℓ`, o que muda no Teorema 1 em
+blocos, e a taxa da §4 fica? No código é o `klopp.freecoarse`:
+`wafc_kp_groups(balanced = TRUE, free.coarse = TRUE)`, com esses níveis no
+grupo 0 do `grpreg`, os níveis finos nos pedaços balanceados e os pesos
+`sqrt(|G|)`. Conferência: Parte F de [`check/08a-blocos.R`](check/08a-blocos.R).
+
+Escrevo `j*` para o nível mais fino com `2^{j*} < b_n`, de modo que
+`2^{j*} < b_n ≤ 2^{j*+1}`; cada bloco solta os níveis `0` a `j*`, isto é,
+`2^{j*+1} − 1` colunas, e `𝒢_F` é a partição dos níveis `j*+1` a `J − 1` em
+pedaços balanceados.
+
+**Veredito: o Teorema 1 em blocos vale como está, com `A` trocado por
+`A_F = (c_ℓ, níveis grossos)`, de posto**
+
+```
+p_0 = p + pq (2^{j*+1} − 1) = p {1 + q (2^{j*+1} − 1)},      b_n − 1 ≤ 2^{j*+1} − 1 ≤ 2b_n − 3,
+```
+
+**e o termo dos níveis passa a `σ² p_0/n`; os pedaços que sobram têm
+`ρ² ≤ (2b_n − 1)/b_n < 2`; e a taxa da §4 fica, porque `σ² p_0/n` é
+`O(log n/n)`.** É o `p_0` da Proposição 5 de E1.8 com `j_0 = j* + 1`: na
+base periódica centrada os níveis `0` a `j*` geram o mesmo espaço que as
+funções de escala do nível `j* + 1` menos a constante, e a forma livre é a
+convenção clássica da limiarização de wavelets, que deixa intocados os
+coeficientes abaixo de um nível inicial `j_0` (a VisuShrink de Donoho &
+Johnstone, 1994, com `j_0` fixo **[VERIFICAR: não relido]**), aqui com
+`j_0 = j* + 1 ≍ log_2 b_n`. A diferença para E1.8 é que lá `p_0`
+não depende de `n` e aqui cresce como `b_n ≍ log n`. Nos `n` do piloto,
+`2^{j*+1} − 1 = 7` (`b_n = 6` e `7`, `j* = 2`), `p_0 = 45` nas células
+`q = 2` e `116` na `mixed` (`p = q = 4`).
+
+### 12.1 O que passa, passo a passo
+
+1. **A perfilagem (Lema 4 de E1.5).** A prova só usa que a penalidade não
+   toca `A`; com `A_F` no lugar de `A`, `θ̂_F` minimiza
+   `‖Ỹ − B̃_F θ‖_n² + 2λ‖θ‖_{𝒢_F,w}` com `B̃_F = M_{A_F} B_F`, e a
+   decomposição `f̂ − f_J = B̃_F v + P_{A_F}(𝐛 + ε)` vale. A constante
+   melhora em vez de piorar: `γ̃_F = λ_min(B̃_F'B̃_F/n)` é o complemento de
+   Schur do bloco grosso dentro do complemento de Schur da forma balanceada,
+   e a inversa de um complemento de Schur é submatriz principal da inversa,
+   logo `γ̃_F ≥ γ̃ ≥ λ_min(Σ̂)` (Parte F2, em todas as réplicas).
+2. **O posto.** `A_F` tem posto `p_0` sempre que `Σ̂` é definida positiva,
+   porque as colunas de `A_F` são colunas de `Z`; é a hipótese da Proposição
+   5 de E1.8, e E1.4 não muda, porque o desenho `Z` é o mesmo.
+3. **A calibração (§2.3)** roda só sobre `𝒢_F`: `|𝒢_F| = |𝒢| − pq`, e
+   `Ψ̃_G ⪯ Σ̂_GG` continua, porque `M_{A_F}` é projeção. A §11.1 vale com
+   `ρ` dos pedaços finos.
+4. **O termo dos níveis (Teorema 1(iii)).** `E[‖P_{A_F} ε‖_n² | X, U] =
+   σ² p_0/n`, exato em média como na Proposição 5(iii) (Parte F2: razão de
+   0,986 a 1,007 em 2 000 sorteios). A conta direta dá até um pouco mais que
+   o (iii) de E1.5: `f̂ − f = B̃_F v − M_{A_F} 𝐛 + P_{A_F} ε`, logo
+   `‖f̂ − f‖_n ≤ ‖B̃_F v‖_n + ‖𝐛‖_n + ‖P_{A_F} ε‖_n`.
+5. **Os coeficientes grossos** saem da perfilagem, e não da cota de `v`:
+   `A_F(ĉ − c*) = P_{A_F}(𝐛 + ε − B_F v)`, logo
+
+   ```
+   ‖ĉ − c*‖_2  ≤  (‖B_F v‖_n + ‖𝐛‖_n + ‖P_{A_F} ε‖_n) / sqrt(λ_min(A_F'A_F/n)),
+   ```
+
+   com `λ_min(A_F'A_F/n) ≥ λ_min(Σ̂)` (submatriz principal). O erro de uma
+   componente é `‖v_{ℓm}‖² + ‖ĉ_{ℓm} − c*_{ℓm}‖²`, e a parte nova é
+   `O_p(σ² p_0/(nγ))` mais os termos que o Teorema 1 já controla.
+
+### 12.2 O `ρ²` dos pedaços que sobram
+
+Sem o pedaço grosso, todo pedaço penalizado é fino e tem entre `b_n` e
+`2b_n − 1` colunas: `ρ² = max|G|/min|G| ≤ (2b_n − 1)/b_n < 2`, contra
+`(2b_n − 1)/(b_n − 1) ≤ 3` da forma balanceada (Parte F1, `b = 2` a `200`,
+`J = 2` a `12`). Nos `n` do piloto o valor não muda (1,67 em `b_n = 6` e
+1,57 em `b_n = 7`, a partir de `J = 5` e `J = 6`), porque o pedaço grosso de
+7 colunas nunca era o extremo; em `J = 4` resta um pedaço de 8 por bloco
+(`ρ = 1`), e em `J ≤ j* + 1 = 3` não resta nada para penalizar: o estimador
+é o de mínimos quadrados na peneira de nível `J`, que o código ajusta com
+`lm.fit` e o mesmo erro de validação cruzada do `grpreg`.
+
+### 12.3 A taxa
+
+**O risco ideal (§3.1 com a §11.1(ii)):** no evento `𝒯_{𝒢_F}`,
+
+```
+‖f̂ − f‖_n²  ≤  120 Λ ρ² R_{𝒢_F}(θ*_F; η_1) + 120 ‖𝐛‖_n² + 3 ‖P_{A_F} ε‖_n²,
+```
+
+com o risco ideal só sobre os pedaços finos. No lema da §3.2 os níveis
+grossos saem da soma: o termo `(x_+ + 1)η`, ou o `η` por bloco da §11.3,
+desaparece, e em troca entra `3σ² p_0/n` em média. A cabeça da §3.2 começa
+em `j* + 1` e a cauda não muda.
+
+**A ordem.** `σ² p_0/n ≤ σ²(p + pq(2b_n − 3))/n = O(log n/n)`, e a razão para
+a taxa da §4 é da ordem de `log n · n^{−1/(2s+1)}` (dividida pelo fator
+`(log n)^{(2/π−1)_+/(2s+1)}` quando `π < 2`), que vai a zero: **a taxa da §4
+fica**, na mesma janela de `J_n` e sem condição nova. A convergência é lenta
+quando `s` é grande. Sem as constantes da taxa, que a razão não vê, a razão
+das ordens com `π = 1` e `p_0` do piloto é 2,8, 7,4 e 16 em `n = 250` para
+`s = 0,8`, `1,5` e `3`, e 0,17, 1,5 e 8,9 em `n = 10^6` (Parte F4). O mesmo
+vale para a leitura densa da §4.2, cuja taxa `n^{−2s'/(2s'+1)}` domina
+`log n/n`. A §4.1 pedia o pedaço ao menos do tamanho de `log|𝒢|`; com
+`|𝒢_F| < |𝒢|` isso só fica mais fácil.
+
+**O Corolário 8 (§5)** continua com a estatística da norma do bloco
+`(ℓ, m)`, agora com os coeficientes grossos dentro, e a cota do item 5 da
+§12.1 acrescenta a `D_n²` um termo de ordem `σ² p_0/(nγ)`, menor que
+`ρ_n² = n^{−2s'/(2s'+1)}`. O que se perde é a seleção por zeros: um bloco
+com nível grosso nunca é zero, e a estrutura só se lê pela limiarização do
+Lema 13 (ou pela parte penalizada, que é o que o piloto registra).
+
+### 12.4 O que a troca custa e o que compra
+
+Na cota, soltar é sempre melhor: por bloco, o pedaço grosso penalizado
+custa até `120 Λ ρ² η_1 = 192 ρ² λ_1²/γ̃`, com
+`λ_1² ≍ σ²(b_n + log|𝒢|)/n` (§2.3), e o livre custa
+`3σ²(2^{j*+1} − 1)/n ≤ 3σ²(2b_n − 3)/n`: a mesma ordem, com a constante 3
+no lugar de `192 ρ²/γ̃` vezes a de `λ_1²`. Mas a cota é cota: o custo realizado do pedaço penalizado é o
+de `min(‖θ*_G‖², η)`, nulo quando os coeficientes grossos são nulos, e o do
+livre é `σ²(2^{j*+1} − 1)/n` sempre. **No nulo a forma livre paga
+`σ² p_0/n` que a balanceada não paga.**
+
+Números (Parte F3; `J = 5`, `b = 6`, 7 colunas livres por bloco e pedaços
+finos `{8, 6, 10}`, `p_0 = 30`, `ρ² = 1,67`; `λ` da teoria, `λ_w` sobre os
+pedaços finos para a livre e o da §11 para a balanceada; 40 réplicas por
+linha; média de `‖f̂ − f‖_n²`):
+
+| verdade | `n` | forma livre | forma balanceada | livre / `σ²p_0/n` |
+|---|---|---|---|---|
+| dois pedaços finos cheios, grossos nulos | 250, 375, 500 | 0,888, 0,498, 0,340 | 0,827, 0,466, 0,322 | 30, 25, 23 |
+| os mesmos, com os grossos de dois blocos ligados | 250, 375, 500 | 0,815, 0,489, 0,348 | 2,173, 1,639, 1,219 | 27, 24, 23 |
+| `g_{11} = sin(2πu)`, com viés | 250, 375, 500 | 0,0295, 0,0215, 0,0143 | 0,265, 0,160, 0,111 | 0,98, 1,07, 0,96 |
+| nulo | 250, 375, 500 | 0,0301, 0,0185, 0,0143 | 0,0027, 0,0011, 0,0010 | 1,00, 0,92, 0,96 |
+
+- **As três cotas do Teorema 1(ii) em blocos valem nos 480 ajustes**, com
+  `W` e `λ_w` só sobre os pedaços finos e folga mínima de 444 (no nulo e no
+  seno o `λ` da teoria zera todos os pedaços finos); a (iii) com o `A_F` e a
+  cota dos coeficientes grossos também; KKT a menos de `10^{−9}`.
+- **Onde há energia nos níveis grossos a forma livre ganha muito**: 2,7 a
+  3,5 vezes com os grossos ligados e 7,4 a 9,0 vezes no seno, cuja energia está
+  quase toda nos níveis 0 a 2. **No nulo perde por 11 a 16 vezes**, e o seu
+  erro é `σ² p_0/n` a menos de 8%, como a §12.1 prevê; o da balanceada é
+  `σ² p/n`. Com os grossos nulos e pedaços finos ativos as duas empatam,
+  porque o erro está no encolhimento dos pedaços finos.
+- **Leitura para o piloto, como previsão e não medição:** com `σ = 0,62` no
+  nulo e `p_0 = 45`, o termo `σ² p_0/n` vale 0,069 em `n = 250` e 0,017 em
+  `n = 1000`, contra um `rmse_f²` do `wafc.lasso` da ordem de 0,007 e 0,002
+  (E2.5a); no `smooth`, cuja energia está nos níveis grossos, é onde a forma
+  livre pode recuperar o que a balanceada perde. O `λ` da teoria
+  superencolhe (razão erro/`σ²p_0/n` de 23 a 30 com pedaços finos ativos), e
+  com `λ` por validação cruzada os números são outros: a medição é a de
+  E2.5f, no `docs/handoff-E2.5f.md`.
+- **Medido em E2.5f** (validação cruzada, 50 réplicas por célula): a
+  previsão do nulo se confirma (ISE 5 a 9 vezes o da forma balanceada; a
+  validação cruzada escolhe `J = 2`, mínimos quadrados em 21 colunas, em 98%
+  a 100% das réplicas), e o custo dos níveis livres nos blocos **inativos** domina
+  também onde há componente: no `smooth` o ISE dos blocos ativos cai até 26%
+  em `n = 1000`, mas o dos inativos sobe 3 a 6 vezes, e a forma livre é a
+  pior das cinco em quase toda célula. A troca da cota (§12.4) favorece
+  soltar porque conta só os blocos ativos; o termo `σ² p_0/n` é pago por
+  todos os `pq` blocos.
+
+### 12.5 O que isto não cobre
+
+- **O `λ` por validação cruzada**, como em toda a sondagem, e a escolha de
+  `J` entre um ajuste penalizado (`J ≥ 4`) e um de mínimos quadrados
+  (`J ≤ 3`): o primeiro é o desta seção, o segundo é a peneira por mínimos
+  quadrados, cuja cota é `σ²(p + pq(2^J − 1))/n` mais o viés de `V_J`, e a
+  validação cruzada compara os dois sem teorema que a sustente.
+- **`p_0` crescente.** A Proposição 5 de E1.8 tinha `p_0` fixo; aqui
+  `p_0 ≍ pq log n`, e o argumento da taxa usa só que `σ² p_0/n = O(log n/n)`.
+  Nenhum passo do Teorema 1 usa `p_0` fixo; a condição de posto de `A_F`
+  vem do autovalor de E1.4, que já é sobre `Z` inteiro.
+- **Não é prova**, como o resto do documento: a §12.1 é a releitura das §2.1,
+  §2.3 e §11.1 com `A_F`, e a §12.3, a da §3.2 sem os níveis grossos; as
+  duas estão conferidas na Parte F.
