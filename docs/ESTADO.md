@@ -2156,8 +2156,9 @@ Ordenadas pelo que bloqueia mais.
    - (d) Hall, Kerkyacharian & Picard (1999, *Statist. Sinica* 9) e Zhou
      (2010, arXiv:1002.1583) não verificados; entram só se o manuscrito
      precisar.
-   - (e) **Marcas de verificação que L6 achou e não eram dela** (candidatas
-     a uma L7 curta): Donoho & Johnstone (1994) com `j_0` fixo, no `08a`
+   - (e) **Marcas de verificação que L6 achou e não eram dela**
+     (**catalogadas como L7** em 2026-10-01, que acrescenta a eq. (1.8) e o
+     Lema 1 de K&P em `03` e `04`): Donoho & Johnstone (1994) com `j_0` fixo, no `08a`
      (`[VERIFICAR: não relido]`); no `06-selecao-limiar.tex`, a seção do
      LASSO limiarizado em Bühlmann & van de Geer (2011) e o número do
      resultado de Huang, Horowitz & Wei (2010); e, no `08a`, a numeração do
