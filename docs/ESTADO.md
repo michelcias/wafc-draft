@@ -2113,7 +2113,7 @@ Ordenadas pelo que bloqueia mais.
    de E2.5b; abre depois dela. **Catalogada como E2.5c** (2026-09-30).
 
 35. **Pendências de L5** (2026-09-30), nenhuma bloqueando:
-   - (a) Levar as correções bibliográficas aos `derivations/`: Mallat
+   - (a) (**catalogada como L6** em 2026-10-01) Levar as correções bibliográficas aos `derivations/`: Mallat
      (2009, §7.5.1) na prova do Lema 1(i) do `01-identificabilidade.md`;
      Hsu et al. como Teorema 2.1, com a nota da `A` quadrada, e Cai com
      páginas e Teorema 4 no `08a-sondagem-blocos.md`; páginas e Teorema 3.2
