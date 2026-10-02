@@ -11,11 +11,12 @@ fator do suave abaixo de 1,5** (1,31 a 1,37 no `wafc.lasso+max` contra o
 `gam.matched`). As medições que a pergunta 33 pedia estão feitas; a decisão
 de rumo é do autor (perguntas 33 e 38). A decidir também: a saída da
 aplicação (pergunta 2). O teto de páginas fica para o fim (D21).
-**Versão viva do manuscrito:** `k = 2` (`manuscript/ms_2.tex`,
-`supp_2.tex`, `references_2.bib`), aberta em 2026-09-30 por decisão do
-autor; E5c aplicou as edições acumuladas, marcadas, e os dois compilam
-limpos em **33 e 30 páginas**.
-**Cor da rodada corrente:** `colR1`, em uso desde `k = 2`.
+**Versão viva do manuscrito:** `k = 3` (`manuscript/ms_3.tex`,
+`supp_3.tex`, `references_3.bib`), aberta em 2026-10-01 por decisão do
+autor para a notação da seleção (D40); a `k = 2` fica intacta. Os dois
+compilam limpos em **33 e 30 páginas**.
+**Cor da rodada corrente:** `colR1`, em uso desde `k = 2` (a rodada não foi
+aceita, então a marcação de E5c segue em `colR1` na `k = 3`).
 
 Este documento é o ponto de partida de cada sessão. Ele diz onde o trabalho
 parou, o que já foi decidido (para não reabrir) e o que vem a seguir.
@@ -1842,6 +1843,49 @@ páginas tiradas do `journal_ref` das cópias que o IMS depositou no arXiv).
   `mgcv`), não na usada; o Crossref abrevia prenomes de Kauermann &
   Opsomer, outro caso de D39.
 
+### 2026-10-01: a notação da seleção (pergunta 32(a), D40), e `k = 3`
+
+No chat principal. O autor aprovou os quatro símbolos e pediu a `k = 3`. A
+troca é uniformização de notação por lista fechada de padrões, aplicada por
+script **só dentro do modo matemático** e só nos trechos da seleção, e
+entra sem marcação (exceção do §3 do `instrucoes.md`). Os padrões, na
+ordem: `\widehat{N}_{` → `\widehat{\nu}_{`; `N_{` → `\nu_{`;
+`\widehat{S}` → `\widehat{\mathcal{S}}`; `\delta_n` → `\nu_{\min,n}`;
+`\delta` → `\nu_{\min}`; `D_n` → `\bar{\Delta}_n`; `S` → `\mathcal{S}`;
+`D` → `\bar{\Delta}`, as duas letras isoladas e fora de comando.
+
+| arquivo e trecho | trocas |
+|---|---|
+| `ms_3.tex`, §3.6 | 31 (2, 5, 4, 7, 0, 0, 8, 5, na ordem acima) |
+| `supp_3.tex`, Seção S7 | 101 (8, 13, 10, 12, 13, 7, 12, 26) |
+| `06-selecao-limiar.tex`, pelas macros (`\Nhat`, `\Ntrue`, `\Shat`, `\sepmin` e a nova `\sepminn`) mais o modo matemático | 87 (`\sepmin_{n}` 18, `D_{n}` 10, `S_{n}` 3, `S` 21, `D` 35) |
+
+Conferido: o diff do `ms` só toca os símbolos, mais o `\bibliography` e o
+comentário que aponta o `supp`; `ms_3` e `supp_3` compilam em 33 e 30
+páginas e o `06` em 7, sem referência indefinida. Fora do modo matemático
+nada muda, o que protege "D28", "D3" e "Hipótese~S" no `06`. O `N_{ℓm}(ε)`
+da S3 do `supp` (outra contagem) ficou fora, por estar fora do trecho, e
+agora não colide mais. O `δ` de Bühlmann & van de Geer (2011) na lista de
+referências do `06` é outro objeto e ficou.
+
+### 2026-10-01: L9 fechada, Donoho & Johnstone (1998) é sobre corpos de Besov
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: o diff do
+`05-taxas.tex` só tira a entrada de Donoho & Johnstone (1994), que o corpo
+não cita e cuja descrição era falsa; o PDF recompila em 10 páginas. A linha
+de K&P do `busca-novidade.md` passou às condições do *Annals* (eq. 3.13,
+p. 1283; Observação 2, p. 1284). `refs/donoho1998.pdf` entrou.
+
+- **Donoho & Johnstone (1998) não trata de bolas weak-`ℓ_τ`:** o risco
+  minimax está nos Teoremas 4 e 5 (§4.1, pp. 890–891), sobre corpos de
+  Besov `Θ^α_{p,q}(C)` no modelo de sequência, `≍ C^{2(1−r)} ε^{2r}` com
+  `r = 2α/(2α+1)`. Com `α = s` e `τ = (s + 1/2)^{−1}` isso é
+  `C^τ ε^{2−τ}`, **a mesma ordem `λ_n^{2−τ}` que a Observação `rem:tres`
+  usa**; o que não confere é a classe. A forma sobre bolas `ℓ_p` vem de
+  Donoho & Johnstone (1994b, *PTRF* 99, 277–303), fora do `.bib`.
+- A marca da entrada de 1998 no `05` **fica** até a redação ser decidida, e
+  o `ms_3.tex` l. 577 diz a mesma coisa que a Observação: pergunta 35(h).
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1873,6 +1917,7 @@ páginas tiradas do `journal_ref` das cópias que o IMS depositou no arXiv).
 | D37 | 09-28 | **Nenhuma das duas acelerações da pergunta 29 entra:** o `cv.wafc()` continua calculando o caminho inteiro nas dobras, e o `sparsegl` continua em `thresh = 1e-9` | medido em `07-accel.R`: a validação cruzada em etapas passa no LASSO (255 de 255) mas ganha só 1,5× e fica mais lenta em `n = 1000`, o que não paga truncar o `cvm` devolvido; é reprovada nos grupos (104 de 129); o `1e-8` nos grupos é reprovado pelo critério declarado antes por uma réplica (128 de 129); decisão do autor |
 | D38 | 09-30 | **Marcação da troca de "sieve" (D33) no manuscrito:** o termo que substitui vai em `colR1` e o termo antigo é apagado, sem `\sout` nem cinza; vale só para essa troca, e o resto de `k = 2` segue a marcação do §3 do `instrucoes.md` | decisão do autor: são ~31 ocorrências de uma troca de terminologia já ratificada, e o tachado em cada uma polui o PDF sem informar nada que o azul não diga |
 | D39 | 09-30 | **Nomes de autor são grafados como estão impressos em cada referência**, sem uniformizar entre entradas: o mesmo autor pode aparecer como "Alexander" numa e "Alexandre" noutra (Tsybakov). A fonte é a folha de rosto ou o cabeçalho do próprio trabalho; o Crossref só na falta dela | decisão do autor: a citação reproduz o trabalho citado, e as grafias variam entre as publicações do mesmo autor |
+| D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D32 | 09-20 | **A seleção de estrutura entra pela limiarização (saída (c)), e a saída (a) não abre agora.** O Corolário 8 de `06-selecao-limiar.tex` é o enunciado do artigo, com a hipótese de separação numerada e dizendo no próprio enunciado que é **estimação seguida de limiar**. A sondagem de E1.7a fica registrada como observação de meia página (a condição em grupos não depende de `J` nem da base), e a saída (a), se voltar depois de E2.5, volta pela rota de Wei & Huang (2010), não pela de Bach | veredito de E1.7a: a redução algébrica tira o risco de a condição falhar por construção, mas não o custo, e exige (BD) mais `E(XX'\|U)` constante, que contraria D13; além disso o valor de (a) continua condicionado a E2.5 escolher a variante em grupos, e E1.7c mostrou o LASSO limiarizado acertando 10 de 10 onde ela acerta 0 de 10 |
 | D31 | 09-20 | **Em avaliação numérica repetida, a base é fixada e avaliada por tabela**, não pelo algoritmo de Daubechies-Lagarias a cada ajuste: construir a tabela uma vez com `WaveBased::wtable()` para o par `(family, filter.size)` e passá-la em `wavelet.table` de `wafc_design()`, em vez de deixar a regra `use.table = "auto"` decidir réplica a réplica. Vale para o piloto (E2.4), o compêndio (E4) e a aplicação (E6). **Exceção:** conferência que mede precisão fina (as de `derivations/check/`, que leem decaimento até `1e-11`) continua com avaliação exata ou tabela com `prec.wavelet` alto, porque ali o `3.1e-06` engoliria o que se quer medir | pedido do autor, e a razão é **tempo de execução**: a tabela é o caminho rápido e a aproximação é boa o bastante (o erro de interpolação medido em E2.1 é `3.1e-06`), de modo que a variação entre os dois caminhos não é problema prático. A regra `auto` só dispara em `n q ≥ 2000 L`, isto é `n q ≥ 16000` com `L = 8`, e portanto **não dispara** nos `n` do piloto: deixá-la decidir significa pagar Daubechies-Lagarias em toda a varredura |
 | D30 | 09-19 | **O cenário suave é para ganhar, não só para não perder.** A hipótese `C^{p+1}` de Xue & Yang delimita a garantia deles, não o desempenho: com `J` e `λ` por validação cruzada o WAFC pode vencer splines também no suave, e E2.4 e E4 têm de medir isso em condição justa — o concorrente sintonizado nos termos dele (nós por BIC como no artigo deles, e `mgcv` com REML), predição e ISE relatadas em separado, e uma componente **suave de curvatura desigual** (gaussiana estreita ou `doppler` truncado longe da singularidade) acrescentada ao `dgp.R`, que é `C^∞` e portanto dentro da hipótese deles, mas com escala variando ao longo do domínio | argumento do autor; se o ganho aparecer, é ilustração forte para o artigo, e se não aparecer, a paridade no suave já é o que a Seção 5 precisa |
@@ -2198,7 +2243,10 @@ Ordenadas pelo que bloqueia mais.
    entre `J = 2` e `J = 8` é maior que o ruído das dobras.
 
 32. **Pendências de E5c** (2026-09-30), nenhuma bloqueando:
-   - (a) **Colisão de símbolos na §3.6**, herdada de `06-selecao-limiar.tex`:
+   - (a) **~~Colisão de símbolos na §3.6~~ resolvida (D40, 2026-10-01,
+     §2):** `ν_{ℓm}`, `𝒮`, `ν_{min,n}` e `Δ̄_n`, no `06` e na `k = 3`, mais
+     a colisão de `D` com `D = p + d`, que a pergunta não listava. Texto
+     original: herdada de `06-selecao-limiar.tex`:
      `N_{ℓm}` (norma do bloco) colide com `N` (momentos nulos) e com `N_J`;
      `S` (conjunto de blocos) com o `S` de suporte genérico; `δ_n` com o
      vetor `δ`. Proposta da tarefa: `ν_{ℓm}` ou a norma por extenso, e
@@ -2309,7 +2357,9 @@ Ordenadas pelo que bloqueia mais.
      LASSO limiarizado em Bühlmann & van de Geer (2011) e o número do
      resultado de Huang, Horowitz & Wei (2010); e, no `08a`, a numeração do
      *Annals* de Klopp & Pensky e de Lounici et al., lidos no arXiv.
-   - (f) **A marca que L7 achou e não resolve com número:** o
+   - (f) **~~Feita por L9~~ (2026-10-01, §2):** a entrada de 1994 saiu do
+     `05` e a linha de K&P do `busca-novidade.md` está na forma do *Annals*;
+     o que sobrou é a 35(h). Texto original: a marca que L7 achou e não resolve com número: o
      `05-taxas.tex` (l. 835) atribui a Donoho & Johnstone (1994) "a forma
      original" do risco minimax sobre bolas weak-`ℓ_τ`, e o artigo não trata
      disso; o mais próximo é a desigualdade oráculo (Teorema 1, p. 437;
@@ -2323,6 +2373,24 @@ Ordenadas pelo que bloqueia mais.
      impressão, não conferido no arXiv); e o enunciado dos Lemas 2 a 4, que
      estão no suplemento (`10.1214/15-AOS1309SUPP`). Opcional; se o autor
      baixar o suplemento, entra como `refs/klopp2015-supp.pdf`.
+   - (h) **A classe da referência minimax** (de L9). A ordem `λ_n^{2−τ}`
+     que o `05` (Observação `rem:tres`) e o `ms_3` (l. 577) citam está nos
+     Teoremas 4 e 5 de Donoho & Johnstone (1998), mas sobre **corpos de
+     Besov**, não sobre bolas weak-`ℓ_τ`. Duas saídas: (a) trocar "weak
+     `ℓ_τ` balls" por "Besov bodies" nos dois lugares, com "Theorems 4 and
+     5", o que casa com a frase seguinte (o Besov já implica a
+     compressibilidade, Lema 9) e não pede leitura nova; ou (b) manter
+     weak-`ℓ_τ` e apoiar só em Johnstone (2019) ou em Donoho & Johnstone
+     (1994b), com o resultado conferido no texto. A redação de (a) para a
+     entrada e para a Observação do `05` está no handoff, reproduzida aqui:
+     a entrada passa a "Teoremas 4 e 5 (§4.1, pp. 890–891): no modelo de
+     sequência gaussiano com ruído `ε`, o risco minimax sobre corpos de
+     Besov `Θ^α_{p,q}(C)` é `≍ C^{2(1−r)} ε^{2r}`, com `r = 2α/(2α+1)`; com
+     `α = s` e `τ = (s+1/2)^{−1}`, isto é `C^τ ε^{2−τ}`. O artigo não trata
+     de bolas weak-`ℓ_τ`."; e a Observação, "referência minimax do modelo
+     de sequência gaussiana sobre corpos de Besov (que o Lema `lem:weak`(i)
+     põe dentro de bolas weak-`ℓ_τ`) com ruído por coordenada `λ_n`". No
+     manuscrito, (a) é edição marcada em `colR1` na `k = 3`.
 
 36. **Pendências de E2.5d** (2026-09-30), nenhuma bloqueando:
    - (a) **Qual `gam` é o concorrente de E4 e da tabela do manuscrito.**
@@ -2459,6 +2527,8 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | L9 fechada e integrada: a entrada falsa de Donoho & Johnstone (1994) saiu do `05`; o risco minimax de 1998 é sobre corpos de Besov, com a mesma ordem, e a classe citada no `05` e no `ms_3` é a pergunta 35(h) |
+| 2026-10-01 | Pergunta 32(a) resolvida (D40): quatro símbolos da seleção trocados no `06` e no manuscrito, por padrões no modo matemático (31, 101 e 87 trocas); `k = 3` aberta; L9 catalogada |
 | 2026-10-01 | L8 fechada e integrada: `.bib` com 82 entradas; Kauermann & Opsomer usam ML, não REML, e o catálogo da E2.5h foi corrigido; o Ruppert aditivo usa um `K` comum até 40; pergunta 39 |
 | 2026-10-01 | E2.5h e E2.5i catalogadas (o `gam` por REML e GCV, e por validação cruzada, na grade de Ruppert; o GCV do WAFC); E2.5i com 50 réplicas em todas as células, por decisão do autor; L8 catalogada |
 | 2026-10-01 | E2.5g fechada e integrada (921 testes, 24 750 linhas, quinta junção exata): o limiar do Corolário 8 passa o fator do suave pela primeira vez (1,31 a 1,37 no `wafc.lasso+max`), o que sobra é ISE ativo; `c = 0,15` não generaliza ao não homogêneo, `c = 0,4` sim; pergunta 38 |

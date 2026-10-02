@@ -73,7 +73,7 @@ Conferência de que tudo roda (da raiz de `wafc-draft`):
 Rscript -e 'library(WaveBased); w <- wbasis(sort(runif(64)), j0 = 0, J = 3); cat(dim(w), "\n")'   # 64 8
 cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd -   # compila
 cd manuscript/ss-template && latexmk -pdf SS-template.tex && latexmk -c && cd -   # compila (9 páginas)
-cd manuscript && latexmk -pdf ms_2.tex && latexmk -pdf supp_2.tex && latexmk -c && cd -   # versão viva k = 2; 33 e 30 páginas, sem indefinida
+cd manuscript && latexmk -pdf ms_3.tex && latexmk -pdf supp_3.tex && latexmk -c && cd -   # versão viva k = 3; 33 e 30 páginas, sem indefinida
 ```
 
 As conferências das derivações, que devem imprimir `OK` (tempos desta
@@ -142,14 +142,14 @@ WAFC_OUT=wafc/cache/e25g WAFC_TAG=e25g WAFC_METHODS=wafc.lasso,klopp.balanced WA
   dispara nos `n` do estudo e deixaria tudo no algoritmo lento (D31). A
   exceção são as conferências de `derivations/check/`, que medem precisão
   fina.
-- **Manuscrito vivo em `k = 2`** (aberto em 2026-09-30): `ms_2.tex` e
-  `supp_2.tex` compilam limpos, em 33 e 30 páginas, com as edições de E5c
-  marcadas em `colR1` (inclusive o Corolário 8 na §3.6); as pendências
-  dela são a pergunta 32 do `ESTADO.md`.
+- **Manuscrito vivo em `k = 3`** (aberto em 2026-10-01 para a notação da
+  seleção, D40): `ms_3.tex` e `supp_3.tex` compilam limpos, em 33 e 30
+  páginas, com as edições de E5c marcadas em `colR1` (inclusive o
+  Corolário 8 na §3.6); as pendências são a pergunta 32 do `ESTADO.md`.
 - **Bibliografia:** 82 entradas verificadas (L1, L3, L4, L5 e L8), e as citações das derivações conferidas nas fontes publicadas (L6, L7); os PDFs ficam em `refs/`, não versionado, e não viajam; pendências na pergunta 35 do `ESTADO.md`.
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** E2.5h (o `gam` por REML e GCV, e o GCV do WAFC), E2.5i (o `gam` com `k` por validação cruzada, depois da E2.5h; as duas rodadas esperam o aviso do autor). L8 fechou em 2026-10-01. E2.5f, E2.5g, L6 e L7 fecharam em 2026-10-01; E2.4c, E2.5a a E2.5e, E1.11 e L5 em 2026-09-30 e 10-01; E2.5 espera a decisão das perguntas 33 e 38 do `ESTADO.md`;
+- **Catálogo:** E2.5h (o `gam` por REML e GCV, e o GCV do WAFC), E2.5i (o `gam` com `k` por validação cruzada, depois da E2.5h; as duas rodadas esperam o aviso do autor). L8 e L9 fecharam em 2026-10-01. E2.5f, E2.5g, L6 e L7 fecharam em 2026-10-01; E2.4c, E2.5a a E2.5e, E1.11 e L5 em 2026-09-30 e 10-01; E2.5 espera a decisão das perguntas 33 e 38 do `ESTADO.md`;
   detalhe no `TAREFA.md` §3.
 - **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
   de tarefa que não foi integrado: o protocolo está na §7 de

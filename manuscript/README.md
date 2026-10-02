@@ -9,10 +9,12 @@ mesmo índice `k`; a versão `{k+1}` copia os três e atualiza
 A versão `1` não leva marcação de alteração; o preâmbulo já define `colR1`
 e carrega `ulem` para quando `k = 2` existir.
 
-**Versão viva: `k = 2`**, aberta em 2026-09-30 como cópia de `k = 1`
-(`ms_2.tex`, `supp_2.tex`, `references_2.bib`), com toda alteração marcada
-em `colR1`. Depois de E5c: 33 e 30 páginas, `.bib` com 37 entradas, e o
-mapa da numeração global no cabeçalho do `ms_2.tex`.
+**Versão viva: `k = 3`**, aberta em 2026-10-01 como cópia de `k = 2`
+(`ms_3.tex`, `supp_3.tex`, `references_3.bib`) para a notação da seleção
+(D40), aplicada sem marcação por lista fechada de padrões; as edições de
+E5c seguem marcadas em `colR1`. 33 e 30 páginas, `.bib` com 37 entradas, e
+o mapa da numeração global no cabeçalho do `ms_3.tex`. A `k = 2` (aberta em
+2026-09-30, E5c) fica intacta.
 
 | Pasta | O que é |
 |---|---|
@@ -34,5 +36,5 @@ geradas dos arquivos de origem é item do checklist de submissão
 ## Compilar
 
 ```bash
-cd manuscript && latexmk -pdf ms_2.tex && latexmk -pdf supp_2.tex && latexmk -c
+cd manuscript && latexmk -pdf ms_3.tex && latexmk -pdf supp_3.tex && latexmk -c
 ```

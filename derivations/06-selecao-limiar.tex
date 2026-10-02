@@ -37,10 +37,11 @@
 \newcommand{\smax}{\widehat{\sigma}_{\max}}
 \newcommand{\eps}{\varepsilon}
 \newcommand{\ghat}[2]{\widehat{g}_{#1#2}}
-\newcommand{\Nhat}[2]{\widehat{N}_{#1#2}}
-\newcommand{\Ntrue}[2]{N_{#1#2}}
-\newcommand{\Shat}{\widehat{S}}
-\newcommand{\sepmin}{\delta}
+\newcommand{\Nhat}[2]{\widehat{\nu}_{#1#2}}
+\newcommand{\Ntrue}[2]{\nu_{#1#2}}
+\newcommand{\Shat}{\widehat{\mathcal{S}}}
+\newcommand{\sepmin}{\nu_{\min}}
+\newcommand{\sepminn}{\nu_{\min,n}}
 \newcommand{\rn}{\rho}
 
 % A numeração global começa depois de Proposição 6, Lema 12, Teorema 2 e
@@ -98,9 +99,9 @@ existe configuração em que \emph{nenhum} limiar acerta.
 
 São dois enunciados. O Lema~\ref{lem:sanduiche} é determinístico e não sabe
 o que é um LASSO: dado qualquer estimador cujo erro por bloco seja dominado
-por $D$, ele sanduicha o conjunto limiarizado entre dois conjuntos de nível
+por $\bar{\Delta}$, ele sanduicha o conjunto limiarizado entre dois conjuntos de nível
 da verdade. O Corolário~\ref{cor:limiar} instala nele a taxa do Corolário~4 e
-produz $\Prob(\Shat = S) \to 1$.
+produz $\Prob(\Shat = \mathcal{S}) \to 1$.
 
 \section{Objetos}
 
@@ -135,7 +136,7 @@ suas normas,
 \]
 a estrutura verdadeira e a estimada, esta indexada pelo limiar $t \ge 0$,
 \[
-  S \;=\; \bigl\{(\cv,\md) :\; \gcomp{\cv}{\md} \not\equiv 0
+  \mathcal{S} \;=\; \bigl\{(\cv,\md) :\; \gcomp{\cv}{\md} \not\equiv 0
   \text{ em } L_{2}[0,1]\bigr\}
   \;=\; \bigl\{(\cv,\md) :\; \Ntrue{\cv}{\md} > 0 \bigr\},
   \qquad
@@ -146,7 +147,7 @@ o erro máximo por bloco e a separação,
   \Delta \;=\; \max_{\cv,\md}
   \bigl\lVert \ghat{\cv}{\md} - \gcomp{\cv}{\md}\bigr\rVert_{L_{2}[0,1]},
   \qquad
-  \sepmin \;=\; \min_{(\cv,\md)\in S} \Ntrue{\cv}{\md};
+  \sepmin \;=\; \min_{(\cv,\md)\in \mathcal{S}} \Ntrue{\cv}{\md};
 \]
 e a taxa por componente do Corolário~4 de E1.6,
 \begin{equation}
@@ -155,8 +156,8 @@ e a taxa por componente do Corolário~4 de E1.6,
   \;\asymp\; \Bigl(\frac{\log n}{n}\Bigr)^{\seff/(2\seff+1)} .
 \end{equation}
 
-Duas convenções. A primeira é que $S$ é um conjunto de \emph{blocos}, não de
-coeficientes: $|S| \le pq$, e nada aqui diz respeito a quais
+Duas convenções. A primeira é que $\mathcal{S}$ é um conjunto de \emph{blocos}, não de
+coeficientes: $|\mathcal{S}| \le pq$, e nada aqui diz respeito a quais
 $\wav{\lev}{\tsl}$ dentro de um bloco são não nulos. A segunda é que a
 desigualdade que define $\Shat(t)$ é estrita, o que só importa em empates de
 medida nula e é a convenção que a conferência numérica implementa.
@@ -169,18 +170,18 @@ local ao arquivo, como em E1.5 e E1.6.
 
 \begin{assumption}[separação em nível de bloco]\label{ass:sep}
 Na sequência de problemas da Hipótese~1 de E1.6, o alvo pode variar com $n$;
-escreva $S_{n}$ e $\sepmin_{n} = \min_{(\cv,\md)\in S_{n}}
-\lVert g^{(n)}_{\cv\md}\rVert_{L_{2}[0,1]}$, com $\sepmin_{n} = +\infty$ se
-$S_{n} = \emptyset$. Supõe-se
+escreva $\mathcal{S}_{n}$ e $\sepminn = \min_{(\cv,\md)\in \mathcal{S}_{n}}
+\lVert g^{(n)}_{\cv\md}\rVert_{L_{2}[0,1]}$, com $\sepminn = +\infty$ se
+$\mathcal{S}_{n} = \emptyset$. Supõe-se
 \[
-  \frac{\sepmin_{n}}{\rn_{n}} \;\longrightarrow\; \infty ,
+  \frac{\sepminn}{\rn_{n}} \;\longrightarrow\; \infty ,
 \]
 com $\rn_{n}$ de \eqref{eq:rho}: \emph{o menor bloco ativo tem norma de ordem
 estritamente maior que a taxa por componente}.
 \end{assumption}
 
 Três leituras, que a Observação~\ref{rem:fixa} retoma. (i) Sob alvo fixo, e
-portanto sob a Hipótese~1 de E1.6 lida literalmente, $\sepmin_{n} = \sepmin$ é
+portanto sob a Hipótese~1 de E1.6 lida literalmente, $\sepminn = \sepmin$ é
 constante positiva e a hipótese é automática, porque $\rn_{n}\to 0$. (ii) Ela
 tem conteúdo em arranjo triangular, onde o menor bloco ativo pode encolher com
 $n$; aí ela diz exatamente quão devagar. (iii) Ela é hipótese sobre
@@ -193,26 +194,26 @@ entra neste arquivo, e em particular nenhuma irrepresentabilidade.
 \label{lem:sanduiche}
 Sejam $\{\gcomp{\cv}{\md}\}$ e $\{\ghat{\cv}{\md}\}$ famílias quaisquer de
 funções de $L_{2}[0,1]$ indexadas por $(\cv,\md)$, com $\Nhat{\cv}{\md}$,
-$\Ntrue{\cv}{\md}$, $S$, $\Shat(t)$, $\Delta$ e $\sepmin$ definidos a partir
-delas como na §1, e seja $D \ge \Delta$. Então, para todo $t \ge 0$,
+$\Ntrue{\cv}{\md}$, $\mathcal{S}$, $\Shat(t)$, $\Delta$ e $\sepmin$ definidos a partir
+delas como na §1, e seja $\bar{\Delta} \ge \Delta$. Então, para todo $t \ge 0$,
 \begin{equation}
   \label{eq:sanduiche}
-  \bigl\{(\cv,\md):\; \Ntrue{\cv}{\md} > t + D\bigr\}
+  \bigl\{(\cv,\md):\; \Ntrue{\cv}{\md} > t + \bar{\Delta}\bigr\}
   \;\subseteq\; \Shat(t) \;\subseteq\;
-  \bigl\{(\cv,\md):\; \Ntrue{\cv}{\md} > t - D\bigr\} .
+  \bigl\{(\cv,\md):\; \Ntrue{\cv}{\md} > t - \bar{\Delta}\bigr\} .
 \end{equation}
 Em particular:
 \begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
-  \item \textup{(sem falso positivo; não usa separação)} se $t \ge D$, então
-    $\Shat(t) \subseteq S$;
-  \item \textup{(sem falso negativo; usa separação)} se $t < \sepmin - D$,
-    então $S \subseteq \Shat(t)$;
-  \item \textup{(acerto exato)} se $D \le t < \sepmin - D$, então
-    $\Shat(t) = S$. Tal $t$ existe se e só se $\sepmin > 2D$.
+  \item \textup{(sem falso positivo; não usa separação)} se $t \ge \bar{\Delta}$, então
+    $\Shat(t) \subseteq \mathcal{S}$;
+  \item \textup{(sem falso negativo; usa separação)} se $t < \sepmin - \bar{\Delta}$,
+    então $\mathcal{S} \subseteq \Shat(t)$;
+  \item \textup{(acerto exato)} se $\bar{\Delta} \le t < \sepmin - \bar{\Delta}$, então
+    $\Shat(t) = \mathcal{S}$. Tal $t$ existe se e só se $\sepmin > 2\bar{\Delta}$.
 \end{enumerate}
 \end{lemma}
 
-O lema não usa nada do estimador além da cota $\Delta \le D$: vale para o
+O lema não usa nada do estimador além da cota $\Delta \le \bar{\Delta}$: vale para o
 LASSO, para a variante em grupos, para um estimador por splines, e é por isso
 que a única coisa que E1.6 precisa fornecer é a taxa por componente.
 
@@ -224,39 +225,39 @@ $J_{n}$ daquele arquivo):
   \item \textup{(não assintótico)} Sejam $\alpha,\alpha'\in(0,1)$ e
     \begin{equation}
       \label{eq:Dn}
-      D_{n}^{2}
+      \bar{\Delta}_{n}^{2}
       \;=\; \frac{512\,\pen_{n}^{2}\,d_{n}}{\gamma^{2}}
       \;+\; \frac{64\,\mathcal{B}_{J_{n}}^{2}}{\alpha'\gamma}
       \;+\; \frac{2\,C_{g}^{2}}{1-2^{-2\seff}}\,2^{-2J_{n}\seff} .
     \end{equation}
     Então, num evento de probabilidade ao menos
     $1-\alpha-\alpha'-\Prob\{\lmin(\Gramhat)<\gamma/2\}
-    -\Prob\{\smax^{2}>2B_{X}^{2}C_{U}\}$, vale $\Delta \le D_{n}$ e portanto,
+    -\Prob\{\smax^{2}>2B_{X}^{2}C_{U}\}$, vale $\Delta \le \bar{\Delta}_{n}$ e portanto,
     pelo Lema~\ref{lem:sanduiche}(iii),
     \[
-      \Shat(t) = S \qquad\text{para todo } t \text{ com }
-      D_{n} \le t < \sepmin - D_{n} ,
+      \Shat(t) = \mathcal{S} \qquad\text{para todo } t \text{ com }
+      \bar{\Delta}_{n} \le t < \sepmin - \bar{\Delta}_{n} ,
     \]
-    janela não vazia sempre que $\sepmin > 2D_{n}$. As duas últimas
+    janela não vazia sempre que $\sepmin > 2\bar{\Delta}_{n}$. As duas últimas
     probabilidades tendem a zero pela Proposição~3(iv) de E1.4 e pelo Lema~6
     de E1.5.
   \item \textup{(triagem, sem hipótese de separação)} $\Delta = O_{p}(\rn_{n})$
     e, para qualquer $t_{n}$ com $t_{n}/\rn_{n} \to \infty$,
     \[
-      \Prob\bigl\{\Shat(t_{n}) \subseteq S\bigr\} \;\longrightarrow\; 1 .
+      \Prob\bigl\{\Shat(t_{n}) \subseteq \mathcal{S}\bigr\} \;\longrightarrow\; 1 .
     \]
-    \emph{Nenhuma hipótese sobre $\sepmin_{n}$ é usada aqui}: eliminar os
+    \emph{Nenhuma hipótese sobre $\sepminn$ é usada aqui}: eliminar os
     blocos nulos é de graça.
   \item \textup{(acerto exato)} Sob a Hipótese~\ref{ass:sep}, e para qualquer
     $t_{n}$ com
     \[
       \frac{t_{n}}{\rn_{n}} \to \infty
       \qquad\text{e}\qquad
-      \limsup_{n} \frac{t_{n}}{\sepmin_{n}} < 1 ,
+      \limsup_{n} \frac{t_{n}}{\sepminn} < 1 ,
     \]
-    vale $\Prob\{\Shat(t_{n}) = S\} \to 1$. Tal $t_{n}$ existe sempre sob a
+    vale $\Prob\{\Shat(t_{n}) = \mathcal{S}\} \to 1$. Tal $t_{n}$ existe sempre sob a
     Hipótese~\ref{ass:sep}, e a escolha canônica é a média geométrica
-    $t_{n} = \sqrt{\rn_{n}\sepmin_{n}}$.
+    $t_{n} = \sqrt{\rn_{n}\sepminn}$.
 \end{enumerate}
 \end{corollary}
 
@@ -269,21 +270,21 @@ Pela desigualdade triangular em $L_{2}[0,1]$,
   \label{eq:triangular}
   \bigl|\Nhat{\cv}{\md} - \Ntrue{\cv}{\md}\bigr|
   \;\le\; \bigl\lVert\ghat{\cv}{\md} - \gcomp{\cv}{\md}\bigr\rVert_{L_{2}[0,1]}
-  \;\le\; \Delta \;\le\; D
+  \;\le\; \Delta \;\le\; \bar{\Delta}
   \qquad\text{para todo }(\cv,\md).
 \end{equation}
-Inclusão da esquerda de \eqref{eq:sanduiche}: se $\Ntrue{\cv}{\md} > t+D$,
-então $\Nhat{\cv}{\md} \ge \Ntrue{\cv}{\md} - D > t$, logo
+Inclusão da esquerda de \eqref{eq:sanduiche}: se $\Ntrue{\cv}{\md} > t+\bar{\Delta}$,
+então $\Nhat{\cv}{\md} \ge \Ntrue{\cv}{\md} - \bar{\Delta} > t$, logo
 $(\cv,\md)\in\Shat(t)$. Inclusão da direita: se $(\cv,\md)\in\Shat(t)$, então
-$\Ntrue{\cv}{\md} \ge \Nhat{\cv}{\md} - D > t - D$.
+$\Ntrue{\cv}{\md} \ge \Nhat{\cv}{\md} - \bar{\Delta} > t - \bar{\Delta}$.
 
-Para (i), tome $t \ge D$: a inclusão da direita dá
-$\Shat(t) \subseteq \{\Ntrue{\cv}{\md} > t - D\} \subseteq
-\{\Ntrue{\cv}{\md} > 0\} = S$, porque $t - D \ge 0$. Para (ii), tome
-$t < \sepmin - D$: todo $(\cv,\md)\in S$ tem
-$\Ntrue{\cv}{\md} \ge \sepmin > t + D$, e a inclusão da esquerda dá
+Para (i), tome $t \ge \bar{\Delta}$: a inclusão da direita dá
+$\Shat(t) \subseteq \{\Ntrue{\cv}{\md} > t - \bar{\Delta}\} \subseteq
+\{\Ntrue{\cv}{\md} > 0\} = \mathcal{S}$, porque $t - \bar{\Delta} \ge 0$. Para (ii), tome
+$t < \sepmin - \bar{\Delta}$: todo $(\cv,\md)\in \mathcal{S}$ tem
+$\Ntrue{\cv}{\md} \ge \sepmin > t + \bar{\Delta}$, e a inclusão da esquerda dá
 $(\cv,\md)\in\Shat(t)$. (iii) é a conjunção das duas, e o intervalo
-$[D,\sepmin-D)$ é não vazio se e só se $D < \sepmin - D$. \qed
+$[\bar{\Delta},\sepmin-\bar{\Delta})$ é não vazio se e só se $\bar{\Delta} < \sepmin - \bar{\Delta}$. \qed
 
 \subsection*{Corolário~\ref{cor:limiar}}
 
@@ -312,49 +313,49 @@ $(x+y)^{2}\le 2x^{2}+2y^{2}$,
 \[
   \Delta^{2} \;\le\; 2\norm{v}_{2}^{2}
   + \frac{2C_{g}^{2}}{1-2^{-2\seff}}2^{-2J_{n}\seff}
-  \;\le\; D_{n}^{2},
+  \;\le\; \bar{\Delta}_{n}^{2},
 \]
-que é \eqref{eq:Dn}. O Lema~\ref{lem:sanduiche}(iii) com $D = D_{n}$ fecha.
+que é \eqref{eq:Dn}. O Lema~\ref{lem:sanduiche}(iii) com $\bar{\Delta} = \bar{\Delta}_{n}$ fecha.
 
 \emph{(ii).} Na resolução $J_{n}$ do Teorema~2 de E1.6, as três parcelas de
 \eqref{eq:Dn} são da mesma ordem $\rn_{n}^{2}$: a primeira porque
 $\pen_{n}^{2}d_{n} \asymp (J_{n}/n)\,pq2^{J_{n}} \asymp (J_{n}/n)^{2\seff/(2\seff+1)}$
 pelo Teorema~2(iii) de E1.6, e a segunda e a terceira porque
 $2^{-2J_{n}\seff} \asymp (\log n/n)^{2\seff/(2\seff+1)}$ pela definição de
-$J_{n}$. Logo $D_{n} \le c(\alpha')\rn_{n}$ com $c(\alpha')<\infty$. Dado
+$J_{n}$. Logo $\bar{\Delta}_{n} \le c(\alpha')\rn_{n}$ com $c(\alpha')<\infty$. Dado
 $\epsilon>0$, tome $\alpha = \alpha' = \epsilon/4$ e $n$ grande o bastante
 para que as duas probabilidades residuais de (i) somem menos de
 $\epsilon/2$; então $\Prob(\Delta > c(\epsilon/4)\rn_{n}) < \epsilon$, que é
 $\Delta = O_{p}(\rn_{n})$. Se $t_{n}/\rn_{n}\to\infty$, então
 $\Prob(t_{n} \ge \Delta) \to 1$, e nesse evento o
-Lema~\ref{lem:sanduiche}(i) dá $\Shat(t_{n})\subseteq S$.
+Lema~\ref{lem:sanduiche}(i) dá $\Shat(t_{n})\subseteq \mathcal{S}$.
 
 \emph{(iii).} Sob a Hipótese~\ref{ass:sep} e com
-$\limsup t_{n}/\sepmin_{n} < 1$, existem $\eta>0$ e $n_{0}$ tais que
-$\sepmin_{n} - t_{n} \ge \eta\,\sepmin_{n}$ para $n \ge n_{0}$, e portanto
-$(\sepmin_{n}-t_{n})/\rn_{n} \ge \eta\,\sepmin_{n}/\rn_{n} \to\infty$.
+$\limsup t_{n}/\sepminn < 1$, existem $\eta>0$ e $n_{0}$ tais que
+$\sepminn - t_{n} \ge \eta\,\sepminn$ para $n \ge n_{0}$, e portanto
+$(\sepminn-t_{n})/\rn_{n} \ge \eta\,\sepminn/\rn_{n} \to\infty$.
 Assim $\Prob(\Delta \le t_{n}) \to 1$ e
-$\Prob(\Delta < \sepmin_{n}-t_{n}) \to 1$; na interseção dos dois eventos,
-o Lema~\ref{lem:sanduiche}(iii) com $D = \Delta$ dá $\Shat(t_{n}) = S$.
-Quanto à existência: com $t_{n} = \sqrt{\rn_{n}\sepmin_{n}}$ tem-se
-$t_{n}/\rn_{n} = \sqrt{\sepmin_{n}/\rn_{n}} \to\infty$ e
-$t_{n}/\sepmin_{n} = \sqrt{\rn_{n}/\sepmin_{n}} \to 0$. \qed
+$\Prob(\Delta < \sepminn-t_{n}) \to 1$; na interseção dos dois eventos,
+o Lema~\ref{lem:sanduiche}(iii) com $\bar{\Delta} = \Delta$ dá $\Shat(t_{n}) = \mathcal{S}$.
+Quanto à existência: com $t_{n} = \sqrt{\rn_{n}\sepminn}$ tem-se
+$t_{n}/\rn_{n} = \sqrt{\sepminn/\rn_{n}} \to\infty$ e
+$t_{n}/\sepminn = \sqrt{\rn_{n}/\sepminn} \to 0$. \qed
 
 \section{Observações}
 
 \begin{remark}[a janela do Lema~\ref{lem:sanduiche} é exata]\label{rem:exata}
-A condição $\sepmin > 2D$ não é artefato da prova. Tome dois blocos, um ativo
-com $\Ntrue{1}{1} = 2D$ e um nulo com $\Ntrue{2}{1} = 0$, e estimativas
-$\Nhat{1}{1} = D$ e $\Nhat{2}{1} = D$, compatíveis com $\Delta \le D$. As
+A condição $\sepmin > 2\bar{\Delta}$ não é artefato da prova. Tome dois blocos, um ativo
+com $\Ntrue{1}{1} = 2\bar{\Delta}$ e um nulo com $\Ntrue{2}{1} = 0$, e estimativas
+$\Nhat{1}{1} = \bar{\Delta}$ e $\Nhat{2}{1} = \bar{\Delta}$, compatíveis com $\Delta \le \bar{\Delta}$. As
 duas estatísticas empatam, e nenhum $t$ separa. Isto diz que o \emph{argumento}
-não se estende abaixo de $\sepmin = 2D$; não diz que nenhum procedimento
+não se estende abaixo de $\sepmin = 2\bar{\Delta}$; não diz que nenhum procedimento
 consegue, o que seria uma cota inferior e não é feito aqui nem em E1.6
 (``o que isto não cobre'' daquele arquivo).
 \end{remark}
 
 \begin{remark}[a hipótese de separação sob alvo fixo]\label{rem:fixa}
 A Hipótese~1 de E1.6 fixa $p$, $q$, $s$, $\pi$ e $C_{g}$, e se o alvo também
-for fixo então $S$ e $\sepmin$ não dependem de $n$; como $\rn_{n}\to 0$, a
+for fixo então $\mathcal{S}$ e $\sepmin$ não dependem de $n$; como $\rn_{n}\to 0$, a
 Hipótese~\ref{ass:sep} é automática e o
 Corolário~\ref{cor:limiar}(iii) vale para \emph{qualquer} $t_{n}\to 0$ com
 $t_{n}/\rn_{n}\to\infty$. É a leitura que a conferência numérica realiza, e é
@@ -367,13 +368,13 @@ formalidade.
 \begin{remark}[é estimação seguida de limiar, e não seleção pelo estimador]
 \label{rem:nao-selecao}
 Nada aqui afirma que o LASSO seleciona. O suporte de $\thetahat$ não tem
-relação com $S$: sob a Hipótese de Besov de E1.3 o oráculo do espaço de
+relação com $\mathcal{S}$: sob a Hipótese de Besov de E1.3 o oráculo do espaço de
 aproximação é genericamente denso (E1.6, ``onde este resultado entra''), e na
 prática o LASSO deixa coeficientes não nulos em blocos nulos --- a conferência de E2.2
 mediu, com cerca de $99$ não nulos, \emph{zero} dos três blocos nulos zerados
 pelo LASSO contra três pelo sparse group LASSO. O que o
 Corolário~\ref{cor:limiar} diz é outra coisa: a \emph{norma} do bloco, e não o
-seu suporte, é pequena nos blocos nulos, e um corte na norma recupera $S$. O
+seu suporte, é pequena nos blocos nulos, e um corte na norma recupera $\mathcal{S}$. O
 procedimento é, portanto, de dois passos, e o enunciado do artigo tem de
 dizê-lo.
 \end{remark}
@@ -444,14 +445,14 @@ em um passo.
 
 \begin{itemize}[nosep, leftmargin=*]
   \item \textbf{$t_{n}$ depende de constantes desconhecidas.} A janela de (i)
-    é escrita em $D_{n}$, que carrega $\sigma$, $\gamma = \kappa_{1}c_{U}$,
+    é escrita em $\bar{\Delta}_{n}$, que carrega $\sigma$, $\gamma = \kappa_{1}c_{U}$,
     $C_{g}$, $\seff$ e $\mathcal{B}_{J_{n}}$; e a de (iii), em $\rn_{n}$ e
-    $\sepmin_{n}$. Nada aqui diz como escolher $t_{n}$ com os dados. A
+    $\sepminn$. Nada aqui diz como escolher $t_{n}$ com os dados. A
     escolha empírica é de E2.4 e E2.5, e a conferência desta etapa entrega
     apenas a curva de acerto contra o limiar e uma regra invariante de escala
     para servir de ponto de partida.
   \item \textbf{Não é cota inferior.} A Observação~\ref{rem:exata} mostra que
-    o argumento para em $\sepmin = 2D$; não se prova que a separação seja
+    o argumento para em $\sepmin = 2\bar{\Delta}$; não se prova que a separação seja
     necessária para algum procedimento. A cota inferior para $q\ge2$ não
     existe neste projeto (E1.9).
   \item \textbf{Não é a propriedade oráculo da saída (a).} O estimador não
@@ -464,7 +465,7 @@ em um passo.
     afirmação de taxa, não de recuperação de suporte, e continua sendo.
   \item \textbf{O alvo limiarizado é $\PiJ\gcomp{\cv}{\md}$, não
     $\gcomp{\cv}{\md}$.} A estatística vive na resolução $J_{n}$, e o viés de
-    aproximação entra em $D_{n}$ pela terceira parcela de \eqref{eq:Dn}. Nas
+    aproximação entra em $\bar{\Delta}_{n}$ pela terceira parcela de \eqref{eq:Dn}. Nas
     resoluções que a regra $J_{n}$ prescreve para os $n$ do piloto essa
     parcela \emph{domina} as outras duas, o que a conferência mede: a janela
     do Lema~\ref{lem:sanduiche} chega a ser vazia enquanto o acerto observado
@@ -494,8 +495,8 @@ na parte que mede a identidade de normas. As cinco partes e o que saiu em
     \eqref{eq:sanduiche} e a janela de (iii) valem em $2000$ configurações
     aleatórias de até $12$ blocos, com $21$ limiares em cada uma: zero
     falhas nas duas afirmações. A configuração da Observação~\ref{rem:exata}
-    é construída e verificada: com $\sepmin = 2D$ as duas estatísticas
-    empatam em $D$ e nenhum dos $201$ limiares testados acerta.
+    é construída e verificada: com $\sepmin = 2\bar{\Delta}$ as duas estatísticas
+    empatam em $\bar{\Delta}$ e nenhum dos $201$ limiares testados acerta.
   \item \textbf{Parte II, a estatística.} Com \texttt{rescale = FALSE} e
     avaliação exata da base, $\Nhat{\cv}{\md}$ calculada por quadratura e
     $\norm{\thetahat_{\cv\md,\cdot}}_{2}$ coincidem nos seis blocos com erro
@@ -516,14 +517,14 @@ na parte que mede a identidade de normas. As cinco partes e o que saiu em
     $\min_{S}\lVert\PiJ\gcomp{\cv}{\md}\rVert$ é $0{,}999$ no suave e
     $0{,}778$ no não homogêneo em $n = 2000$. A janela $\sepmin > 2\Delta_{n}$
     existe em todas as células do cenário suave e em \emph{nenhuma} do não
-    homogêneo; ainda assim, $\Prob(\Shat = S)$ no melhor limiar da grade é
+    homogêneo; ainda assim, $\Prob(\Shat = \mathcal{S})$ no melhor limiar da grade é
     $1{,}00$ em todas as células com \texttt{cv.min} a partir de $n = 500$, e
     a fração de réplicas em que \emph{algum} limiar acerta é $1{,}00$ (a
     única exceção é $0{,}95$, em $n = 250$ no não homogêneo). É a assimetria
     do Corolário~\ref{cor:limiar}(ii) contra (iii): o viés de aproximação
     encolhe todas as normas na mesma direção e não cria falso positivo.
   \item \textbf{Parte III, a curva.} Em $n = 2000$ o platô de acerto é largo:
-    $\Prob(\Shat(t) = S) = 1$ para $t \in [0{,}062;\,0{,}590]$ no cenário
+    $\Prob(\Shat(t) = \mathcal{S}) = 1$ para $t \in [0{,}062;\,0{,}590]$ no cenário
     suave e $t \in [0{,}127;\,0{,}590]$ no não homogêneo. À esquerda do platô
     entram os três blocos nulos, à direita saem os três ativos.
   \item \textbf{Parte III, a regra da teoria.} O par $(J_{n},\pen_{n})$ do

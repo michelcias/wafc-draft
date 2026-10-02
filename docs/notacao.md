@@ -177,3 +177,19 @@ fonte, porque `\E` continua sendo `\E`; o que muda é como ele imprime.
 (D33, 2026-09-21: nos documentos de trabalho, "sieve" também cede lugar a
 "espaço de aproximação"; os símbolos não mudam.)
 
+## 9. Emenda de 2026-10-01 (D40): a seleção de estrutura
+
+A seleção por limiarização (E1.7c, Corolário 8; §3.6 e S7 do manuscrito)
+usava quatro símbolos que colidiam com outros já fixados. Ficam:
+
+| Símbolo | Significado | Era | Colidia com |
+|---|---|---|---|
+| `ν_{ℓm}`, `ν̂_{ℓm}` | norma `L_2[0,1]` da componente `g_{ℓm}` e da estimada; a segunda é a norma euclidiana do bloco `θ̂_{ℓm,·}` | `N_{ℓm}`, `N̂_{ℓm}` | `N` (momentos nulos) e `N_J` |
+| `𝒮`, `𝒮̂(t)` | a estrutura, `{(ℓ,m) : ν_{ℓm} > 0}`, e a estimada pelo limiar `t` | `S`, `Ŝ(t)` | `S` (suporte genérico) e `S_0` |
+| `ν_min`, `ν_{min,n}` | a separação, `min_{(ℓ,m)∈𝒮} ν_{ℓm}`, fixa ou na sequência triangular | `δ`, `δ_n` | o vetor `δ` da prova do oráculo |
+| `Δ̄`, `Δ̄_n` | a cota do erro uniforme por bloco `Δ` | `D`, `D_n` | `D = p + d` (proposição do desenho) |
+
+`Δ`, `ρ_n` e `t_n` não mudam. No LaTeX: `\nu`, `\widehat{\nu}`,
+`\mathcal{S}`, `\widehat{\mathcal{S}}`, `\nu_{\min}`, `\nu_{\min,n}`,
+`\bar{\Delta}`.
+

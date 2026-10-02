@@ -79,6 +79,7 @@ que ler antes está aqui e no plano.
 | E2.5h o `gam` por REML e GCV, e o GCV do WAFC | **catalogada** (2026-10-01) | §3 |
 | E2.5i o `gam` com `k` por validação cruzada | **catalogada** (2026-10-01), depois da E2.5h | §3 |
 | L8 referências do `mgcv` e da escolha da dimensão | **fechada** (2026-10-01): 82 entradas; Kauermann & Opsomer usam ML, e o catálogo da E2.5h foi corrigido | `referencias-verificadas.bib`, `literatura.md` |
+| L9 as duas frases que L7 deixou | **fechada** (2026-10-01): a entrada de 1994 saiu; o risco minimax de 1998 é sobre corpos de Besov (pergunta 35(h)) | `derivations/05-taxas.tex`, `docs/busca-novidade.md` |
 | E2.5, E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
@@ -101,7 +102,7 @@ catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**Catalogadas: E2.5h** (2026-10-01), o `gam` sintonizado nos termos dele (REML e GCV sobre a grade de Ruppert) e o GCV do WAFC; **E2.5i** (2026-10-01), o `gam` com `k` por validação cruzada, separada por custo e aberta só depois da E2.5h, porque toca os mesmos arquivos e precisa dos `.rds` dela; L8 fechou; E2.5e, E2.5f, E2.5g, L6 e L7 fecharam. A repetição do piloto (E2.4c,
+**Catalogadas: E2.5h** (2026-10-01), o `gam` sintonizado nos termos dele (REML e GCV sobre a grade de Ruppert) e o GCV do WAFC; **E2.5i** (2026-10-01), o `gam` com `k` por validação cruzada, separada por custo e aberta só depois da E2.5h, porque toca os mesmos arquivos e precisa dos `.rds` dela; L8 e L9 fecharam; E2.5e, E2.5f, E2.5g, L6 e L7 fecharam. A repetição do piloto (E2.4c,
 E2.5a) devolveu no-go para a variante LASSO, e as medições que a pergunta
 33 do `ESTADO.md` pedia fecharam no mesmo dia: E2.5b (o block LASSO com
 níveis livres), E2.5c (os pesos), E2.5d (o `gam` autônomo), E1.11 (a
@@ -120,10 +121,10 @@ A cota inferior para `q ≥ 2`, que o handoff de E1.6 chegou a chamar de E1.8,
 é **E1.9** se algum dia for aberta (a numeração E1.8 ficou com a rota do
 intervalo).
 
-**O manuscrito está vivo em `k = 2`** (aberto em 2026-09-30; E5c
-aplicou as edições acumuladas; `k = 1` fica intacta). Toda alteração é marcada em `colR1`; `ms`, `supp` e
+**O manuscrito está vivo em `k = 3`** (aberto em 2026-10-01 para a
+notação de D40; `k = 1` e `k = 2` ficam intactas). Toda alteração é marcada em `colR1`; `ms`, `supp` e
 `references` andam juntos. O mapa da numeração global para os rótulos do
-LaTeX está no cabeçalho do `ms_2.tex`.
+LaTeX está no cabeçalho do `ms_3.tex`.
 
 ## 5. Numeração dos resultados
 
@@ -141,7 +142,7 @@ pelo chat principal, com o mapa abaixo.
 | `05-taxas.tex` (E1.6) | Lema 8, Lema 9, Proposição 4, Teorema 2, Corolário 4, Corolário 5 |
 | `02-aproximacao-besov.tex` (emenda E1.3b) | Lema 10 |
 | `07-rota-intervalo.tex` (E1.8) | Lema 11, Proposição 5, Corolário 6, Proposição 6, Corolário 7, Lema 12 |
-| `06-selecao-limiar.tex` (E1.7c) | Lema 13, Corolário 8 (no manuscrito: Lemma S7.1 e Corollary 2, com a Hipótese S como Assumption 6; mapa no cabeçalho do `ms_2.tex`) |
+| `06-selecao-limiar.tex` (E1.7c) | Lema 13, Corolário 8 (no manuscrito: Lemma S7.1 e Corollary 2, com a Hipótese S como Assumption 6; mapa no cabeçalho do `ms_3.tex`) |
 
 **Este mapa é a autoridade**, e é ele que E5a usa ao montar o manuscrito. O
 `04-oraculo.tex` já imprime o número global (via `\setcounter` no
