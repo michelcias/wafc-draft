@@ -265,7 +265,7 @@ factor, under the same Besov assumption that governs \textcolor{colR1}{linear ap
 reduces to the rate of Klopp and Pensky when a single modulator is present.
 
 We call the resulting procedure WAFC, for wavelet additive functional
-coefficients. Its contributions are of three kinds. The first is the theory of
+coefficients. Its contributions are of \textcolor{gray}{\sout{three}} \textcolor{colR1}{four} kinds. The first is the theory of
 the additive product design: a design condition for the Gram matrix of the
 products between a linear covariate and a wavelet of a modulator, which
 carries a cross term between distinct modulators and does not assume
@@ -279,7 +279,12 @@ $\tau = (s+1/2)^{-1}$ (Lemma~\ref{lem:weak}\textcolor{colR1}{, a form with expli
 the rate of the estimator from the rate of \textcolor{colR1}{linear approximation} when the Besov
 integrability index is smaller than two. The third is computational: the
 estimator is one convex program on a sparse design matrix, and the resolution
-level and the penalty are chosen jointly.
+level and the penalty are chosen jointly. \textcolor{colR1}{The fourth is the
+recovery of the structure of the model, which modulators act on which
+coefficients, by a threshold on the norms of the fitted components
+(Corollary~\ref{cor:threshold}): it needs no design condition beyond the one
+above and no irrepresentability condition, and removing the null blocks needs
+no separation condition at all.}
 
 The rest of the paper is organized as follows. Section~\ref{sec:model}
 introduces the model, its identification, the wavelet \textcolor{colR1}{approximation space} and the estimator.
@@ -898,8 +903,27 @@ then $\Prob\{\widehat{\mathcal{S}}(t_n) \subseteq \mathcal{S}\} \to 1$.
 \item[(ii)] (Recovery.) If, in addition, Assumption~\ref{ass:sep} holds and
 $\limsup_n t_n/\nu_{\min,n} < 1$, then $\Prob\{\widehat{\mathcal{S}}(t_n) = \mathcal{S}\} \to 1$.
 Such thresholds always exist; one is $t_n = (\rho_n\nu_{\min,n})^{1/2}$.
+\item[(iii)] \textcolor{colR1}{(A window at fixed $n$.) With $\alpha$ the level in
+\eqref{eq:lambda}, for every $n$ and every $\alpha' \in (0,1)$ there is an
+event, of probability at least
+$1 - \alpha - \alpha' - \omega_n$ with $\omega_n \to 0$ not depending on the
+components, on which $\widehat{\mathcal{S}}(t) = \mathcal{S}$ for every $t$
+with $\bar{\Delta}_n \le t < \nu_{\min,n} - \bar{\Delta}_n$; here
+$\bar{\Delta}_n \le c(\alpha,\alpha')\rho_n$ is an explicit bound on
+$\max_{(\cv,\md)}\lVert \widehat{g}_{\cv\md} - \gcomp{\cv}{\md}
+\rVert_{L_2[0,1]}$, given in the proof (Section~S7 of the Supplementary
+Material).}
 \end{enumerate}
 \end{corollary}
+
+\textcolor{colR1}{Parts (i) and (ii) hold also at the resolution of
+Theorem~\ref{thm:main}, with $\rho_n$ replaced by
+$\tilde\rho_n = (\log n/n)^{s/(2s+1)}$, the square root of the rate of that
+theorem, both in the condition on $t_n$ and in Assumption~\ref{ass:sep}.
+Since $\tilde\rho_n \le \rho_n$, with a gap in the exponent when $\pi < 2$,
+the separation required is weaker exactly where the components are spatially
+inhomogeneous. Part (iii) is stated at the resolution of
+Theorem~\ref{thm:sieve}, where its bound is explicit.}
 
 Part (i) uses no separation: removing the null blocks is free, and
 Assumption~\ref{ass:sep} is spent entirely on not losing a small active block.

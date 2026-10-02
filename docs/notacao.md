@@ -189,7 +189,9 @@ usava quatro símbolos que colidiam com outros já fixados. Ficam:
 | `ν_min`, `ν_{min,n}` | a separação, `min_{(ℓ,m)∈𝒮} ν_{ℓm}`, fixa ou na sequência triangular | `δ`, `δ_n` | o vetor `δ` da prova do oráculo |
 | `Δ̄`, `Δ̄_n` | a cota do erro uniforme por bloco `Δ` | `D`, `D_n` | `D = p + d` (proposição do desenho) |
 
-`Δ`, `ρ_n` e `t_n` não mudam. No LaTeX: `\nu`, `\widehat{\nu}`,
+`Δ`, `ρ_n` e `t_n` não mudam. `ρ̃_n = (log n/n)^{s/(2s+1)}` é a raiz da taxa do
+Corolário 5 de E1.6 (Theorem 1 do manuscrito), usada na versão do Corolário 8
+nessa resolução (pergunta 32(c)); `ρ̃_n ≤ ρ_n`. No LaTeX: `\nu`, `\widehat{\nu}`,
 `\mathcal{S}`, `\widehat{\mathcal{S}}`, `\nu_{\min}`, `\nu_{\min,n}`,
 `\bar{\Delta}`.
 

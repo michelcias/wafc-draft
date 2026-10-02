@@ -1102,7 +1102,9 @@ $C_g^2(1-2^{-2\seff})^{-1}2^{-2J_n\seff}$. By $(x+y)^2 \le 2x^2 + 2y^2$,
 with probability at least
 $1 - \alpha - \alpha' - \Prob\{\lmin(\Gramhat) < \gamma/2\} -
 \Prob\{\smax^2 > 2B_X^2C_U\}$, the last two terms tending to zero by
-Proposition 2(ii) and Lemma S5.3. By Lemma S7.1(iii), on that event
+Proposition 2(ii) and Lemma S5.3\textcolor{colR1}{; their sum is the
+$\omega_n$ of Corollary 2(iii), and this paragraph is the proof of that
+part}. By Lemma S7.1(iii), on that event
 $\widehat{\mathcal{S}}(t) = \mathcal{S}$ for every $t$ with $\bar{\Delta}_n \le t < \nu_{\min} - \bar{\Delta}_n$, a window
 that is nonempty whenever $\nu_{\min} > 2\bar{\Delta}_n$. The bound $\bar{\Delta}_n$ depends on the
 components only through the constants of Assumption 5, and the two residual
@@ -1136,6 +1138,17 @@ on the intersection of the two events Lemma S7.1(iii) with $\bar{\Delta} = \Delt
 $\widehat{\mathcal{S}}(t_n) = \mathcal{S}$. For the existence, $t_n = (\rho_n\nu_{\min,n})^{1/2}$ has
 $t_n/\rho_n = (\nu_{\min,n}/\rho_n)^{1/2} \to \infty$ and
 $t_n/\nu_{\min,n} = (\rho_n/\nu_{\min,n})^{1/2} \to 0$. \qed
+
+\textcolor{colR1}{\emph{At the resolution of Theorem 1.} Theorem 1 gives
+$\sum_{\cv,\md}\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}\rVert^2_{L_2[0,1]}
+= O_p(\tilde\rho_n^{\,2})$ with $\tilde\rho_n = (\log n/n)^{s/(2s+1)}$, hence
+$\Delta = O_p(\tilde\rho_n)$, and the bound in its proof depends on the
+components only through the constants of Assumption 5, through $C_\tau$ of
+Lemma 3 and the design constants, so that this holds uniformly over the
+class. The proofs of parts (i) and (ii) above use nothing about $\Delta$
+beyond $\Delta = O_p(\rho_n)$ uniformly over the class, together with
+Lemma S7.1 and Assumption 6, and they go through verbatim with
+$\tilde\rho_n$ in place of $\rho_n$.}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

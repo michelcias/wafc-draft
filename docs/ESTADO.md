@@ -2257,9 +2257,9 @@ Ordenadas pelo que bloqueia mais.
      `S` (conjunto de blocos) com o `S` de suporte genérico; `δ_n` com o
      vetor `δ`. Proposta da tarefa: `ν_{ℓm}` ou a norma por extenso, e
      `\mathcal{S}` para a estrutura. Passa pelo `notacao.md`.
-   - (b) O Corollary 2 enuncia só triagem e recuperação; a janela não
+   - (b) **~~Aplicada em 2026-10-01~~:** item (iii) do Corollary 2 no `ms_3`, a janela `Δ̄_n ≤ t < ν_{min,n} − Δ̄_n` num evento de probabilidade `≥ 1 − α − α′ − ω_n`, com `α` o nível de `eq:lambda`, e a prova no `supp_3` (S7) identificando `ω_n`; marcado em `colR1`. Texto original: o Corollary 2 enuncia só triagem e recuperação; a janela não
      assintótica `D_n ≤ t < δ − D_n` ficou na prova. Subir ao enunciado?
-   - (c) O Corollary 2 cobre só o regime do Theorem 3 (aproximação linear);
+   - (c) **~~Aplicada em 2026-10-01~~:** as partes (i) e (ii) valem também na resolução do Theorem 1, com `ρ̃_n = (log n/n)^{s/(2s+1)} ≤ ρ_n` (separação mais fraca com `π < 2`); a (iii) fica no Theorem 3. Parágrafo depois do Corollary 2 no `ms_3`, prova no fim da S7 do `supp_3`, Observação `rem:compressivel` no `06`, `ρ̃_n` no `notacao.md` §9; marcado. Texto original: o Corollary 2 cobre só o regime do Theorem 3 (aproximação linear);
      a mesma prova daria a versão com `ρ_n = (log n/n)^{s/(2s+1)}` sob o
      Theorem 1. Enunciado novo: acrescentar?
    - (d) Levar o Lema 10 ao `supp` como Proposition S3.2, com o expoente
@@ -2272,7 +2272,7 @@ Ordenadas pelo que bloqueia mais.
    - (f) A frase de reprodutibilidade ganha endereço quando houver (E3.3,
      E4.1).
    - (g) Os números da §4.3 precisam de tabela em E5b.
-   - (h) A lista de contribuições da Introduction não menciona a
+   - (h) **~~Aplicada em 2026-10-01~~:** a Introduction do `ms_3` passa de três a quatro contribuições, a quarta sendo a recuperação de estrutura pelo limiar (Corollary 2), sem condição de desenho nova nem irrepresentabilidade, e com a triagem sem separação; marcado. Texto original: a lista de contribuições da Introduction não menciona a
      recuperação de estrutura; acrescentar como quarta ou deixar?
 
 33. **O rumo depois do no-go de E2.5a** (2026-09-30), a mais importante
@@ -2574,6 +2574,8 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-02 | 32(c) aplicada: o Corollary 2 (i)–(ii) também na resolução do Theorem 1, com `ρ̃_n`; no `ms_3`, no `supp_3` e no `06` |
+| 2026-10-01 | 32(b) e 32(h) aplicadas no `ms_3` e no `supp_3` (janela não assintótica no enunciado do Corollary 2; a estrutura como quarta contribuição); 34 e 30 páginas |
 | 2026-10-01 | D42 (as quatro convenções de L1) ratificada; o `.bst` próprio dispensado (27(a)); o `08a` corrigido com o suplemento de K&P, e o "(A4)" do suplemento é a (A3) do artigo |
 | 2026-10-01 | Pergunta 40 aplicada: a Proposição 9.15 e o Teorema 9.3 de Johnstone (2019) citados no `ms_3` (marcado) e no `05`; contribuição 2 reescrita |
 | 2026-10-01 | Johnstone (2019) em `refs/`: a Proposição 9.15 dele é o Lema 9(i), o que tira a novidade do mergulho e pede reescrever a contribuição 2 (pergunta 40); o Teorema 9.3 dá o minimax sobre bolas weak-`ℓ_p` |
