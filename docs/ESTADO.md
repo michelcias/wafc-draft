@@ -2368,7 +2368,15 @@ Ordenadas pelo que bloqueia mais.
      precede", ou a entrada sai. E a frase de `busca-novidade.md` l. 45 com
      as condições do arXiv de K&P, que no *Annals* são `L + 1 = n^ς` e
      `r* > (2ς)^{−1}`. As duas são edição curta; a primeira recompila o PDF.
-   - (g) **Dois pontos de K&P que só o arXiv ou o suplemento resolvem:** o
+   - (g) **Suplemento de K&P lido em 2026-10-01** (`refs/klopp2015-supp.pdf`):
+     os Lemas 2 a 5 estão lá com os números que o `08a` usa, e o Lema 2(ii)
+     é a eq. (5.25), o termo de viés pela norma dual, como o `08a` diz. Dois
+     pontos novos para o `08a` §1.1, sem urgência: o Lema 4 é enunciado sob
+     a condição **(A4)**, eq. (5.30), e não "(A3)" como o `08a` escreve; e
+     pede `1 ≤ ν < ∞` e `r > min(1/2, 1/ν)`, de modo que a leitura
+     `(r, ν) = (s, π)` só vale com `π ≥ 1`. O expoente do Corolário 1 (o
+     fator 2) continua sem resolução, porque o suplemento não trata do
+     corolário. Texto original: dois pontos de K&P que só o arXiv ou o suplemento resolvem: o
      Corolário 1 do *Annals* (3.21) tem um fator 2 no expoente do log que a
      (3.17) e a (3.20) não têm, e o `08a` §4.3 o lê sem o 2 (parece erro de
      impressão, não conferido no arXiv); e o enunciado dos Lemas 2 a 4, que
@@ -2460,7 +2468,20 @@ Ordenadas pelo que bloqueia mais.
      verdade), entra só no suporte, não no bloco inteiro.
 
 39. **Pendências de L8** (2026-10-01), nenhuma bloqueando:
-   - (a) **PDFs que fecham três `[VERIFICAR]` no `.bib`:** Zou, Hastie &
+   - (a) **~~PDFs que fecham três `[VERIFICAR]`~~ lidos em 2026-10-01**
+     (`refs/zou2007.pdf`, `tibshirani2012.pdf`, `marra2011.pdf`), e o
+     `.bib` não tem mais marca. Zou et al. (2007, Teorema 1, p. 2177)
+     **exigem `rank(X) = p`**, o que falha no WAFC com `d > n`; quem cobre o
+     desenho do WAFC é Tibshirani & Taylor (2012): Teorema 2 (p. 1213),
+     `df = E[rank(X_A)]` para qualquer `X`, e a Observação da p. 1215, que
+     com colunas não penalizadas dá `df = p + E[rank(M X_A)]`, com `M` a
+     projeção que tira os níveis. **A contagem "não nulos + p" do GCV da
+     E2.5h é esse `df` quando `M X_A` tem posto coluna cheio**, o que o
+     artigo não garante em geral; o manuscrito deve citar Tibshirani &
+     Taylor e dizer a condição, e a E2.5h pode conferir `rank(M X_A)`
+     contra `|A|` nos `λ` escolhidos. Marra & Wood (2011), §2.1, p. 2374:
+     a dupla penalidade é o `select = TRUE`, dito no próprio artigo. Texto
+     original: PDFs que fecham três `[VERIFICAR]` no `.bib`: Zou, Hastie &
      Tibshirani (2007) e Tibshirani & Taylor (2012), o teorema que dá os
      graus de liberdade do LASSO e se o caso com colunas não penalizadas
      (os `p` níveis do WAFC) está enunciado. **É a justificativa do `df` do
@@ -2528,6 +2549,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | PDFs da 39(a) e da 35(g) lidos: o `df` do GCV do WAFC se apoia em Tibshirani & Taylor (2012, Teorema 2 e a observação das colunas não penalizadas), não em Zou et al., que exigem posto cheio; o Lema 4 de K&P pede (A4) e `ν ≥ 1` |
 | 2026-10-01 | Pergunta 35(h) decidida, saída (a): "Besov bodies" com os Teoremas 4 e 5 de Donoho & Johnstone (1998) no `05` e no `ms_3`, marcado; os dois compilam em 10 e 33 páginas |
 | 2026-10-01 | E2.5h parou antes da rodada e mediu uma réplica: o `gam.gcv` na `mixed` custa ~900 h na grade até 120; D41 fixa a grade única `{5, 10, 20, 40, 80}`, tira o `gam.gcv` da `mixed` e junta a E2.5i de volta, ~15,5 h no total |
 | 2026-10-01 | L9 fechada e integrada: a entrada falsa de Donoho & Johnstone (1994) saiu do `05`; o risco minimax de 1998 é sobre corpos de Besov, com a mesma ordem, e a classe citada no `05` e no `ms_3` é a pergunta 35(h) |

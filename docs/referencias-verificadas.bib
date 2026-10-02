@@ -738,11 +738,14 @@
 % `published-print` 2007-10, mas não guarda páginas; "2173--2192" vem do
 % `journal_ref` do arXiv:0712.0881v1, que é a cópia publicada depositada
 % pelo IMS ("Published in ... the Annals of Statistics ... by the Institute
-% of Mathematical Statistics"). PDF não lido. O que o projeto usa: o número
-% de coeficientes não nulos como estimador não viesado dos graus de
-% liberdade do LASSO, e o seu uso em Cp, AIC, BIC e GCV, que é a contagem
-% de `wafc_bic()` (D19) e do GCV de E2.5h [VERIFICAR: número do teorema e
-% da seção, PDF não lido].
+% of Mathematical Statistics"). Lido no PDF da editora (refs/zou2007.pdf,
+% 2026-10-01); nomes como impressos. O que o projeto usa: o Teorema 1
+% (§2.1, p. 2177), df(λ) = E|B_λ|, o número de coeficientes não nulos como
+% estimador não viesado dos graus de liberdade, e o seu uso em Cp, AIC, BIC
+% e GCV. Ressalva: o teorema vale "as long as X is full rank, that is,
+% rank(X) = p", o que falha no desenho do WAFC quando d > n (J fundo); para
+% esse caso e para as colunas não penalizadas, a referência é
+% Tibshirani & Taylor (2012), abaixo.
 @article{Zou-Hastie-Tibshirani-2007,
   author  = {Zou, Hui and Hastie, Trevor and Tibshirani, Robert},
   title   = {On the ``degrees of freedom'' of the lasso},
@@ -757,12 +760,16 @@
 % L8 (2026-10-01). Ryan J. Tibshirani (cf. `Tibshirani-2013`). O Crossref
 % confere título, autores, 40(2), DOI e `published-print` 2012-04, sem
 % páginas; "1198--1232" vem do `journal_ref` do arXiv:1111.0653v4, a cópia
-% publicada depositada pelo IMS. PDF não lido. O que o projeto usa: a
-% extensão do resultado de Zou et al. (2007) a matriz de desenho qualquer,
-% em que os graus de liberdade são a esperança do posto das colunas
-% ativas, o que cobre as colunas não penalizadas dos níveis `p` na contagem
-% do GCV de E2.5h [VERIFICAR: número do teorema e se o caso com colunas
-% não penalizadas está enunciado, PDF não lido].
+% publicada depositada pelo IMS. Lido no PDF da editora
+% (refs/tibshirani2012.pdf, 2026-10-01); nomes como impressos. O que o
+% projeto usa: o Teorema 2 (§3.5, p. 1213), df(Xβ̂) = E[rank(X_A)] para
+% qualquer X, com A o conjunto ativo; e a Observação "The lasso with
+% intercept" (p. 1215), que estende a qualquer conjunto de coeficientes
+% não penalizados: df = dim(col(X_U)) + E[rank(M X_A)], com M a projeção no
+% complemento ortogonal das colunas não penalizadas X_U (a prova é
+% omitida no artigo). No WAFC, X_U são os p níveis, e a contagem
+% "não nulos + p" de `wafc_bic()` e do GCV de E2.5h coincide com ela
+% quando M X_A tem posto coluna cheio, o que o artigo não afirma em geral.
 @article{Tibshirani-Taylor-2012,
   author  = {Tibshirani, Ryan J. and Taylor, Jonathan},
   title   = {Degrees of freedom in lasso problems},
@@ -1056,11 +1063,12 @@
 }
 
 % L8 (2026-10-01). O Crossref confere tudo, inclusive 55(7), 2372--2387 e
-% `published-print` 2011-07. PDF não lido; nomes do Crossref (D39). O que
-% o projeto usa: a penalidade extra no espaço nulo de cada suavizador, que
-% permite zerar o termo inteiro e é o `select = TRUE` do `gam` concorrente
-% desde E2.4 (o help de `mgcv::gam.selection` cita este artigo para isso)
-% [VERIFICAR: seção, PDF não lido].
+% `published-print` 2011-07. Lido no PDF da editora (refs/marra2011.pdf,
+% 2026-10-01); nomes como impressos (D39). O que o projeto usa: a
+% "double penalty approach" da §2.1 (p. 2374, eq. (3)), uma penalidade
+% extra no espaço nulo de cada suavizador, que permite zerar o termo
+% inteiro; o próprio artigo diz que ela é o `select = TRUE` do `gam` do
+% `mgcv`, que é o do concorrente desde E2.4.
 @article{Marra-Wood-2011,
   author  = {Marra, Giampiero and Wood, Simon N.},
   title   = {Practical variable selection for generalized additive models},
