@@ -1,6 +1,6 @@
 # Estado do trabalho, handoff de continuidade
 
-**Última atualização:** 2026-10-01.
+**Última atualização:** 2026-10-02.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8,
 E1.10 e E1.11), E5a, E5c e E2.1 a E2.5h fechadas**, mais L1 a L9 e a
 sondagem E6.1a. Falta E2.5 (go/no-go) para fechar E2. O LASSO puro levou
@@ -2326,7 +2326,7 @@ Ordenadas pelo que bloqueia mais.
    - (c) **~~Aplicada em 2026-10-01~~:** as partes (i) e (ii) valem também na resolução do Theorem 1, com `ρ̃_n = (log n/n)^{s/(2s+1)} ≤ ρ_n` (separação mais fraca com `π < 2`); a (iii) fica no Theorem 3. Parágrafo depois do Corollary 2 no `ms_3`, prova no fim da S7 do `supp_3`, Observação `rem:compressivel` no `06`, `ρ̃_n` no `notacao.md` §9; marcado. Texto original: o Corollary 2 cobre só o regime do Theorem 3 (aproximação linear);
      a mesma prova daria a versão com `ρ_n = (log n/n)^{s/(2s+1)}` sob o
      Theorem 1. Enunciado novo: acrescentar?
-   - (d) Levar o Lema 10 ao `supp` como Proposition S3.2, com o expoente
+   - (d) (**Deixada para a revisão** em 2026-10-01, por recomendação do chat principal: o lema não dá taxa em `ε = 0`, a resposta pronta a um referee é a rota do intervalo de E1.8, e ele convidaria a pergunta pela taxa com margem, cuja resposta é a Proposição 6. Sem decisão do autor.) Levar o Lema 10 ao `supp` como Proposition S3.2, com o expoente
      exato e a observação sobre a margem acoplada a `J`?
    - (e) **~~Catalogado como L5~~ verificado por L5 (2026-09-30):** Teorema
      3.2, pp. 688–749. Texto original: catalogado como L5, com as duas referências de
@@ -2626,45 +2626,63 @@ Ordenadas pelo que bloqueia mais.
 
 ## 5. Próximos passos
 
-Tudo converge em E2.5 (go/no-go). A repetição do piloto (c) está feita e
-devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
+**Onde parou (2026-10-02).** Catálogo vazio, nenhum handoff pendente, tudo
+commitado. As medições de E2.5 estão completas (E2.5a a E2.5h): o LASSO puro
+levou no-go pelo critério literal; o limiar do Corolário 8 e a forma
+balanceada do block LASSO são o que melhora o WAFC; e o `gam` sintonizado nos
+termos dele (E2.5h) não muda o veredito. O manuscrito está em `k = 3` com as
+pendências de redação resolvidas (32(a), (b), (c), (h); D40), e a bibliografia
+sem marca aberta (83 entradas).
 
-- (a) **~~Conserto do repasse de `wavelet.table`~~ feito em 2026-09-28**
-  (pergunta 10), com a revisão do código de `wafc/` (§2).
-- (b) **~~Autor: decidir P1 e P2~~ ratificadas em 2026-09-28** (D34,
-  D35), já no código.
-- (b') **~~Medir as duas acelerações da pergunta 29~~ medidas, e nenhuma
-  entra (D37).**
-- (b'') **~~Pergunta 31~~ respondida (§2):** a coluna `wafc.sglasso` pode
-  ser lida em predição; em estrutura, `λ.min` liga centenas de
-  coeficientes falsos no nulo, e a estrutura se lê pela limiarização ou
-  por `λ.1se`.
-- (c) **Repetir a parte `competitors` do piloto** com a grade `2:8`
-  (D34), o `bsgl` na mesma grade (D36), o `gam` em dimensão casada (`wafc_k_matched()`, motor `bam`) e o
-  cenário `uneven` de D30; só então fixar o fator do critério de saída no
-  cenário suave (pergunta 8). A coluna `theory` do `uneven` sai degenerada
-  e tem de ser dita na tabela. **Catalogado em 2026-09-30** como E2.4c
-  (o script ainda não tem a célula `uneven` nem o `gam` casado por `bam`:
-  a parte `competitors` chama o `gam` com `k = 10`) seguida de E2.5a (a
-  rodada), no `TAREFA.md` §3; E2.4c sem rodada de calibração, por decisão
-  do autor. **E2.4c e E2.5a fecharam em 2026-09-30 (§2).**
-- (d) **E2.5**, agora sobre o no-go de E2.5a: **todas as medições estão
-  feitas** (E2.5b a E2.5g; a calibração de `t_n` da pergunta 11 por
-  E2.5g). Falta a decisão do autor: a pergunta 33 (o que o WAFC é: LASSO,
-  blocos, e com qual limiar) e a 38 (a regra de `t` e o papel do limiar).
-  O sparse group LASSO chega a E2.5 sem ganho em predição e com 42% do
-  processador da rodada.
-- (e) **Autor, sem bloquear E2.5:** a saída da aplicação (pergunta 2) e as
-  pendências de E5c (pergunta 32). `k = 2` foi aberta e E5c fechou em
-  2026-09-30.
-- (f) **Depois de E2.5:** E3 (consolidação e E3.3, o empacotamento), E4 e
-  E6 em paralelo; a decisão sobre E1.9 (cota inferior, pergunta 20) espera
-  os números de E2.5 e E4.
+**O próximo passo é a decisão de rumo, do autor**, com os números da §2:
+
+- (a) **Pergunta 33, o que o WAFC é.** LASSO limiarizado ou block LASSO na
+  forma balanceada (a que a teoria cobre, E2.5e), e se o block LASSO vira a
+  variante principal (muda o posicionamento de D18, que diz "penalize
+  coefficient by coefficient"). O resumo, contra o `gam.cv` (mesmo critério
+  e mesmas dobras, E2.5h): o WAFC perde no `smooth` (1,25 a 1,38 em
+  `rmse_f`) e no `uneven` em toda forma; o `klopp.balanced+cv` vence no não
+  homogêneo (0,90 a 0,96) e na `mixed` (0,94 a 0,98); o fator do suave do
+  `wafc.lasso+max` é 1,27 a 1,49, no limite de 1,5. A avaliação franca de
+  2026-10-01 (chat principal): a teoria é o ponto forte; a vantagem numérica
+  sobre o spline é pequena e cresce com `n`; a recuperação de estrutura pelo
+  limiar é a vantagem que o spline não tem.
+- (b) **Pergunta 38, o limiar:** qual regra de `t` (o `c = 0,15` de E1.7c
+  falha no não homogêneo; `c = 0,4` acerta 0,88 a 1 em `n ≥ 500`), a porta
+  de "tudo zero" para o nulo, e se o limiar é também o estimador de
+  predição.
+- (c) **Pergunta 41, o concorrente spline de E4:** `gam.cv` (proposto) ou
+  `gam.reml` (mesmo erro, um décimo do custo); o `gam.gcv` como terceira
+  coluna; se o `wafc.gcv` entra.
+- (d) **Pergunta 2, a aplicação:** a maior lacuna para o formato da revista
+  (método, teoria, simulação, aplicação). Busca nova com o critério de
+  E6.1a (salto documentado na literatura da área) ou aplicação neutra.
+
+**Medições candidatas para depois da decisão** (não catalogadas; todas
+disputam os 8 núcleos, uma rodada por vez): `n = 2000` no não homogêneo e
+na `mixed`, com e sem limiar, que diz se a vantagem que cresce com `n`
+continua; `boundary = "interval"` e pesos adaptativos, que o plano (E2.5 e
+tabela de riscos) manda testar antes de mudar de rumo; o `gam.k128` na
+`mixed` com 50 réplicas (36(b); hoje 15); o `c` relativo do limiar por
+validação cruzada (38(a)); a guarda de `edf` no `gam` (36(c)); e onde o
+`glmnet` deixa de convergir (41(d)).
+
+**Sem bloquear:** 12 (cenário `smooth`), 13 (nome da (BD)), 20 (cota
+inferior, o risco assumido com D18), 21
+(`p` crescente); 32(d), o Lema 10 no `supp`, deixado para a revisão por
+recomendação do chat principal, sem decisão do autor.
+
+**Depois de E2.5:** E3 (consolidação, E3.1 a E3.3, empacotamento), E4 (o
+compêndio `wafc-studies` e o estudo) e E6 (a aplicação) em paralelo; E5b
+(Seções 5 a 7, com a tabela da §4.3, 32(g), e o endereço de
+reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
+27(b) e (c) do checklist).
 
 ## 6. Histórico de sessões
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-02 | Documentação de continuidade revista para recomeçar em outro chat: §5 do `ESTADO.md` reescrita em torno da decisão de rumo; `CONTINUAR.md` §3 e §4, `plano-projeto.md` E2.5 e `TAREFA.md` alinhados |
 | 2026-10-02 | E2.5h fechada e integrada (1 006 testes, 28 350 linhas, sexta junção exata): com o `gam` sintonizado por REML, validação cruzada ou GCV o veredito se mantém; `gam.reml` e `gam.cv` coincidem; o GCV do WAFC não ganha nada; o posto de Tibshirani & Taylor confere; Wood (2004) no `.bib`; pergunta 41 |
 | 2026-10-02 | Folha de rosto da impressão de Härdle et al. (1998) conferida: "Gerard" e "Alexander", como no `.bib`; o WALL diverge (35(c)) |
 | 2026-10-02 | 35(g) fechada: o fator 2 do Corolário 1 de K&P é erro do enunciado do *Annals*, que (3.19), (3.20) e (3.6) desmentem; o arXiv v2 tinha outro corolário; o `08a` já lia certo e agora diz por quê |

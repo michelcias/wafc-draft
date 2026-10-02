@@ -112,50 +112,45 @@ WAFC_OUT=wafc/cache/e25g WAFC_TAG=e25g WAFC_METHODS=wafc.lasso,klopp.balanced WA
 NC=8 setsid nohup wafc/cache/e25h/run.sh > wafc/cache/e25h/run.out 2>&1 &   # E2.5h, o gam por REML, CV e GCV e o GCV do WAFC (D41): 10 h 08 min em 8 núcleos, pico de 1,2 GB; o run.sh não é versionado, e o comando por baixo é o 04-pilot.R com WAFC_METHODS=gam.reml,gam.cv,gam.gcv,wafc.gcv (gam.gcv fora da mixed)
 ```
 
-## 3. Onde o trabalho está (resumo de 2026-10-01; o `ESTADO.md` manda)
+## 3. Onde o trabalho está (resumo de 2026-10-02; o `ESTADO.md` manda)
 
-- **E0 fechada.** Código em `wafc/` (D4); alvo *Statistica Sinica* (D5,
-  confirmada Q1 no SCImago) e método chamado **WAFC** (D8); instruções da
-  revista em `docs/ss-instrucoes-autores.md` e templates em
-  `manuscript/ss-template/`; teto de 40 páginas em espaço duplo, referências
-  incluídas. O tipo de revisão não consta da página oficial.
-- **Notação congelada** (E1.1, D9 a D12): `ψ_{jk}`, `X_ℓ`, `U_m`,
-  `θ_{ℓm,jk}`, `U ∈ [0,1]^q`; `derivations/macros.tex` implementa e compila.
-- **Teoria: E1 fechada** (E1.2 a E1.6, mais E1.3b, E1.4c, E1.7a, E1.7c,
-  E1.8 e E1.10), com as oito conferências numéricas rodando. O enunciado
-  principal é o Corolário 5 de `05-taxas.tex` (D16); a seleção de estrutura
-  entra pela limiarização (Corolário 8, D32); a rota do intervalo está
-  escrita e não vai ao manuscrito (D26). E1.9 (cota inferior) fica para
-  depois dos resultados.
-- **Código: E2.1 a E2.4c fechadas**, com o piloto, os sete concorrentes, o
-  QUT, o cenário `uneven` e a tabela de tempo, e a revisão de 2026-09-28
-  (defeitos, memória, busca de nós) e D34 a D37; **674 testes passam**.
-  E2.4c e E2.5a (a repetição do piloto) fecharam em 2026-09-30 com
-  **no-go para a variante LASSO** pelo critério literal; E2.5b a E2.5d
-  mediram o block LASSO de K&P, os pesos dele e o `gam` autônomo (**696
-  testes**; 730 depois de E2.5e, que achou a forma do block LASSO que a
-  teoria cobre). E2.5f mediu os níveis grossos livres (não pagam) e E2.5g o
-  limiar do Corolário 8 (`wafc/R/threshold.R`), que passa o fator do suave;
-  E2.5h o `gam` sintonizado nos termos dele, que não muda o veredito, e o GCV
-  do WAFC; **1 006 testes**. E2.5 espera a decisão de rumo (perguntas 33, 38
-  e 41 do `ESTADO.md`).
+- **Fechado:** E0, E1 (E1.2 a E1.8, E1.10, E1.11), E2.1 a E2.5h, E5a, E5c, a
+  sondagem E6.1a e as rodadas de bibliografia L1 a L9. Decisões D1 a D42 na
+  tabela do `ESTADO.md` §2.
+- **Teoria:** o enunciado principal é o Corolário 5 de `05-taxas.tex`
+  (Theorem 1 do manuscrito, D16); a seleção de estrutura é o Corolário 8 de
+  `06-selecao-limiar.tex` (Corollary 2, D32), agora com a janela a `n` fixo
+  e a versão no regime do Theorem 1; a rota do intervalo (E1.8) está
+  escrita e não vai ao manuscrito (D26); a teoria do block LASSO é a
+  sondagem `08a` (E1.11, E2.5e, E2.5f). O mergulho de Besov em weak-`ℓ_τ`
+  (Lema 9(i)) é clássico (Johnstone 2019, Proposição 9.15) e está citado
+  assim.
+- **Código** (`wafc/`, privado, D4): `wafc()`, `cv.wafc()`, os
+  concorrentes (`gam` com `k` por REML, CV ou GCV na grade de D41; `bsgl`;
+  as cinco formas do `klopp`; `aspline`; `vcbart`; `linear`; `oracle`), o
+  limiar `wafc_threshold()` (E2.5g) e o GCV `wafc_gcv()` (E2.5h); **1 006
+  testes passam**. A tabela mais recente é
+  `wafc/cache/e25h/e25h-joined.rds` (28 350 linhas, não versionada); o
+  procedimento para acrescentar um método por `WAFC_METHODS` foi validado
+  seis vezes (`TAREFA.md` §3).
 - **Avaliação da base em estudo numérico:** tabela fixa (`wtable()` uma vez,
   passada em `wavelet.table`), que é o caminho rápido; a regra `auto` não
-  dispara nos `n` do estudo e deixaria tudo no algoritmo lento (D31). A
-  exceção são as conferências de `derivations/check/`, que medem precisão
-  fina.
-- **Manuscrito vivo em `k = 3`** (aberto em 2026-10-01 para a notação da
-  seleção, D40): `ms_3.tex` e `supp_3.tex` compilam limpos, em 34 e 30
-  páginas, com as edições de E5c marcadas em `colR1` (inclusive o
-  Corolário 8 na §3.6); as pendências são a pergunta 32 do `ESTADO.md`.
-- **Bibliografia:** 83 entradas verificadas (L1, L3, L4, L5 e L8, mais Wood 2004 depois da E2.5h), e as citações das derivações conferidas nas fontes publicadas (L6, L7); os PDFs ficam em `refs/`, não versionado, e não viajam; pendências na pergunta 35 do `ESTADO.md`.
+  dispara nos `n` do estudo (D31). A exceção são as conferências de
+  `derivations/check/`, que medem precisão fina.
+- **Manuscrito vivo em `k = 3`** (`ms_3.tex`, `supp_3.tex`,
+  `references_3.bib`, aberto em 2026-10-01 para a notação de D40): compilam
+  limpos em 34 e 30 páginas; as edições desde a `k = 2` estão marcadas em
+  `colR1` (a rodada não foi aceita); as Seções 5 a 7 são de E5b.
+- **Bibliografia:** 83 entradas verificadas em
+  `docs/referencias-verificadas.bib`, sem marca aberta; as citações das
+  derivações conferidas nas fontes publicadas (L6, L7, L9); os PDFs ficam em
+  `refs/` (§4).
 - **Aplicação:** a sondagem E6.1a deu veredito negativo nas três bases
   (`docs/aplicacao-candidatas.md`); a saída é decisão do autor (pergunta 2).
-- **Catálogo:** vazio. E2.5h (o `gam` sintonizado nos termos dele e o GCV do WAFC) fechou em 2026-10-02. L8 e L9 fecharam em 2026-10-01. E2.5f, E2.5g, L6 e L7 fecharam em 2026-10-01; E2.4c, E2.5a a E2.5e, E1.11 e L5 em 2026-09-30 e 10-01; E2.5 espera a decisão das perguntas 33 e 38 do `ESTADO.md`;
-  detalhe no `TAREFA.md` §3.
-- **Nenhum handoff pendente.** Se aparecer um `docs/handoff-*.md`, é de chat
-  de tarefa que não foi integrado: o protocolo está na §7 de
-  `instrucoes.md`.
+- **O próximo passo é a decisão de rumo** (perguntas 33, 38 e 41), e a
+  §5 do `ESTADO.md` diz com quais números. **Catálogo vazio** e **nenhum
+  handoff pendente**; se aparecer um `docs/handoff-*.md`, é de chat de
+  tarefa que não foi integrado (§7 de `instrucoes.md`).
 
 ## 4. O que não viaja
 
@@ -165,6 +160,15 @@ NC=8 setsid nohup wafc/cache/e25h/run.sh > wafc/cache/e25h/run.out 2>&1 &   # E2
   handoff e o `ESTADO.md` registram os números.
 - A instalação do `WaveBased`: reinstalar com `R CMD INSTALL .` na pasta
   clonada.
+- **Os PDFs de `refs/`** (não versionados, por direito autoral): as fontes
+  que as rodadas de bibliografia leram, com os nomes usados nos comentários
+  do `.bib` (`buhlmann2011`, `cai1999`, `donoho1994`, `donoho1998`,
+  `hardle1998` e `hardle1998-springer-fm`, `hsu2012`, `huang2010`,
+  `johnstone2019`, `kauermann2011`, `klopp2014-arxiv`, `klopp2015` e
+  `klopp2015-supp`, `lounici2011`, `mallat2009`, `marra2011`, `pya2016`,
+  `restrepo1997`, `ruppert2000`, `ruppert2002`, `tibshirani2012`,
+  `vandegeer2011`, `wood2017`, `zou2007`). Em outra máquina, copiar a pasta
+  à mão; só uma conferência nova de citação precisa deles.
 
 ## 5. Regras que valem lá como aqui
 

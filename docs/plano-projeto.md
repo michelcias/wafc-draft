@@ -349,6 +349,15 @@ E1.7c a escolha de variante é entre o **LASSO limiarizado** e o sparse group
 LASSO, e E2.5 calibra também o limiar `t_n` (pergunta 11 do `ESTADO.md`).
 A grade padrão (`2:8`, D34) e a margem (`0`, D35) já estão decididas.
 
+**Medido de 2026-09-30 a 2026-10-02 (E2.5a a E2.5h, números no
+`ESTADO.md` §2):** no-go literal para o LASSO puro (E2.5a); cinco formas do
+block LASSO de K&P, das quais a balanceada é a que a teoria cobre e a melhor
+fora do suave (E2.5b a E2.5f); a estimação seguida de limiar, que derruba o
+fator do suave abaixo de 1,5 contra o `gam.matched` (E2.5g); e o `gam`
+sintonizado por REML, validação cruzada e GCV numa grade única (D41), que
+não muda o veredito (E2.5h). Ficaram por testar `boundary = "interval"` e
+pesos adaptativos. A decisão de rumo é do autor (perguntas 33, 38 e 41).
+
 **Critério de saída de E2:** testes de E2.1 a E2.3 passando; tabela do
 piloto; decisão registrada.
 
