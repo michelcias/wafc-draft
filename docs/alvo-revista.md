@@ -216,9 +216,10 @@ contra o PDF compilado no template, não contra esta tabela.
 - [ ] Seção "Supplementary Material" antes dos agradecimentos, e o suplemento
       num único PDF de até 10 MB com o mesmo título e os mesmos autores.
 - [ ] Figuras legíveis em preto e branco, sem referência a cor no texto.
-- [ ] **Estilo de citação:** o `chicago.bst` que o template carrega abrevia
+- [x] ~~**Estilo de citação:** o `chicago.bst` que o template carrega abrevia
       em "et al." a partir de três autores; a §4 das instruções manda listar
-      os três. Corrigir no `.bst`, não no texto.
+      os três.~~ Dispensado pelo autor em 2026-10-01: a revista não tem
+      `.bst` próprio e diagrama o artigo aceito a partir da fonte.
 - [ ] **Pacote autocontido:** substituir os `\input` pelas cópias dos
       arquivos de macro, com a correspondência entre bloco copiado e arquivo
       de origem registrada.

@@ -103,9 +103,15 @@ não foi relido.
   fixo e `n` grande**, que é o regime de E1.6. A taxa do teorema, com `μ log p ≍ log n`, é
   `(σ²/n)^{2r/(2r+1)} (log n)^{(2−ν)_+/(ν(2r+1))}`, que é exatamente a de §4
   com `(r, ν) = (s, π)`.
-- **O Lema 4 do suplemento** (risco ideal por blocos sob a classe (A3)) é
+- **O Lema 4 do suplemento** (risco ideal por blocos sob a classe (A3);
+  eq. (5.31), conferido em `refs/klopp2015-supp.pdf` em 2026-10-01) é
   `Σ_l min(‖a_l‖², εd) ≤ C_a^{2/(2r+1)} ε^{2r/(2r+1)} d^{(2−ν)_+/(ν(2r+1))}`,
-  e é o que a §3 reproduz sob a hipótese de E1.3.
+  e é o que a §3 reproduz sob a hipótese de E1.3. O suplemento rotula a
+  condição como "(A4)", mas a que ele escreve, eq. (5.30), é a (A3) do
+  artigo (p. 1278), e a (A4) de lá é a do ruído: é rótulo trocado no
+  suplemento, não neste arquivo. O lema pede `1 ≤ ν < ∞` e
+  `r > min(1/2, 1/ν)`, de modo que a correspondência `(r, ν) = (s, π)` com
+  o lema deles só vale com `π ≥ 1`.
 
 ### 1.2 Lounici, Pontil, van de Geer & Tsybakov (2011)
 

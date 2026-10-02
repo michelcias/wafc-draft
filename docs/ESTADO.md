@@ -1919,6 +1919,7 @@ p. 1283; Observação 2, p. 1284). `refs/donoho1998.pdf` entrou.
 | D39 | 09-30 | **Nomes de autor são grafados como estão impressos em cada referência**, sem uniformizar entre entradas: o mesmo autor pode aparecer como "Alexander" numa e "Alexandre" noutra (Tsybakov). A fonte é a folha de rosto ou o cabeçalho do próprio trabalho; o Crossref só na falta dela | decisão do autor: a citação reproduz o trabalho citado, e as grafias variam entre as publicações do mesmo autor |
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
+| D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
 | D32 | 09-20 | **A seleção de estrutura entra pela limiarização (saída (c)), e a saída (a) não abre agora.** O Corolário 8 de `06-selecao-limiar.tex` é o enunciado do artigo, com a hipótese de separação numerada e dizendo no próprio enunciado que é **estimação seguida de limiar**. A sondagem de E1.7a fica registrada como observação de meia página (a condição em grupos não depende de `J` nem da base), e a saída (a), se voltar depois de E2.5, volta pela rota de Wei & Huang (2010), não pela de Bach | veredito de E1.7a: a redução algébrica tira o risco de a condição falhar por construção, mas não o custo, e exige (BD) mais `E(XX'\|U)` constante, que contraria D13; além disso o valor de (a) continua condicionado a E2.5 escolher a variante em grupos, e E1.7c mostrou o LASSO limiarizado acertando 10 de 10 onde ela acerta 0 de 10 |
 | D31 | 09-20 | **Em avaliação numérica repetida, a base é fixada e avaliada por tabela**, não pelo algoritmo de Daubechies-Lagarias a cada ajuste: construir a tabela uma vez com `WaveBased::wtable()` para o par `(family, filter.size)` e passá-la em `wavelet.table` de `wafc_design()`, em vez de deixar a regra `use.table = "auto"` decidir réplica a réplica. Vale para o piloto (E2.4), o compêndio (E4) e a aplicação (E6). **Exceção:** conferência que mede precisão fina (as de `derivations/check/`, que leem decaimento até `1e-11`) continua com avaliação exata ou tabela com `prec.wavelet` alto, porque ali o `3.1e-06` engoliria o que se quer medir | pedido do autor, e a razão é **tempo de execução**: a tabela é o caminho rápido e a aproximação é boa o bastante (o erro de interpolação medido em E2.1 é `3.1e-06`), de modo que a variação entre os dois caminhos não é problema prático. A regra `auto` só dispara em `n q ≥ 2000 L`, isto é `n q ≥ 16000` com `L = 8`, e portanto **não dispara** nos `n` do piloto: deixá-la decidir significa pagar Daubechies-Lagarias em toda a varredura |
 | D30 | 09-19 | **O cenário suave é para ganhar, não só para não perder.** A hipótese `C^{p+1}` de Xue & Yang delimita a garantia deles, não o desempenho: com `J` e `λ` por validação cruzada o WAFC pode vencer splines também no suave, e E2.4 e E4 têm de medir isso em condição justa — o concorrente sintonizado nos termos dele (nós por BIC como no artigo deles, e `mgcv` com REML), predição e ISE relatadas em separado, e uma componente **suave de curvatura desigual** (gaussiana estreita ou `doppler` truncado longe da singularidade) acrescentada ao `dgp.R`, que é `C^∞` e portanto dentro da hipótese deles, mas com escala variando ao longo do domínio | argumento do autor; se o ganho aparecer, é ilustração forte para o artigo, e se não aparecer, a paridade no suave já é o que a Seção 5 precisa |
@@ -2180,14 +2181,18 @@ Ordenadas pelo que bloqueia mais.
    moldes de L1 e L3, antes de E5b.
 27. **Pendências de acabamento do manuscrito**, todas para a semana da
    submissão e nenhuma bloqueando (estão no checklist de `alvo-revista.md`
-   §6): (a) o `chicago.bst` do template abrevia em "et al." a partir de três
-   autores, contra a §4 das instruções, e a correção é no `.bst`, não no
-   texto; (b) substituir os `\input` pelas cópias dos arquivos de macro, de
+   §6): (a) **~~o `chicago.bst`~~ dispensado pelo autor (2026-10-01):** o
+   `chicago` do template abrevia em "et al." a partir de três autores e não
+   põe o volume em negrito, contra a §4 das instruções, mas a revista não
+   tem `.bst` próprio e diagrama o artigo aceito a partir da fonte, então
+   fica como está; (b) substituir os `\input` pelas cópias dos arquivos de macro, de
    modo que o pacote enviado seja autocontido, registrando a correspondência
    entre bloco copiado e arquivo de origem; (c) autores, afiliações, e-mails
    na última página e agradecimentos, que hoje são os marcadores do
    template.
-28. **Bibliografia, quatro pontos deixados por L1** (nenhum bloqueia; o
+28. **~~Bibliografia, quatro pontos deixados por L1~~ ratificados pelo autor
+   em 2026-10-01 (D42)**, como propostos; o `.bib` já estava assim. Texto
+   original: (nenhum bloqueia; o
    `.bib` fica como está até a resposta):
    - Amato et al. (2022) ou Haris, Simon & Shojaie (2018) na linha que
      citava o arXiv 1903.04631? Proposta: **as duas**, que são trabalhos
@@ -2371,9 +2376,12 @@ Ordenadas pelo que bloqueia mais.
    - (g) **Suplemento de K&P lido em 2026-10-01** (`refs/klopp2015-supp.pdf`):
      os Lemas 2 a 5 estão lá com os números que o `08a` usa, e o Lema 2(ii)
      é a eq. (5.25), o termo de viés pela norma dual, como o `08a` diz. Dois
-     pontos novos para o `08a` §1.1, sem urgência: o Lema 4 é enunciado sob
-     a condição **(A4)**, eq. (5.30), e não "(A3)" como o `08a` escreve; e
-     pede `1 ≤ ν < ∞` e `r > min(1/2, 1/ν)`, de modo que a leitura
+     pontos para o `08a` §1.1 (**aplicados em 2026-10-01**, com uma
+     correção ao que eu tinha escrito aqui): o suplemento rotula a condição
+     do Lema 4 como "(A4)", mas a que ele escreve, eq. (5.30), é a (A3) do
+     artigo, e a (A4) de lá é a do ruído, de modo que o "(A3)" do `08a`
+     estava certo e o rótulo do suplemento é que destoa; e o lema pede
+     `1 ≤ ν < ∞` e `r > min(1/2, 1/ν)`, de modo que a correspondência
      `(r, ν) = (s, π)` só vale com `π ≥ 1`. O expoente do Corolário 1 (o
      fator 2) continua sem resolução, porque o suplemento não trata do
      corolário. Texto original: dois pontos de K&P que só o arXiv ou o suplemento resolvem: o
@@ -2566,9 +2574,10 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | D42 (as quatro convenções de L1) ratificada; o `.bst` próprio dispensado (27(a)); o `08a` corrigido com o suplemento de K&P, e o "(A4)" do suplemento é a (A3) do artigo |
 | 2026-10-01 | Pergunta 40 aplicada: a Proposição 9.15 e o Teorema 9.3 de Johnstone (2019) citados no `ms_3` (marcado) e no `05`; contribuição 2 reescrita |
 | 2026-10-01 | Johnstone (2019) em `refs/`: a Proposição 9.15 dele é o Lema 9(i), o que tira a novidade do mergulho e pede reescrever a contribuição 2 (pergunta 40); o Teorema 9.3 dá o minimax sobre bolas weak-`ℓ_p` |
-| 2026-10-01 | PDFs da 39(a) e da 35(g) lidos: o `df` do GCV do WAFC se apoia em Tibshirani & Taylor (2012, Teorema 2 e a observação das colunas não penalizadas), não em Zou et al., que exigem posto cheio; o Lema 4 de K&P pede (A4) e `ν ≥ 1` |
+| 2026-10-01 | PDFs da 39(a) e da 35(g) lidos: o `df` do GCV do WAFC se apoia em Tibshirani & Taylor (2012, Teorema 2 e a observação das colunas não penalizadas), não em Zou et al., que exigem posto cheio; o Lema 4 de K&P pede `ν ≥ 1` (o "(A4)" do suplemento é a (A3) do artigo) |
 | 2026-10-01 | Pergunta 35(h) decidida, saída (a): "Besov bodies" com os Teoremas 4 e 5 de Donoho & Johnstone (1998) no `05` e no `ms_3`, marcado; os dois compilam em 10 e 33 páginas |
 | 2026-10-01 | E2.5h parou antes da rodada e mediu uma réplica: o `gam.gcv` na `mixed` custa ~900 h na grade até 120; D41 fixa a grade única `{5, 10, 20, 40, 80}`, tira o `gam.gcv` da `mixed` e junta a E2.5i de volta, ~15,5 h no total |
 | 2026-10-01 | L9 fechada e integrada: a entrada falsa de Donoho & Johnstone (1994) saiu do `05`; o risco minimax de 1998 é sobre corpos de Besov, com a mesma ordem, e a classe citada no `05` e no `ms_3` é a pergunta 35(h) |
