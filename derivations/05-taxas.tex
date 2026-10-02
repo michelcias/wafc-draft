@@ -423,8 +423,9 @@ Corolário~\ref{cor:compressivel} é a do LASSO, que escolhe os termos. Para $\p
 por isso que nesse regime estimadores lineares já são ótimos; para $\pi < 2$
 elas se separam, e é exatamente aí que a penalidade $\norm{\btheta}_{1}$ paga
 por si. A taxa $(\log n/n)^{2s/(2s+1)}$ é a referência minimax do modelo de
-sequência gaussiana sobre bolas weak-$\ell_{\tau}$ com ruído por coordenada
-$\pen_{n}$, que é de ordem $\pen_{n}^{2-\tau}$ (Donoho e Johnstone, 1998);
+sequência gaussiana sobre corpos de Besov (que o Lema~\ref{lem:weak}(i) põe
+dentro de bolas weak-$\ell_{\tau}$) com ruído por coordenada $\pen_{n}$, que é
+de ordem $\pen_{n}^{2-\tau}$ (Donoho e Johnstone, 1998, Teoremas~4 e~5);
 o fator logarítmico é o preço da escolha única e não adaptativa
 $\pen_{n} \asymp \sqrt{J_{n}/n}$, isto é, da união sobre as $d_{n}$ colunas.
 \end{remark}
@@ -826,9 +827,14 @@ Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
     verificada em L1.) Usada só por meio de E1.5.
   \item Donoho, D.~L.\ e Johnstone, I.~M. (1998). Minimax estimation via
     wavelet shrinkage. \emph{The Annals of Statistics} 26, 879--921.
-    (\texttt{Donoho-Johnstone-1998}, verificada em L1.) Referência do risco
-    minimax sobre bolas weak-$\ell_{\tau}$ no modelo de sequência, citada na
-    Observação~\ref{rem:tres}. \textsc{[verificar numeração do resultado]}
+    (\texttt{Donoho-Johnstone-1998}, verificada em L1.) Teoremas~4 e~5
+    (\S4.1, pp.~890--891): no modelo de sequência gaussiano com ruído
+    $\varepsilon$, o risco minimax sobre corpos de Besov
+    $\Theta^{\alpha}_{p,q}(C)$ é $\asymp C^{2(1-r)}\varepsilon^{2r}$, com
+    $r = 2\alpha/(2\alpha+1)$; com $\alpha = s$ e $\tau = (s+1/2)^{-1}$,
+    isto é $C^{\tau}\varepsilon^{2-\tau}$. Citada na
+    Observação~\ref{rem:tres}. O artigo não trata de bolas
+    weak-$\ell_{\tau}$ (conferido em L9).
   \item Klopp, O.\ e Pensky, M. (2015). Sparse high-dimensional varying
     coefficient model: nonasymptotic minimax study. \emph{The Annals of
     Statistics} 43(3), 1273--1299. (\texttt{Klopp-Pensky-2015}, verificada em

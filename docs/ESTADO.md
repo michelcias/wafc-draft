@@ -2374,7 +2374,7 @@ Ordenadas pelo que bloqueia mais.
      impressão, não conferido no arXiv); e o enunciado dos Lemas 2 a 4, que
      estão no suplemento (`10.1214/15-AOS1309SUPP`). Opcional; se o autor
      baixar o suplemento, entra como `refs/klopp2015-supp.pdf`.
-   - (h) **A classe da referência minimax** (de L9). A ordem `λ_n^{2−τ}`
+   - (h) **~~A classe da referência minimax~~ decidida pelo autor, saída (a), e aplicada (2026-10-01):** no `05`, a Observação `rem:tres` diz "corpos de Besov (que o Lema `lem:weak`(i) põe dentro de bolas weak-`ℓ_τ`)" e cita os Teoremas 4 e 5, e a entrada de 1998 perdeu a marca; no `ms_3` (§3.3, l. 576), "weak `ℓ_τ` balls" virou "Besov bodies" e a citação ganhou "Theorems 4 and 5", marcado em `colR1`; Johnstone (2019) ficou ao lado, sem conferir o resultado. Texto original: (de L9). A ordem `λ_n^{2−τ}`
      que o `05` (Observação `rem:tres`) e o `ms_3` (l. 577) citam está nos
      Teoremas 4 e 5 de Donoho & Johnstone (1998), mas sobre **corpos de
      Besov**, não sobre bolas weak-`ℓ_τ`. Duas saídas: (a) trocar "weak
@@ -2528,6 +2528,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | Pergunta 35(h) decidida, saída (a): "Besov bodies" com os Teoremas 4 e 5 de Donoho & Johnstone (1998) no `05` e no `ms_3`, marcado; os dois compilam em 10 e 33 páginas |
 | 2026-10-01 | E2.5h parou antes da rodada e mediu uma réplica: o `gam.gcv` na `mixed` custa ~900 h na grade até 120; D41 fixa a grade única `{5, 10, 20, 40, 80}`, tira o `gam.gcv` da `mixed` e junta a E2.5i de volta, ~15,5 h no total |
 | 2026-10-01 | L9 fechada e integrada: a entrada falsa de Donoho & Johnstone (1994) saiu do `05`; o risco minimax de 1998 é sobre corpos de Besov, com a mesma ordem, e a classe citada no `05` e no `ms_3` é a pergunta 35(h) |
 | 2026-10-01 | Pergunta 32(a) resolvida (D40): quatro símbolos da seleção trocados no `06` e no manuscrito, por padrões no modo matemático (31, 101 e 87 trocas); `k = 3` aberta; L9 catalogada |
