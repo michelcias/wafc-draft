@@ -879,3 +879,215 @@ test_that("bsgl records the dimension it chose as a level of the WAFC", {
   fit <- wafc_competitor("bsgl", x0, u0, y0, foldid = folds, df = 6L)
   expect_identical(fit[["extra"]][["J"]], NA_integer_)
 })
+
+## ---------------------------------------------------------------------------
+## The basis dimension of the spline chosen by a criterion (step E2.5h)
+## ---------------------------------------------------------------------------
+
+## A small replicate, so that the search by hand below costs seconds.
+dk <- simulate_wafc(150L, p = 2L, q = 2L, scenario = "smooth", seed = 7L,
+                    snr = 4)
+xk <- dk[["x"]]
+uk <- dk[["u"]]
+yk <- dk[["y"]]
+gridk <- c(5L, 10L, 20L)
+
+## The model of wafc_fit_gam() at a common k, written out by hand.
+gam_by_hand <- function(k, method, engine = "gam", u = uk) {
+  dat <- data.frame(x1 = xk[, 1L], x2 = xk[, 2L], u1 = u[, 1L], u2 = u[, 2L],
+                    y = yk)
+  fo <- stats::as.formula(sprintf(paste(
+    "y ~ 0 + x1 + x2 + s(u1, k = %d, by = x1) + s(u2, k = %d, by = x1) +",
+    "s(u1, k = %d, by = x2) + s(u2, k = %d, by = x2)"), k[1L], k[2L], k[1L],
+    k[2L]))
+  if (engine == "gam") {
+    mgcv::gam(fo, data = dat, method = method, select = TRUE)
+  } else {
+    mgcv::bam(fo, data = dat, method = "fREML", discrete = TRUE,
+              select = TRUE)
+  }
+}
+
+## The Gaussian restricted negative log-likelihood of y with the parametric
+## terms as fixed effects, written with the n by n covariance
+## V = I + Z S^{-1} Z' of the mixed model (the form of Harville, and of
+## Kauermann and Opsomer, 2011, with REML in place of ML), at the smoothing
+## parameters of a fit and at a given scale.
+reml_dense <- function(fit, y, s2) {
+  X <- stats::predict(fit, type = "lpmatrix")
+  np <- fit[["nsdf"]]
+  P <- ncol(X)
+  S <- matrix(0, P, P)
+  j <- 0L
+  for (sm in fit[["smooth"]]) {
+    ii <- sm[["first.para"]]:sm[["last.para"]]
+    for (Sj in sm[["S"]]) {
+      j <- j + 1L
+      S[ii, ii] <- S[ii, ii] + fit[["sp"]][j] * Sj
+    }
+  }
+  Xp <- X[, seq_len(np), drop = FALSE]
+  Z <- X[, -seq_len(np), drop = FALSE]
+  V <- diag(nrow(X)) + Z %*% solve(S[-seq_len(np), -seq_len(np)], t(Z))
+  Vi <- solve(V)
+  A <- t(Xp) %*% Vi %*% Xp
+  r <- y - Xp %*% solve(A, t(Xp) %*% Vi %*% y)
+  ld <- function(M) as.numeric(determinant(M, logarithm = TRUE)[["modulus"]])
+  n <- nrow(X)
+  0.5 * ((n - np) * log(2 * pi * s2) + ld(V) + ld(A) +
+           sum(r * (Vi %*% r)) / s2)
+}
+
+test_that("the REML score is one likelihood of the same data at every k", {
+  skip_if_not(has("mgcv"))
+  for (k in gridk) {
+    ## with the exact engine the score is the one mgcv optimizes
+    fg <- gam_by_hand(c(k, k), "REML")
+    sg <- wafc_gam_reml(fg, yk)
+    expect_equal(as.numeric(sg), as.numeric(fg[["gcv.ubre"]]), tolerance = 1e-6)
+    ## and with both engines it is the restricted likelihood of y with the
+    ## same two level terms as fixed effects, so the scores of two values
+    ## of k are values of one function of the data: comparable
+    for (eng in c("gam", "bam")) {
+      fk <- if (eng == "gam") fg else gam_by_hand(c(k, k), "REML", "bam")
+      sk <- wafc_gam_reml(fk, yk)
+      expect_equal(as.numeric(sk),
+                   reml_dense(fk, yk, attr(sk, "sigma2")),
+                   tolerance = 1e-8)
+    }
+  }
+})
+
+test_that("the choice of k in each criterion is the search redone by hand", {
+  skip_if_not(has("mgcv"))
+  ## REML with the exact engine: the score of each candidate is the one
+  ## mgcv reports, so the search by hand reads it from mgcv alone
+  fr <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "reml")
+  hand <- vapply(gridk, function(k) {
+    as.numeric(gam_by_hand(c(k, k), "REML")[["gcv.ubre"]])
+  }, 0)
+  tab <- fr[["extra"]][["k.table"]]
+  expect_equal(tab[["k"]], gridk)
+  expect_equal(tab[["score"]], hand, tolerance = 1e-6)
+  expect_identical(fr[["extra"]][["k"]], rep(gridk[which.min(hand)], 2L))
+  expect_identical(fr[["extra"]][["k.top"]], which.min(hand) == 3L)
+  expect_identical(fr[["extra"]][["smooth.method"]], "REML")
+  ## the fit kept is the one at the chosen k
+  fh <- gam_by_hand(fr[["extra"]][["k"]], "REML")
+  expect_equal(fr[["fitted"]], as.numeric(stats::fitted(fh)),
+               tolerance = 1e-8)
+  ## GCV: the score of a candidate is n RSS / (n - tau)^2 of its fit, with
+  ## tau the total effective degrees of freedom
+  fv <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "gcv")
+  hv <- vapply(gridk, function(k) {
+    f <- gam_by_hand(c(k, k), "GCV.Cp")
+    nn <- length(yk)
+    nn * sum(stats::residuals(f)^2) / (nn - sum(f[["edf"]]))^2
+  }, 0)
+  tv <- fv[["extra"]][["k.table"]]
+  expect_equal(tv[["score"]], hv, tolerance = 1e-6)
+  expect_identical(fv[["extra"]][["k"]], rep(gridk[which.min(hv)], 2L))
+  expect_identical(fv[["extra"]][["smooth.method"]], "GCV.Cp")
+  ## with the bam engine, REML searches by the score recomputed here and
+  ## keeps the one bam reports beside it
+  fb <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "reml",
+                        engine = "bam")
+  hb <- vapply(gridk, function(k) {
+    f <- gam_by_hand(c(k, k), "REML", "bam")
+    c(as.numeric(wafc_gam_reml(f, yk)), as.numeric(f[["gcv.ubre"]]))
+  }, c(0, 0))
+  tb <- fb[["extra"]][["k.table"]]
+  expect_equal(tb[["score"]], hb[1L, ], tolerance = 1e-8)
+  expect_equal(tb[["score.engine"]], hb[2L, ], tolerance = 1e-8)
+  expect_identical(fb[["extra"]][["k"]], rep(gridk[which.min(hb[1L, ])], 2L))
+})
+
+test_that("the grid of k is the one of D41, truncated at the distinct values", {
+  ## the default grid of the search: Ruppert (2002, section 3) without his
+  ## 120, one grid for the three criteria (decision D41)
+  expect_identical(wafc_k_grid, c(5L, 10L, 20L, 40L, 80L))
+  ## a modulator with 25 distinct values admits at most 24 basis functions:
+  ## 40 and 80 become 24 on it, and the candidates the truncation makes
+  ## equal are fitted once
+  ud <- uk
+  ud[, 2L] <- round(ud[, 2L] * 24) / 24
+  cd <- wafc_k_candidates(ud, wafc_k_grid)
+  expect_identical(attr(cd, "grid"), wafc_k_grid)
+  expect_identical(cd[[4L]], c(40L, 24L))
+  expect_identical(cd[[5L]], c(80L, 24L))
+  ud[, 1L] <- round(ud[, 1L] * 24) / 24
+  cd <- wafc_k_candidates(ud, wafc_k_grid)
+  expect_identical(attr(cd, "grid"), c(5L, 10L, 20L, 40L))
+  expect_identical(cd, structure(list(c(5L, 5L), c(10L, 10L), c(20L, 20L),
+                                      c(24L, 24L)),
+                                 grid = c(5L, 10L, 20L, 40L)))
+  ## and the search fits exactly those, with the top read on them
+  skip_if_not(has("mgcv"))
+  ud <- uk
+  ud[, 1L] <- round(ud[, 1L] * 11) / 11
+  ud[, 2L] <- round(ud[, 2L] * 11) / 11
+  fit <- wafc_competitor("gam", xk, ud, yk, k = c(5L, 20L, 40L),
+                         k.select = "reml")
+  tab <- fit[["extra"]][["k.table"]]
+  expect_identical(tab[["k"]], c(5L, 20L))
+  expect_identical(tab[["k.used"]], c("5,5", "11,11"))
+  hand <- vapply(list(c(5L, 5L), c(11L, 11L)), function(k) {
+    as.numeric(gam_by_hand(k, "REML", u = ud)[["gcv.ubre"]])
+  }, 0)
+  expect_equal(tab[["score"]], hand, tolerance = 1e-6)
+  expect_identical(fit[["extra"]][["k.top"]], which.min(hand) == 2L)
+  ## without a search nothing changes: k = 10, no table
+  f0 <- wafc_competitor("gam", xk, uk, yk)
+  expect_identical(f0[["extra"]][["k"]], c(10L, 10L))
+  expect_null(f0[["extra"]][["k.table"]])
+  expect_identical(f0[["extra"]][["k.select"]], "none")
+  expect_error(wafc_competitor("gam", xk, uk, yk, k = c(2L, 10L),
+                               k.select = "gcv"), "at least 3")
+})
+
+test_that("the choice of k by cross-validation is the search redone by hand", {
+  skip_if_not(has("mgcv"))
+  ## the folds of the replicate, REML and bam inside each fold, and the
+  ## loss of cv.wafc(): the mean over folds of the mean squared error on the
+  ## observations the fold leaves out
+  fk <- rep_len(1:5, length(yk))
+  fit <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "cv",
+                         engine = "bam", foldid = fk)
+  dat <- data.frame(x1 = xk[, 1L], x2 = xk[, 2L], u1 = uk[, 1L],
+                    u2 = uk[, 2L], y = yk)
+  hand <- t(vapply(gridk, function(k) {
+    fm <- vapply(1:5, function(f) {
+      out <- fk == f
+      fo <- stats::as.formula(sprintf(paste(
+        "y ~ 0 + x1 + x2 + s(u1, k = %d, by = x1) + s(u2, k = %d, by = x1) +",
+        "s(u1, k = %d, by = x2) + s(u2, k = %d, by = x2)"), k, k, k, k))
+      ff <- mgcv::bam(fo, data = dat[!out, ], method = "fREML",
+                      discrete = TRUE, select = TRUE)
+      mean((yk[out] - as.numeric(stats::predict(ff, newdata = dat[out, ])))^2)
+    }, 0)
+    c(mean(fm), stats::sd(fm) / sqrt(5))
+  }, c(0, 0)))
+  tab <- fit[["extra"]][["k.table"]]
+  expect_equal(tab[["k"]], gridk)
+  expect_equal(tab[["score"]], hand[, 1L], tolerance = 1e-10)
+  expect_equal(tab[["cvsd"]], hand[, 2L], tolerance = 1e-10)
+  expect_true(all(is.na(tab[["score.engine"]])))
+  kh <- gridk[which.min(hand[, 1L])]
+  expect_identical(fit[["extra"]][["k"]], c(kh, kh))
+  expect_identical(fit[["extra"]][["k.top"]], which.min(hand[, 1L]) == 3L)
+  expect_identical(fit[["extra"]][["foldid"]], fk)
+  expect_identical(fit[["extra"]][["smooth.method"]], "REML")
+  ## the fit returned is the one on the whole sample at the k chosen
+  fh <- gam_by_hand(c(kh, kh), "REML", "bam")
+  expect_equal(fit[["fitted"]], as.numeric(stats::fitted(fh)),
+               tolerance = 1e-10)
+  ## with the folds fixed the search reproduces exactly
+  again <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "cv",
+                           engine = "bam", foldid = fk)
+  expect_identical(again[["extra"]][["k.table"]][["score"]], tab[["score"]])
+  expect_identical(again[["fitted"]], fit[["fitted"]])
+  ## the folds are validated as the ones of cv.wafc()
+  expect_error(wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "cv",
+                               foldid = rep_len(1:2, length(yk))),
+               "at least 3 folds")
+})

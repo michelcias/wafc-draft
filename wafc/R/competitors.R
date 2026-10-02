@@ -310,9 +310,73 @@ wafc_k_matched <- function(u, J, kmin = 3L) {
 #' change of estimator, and the number it produces is labelled with it
 #' wherever it is reported.
 #'
+#' Step E2.5h added the choice of the basis dimension from a grid, with
+#' \code{k.select}. The grid is 5, 10, 20, 40 and 80 (decision D41), one
+#' grid for the three criteria, and every candidate is fitted and scored by
+#' one criterion, the full search of Ruppert (2002) and option 3 of Pya and
+#' Wood (2016, section 2); powers of two are not used, so that the spline
+#' is not tuned on the grid of the wavelets. The grid is the one of Ruppert
+#' (2002, section 3) without its last value, 120: his additive search
+#' (section 6) stops at 40, 80 is kept because step E2.5d saw
+#' \code{k = 64} bind in the inhomogeneous scenario, and 120 cost three to
+#' four times the rest of the grid. Two things differ from Ruppert
+#' and are declared, not corrected: his \eqn{K} is a number of knots of a
+#' truncated power basis, while the \code{k} of \pkg{mgcv} is the dimension
+#' of a thin plate regression spline basis, so the same number is a slightly
+#' smaller space here; and his candidates stop below \eqn{n - p - 1}, while
+#' here a candidate is truncated, modulator by modulator, at the number of
+#' distinct values of the modulator minus one, as \code{\link{wafc_k_matched}}
+#' does, and the candidates that the truncation makes equal are fitted once.
+#' The value is common to the smooths, which is what Ruppert (2002, section
+#' 6) recommends for additive models, since a search over one value per
+#' term multiplies the cost and buys little once each value is large
+#' enough.
+#'
+#' The two criteria are the two smoothing criteria of \pkg{mgcv}, and each
+#' search uses the same criterion for the smoothing parameters and for
+#' \code{k}. With \code{k.select = "reml"} the smoothing parameters are
+#' estimated by REML, as without a search, and \code{k} minimises the
+#' restricted negative log-likelihood, profiled over the scale, which is
+#' the criterion of Kauermann and Opsomer (2011) with REML in place of
+#' maximum likelihood. Their reason for maximum likelihood does not apply:
+#' the fixed effects of the restricted likelihood are the \eqn{p} level
+#' terms (with \code{select = TRUE} every coefficient of every smooth is
+#' penalized), and they do not change with \code{k}, so the scores of two
+#' candidates are values of one function of the same data. The score is
+#' computed here from the fitted smoothing parameters
+#' (\code{wafc_gam_reml()}) and not read from the engine: with
+#' \code{engine = "gam"} the two coincide, but with \code{engine = "bam"}
+#' the score \code{bam} reports under \code{discrete = TRUE} is off the
+#' exact one by an amount that changes with \code{k} (1.09, 0.93 and 0.92
+#' at \code{k} = 5, 10 and 20 in the test of this step), which would bias
+#' the choice; the one the engine reports is kept beside it. With
+#' \code{k.select = "gcv"} the smoothing parameters are chosen by
+#' generalized cross-validation (\code{method = "GCV.Cp"}) and \code{k}
+#' minimises the GCV score \eqn{n\,RSS/(n - \tau)^2} of the fit,
+#' \eqn{\tau} the trace of the influence matrix, as in Ruppert (2002).
+#' \code{bam} discretizes only under REML, so \code{engine = "bam"} fits
+#' this search without \code{discrete = TRUE}.
+#'
+#' With \code{k.select = "cv"} the score of a candidate is the squared
+#' error of prediction on the folds \code{foldid}, the mean over folds of
+#' the mean over the observations a fold leaves out, which is the loss of
+#' \code{\link{cv.wafc}}: given its folds, the spline and the WAFC choose
+#' their dimension by the same criterion on the same partition. Inside each
+#' fold the smoothing parameters are estimated by REML on the engine given,
+#' and the fit returned is the one on the whole sample at the \code{k}
+#' chosen. It costs one fit per fold and candidate, plus one.
+#'
 #' @param x,u,y The data, as in \code{\link{wafc_competitor}}.
 #' @param k Basis dimension of each smooth: one value for every smooth, or
-#'   one value per modulating covariate.
+#'   one value per modulating covariate. With \code{k.select} other than
+#'   \code{"none"}, the grid of candidates, each one common to the
+#'   smooths. \code{NULL} (the default) is 10 without a search and the grid
+#'   of decision D41 with one.
+#' @param k.select \code{"none"} (the default) fits at \code{k};
+#'   \code{"reml"}, \code{"gcv"} and \code{"cv"} fit every candidate of the
+#'   grid and keep the one with the smallest score of that criterion.
+#' @param nfolds,foldid Folds of \code{k.select = "cv"}, as in
+#'   \code{\link{cv.wafc}}; ignored by the other criteria.
 #' @param select Passed to \code{\link[mgcv]{gam}}: \code{TRUE} adds the
 #'   extra penalty on the null space, which is what lets a smooth be shrunk
 #'   away entirely and is the fair setting when half the blocks are zero.
@@ -328,26 +392,65 @@ wafc_k_matched <- function(u, J, kmin = 3L) {
 #'
 #' @return An object of class \code{"wafc_competitor"}, whose \code{extra}
 #'   carries the \code{edf} matrix, the \code{edf.tol} used, the vector
-#'   \code{k} and the \code{engine}.
+#'   \code{k} (one value per modulating covariate), the \code{engine}, the
+#'   \code{k.select} and the smoothing criterion \code{smooth.method}. With
+#'   a search it also carries \code{k.table}, one row per candidate fitted
+#'   (the value of the grid, the dimensions used after the truncation, the
+#'   \code{score} of the criterion, its standard error \code{cvsd} for
+#'   \code{"cv"}, the \code{score.engine} the engine reports, the total
+#'   effective degrees of freedom, the number of coefficients and the
+#'   seconds; for \code{"cv"} the last three are the means over the folds
+#'   and \code{score.engine} is \code{NA}), and \code{k.top}, \code{TRUE}
+#'   when the candidate chosen is the largest one fitted; with
+#'   \code{"cv"}, also the \code{foldid} used.
+#'
+#' @references Kauermann, G. and Opsomer, J. D. (2011). Data-driven
+#'   selection of the spline dimension in penalized spline regression.
+#'   \emph{Biometrika} 98(1), 225-230.
+#'
+#'   Pya, N. and Wood, S. N. (2016). A note on basis dimension selection in
+#'   generalized additive modelling. arXiv:1602.06696.
+#'
+#'   Ruppert, D. (2002). Selecting the number of knots for penalized
+#'   splines. \emph{Journal of Computational and Graphical Statistics}
+#'   11(4), 735-757.
 #'
 #' @examples
 #' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
 #' wafc_fit_gam(d$x, d$u, d$y)$blocks
+#' wafc_fit_gam(d$x, d$u, d$y, k = c(5, 10), k.select = "reml")$extra$k.table
 #'
 #' @export
-wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1,
-                         engine = c("gam", "bam"), ...) {
+wafc_fit_gam <- function(x, u, y, k = NULL,
+                         k.select = c("none", "reml", "gcv", "cv"),
+                         select = TRUE, edf.tol = 0.1,
+                         engine = c("gam", "bam"), nfolds = 10L,
+                         foldid = NULL, ...) {
   if (!requireNamespace("mgcv", quietly = TRUE)) {
     stop("method = \"gam\" needs the package 'mgcv'.", call. = FALSE)
   }
   engine <- match.arg(engine)
+  k.select <- match.arg(k.select)
   p <- ncol(x)
   q <- ncol(u)
-  k <- wafc_recycle(k, q, "k")
-  if (any(!is.finite(k)) || any(k != round(k)) || any(k < 3)) {
-    stop("'k' must contain integer values of at least 3.", call. = FALSE)
+  if (k.select == "none") {
+    if (is.null(k)) k <- 10L
+    k <- wafc_recycle(k, q, "k")
+    if (any(!is.finite(k)) || any(k != round(k)) || any(k < 3)) {
+      stop("'k' must contain integer values of at least 3.", call. = FALSE)
+    }
+    cand <- list(as.integer(k))
+    grid <- NA_integer_
+  } else {
+    if (is.null(k)) k <- wafc_k_grid
+    cand <- wafc_k_candidates(u, k)
+    grid <- attr(cand, "grid")
   }
-  k <- as.integer(k)
+  if (k.select == "cv") {
+    foldid <- wafc_foldid(foldid, nrow(x), nfolds)
+    nfolds <- max(foldid)
+  }
+  smooth.method <- if (k.select == "gcv") "GCV.Cp" else "REML"
   xn <- wafc_names(x, p, "x")
   un <- wafc_names(u, q, "u")
   dat <- wafc_frame(x, u, xn, un)
@@ -357,19 +460,85 @@ wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1,
   ## predict(type = "terms") multiplies the smooth by, so evaluating the
   ## terms with every covariate set to one is what turns the term of the
   ## block (l, m) into the component g_{lm} itself.
-  terms <- character(0)
-  for (l in seq_len(p)) {
-    for (m in seq_len(q)) {
-      terms <- c(terms, sprintf("s(%s, k = %d, by = %s)", un[m], k[m], xn[l]))
+  fit_at <- function(kk, rows = seq_len(nrow(dat))) {
+    terms <- character(0)
+    for (l in seq_len(p)) {
+      for (m in seq_len(q)) {
+        terms <- c(terms, sprintf("s(%s, k = %d, by = %s)", un[m], kk[m],
+                                  xn[l]))
+      }
+    }
+    fo <- stats::as.formula(paste("y ~ 0 +",
+                                  paste(c(xn, terms), collapse = " + ")))
+    d <- dat[rows, , drop = FALSE]
+    if (engine == "gam") {
+      mgcv::gam(fo, data = d, method = smooth.method, select = select, ...)
+    } else if (smooth.method == "REML") {
+      mgcv::bam(fo, data = d, method = "fREML", discrete = TRUE,
+                select = select, ...)
+    } else {
+      mgcv::bam(fo, data = d, method = smooth.method, select = select, ...)
     }
   }
-  fo <- stats::as.formula(paste("y ~ 0 +", paste(c(xn, terms), collapse = " + ")))
-  fit <- if (engine == "gam") {
-    mgcv::gam(fo, data = dat, method = "REML", select = select, ...)
-  } else {
-    mgcv::bam(fo, data = dat, method = "fREML", discrete = TRUE,
-              select = select, ...)
+  ## The cross-validated error of one candidate: the fold fits on the rows
+  ## kept, the squared error on the rows left out, the mean of the fold
+  ## means and its standard error, as in wafc_cv_design().
+  cv_at <- function(kk) {
+    fm <- numeric(nfolds)
+    edf <- numeric(nfolds)
+    nc <- numeric(nfolds)
+    for (f in seq_len(nfolds)) {
+      out <- which(foldid == f)
+      ff <- fit_at(kk, rows = -out)
+      pr <- as.numeric(stats::predict(ff, newdata = dat[out, , drop = FALSE]))
+      fm[f] <- mean((y[out] - pr)^2)
+      edf[f] <- sum(ff[["edf"]])
+      nc[f] <- length(stats::coef(ff))
+      rm(ff)
+    }
+    list(cvm = mean(fm), cvsd = stats::sd(fm) / sqrt(nfolds),
+         edf = mean(edf), ncoef = mean(nc))
   }
+  ## The search keeps only the best fit so far: a fit of mgcv carries its
+  ## model matrix, and at the top of the grid in the cell "mixed" that is
+  ## 16 smooths of 80 columns. The cross-validation fits the whole sample
+  ## once, at the k it chooses.
+  fit <- NULL
+  best <- Inf
+  ibest <- 1L
+  tab <- vector("list", length(cand))
+  for (i in seq_along(cand)) {
+    t0 <- proc.time()[["elapsed"]]
+    if (k.select == "cv") {
+      z <- cv_at(cand[[i]])
+      score <- z[["cvm"]]
+      row <- list(cvsd = z[["cvsd"]], score.engine = NA_real_,
+                  edf = z[["edf"]], ncoef = z[["ncoef"]])
+    } else {
+      fi <- fit_at(cand[[i]])
+      score <- switch(k.select, none = NA_real_,
+                      reml = as.numeric(wafc_gam_reml(fi, y)),
+                      gcv = as.numeric(fi[["gcv.ubre"]]))
+      row <- list(cvsd = NA_real_,
+                  score.engine = as.numeric(fi[["gcv.ubre"]]),
+                  edf = sum(fi[["edf"]]), ncoef = length(stats::coef(fi)))
+    }
+    tab[[i]] <- data.frame(k = grid[i],
+                           k.used = paste(cand[[i]], collapse = ","),
+                           score = score, cvsd = row[["cvsd"]],
+                           score.engine = row[["score.engine"]],
+                           edf = row[["edf"]], ncoef = row[["ncoef"]],
+                           time = proc.time()[["elapsed"]] - t0,
+                           stringsAsFactors = FALSE)
+    if (is.na(best) || i == 1L || (!is.na(score) && score < best)) {
+      if (k.select != "cv") fit <- fi
+      best <- score
+      ibest <- i
+    }
+    if (k.select != "cv") rm(fi)
+  }
+  k <- cand[[ibest]]
+  if (k.select == "cv") fit <- fit_at(k)
   ## Effective degrees of freedom by smooth, in the order the terms were
   ## written, which is the lexicographic order of D12.
   edf <- vapply(fit[["smooth"]],
@@ -419,7 +588,13 @@ wafc_fit_gam <- function(x, u, y, k = 10L, select = TRUE, edf.tol = 0.1,
        fitted = as.numeric(stats::fitted(fit)), xnames = xn, unames = un,
        extra = list(edf = matrix(edf, p, q, byrow = TRUE,
                                  dimnames = list(xn, un)),
-                    edf.tol = edf.tol, k = k, engine = engine))
+                    edf.tol = edf.tol, k = k, engine = engine,
+                    k.select = k.select, smooth.method = smooth.method,
+                    k.table = if (k.select == "none") NULL else
+                      do.call(rbind, tab),
+                    k.top = if (k.select == "none") NA else
+                      ibest == length(cand),
+                    foldid = if (k.select == "cv") foldid else NULL))
 }
 
 #' B-spline sieve with a group LASSO by block
@@ -1169,6 +1344,84 @@ wafc_fitter_args <- function() {
              wafc_fit_vcbart, wafc_fit_linear, wafc_fit_oracle)
   setdiff(unique(unlist(lapply(fs, function(f) names(formals(f))))),
           c("...", "x", "u", "y"))
+}
+
+## The grid of basis dimensions searched by wafc_fit_gam() when k.select is
+## not "none" (step E2.5h, decision D41): the one of Ruppert (2002, section
+## 3) without its 120, one grid for the three criteria.
+wafc_k_grid <- c(5L, 10L, 20L, 40L, 80L)
+
+## The candidates of a search over k: each value of the grid, common to the
+## smooths, truncated modulator by modulator at the number of distinct
+## values minus one (the rule of wafc_k_matched()) and at 3 from below, and
+## the vectors the truncation makes equal kept once, at the first value of
+## the grid that produced them. The grid kept is the attribute "grid".
+wafc_k_candidates <- function(u, k) {
+  u <- wafc_as_matrix(u, "u")
+  if (!is.numeric(k) || length(k) == 0L || any(!is.finite(k)) ||
+      any(k != round(k)) || any(k < 3)) {
+    stop("'k' must contain integer values of at least 3.", call. = FALSE)
+  }
+  k <- sort(unique(as.integer(k)))
+  ndist <- vapply(seq_len(ncol(u)), function(m) length(unique(u[, m])), 0L)
+  cand <- lapply(k, function(kk) as.integer(pmax(3L, pmin(kk, ndist - 1L))))
+  keep <- !duplicated(vapply(cand, paste, "", collapse = ","))
+  out <- cand[keep]
+  attr(out, "grid") <- k[keep]
+  out
+}
+
+## The restricted negative log-likelihood of a Gaussian fit of mgcv, at its
+## smoothing parameters and profiled over the scale (step E2.5h). With the
+## penalty S = sum_j sp_j S_j, block diagonal over the smooths, and Mp the
+## number of unpenalized coefficients (the parametric ones, plus the null
+## spaces left unpenalized when select = FALSE),
+##
+##   V = (RSS + b'Sb) / (2 s2) + (n - Mp)/2 log(2 pi s2)
+##       - log|S|_+ / 2 + log|X'X + S| / 2,
+##
+## with b = (X'X + S)^{-1} X'y and s2 = (RSS + b'Sb) / (n - Mp), which is the
+## REML score of Wood (2011) and of mgcv::gam(method = "REML") at its own
+## optimum. It is the Gaussian restricted likelihood of y with the
+## parametric terms as fixed effects, so it is comparable between fits that
+## share those terms; the test of this step checks it against that
+## likelihood written with the n by n covariance. b and s2 are recomputed
+## from the model matrix rather than read from the fit, because bam with
+## discrete = TRUE reports a score of its own (see wafc_fit_gam()).
+wafc_gam_reml <- function(fit, y) {
+  X <- stats::predict(fit, type = "lpmatrix")
+  n <- nrow(X)
+  P <- ncol(X)
+  S <- matrix(0, P, P)
+  ldS <- 0
+  Mp <- fit[["nsdf"]]
+  j <- 0L
+  for (sm in fit[["smooth"]]) {
+    ii <- sm[["first.para"]]:sm[["last.para"]]
+    Sb <- matrix(0, length(ii), length(ii))
+    for (Sj in sm[["S"]]) {
+      j <- j + 1L
+      Sb <- Sb + fit[["sp"]][j] * Sj
+    }
+    S[ii, ii] <- Sb
+    r <- length(ii) - sm[["null.space.dim"]]
+    ev <- eigen(Sb, symmetric = TRUE, only.values = TRUE)[["values"]]
+    if (r > 0L && ev[r] <= 0) {
+      stop("the penalty of a smooth has rank below the one mgcv declares.",
+           call. = FALSE)
+    }
+    ldS <- ldS + sum(log(ev[seq_len(r)]))
+    Mp <- Mp + sm[["null.space.dim"]]
+  }
+  R <- chol(crossprod(X) + S)
+  b <- backsolve(R, forwardsolve(t(R), crossprod(X, y)))
+  e <- as.numeric(y - X %*% b)
+  pen <- sum(e^2) + sum(b * (S %*% b))
+  s2 <- pen / (n - Mp)
+  out <- pen / (2 * s2) + (n - Mp) / 2 * log(2 * pi * s2) - ldS / 2 +
+    sum(log(diag(R)))
+  attr(out, "sigma2") <- s2
+  out
 }
 
 ## The methods whose '...' is passed to wafc_design(); the '...' of the

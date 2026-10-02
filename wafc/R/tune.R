@@ -30,6 +30,15 @@
 ##        The resolution is not part of it, so wafc_tune(rule = "qut")
 ##        takes J from the cross-validation and changes only lambda, which
 ##        is what the pilot did.
+##  (v)   wafc_gcv() scores a fitted path by generalized cross-validation,
+##        GCV = n RSS / (n - df)^2, with the degrees of freedom of
+##        wafc_bic(), which Zou, Hastie and Tibshirani (2007) justify for
+##        the LASSO; wafc_tune(rule = "gcv") minimises it over the same grid
+##        of J, so that the WAFC can be compared with a spline whose basis
+##        dimension is chosen by the same criterion (step E2.5h, after
+##        Ruppert, 2002). Points with df >= n/2 are left out, a guard
+##        declared before measuring: the denominator vanishes at df = n,
+##        and near it the criterion rewards an interpolating fit.
 ##
 ## Two things this file inherits from E2.2 and does not renegotiate
 ## (decision D17): the lambda of every object is the lambda of the
@@ -291,6 +300,80 @@ wafc_ebic <- function(object, s = NULL, gamma = 1) {
   wafc_ic(object, s = s, gamma = gamma, name = "ebic")
 }
 
+#' Generalized cross-validation of a WAFC fit
+#'
+#' The criterion of generalized cross-validation along the penalty path of
+#' a fit,
+#' \deqn{GCV = \frac{n\,RSS}{(n - df)^2},}
+#' with the degrees of freedom of \code{\link{wafc_bic}}: the non-zero
+#' wavelet coefficients plus the \eqn{p} level terms. For the LASSO the
+#' number of non-zero coefficients is an unbiased estimate of the degrees of
+#' freedom (Zou, Hastie and Tibshirani, 2007), which is what makes it the
+#' trace that the criterion of generalized cross-validation needs; it is the count of
+#' decision D19, and the one the rule for the sparse group LASSO borrows
+#' without that justification. This is the criterion Ruppert (2002) uses to
+#' choose the number of knots of a penalized spline, so minimising it over
+#' \eqn{(J, \lambda)} (\code{wafc_tune(rule = "gcv")}) puts the WAFC and
+#' a spline tuned by GCV on the same footing (step E2.5h).
+#'
+#' The guard is declared here, before any measurement: points of the path
+#' with \eqn{df \ge} \code{guard}\eqn{\cdot n} are left out of the
+#' minimisation. The denominator vanishes at \eqn{df = n}, and near it a
+#' fit that interpolates the sample has a small criterion for the wrong
+#' reason; the same \eqn{n/2} bounds the starting fit of
+#' \code{\link{wafc_sigma}}. Points with \eqn{df \ge n} have no criterion
+#' (\code{NA}) and are left out with or without the guard.
+#'
+#' @param object An object of class \code{"wafc"}.
+#' @param s Penalty levels at which the criterion is wanted, on the scale of
+#'   the objective of \code{\link{wafc}}. \code{NULL} (the default) is the
+#'   whole path of the fit.
+#' @param guard Fraction of \eqn{n} at or above which a point is left out.
+#'   \code{1} keeps every point with a criterion.
+#'
+#' @return A data frame with one row per penalty level: \code{lambda},
+#'   \code{nzero}, \code{df}, \code{rss}, \code{gcv} and the flag
+#'   \code{excluded}. The index of the minimising row among the ones kept
+#'   is the attribute \code{"which.min"}, and the penalty level attaining
+#'   it \code{"lambda.min"}; the index of the minimising row among every
+#'   row with a criterion is \code{"which.min.unguarded"}.
+#'
+#' @references Ruppert, D. (2002). Selecting the number of knots for penalized
+#'   splines. \emph{Journal of Computational and Graphical Statistics}
+#'   11(4), 735-757.
+#'
+#'   Zou, H., Hastie, T. and Tibshirani, R. (2007). On the degrees of
+#'   freedom of the lasso. \emph{The Annals of Statistics} 35(5), 2173-2192.
+#'
+#' @examples
+#' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
+#' fit <- wafc(d$x, d$u, d$y, J = 3)
+#' gc <- wafc_gcv(fit)
+#' attr(gc, "lambda.min")
+#'
+#' @export
+wafc_gcv <- function(object, s = NULL, guard = 0.5) {
+  if (length(guard) != 1L || !is.finite(guard) || guard <= 0 || guard > 1) {
+    stop("'guard' must be a single value in (0, 1].", call. = FALSE)
+  }
+  ic <- wafc_ic(object, s = s, gamma = 0)
+  n <- object[["n"]]
+  df <- ic[["df"]]
+  gcv <- ifelse(df < n, n * ic[["rss"]] / (n - df)^2, NA_real_)
+  excluded <- df >= guard * n
+  out <- data.frame(lambda = ic[["lambda"]], nzero = ic[["nzero"]], df = df,
+                    rss = ic[["rss"]], gcv = gcv, excluded = excluded)
+  ## the first point of a path has df = p and is never left out, so both
+  ## minima exist
+  keep <- which(!excluded & !is.na(gcv))
+  k <- keep[which.min(gcv[keep])]
+  ku <- which.min(gcv)
+  attr(out, "which.min") <- k
+  attr(out, "lambda.min") <- out[["lambda"]][k]
+  attr(out, "which.min.unguarded") <- ku
+  out
+}
+
 #' Resolution level and penalty level prescribed by the theory
 #'
 #' The pair that Theorem 2 of \file{derivations/05-taxas.tex} balances. The
@@ -500,12 +583,14 @@ wafc_sigma <- function(design, y, method = c("cv", "fixed.point"),
 
 #' Select the pair (J, lambda) of a WAFC fit by one rule
 #'
-#' One entry point for the six selection rules, so that they are applied to
-#' the same data through the same interface and their cost can be compared.
-#' \code{"cv.min"} and \code{"cv.1se"} call \code{\link{cv.wafc}};
-#' \code{"bic"} and \code{"ebic"} minimise the criterion of
-#' \code{\link{wafc_bic}} over the same grid of \eqn{J} and over the path
-#' of each candidate; \code{"theory"} takes the pair of
+#' One entry point for the seven selection rules, so that they are applied
+#' to the same data through the same interface and their cost can be
+#' compared. \code{"cv.min"} and \code{"cv.1se"} call
+#' \code{\link{cv.wafc}}; \code{"bic"}, \code{"ebic"} and \code{"gcv"}
+#' minimise the criterion of \code{\link{wafc_bic}} or of
+#' \code{\link{wafc_gcv}} over the same grid of \eqn{J} and over the path
+#' of each candidate, \code{"gcv"} with its guard (points with
+#' \eqn{df \ge n/2} left out); \code{"theory"} takes the pair of
 #' \code{\link{wafc_J_theory}} and \code{\link{wafc_lambda_theory}}
 #' without looking at any loss; and \code{"qut"} takes \eqn{J} from the
 #' same cross-validation the first two use and \eqn{\lambda} from
@@ -540,6 +625,12 @@ wafc_sigma <- function(design, y, method = c("cv", "fixed.point"),
 #'   coefficients there, the table \code{tab} of the rule over the grid, the
 #'   \code{sigma} used by \code{rule = "theory"} and, for the
 #'   cross-validation rules, the whole \code{"cv.wafc"} object in \code{cv}.
+#'   For \code{rule = "gcv"}, \code{tab} also has, for each \eqn{J}, the
+#'   number of points of the path the guard left out (\code{excluded}) and
+#'   the minimum without the guard (\code{gcv.unguarded}), and the list
+#'   \code{guard} says how many points of the whole grid were left out and
+#'   whether the guard decided, that is, whether the pair chosen without it
+#'   (among the points with \eqn{df < n}) would have been another one.
 #'
 #' @seealso \code{\link{cv.wafc}}, \code{\link{wafc_bic}},
 #'   \code{\link{wafc_J_theory}}, \code{\link{wafc_lambda_qut}}.
@@ -554,7 +645,7 @@ wafc_sigma <- function(design, y, method = c("cv", "fixed.point"),
 #' @export
 wafc_tune <- function(x, u, y,
                       rule = c("cv.min", "cv.1se", "bic", "ebic", "theory",
-                               "qut"),
+                               "qut", "gcv"),
                       J = NULL, penalty = c("lasso", "sglasso"),
                       nfolds = 10L, foldid = NULL, nlambda = 100L,
                       lambda.min.ratio = NULL, gamma = 1, s = 1,
@@ -627,6 +718,58 @@ wafc_tune <- function(x, u, y,
     out <- list(rule = rule, J = cv[["J.min"]], lambda = lam, fit = fit,
                 nzero = nz, tab = cv[["cvtab"]], sigma = NA_real_, cv = cv,
                 call = this_call)
+    class(out) <- "wafc_tune"
+    return(out)
+  }
+
+  ## gcv: the same grid of J, the criterion minimised over the points of
+  ## each path the guard keeps, and then over the grid. The minimum without
+  ## the guard is carried beside it, so that how often the guard decides is
+  ## read from the object and not rerun.
+  if (rule == "gcv") {
+    J <- wafc_J_grid(J, n)
+    best <- NULL
+    free <- NULL
+    rows <- vector("list", length(J))
+    nexcl <- 0L
+    npts <- 0L
+    for (i in seq_along(J)) {
+      fit <- do.call(wafc, c(list(x = x, u = u, y = y, J = J[i],
+                                  penalty = penalty, nlambda = nlambda,
+                                  lambda.min.ratio = lambda.min.ratio),
+                             dots[["design"]], dots[["fit"]]))
+      gc <- wafc_gcv(fit)
+      k <- attr(gc, "which.min")
+      ku <- attr(gc, "which.min.unguarded")
+      nexcl <- nexcl + sum(gc[["excluded"]])
+      npts <- npts + nrow(gc)
+      rows[[i]] <- data.frame(J = J[i], lambda = gc[["lambda"]][k],
+                              nzero = gc[["nzero"]][k], df = gc[["df"]][k],
+                              gcv = gc[["gcv"]][k],
+                              excluded = sum(gc[["excluded"]]),
+                              points = nrow(gc),
+                              gcv.unguarded = gc[["gcv"]][ku],
+                              df.unguarded = gc[["df"]][ku])
+      if (is.null(best) || rows[[i]][["gcv"]] < best[["value"]]) {
+        best <- list(value = rows[[i]][["gcv"]], J = J[i],
+                     lambda = gc[["lambda"]][k], fit = fit,
+                     nzero = gc[["nzero"]][k])
+      }
+      if (is.null(free) || gc[["gcv"]][ku] < free[["value"]]) {
+        free <- list(value = gc[["gcv"]][ku], J = J[i],
+                     lambda = gc[["lambda"]][ku], df = gc[["df"]][ku])
+      }
+    }
+    tab <- do.call(rbind, rows)
+    guard <- list(excluded = nexcl, points = npts,
+                  decides = !(free[["J"]] == best[["J"]] &&
+                                free[["lambda"]] == best[["lambda"]]),
+                  J.unguarded = free[["J"]],
+                  lambda.unguarded = free[["lambda"]],
+                  df.unguarded = free[["df"]])
+    out <- list(rule = rule, J = best[["J"]], lambda = best[["lambda"]],
+                fit = best[["fit"]], nzero = best[["nzero"]], tab = tab,
+                sigma = NA_real_, cv = NULL, guard = guard, call = this_call)
     class(out) <- "wafc_tune"
     return(out)
   }

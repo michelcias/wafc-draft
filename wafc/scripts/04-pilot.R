@@ -92,6 +92,27 @@
 ## curve of recovery against t is read, and '<tag>-thr-t.rds', the t and
 ## the fraction c = t / max norm each thresholded row used.
 ##
+## Step E2.5h adds four methods to the part 'competitors'. 'gam.reml',
+## 'gam.gcv' and 'gam.cv' are mgcv with the basis dimension chosen on one
+## grid, 5, 10, 20, 40 and 80, common to the smooths (decision D41), by the
+## REML of the fit (engine bam with discrete = TRUE, as 'gam.matched'), by
+## its GCV (smoothing parameters by GCV as well; bam discretizes only under
+## REML, so this one runs on the engine named in gam_gcv_engine below), or
+## by the squared error on the folds of the replicate, the ones cv.wafc()
+## uses (REML and bam inside each fold), with the time of the whole search
+## in the row. D41 leaves 'gam.gcv' out of the cell "mixed": the run does
+## not ask for it there (WAFC_METHODS), and a fit at k = 80 took more than
+## an hour there. 'wafc.gcv' is the WAFC with
+## (J, lambda) by generalized cross-validation over the grid 2:8
+## (wafc_tune(rule = "gcv"), with its guard: points with df >= n/2 left
+## out), and 'wafc.gcv+max' the threshold of step E2.5g on it, with
+## c = 0.15 and no refit. Two side tables go beside the rows:
+## '<tag>-gam-k.rds', one row per candidate of k fitted, with its score,
+## the score the engine reports, its edf, its number of coefficients and its
+## seconds, and the flags of the k chosen and of the top of the grid; and
+## '<tag>-gcv-guard.rds', how many points of the paths of 'wafc.gcv' the
+## guard left out and whether it decided the pair.
+##
 ## The two parts that answer a question about the code rather than about
 ## the method, 'margin' and 'j1', are capped at 20 replicates:
 ## what they measure is a ranking of margins and a frequency of selection,
@@ -228,10 +249,19 @@ if (length(args) >= 5L && nzchar(args[5L])) {
 ## tables; a method added later goes after the one it varies, which changes
 ## no seed, since the random stream of every method is the one it would
 ## start from alone (run_competitors()).
-methods <- c("wafc.lasso", "wafc.sglasso", "gam", "gam.matched", "bsgl",
+methods <- c("wafc.lasso", "wafc.sglasso", "wafc.gcv", "gam", "gam.matched",
+             "gam.reml", "gam.gcv", "gam.cv", "bsgl",
              "klopp", "klopp.free", "klopp.unit", "klopp.merged",
              "klopp.balanced", "klopp.freecoarse", "aspline", "vcbart",
              "linear", "oracle")
+## The engine of 'gam.gcv' (step E2.5h): bam discretizes the covariates only
+## under REML, and with method = "GCV.Cp" it warns and fits without the
+## discretization, so the choice is between bam and gam without it. bam by
+## default: measured on one replicate, the two cost the same with q = 2 at
+## n = 250 (419 s and 394 s over the grid up to 120), and bam is eight
+## times faster in the cell "mixed" at n = 1000 and k = 20 (55 s against
+## 467 s). WAFC_GAM_GCV_ENGINE = "gam" switches.
+gam_gcv_engine <- Sys.getenv("WAFC_GAM_GCV_ENGINE", "bam")
 ## Step E2.5g: the thresholded rows of 'wafc.lasso' and 'klopp.balanced'.
 thr_bases <- c("wafc.lasso", "klopp.balanced")
 thr_rules <- c("max", "cv", "oracle")
@@ -242,7 +272,8 @@ thr_labels <- function(base) {
   }))
 }
 method_levels <- unlist(lapply(methods, function(m) {
-  c(m, if (m %in% thr_bases) thr_labels(m))
+  c(m, if (m %in% thr_bases) thr_labels(m),
+    if (m == "wafc.gcv") "wafc.gcv+max")
 }))
 run_methods <- methods
 if (nzchar(Sys.getenv("WAFC_METHODS", ""))) {
@@ -484,6 +515,66 @@ run_competitors <- function(cell, n, r) {
     }
   }
 
+  ## 'wafc.gcv' (step E2.5h): the pair (J, lambda) by generalized
+  ## cross-validation over the grid 2:8, with the guard of wafc_gcv(), and
+  ## its threshold by the rule "max" of step E2.5g at c = 0.15, no refit. The
+  ## time of the row is the time of the search; the one of the thresholded
+  ## row adds the threshold.
+  if ("wafc.gcv" %in% run_methods) {
+    from_start()
+    t0 <- proc.time()[["elapsed"]]
+    tn <- try(wafc_tune(dgp[["x"]], dgp[["u"]], dgp[["y"]], rule = "gcv",
+                        wavelet.table = wafc_pilot_table), silent = TRUE)
+    el <- proc.time()[["elapsed"]] - t0
+    if (inherits(tn, "try-error")) {
+      for (lab in c("wafc.gcv", "wafc.gcv+max")) {
+        rows[[length(rows) + 1L]] <- fail_row(cell, n, r, lab, dgp, active,
+                                              tn)
+      }
+    } else {
+      f <- tn[["fit"]]
+      lam <- tn[["lambda"]]
+      d_test <- wafc_design(test[["x"]], test[["u"]], spec = f[["design"]])
+      d_grid <- wafc_design(matrix(1, n_grid, p), grid, spec = f[["design"]])
+      cf <- wafc_raw_coef(f, s = lam)
+      fh <- as.numeric(d_test[["Z"]] %*% cf[-1L, 1L]) + cf[1L, 1L]
+      bh <- predict(f, newu = test[["u"]], s = lam, type = "beta")
+      gh <- wafc_grid_components(f, grid, s = lam, design = d_grid)
+      blk <- wafc_blocks(f, s = lam)[["nonzero"]] > 0L
+      rows[[length(rows) + 1L]] <- one_row(
+        cell, n, r, "wafc.gcv", dgp, test, grid,
+        list(f_test = fh, beta_test = bh, time = el), active, blk, gh,
+        list(J = tn[["J"]], lambda = lam,
+             nzero = sum(cf[-1L, 1L][-f[["design"]][["unpenalized"]]] != 0)))
+      gd <- tn[["guard"]]
+      side <- side_add(side, list("gcv-guard" = data.frame(
+        cell = cell[["name"]], n = n, rep = r, J = tn[["J"]], lambda = lam,
+        excluded = gd[["excluded"]], points = gd[["points"]],
+        decides = gd[["decides"]], J.unguarded = gd[["J.unguarded"]],
+        lambda.unguarded = gd[["lambda.unguarded"]],
+        df.unguarded = gd[["df.unguarded"]],
+        df = tn[["nzero"]] + p, stringsAsFactors = FALSE)))
+      th <- try(wafc_threshold(f, s = lam, rule = "max", c = 0.15,
+                               refit = "none", y = dgp[["y"]]), silent = TRUE)
+      if (inherits(th, "try-error")) {
+        rows[[length(rows) + 1L]] <- fail_row(cell, n, r, "wafc.gcv+max", dgp,
+                                              active, th)
+      } else {
+        ex <- th[["extra"]]
+        rows[[length(rows) + 1L]] <- one_row(
+          cell, n, r, "wafc.gcv+max", dgp, test, grid,
+          list(f_test = predict(th, test[["x"]], test[["u"]]),
+               beta_test = th[["beta"]](test[["u"]]),
+               time = el + th[["time"]]),
+          active, th[["blocks"]], wafc_grid_components(th, grid),
+          list(J = ex[["J"]], lambda = ex[["lambda"]], nzero = ex[["nzero"]]))
+        side <- side_add(side, list("thr-t" = data.frame(
+          cell = cell[["name"]], n = n, rep = r, method = "wafc.gcv+max",
+          t = ex[["t"]], c = ex[["c"]], stringsAsFactors = FALSE)))
+      }
+    }
+  }
+
   ## 'gam.matched' is mgcv with the basis dimension of each smooth matched to
   ## the 2^J wavelet columns of a block at the J the WAFC with the LASSO
   ## selected on this replicate (wafc_k_matched(), step E2.4b), fitted by
@@ -494,9 +585,12 @@ run_competitors <- function(cell, n, r) {
   ## 'klopp.free' is 'klopp' with penalize.levels = FALSE, and the two
   ## variants of step E2.5c, the one of step E2.5e and the one of step
   ## E2.5f keep the levels free as well.
-  for (lab in setdiff(run_methods, c("wafc.lasso", "wafc.sglasso"))) {
+  for (lab in setdiff(run_methods, c("wafc.lasso", "wafc.sglasso",
+                                     "wafc.gcv"))) {
     from_start()
-    mth <- sub("\\.(matched|free|unit|merged|balanced|freecoarse)$", "", lab)
+    mth <- sub(
+      "\\.(matched|reml|gcv|cv|free|unit|merged|balanced|freecoarse)$", "",
+      lab)
     own <- switch(lab,
                   klopp.free = list(penalize.levels = FALSE),
                   klopp.unit = list(penalize.levels = FALSE,
@@ -508,6 +602,9 @@ run_competitors <- function(cell, n, r) {
                   klopp.freecoarse = list(penalize.levels = FALSE,
                                           balanced = TRUE,
                                           free.coarse = TRUE),
+                  gam.reml = list(k.select = "reml", engine = "bam"),
+                  gam.gcv = list(k.select = "gcv", engine = gam_gcv_engine),
+                  gam.cv = list(k.select = "cv", engine = "bam"),
                   list())
     if (lab == "gam.matched") {
       if (is.null(J_lasso)) {
@@ -543,6 +640,18 @@ run_competitors <- function(cell, n, r) {
                      active, foldid)
       rows <- c(rows, tr[["rows"]])
       side <- side_add(side, tr[["side"]])
+    }
+    ## the search over k of step E2.5h, one row per candidate fitted, with
+    ## the dimensions chosen per modulator in the row of the candidate kept
+    kt <- f[["extra"]][["k.table"]]
+    if (!is.null(kt)) {
+      kt[["chosen"]] <- kt[["k.used"]] ==
+        paste(f[["extra"]][["k"]], collapse = ",")
+      kt[["top"]] <- kt[["chosen"]] & f[["extra"]][["k.top"]]
+      side <- side_add(side, list("gam-k" = cbind(
+        data.frame(cell = cell[["name"]], n = n, rep = r, method = lab,
+                   engine = f[["extra"]][["engine"]],
+                   stringsAsFactors = FALSE), kt)))
     }
   }
   out <- do.call(rbind, rows)

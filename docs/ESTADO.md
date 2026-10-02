@@ -2,15 +2,19 @@
 
 **Última atualização:** 2026-10-01.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8,
-E1.10 e E1.11), E5a, E5c e E2.1 a E2.5g fechadas**, mais L1 a L7 e a
+E1.10 e E1.11), E5a, E5c e E2.1 a E2.5h fechadas**, mais L1 a L9 e a
 sondagem E6.1a. Falta E2.5 (go/no-go) para fechar E2. O LASSO puro levou
 no-go pelo critério literal em E2.5a; E2.5b a E2.5f mediram cinco formas
 do block LASSO (a balanceada é a que a teoria cobre e a melhor fora do
-suave); e **E2.5g mostrou que o limiar do Corolário 8 é o que derruba o
-fator do suave abaixo de 1,5** (1,31 a 1,37 no `wafc.lasso+max` contra o
-`gam.matched`). As medições que a pergunta 33 pedia estão feitas; a decisão
-de rumo é do autor (perguntas 33 e 38). A decidir também: a saída da
-aplicação (pergunta 2). O teto de páginas fica para o fim (D21).
+suave); E2.5g mostrou que o limiar do Corolário 8 derruba o fator do suave
+abaixo de 1,5 contra o `gam.matched`; e **E2.5h, com o `gam` sintonizado
+nos termos dele (REML, validação cruzada nas dobras do WAFC e GCV), manteve
+o veredito**: o WAFC perde no `smooth` e no `uneven` em toda forma, o
+`klopp.balanced+cv` vence no não homogêneo, na `mixed` e no nulo, e o fator
+do `wafc.lasso+max` no suave fica no limite de 1,5 (1,49 contra o `gam.cv`
+em `n = 1000`). As medições estão feitas; a decisão de rumo é do autor
+(perguntas 33, 38 e 41). A decidir também: a saída da aplicação (pergunta
+2). O teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 3` (`manuscript/ms_3.tex`,
 `supp_3.tex`, `references_3.bib`), aberta em 2026-10-01 por decisão do
 autor para a notação da seleção (D40); a `k = 2` fica intacta. Os dois
@@ -1886,6 +1890,66 @@ p. 1283; Observação 2, p. 1284). `refs/donoho1998.pdf` entrou.
 - A marca da entrada de 1998 no `05` **fica** até a redação ser decidida, e
   o `ms_3.tex` l. 577 diz a mesma coisa que a Observação: pergunta 35(h).
 
+### 2026-10-02: E2.5h fechada, o `gam` sintonizado não muda o veredito
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: **1 006 testes
+passam** (eram 921); `e25h-joined.rds` tem **28 350 linhas**, 0 falhas, e
+as 24 750 que vêm de E2.5g coincidem com diferença 0 (**sexta junção
+exata**); as razões abaixo marcadas reproduzem. Rodada: 10 h 08 min em 8
+processos, 79,6 h de processador, pico de 1,20 GB por processo, no escopo
+de D41 (grade `{5, 10, 20, 40, 80}` comum, 50 réplicas, `gam.gcv` fora da
+`mixed`).
+
+- **O critério de `k` não muda o erro do `gam` com REML:** `gam.reml` e
+  `gam.cv` dão razão **1,000 em toda célula e `n`** (reproduzido), embora
+  escolham `k` diferentes, e ficam a 2% do `gam.k128` e do `gam.matched`.
+  A exceção é o topo da grade: no não homogêneo e na `mixed` em
+  `n = 1000`, `k = 80` fica 1,0% a 1,4% acima do `gam.k128` em `rmse_f`.
+  **D34 dispara** (mais de 20% no topo) no não homogêneo, na `mixed`, no
+  `uneven` e no nulo, mas só aperta de fato naquelas duas células em
+  `n = 1000`; a grade não foi estendida.
+- **O GCV é outro estimador:** o `gam.gcv` é o melhor `gam` medido no não
+  homogêneo (0,93, 0,89 e 0,93 do `gam.matched`, reproduzido; vence em 78%
+  a 96%), perde 3% a 4% no `smooth` e 21% a 51% no nulo, e deixa mais
+  blocos nulos ligados (o subsuavizamento conhecido do GCV, leitura).
+- **Com o mesmo critério e as mesmas dobras dos dois lados (`gam.cv`), o
+  veredito de E2.5a a E2.5g se mantém.** Razões contra o `gam.cv`, `rmse_f`,
+  `n = 250, 500, 1000`: o `wafc.lasso` perde em 1,25 a 1,38 no `smooth` e
+  1,26 a 1,33 no `uneven`; o `klopp.balanced+cv` vence no não homogêneo
+  (**0,964, 0,923, 0,895**, reproduzido; 80% a 94% das réplicas) e na
+  `mixed` (**0,978, 0,964, 0,941**, reproduzido), e o `wafc.lasso+cv` vence
+  no não homogêneo em `n ≥ 500` (0,981 e 0,931). **O fator do suave do
+  `wafc.lasso+max`** (`ISE / ISE(gam.cv)`) é **1,27, 1,44, 1,49** no
+  `smooth` (reproduzido) e 1,72, 1,50, 1,35 no `uneven`: no limite de 1,5
+  no suave, acima dele no `uneven` em `n = 250`. Contra o `gam.reml`, 1,53
+  no `smooth` em `n = 1000`.
+- **O GCV do WAFC não ganha nada sobre o `cv.min`** (1,00 a 1,02 em
+  `rmse_f`, 1,09 a 1,14 no nulo), vai mais fundo em `J`, custa um décimo
+  (0,5 a 3,9 s contra 7 a 26 s), e a guarda `df ≥ n/2` decide em 16,5% das
+  réplicas, quase todas em `n = 250` nas células fundas. Com o limiar, empata
+  com o `cv.min` limiarizado. Contra o `gam.gcv` (GCV dos dois lados) perde
+  no suave e no não homogêneo e vence no nulo.
+- **Pergunta 39(a), conferida:** `rank(M X_A) = |A|` em 150 de 150
+  sintonias refeitas, no `λ` do `wafc.gcv` e no ponto mais denso que a
+  guarda admite (`|A|` até 496, menor valor singular relativo 0,051). Nesta
+  amostra a contagem "não nulos + `p`" é o `df` de Tibshirani & Taylor
+  (2012): condição verificada, não teorema.
+- **Estrutura:** o `gam.reml` e o `gam.cv` acertam `P(Ŝ = S)` de 0,16 a
+  0,42 no suave, 0,24 a 0,34 no não homogêneo e 0 na `mixed`; o `gam.gcv`,
+  de 0 a 0,20. O limiar do WAFC continua sendo a única regra que recupera
+  estrutura, com as ressalvas de E2.5g sobre o `c`.
+- **Lições:** o escore que o `bam` com `discrete = TRUE` reporta não é
+  comparável entre `k` (mudou a escolha em até 10% das réplicas de uma
+  célula), e o código usa o REML exato recalculado; escore de motor
+  aproximado não serve para comparar modelos diferentes sem conferir contra
+  o exato. De passagem: em 10 de 150 sintonias o `glmnet` não convergiu num
+  `λ` e devolveu o caminho até o anterior, sem medição de onde (pergunta
+  41(d)).
+- **Tempo** (mediana por ajuste, busca incluída, 8 processos): `gam.reml`
+  3,4 a 8,6 s com `q = 2` e 77 a 86 s na `mixed`; `gam.cv` 29 a 64 s e
+  780 a 800 s; `gam.gcv` 103 a 318 s; `wafc.gcv` 0,5 a 3,9 s; `wafc.lasso`
+  6,8 a 26 s. O `k = 80` é 75% a 87% do custo da busca do `gam`.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -2418,7 +2482,7 @@ Ordenadas pelo que bloqueia mais.
      manuscrito, (a) é edição marcada em `colR1` na `k = 3`.
 
 36. **Pendências de E2.5d** (2026-09-30), nenhuma bloqueando:
-   - (a) **Qual `gam` é o concorrente de E4 e da tabela do manuscrito.**
+   - (a) **Qual `gam` é o concorrente de E4 e da tabela do manuscrito** (medido por E2.5h, 2026-10-02: a decisão está na pergunta 41(a)).
      (**Em curso como E2.5h**, que absorveu a E2.5i em 2026-10-01: o
      `gam` com `k` escolhido por REML, por GCV e por validação cruzada nas
      dobras do WAFC, numa grade única `{5, 10, 20, 40, 80}` e não em
@@ -2506,12 +2570,12 @@ Ordenadas pelo que bloqueia mais.
      `refs/zou2007.pdf`, `refs/tibshirani2012.pdf`, `refs/marra2011.pdf`.
      Opcionais, só para D39: `wood2003`, `wood2011`, `wood2015`,
      `wood2017jasa`.
-   - (b) **As duas do `citation("mgcv")` que ficaram fora**, já conferidas
+   - (b) (**Wood 2004 entrou no `.bib` em 2026-10-02**, porque o `gam.gcv` da E2.5h é o `bam` com `method = "GCV.Cp"`; Wood, Pya & Säfken 2016 continua fora.) **As duas do `citation("mgcv")` que ficaram fora**, já conferidas
      no Crossref para entrarem sem nova rodada se o handoff da E2.5h disser
      que o código as usa: Wood (2004, *JASA* 99(467), 673–686), se o
      `gam.gcv` for pelo `bam` com `GCV.Cp`; e Wood, Pya & Säfken (2016,
      *JASA* 111(516), 1548–1563 sem a discussão), que hoje não se usa.
-   - (c) **Três candidatas que a ajuda do `mgcv` cita**, conferidas só para
+   - (c) (Depois da E2.5h: Wood 2008 não se aplica, porque o `gam.gcv` usa o `bam` e não o `gam()`; Li & Wood 2020 continua candidata, junto do `discrete = TRUE` do `gam.reml`.) **Três candidatas que a ajuda do `mgcv` cita**, conferidas só para
      registro: Wood (2008, *JRSS-B* 70(3), 495–518), se o `gam.gcv` cair no
      `gam()`; Li & Wood (2020, *Stat. Comput.* 30(1), 19–25), junto do
      `discrete = TRUE`; e Wood (2025, *Annu. Rev. Stat. Appl.*), não
@@ -2538,6 +2602,25 @@ Ordenadas pelo que bloqueia mais.
    ao lado de Donoho & Johnstone (1998) na l. 576, o que daria apoio
    conferido à forma weak-`ℓ_τ` que a 35(h) trocou por Besov. As duas são
    edição marcada na `k = 3`, e (a) toca o `alvo-revista.md`.
+
+41. **Pendências de E2.5h** (2026-10-02), que entram na decisão de rumo:
+   - (a) **Qual `gam` vai a E4 e à tabela do manuscrito.** A tarefa propõe
+     o `gam.cv` (mesmo critério e mesmas dobras do WAFC, e o mesmo erro do
+     `gam.reml` e do `gam.k128`); o `gam.reml` dá o mesmo erro a um décimo
+     do custo. Nos dois casos, com a ressalva do topo da grade no não
+     homogêneo e na `mixed` em `n = 1000` (1,0% a 1,4%). O `gam.gcv` é a
+     referência que mais aperta o WAFC no não homogêneo e a que mais o
+     favorece no nulo; se entrar, entra como terceira coluna.
+   - (b) **O topo da grade:** estender a 120 só onde aperta seria a grade
+     diferente por célula que D41 recusou; fica registrado o custo de 1,0% a
+     1,4%.
+   - (c) **O `wafc.gcv` entra em E4?** Não ganha em erro e perde no nulo; o
+     argumento é o custo (um décimo) e o par com o `gam.gcv`. Se entrar, o
+     manuscrito cita Tibshirani & Taylor (2012) com a condição de posto,
+     conferida em 150 de 150 sintonias.
+   - (d) As 10 de 150 sintonias em que o `glmnet` não convergiu num `λ`:
+     medir em que `J` e se o corte cai dentro da guarda, antes de E4.
+   - (e) O `k.check()` de Wood (2017, §5.9) não foi feito.
 
 ---
 
@@ -2582,6 +2665,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-02 | E2.5h fechada e integrada (1 006 testes, 28 350 linhas, sexta junção exata): com o `gam` sintonizado por REML, validação cruzada ou GCV o veredito se mantém; `gam.reml` e `gam.cv` coincidem; o GCV do WAFC não ganha nada; o posto de Tibshirani & Taylor confere; Wood (2004) no `.bib`; pergunta 41 |
 | 2026-10-02 | Folha de rosto da impressão de Härdle et al. (1998) conferida: "Gerard" e "Alexander", como no `.bib`; o WALL diverge (35(c)) |
 | 2026-10-02 | 35(g) fechada: o fator 2 do Corolário 1 de K&P é erro do enunciado do *Annals*, que (3.19), (3.20) e (3.6) desmentem; o arXiv v2 tinha outro corolário; o `08a` já lia certo e agora diz por quê |
 | 2026-10-02 | 32(c) aplicada: o Corollary 2 (i)–(ii) também na resolução do Theorem 1, com `ρ̃_n`; no `ms_3`, no `supp_3` e no `06` |

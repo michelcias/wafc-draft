@@ -250,7 +250,7 @@ test_that("wafc_sigma returns a scale near the true one at a rich enough sieve",
 ## ---------------------------------------------------------------------------
 
 test_that("every rule returns a pair on the path whose optimality conditions hold", {
-  rules <- c("cv.min", "cv.1se", "bic", "ebic", "theory", "qut")
+  rules <- c("cv.min", "cv.1se", "bic", "ebic", "theory", "qut", "gcv")
   for (rule in rules) {
     tn <- wafc_tune(x0, u0, y0, rule = rule, J = 2:4, foldid = folds,
                     s = 3/2, sigma = dgp[["sigma"]], nsim = 100L,
@@ -397,4 +397,93 @@ test_that("wafc_lambda_max is the entry point of the engine with and without an 
     expect_equal(wafc_lambda_max(des, y1), fit[["lambda"]][1L],
                  tolerance = 1e-8)
   }
+})
+
+## ---------------------------------------------------------------------------
+## Generalized cross-validation (step E2.5h)
+## ---------------------------------------------------------------------------
+
+test_that("wafc_gcv is n RSS / (n - df)^2 recomputed by hand", {
+  fit <- wafc(x0, u0, y0, J = 3L)
+  gc <- wafc_gcv(fit)
+  expect_equal(gc[["lambda"]], fit[["lambda"]])
+  ## the degrees of freedom of wafc_bic(): the non-zero wavelet
+  ## coefficients plus the p levels (decision D19)
+  expect_equal(gc[["df"]], fit[["nzero"]] + p)
+  rss <- unname(colSums((y0 - predict(fit, x0, u0))^2))
+  expect_equal(unname(gc[["rss"]]), rss)
+  expect_equal(gc[["gcv"]], n * rss / (n - (fit[["nzero"]] + p))^2)
+  k <- attr(gc, "which.min")
+  expect_equal(gc[["gcv"]][k], min(gc[["gcv"]][!gc[["excluded"]]]))
+  expect_equal(attr(gc, "lambda.min"), gc[["lambda"]][k])
+  ## and at a chosen penalty level
+  g1 <- wafc_gcv(fit, s = fit[["lambda"]][10L])
+  expect_equal(g1[["gcv"]], gc[["gcv"]][10L])
+  expect_error(wafc_gcv(fit, guard = 0), "in \\(0, 1\\]")
+})
+
+test_that("the guard of the GCV leaves out the points with df >= n/2", {
+  ## J = 6 has 378 penalized columns for n = 250, so the end of the path
+  ## goes past n/2 and, for some points, past n
+  fit <- wafc(x0, u0, y0, J = 6L, lambda.min.ratio = 1e-4)
+  gc <- wafc_gcv(fit)
+  df <- fit[["nzero"]] + p
+  expect_true(any(df >= n / 2))
+  expect_identical(gc[["excluded"]], df >= n / 2)
+  expect_true(all(is.na(gc[["gcv"]][df >= n])))
+  k <- attr(gc, "which.min")
+  expect_false(gc[["excluded"]][k])
+  ku <- attr(gc, "which.min.unguarded")
+  expect_equal(ku, which.min(gc[["gcv"]]))
+  ## guard = 1 keeps every point with a criterion, and is the unguarded
+  ## choice
+  g1 <- wafc_gcv(fit, guard = 1)
+  expect_identical(g1[["excluded"]], df >= n)
+  expect_equal(attr(g1, "which.min"), ku)
+  ## the rule over the grid: the minimum over J of the guarded minima,
+  ## the points left out counted, and the guard said to decide exactly when
+  ## the unguarded minimum over the grid is another pair
+  tn <- wafc_tune(x0, u0, y0, rule = "gcv", J = c(3L, 6L),
+                  lambda.min.ratio = 1e-4)
+  per <- lapply(c(3L, 6L), function(Ji) {
+    wafc_gcv(wafc(x0, u0, y0, J = Ji, lambda.min.ratio = 1e-4))
+  })
+  mins <- vapply(per, function(g) g[["gcv"]][attr(g, "which.min")], 0)
+  free <- vapply(per, function(g) g[["gcv"]][attr(g, "which.min.unguarded")],
+                 0)
+  expect_equal(tn[["tab"]][["gcv"]], mins)
+  expect_equal(tn[["tab"]][["gcv.unguarded"]], free)
+  expect_equal(tn[["J"]], c(3L, 6L)[which.min(mins)])
+  b <- per[[which.min(mins)]]
+  expect_equal(tn[["lambda"]], attr(b, "lambda.min"))
+  expect_equal(tn[["tab"]][["excluded"]],
+               vapply(per, function(g) sum(g[["excluded"]]), 0L))
+  expect_equal(tn[["guard"]][["excluded"]], sum(tn[["tab"]][["excluded"]]))
+  expect_equal(tn[["guard"]][["points"]], sum(tn[["tab"]][["points"]]))
+  jf <- c(3L, 6L)[which.min(free)]
+  gf <- per[[which.min(free)]]
+  expect_equal(tn[["guard"]][["J.unguarded"]], jf)
+  expect_equal(tn[["guard"]][["lambda.unguarded"]],
+               gf[["lambda"]][attr(gf, "which.min.unguarded")])
+  expect_identical(tn[["guard"]][["decides"]],
+                   !(jf == tn[["J"]] &&
+                       tn[["guard"]][["lambda.unguarded"]] == tn[["lambda"]]))
+})
+
+test_that("with theta* in the basis and no noise, the GCV recovers it", {
+  ## the residual sum of squares goes to zero at the small end of the path
+  ## while df stays below n/2 (the 42 columns of J = 3 plus the p levels:
+  ## at 1e-8 the LASSO leaves the null coefficients at rounding size, not at
+  ## zero, and the count of D19 counts them); an explicit
+  ## path, as in the test of cv.wafc above, because the engine stops its own
+  ## path early on a noiseless response (and wafc_tune() has no 'lambda':
+  ## the name would match 'lambda.min.ratio')
+  fit <- wafc(x0, u0, y_exact, J = 3L, rescale = FALSE,
+              lambda = c(0.1, 0.01, 1e-4, 1e-8))
+  gc <- wafc_gcv(fit)
+  expect_equal(attr(gc, "lambda.min"), 1e-8)
+  expect_lt(gc[["df"]][4L], n / 2)
+  expect_equal(attr(gc, "which.min.unguarded"), attr(gc, "which.min"))
+  cf <- coef(fit, s = attr(gc, "lambda.min"))
+  expect_equal(max(abs(unname(cf[-1L, 1L]) - theta)), 0, tolerance = 1e-3)
 })
