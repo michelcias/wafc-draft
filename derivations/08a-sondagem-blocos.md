@@ -443,8 +443,13 @@ em blocos.
 Para `q = 1` e `X ⊥ U`, a cota inferior do Teorema 1 de K&P é
 `(σ²/n)^{2r/(2r+1)}` sem logaritmo: **em `π ≥ 2` a variante em blocos é
 ótima a menos de constante**, e em `π < 2` fica a
-`(log n)^{(2/π−1)/(2s+1)}` dela, que é o Corolário 1 de K&P lido com `p`
-fixo, e é também o expoente da limiarização em blocos de wavelets de Cai
+`(log n)^{(2/π−1)/(2s+1)}` dela, que é o que as eqs. (3.19) e (3.20) de
+K&P dão com `p` fixo (o enunciado do Corolário 1, eq. (3.21), traz
+`2(2−ν)_+/(ν(2r+1))`, com um fator 2 que (3.6), (3.19) e (3.20) não
+sustentam: a razão entre (3.19) e (3.6) é `(log n)^{(2−ν)_+/(ν(2r+1))}`
+vezes `(log p/log n)^{2r/(2r+1)}`, limitado sob `n^β ≥ p`; o arXiv v2 tinha
+outro corolário, com `(log p)^{2r/(2r+1)}`, e não há errata no Crossref;
+conferido em 2026-10-02), e é também o expoente da limiarização em blocos de wavelets de Cai
 (1999, Teorema 4, eq. 5.4, p. 908), que vale com `α ≥ 1/p` (no nosso
 símbolo, `s ≥ 1/π`) e no modelo de sequência, não no desenho de produtos.
 O LASSO de E1.6 fica a `(log n)^{2s/(2s+1)}`, e o Teorema 7.1 de

@@ -2350,7 +2350,7 @@ Ordenadas pelo que bloqueia mais.
      com as de medição.
    - (b) Na próxima rodada do manuscrito, Mallat (2009) na prova do Lemma 1
      do `supp`; Hsu et al. e Cai só se a variante em blocos for adotada.
-   - (c) O `hardle1998wavelets` do WALL continua com "Gérard" e
+   - (c) (**Nota de 2026-10-02:** o PDF em `refs/hardle1998.pdf` é a versão do Seminário Paris-Berlim, com "Gerard Kerkyacharian" e "Alexander Tsybakov" na folha de rosto; a entrada daqui cita a impressão da Springer, *Lecture Notes in Statistics* 129, cuja folha de rosto não foi vista, então D39 está cumprida pela fonte mais próxima, não pela própria. A front matter da Springer, de acesso livre na SpringerLink, fecharia o ponto.) O `hardle1998wavelets` do WALL continua com "Gérard" e
      "Alexandre"; levar D39 ao `references_theo_1.bib` de lá é decisão do
      autor. "Gerard" sem acento veio da versão do seminário, da página da
      Springer e do Crossref; a folha de rosto da impressão não foi vista.
@@ -2382,9 +2382,17 @@ Ordenadas pelo que bloqueia mais.
      artigo, e a (A4) de lá é a do ruído, de modo que o "(A3)" do `08a`
      estava certo e o rótulo do suplemento é que destoa; e o lema pede
      `1 ≤ ν < ∞` e `r > min(1/2, 1/ν)`, de modo que a correspondência
-     `(r, ν) = (s, π)` só vale com `π ≥ 1`. O expoente do Corolário 1 (o
-     fator 2) continua sem resolução, porque o suplemento não trata do
-     corolário. Texto original: dois pontos de K&P que só o arXiv ou o suplemento resolvem: o
+     `(r, ν) = (s, π)` só vale com `π ≥ 1`. **O fator 2 do Corolário 1,
+     resolvido em 2026-10-02:** é erro do enunciado publicado. A razão entre
+     a cota superior (3.19) e a inferior (3.6) do *Annals* é
+     `(log n)^{(2−ν)_+/(ν(2r+1))}` vezes `(log p/log n)^{2r/(2r+1)}`, que a
+     própria (3.20) registra e que fica limitada sob `n^β ≥ p`; o "2" da
+     (3.21) não sai de nenhuma das duas. O arXiv v2 (`refs/klopp2014-arxiv.pdf`)
+     não confirma nem desmente, porque tinha outro corolário, com
+     `(log p)^{2r/(2r+1)}` no lugar de potências de `log n`: o resultado
+     mudou na revisão, e o 2 entrou com ela. Não há errata no Crossref. O
+     `08a` §4.3 lia sem o 2, o que está certo, e agora diz por quê; quem
+     citar a ótima a menos de log de K&P cita (3.19)–(3.20), não a (3.21). Texto original: dois pontos de K&P que só o arXiv ou o suplemento resolvem: o
      Corolário 1 do *Annals* (3.21) tem um fator 2 no expoente do log que a
      (3.17) e a (3.20) não têm, e o `08a` §4.3 o lê sem o 2 (parece erro de
      impressão, não conferido no arXiv); e o enunciado dos Lemas 2 a 4, que
@@ -2574,6 +2582,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-02 | 35(g) fechada: o fator 2 do Corolário 1 de K&P é erro do enunciado do *Annals*, que (3.19), (3.20) e (3.6) desmentem; o arXiv v2 tinha outro corolário; o `08a` já lia certo e agora diz por quê |
 | 2026-10-02 | 32(c) aplicada: o Corollary 2 (i)–(ii) também na resolução do Theorem 1, com `ρ̃_n`; no `ms_3`, no `supp_3` e no `06` |
 | 2026-10-01 | 32(b) e 32(h) aplicadas no `ms_3` e no `supp_3` (janela não assintótica no enunciado do Corollary 2; a estrutura como quarta contribuição); 34 e 30 páginas |
 | 2026-10-01 | D42 (as quatro convenções de L1) ratificada; o `.bst` próprio dispensado (27(a)); o `08a` corrigido com o suplemento de K&P, e o "(A4)" do suplemento é a (A3) do artigo |
