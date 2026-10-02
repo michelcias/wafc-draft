@@ -2350,7 +2350,7 @@ Ordenadas pelo que bloqueia mais.
      com as de medição.
    - (b) Na próxima rodada do manuscrito, Mallat (2009) na prova do Lemma 1
      do `supp`; Hsu et al. e Cai só se a variante em blocos for adotada.
-   - (c) (**Nota de 2026-10-02:** o PDF em `refs/hardle1998.pdf` é a versão do Seminário Paris-Berlim, com "Gerard Kerkyacharian" e "Alexander Tsybakov" na folha de rosto; a entrada daqui cita a impressão da Springer, *Lecture Notes in Statistics* 129, cuja folha de rosto não foi vista, então D39 está cumprida pela fonte mais próxima, não pela própria. A front matter da Springer, de acesso livre na SpringerLink, fecharia o ponto.) O `hardle1998wavelets` do WALL continua com "Gérard" e
+   - (c) (**Conferido em 2026-10-02 na folha de rosto da impressão da Springer**, `refs/hardle1998-springer-fm.pdf`, p. iii: "Gerard Kerkyacharian" sem acento e "Alexander Tsybakov", como no `.bib` daqui, que cumpre D39. **O `references_theo_1.bib` do WALL, com "Gérard" e "Alexandre", diverge da impressão**; levar a correção para lá é decisão do autor.) O `hardle1998wavelets` do WALL continua com "Gérard" e
      "Alexandre"; levar D39 ao `references_theo_1.bib` de lá é decisão do
      autor. "Gerard" sem acento veio da versão do seminário, da página da
      Springer e do Crossref; a folha de rosto da impressão não foi vista.
@@ -2582,6 +2582,7 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-02 | Folha de rosto da impressão de Härdle et al. (1998) conferida: "Gerard" e "Alexander", como no `.bib`; o WALL diverge (35(c)) |
 | 2026-10-02 | 35(g) fechada: o fator 2 do Corolário 1 de K&P é erro do enunciado do *Annals*, que (3.19), (3.20) e (3.6) desmentem; o arXiv v2 tinha outro corolário; o `08a` já lia certo e agora diz por quê |
 | 2026-10-02 | 32(c) aplicada: o Corollary 2 (i)–(ii) também na resolução do Theorem 1, com `ρ̃_n`; no `ms_3`, no `supp_3` e no `06` |
 | 2026-10-01 | 32(b) e 32(h) aplicadas no `ms_3` e no `supp_3` (janela não assintótica no enunciado do Corollary 2; a estrutura como quarta contribuição); 34 e 30 páginas |
