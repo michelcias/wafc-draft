@@ -2350,7 +2350,7 @@ Ordenadas pelo que bloqueia mais.
      com as de medição.
    - (b) Na próxima rodada do manuscrito, Mallat (2009) na prova do Lemma 1
      do `supp`; Hsu et al. e Cai só se a variante em blocos for adotada.
-   - (c) (**Conferido em 2026-10-02 na folha de rosto da impressão da Springer**, `refs/hardle1998-springer-fm.pdf`, p. iii: "Gerard Kerkyacharian" sem acento e "Alexander Tsybakov", como no `.bib` daqui, que cumpre D39. **O `references_theo_1.bib` do WALL, com "Gérard" e "Alexandre", diverge da impressão**; levar a correção para lá é decisão do autor.) O `hardle1998wavelets` do WALL continua com "Gérard" e
+   - (c) (**Conferido em 2026-10-02 na folha de rosto da impressão da Springer**, `refs/hardle1998-springer-fm.pdf`, p. iii: "Gerard Kerkyacharian" sem acento e "Alexander Tsybakov", como no `.bib` daqui, que cumpre D39. **O WALL divergia da impressão**; corrigido em 2026-10-02 a pedido do autor na última versão, `references_theo_8.bib` do `wall-manuscript` ("Gérard" → "Gerard"; o "Alexander" já estava certo ali), sem commit lá.) O `hardle1998wavelets` do WALL continua com "Gérard" e
      "Alexandre"; levar D39 ao `references_theo_1.bib` de lá é decisão do
      autor. "Gerard" sem acento veio da versão do seminário, da página da
      Springer e do Crossref; a folha de rosto da impressão não foi vista.
