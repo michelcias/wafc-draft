@@ -275,7 +275,7 @@ cone condition, because the unpenalized levels are profiled out
 (Theorem~\ref{thm:main}). The second is the reading that compressibility costs
 no assumption: the Besov condition on the components already implies that
 their wavelet coefficients lie in a weak $\ell_\tau$ ball with
-$\tau = (s+1/2)^{-1}$ (Lemma~\ref{lem:weak}), and it is this that separates
+$\tau = (s+1/2)^{-1}$ (Lemma~\ref{lem:weak}\textcolor{colR1}{, a form with explicit constants of the classical embedding in \citealp[Proposition~9.15]{johnstone2019gaussian}}), and it is this that separates
 the rate of the estimator from the rate of \textcolor{colR1}{linear approximation} when the Besov
 integrability index is smaller than two. The third is computational: the
 estimator is one convex program on a sparse design matrix, and the resolution
@@ -574,7 +574,7 @@ because the Besov condition already implies it, with
 $\tau = (s+1/2)^{-1}$, by Lemma~\ref{lem:weak}. Third, the rate
 $(\log n/n)^{2s/(2s+1)}$ is the minimax reference of the Gaussian sequence
 model over \textcolor{gray}{\sout{weak $\ell_\tau$ balls}} \textcolor{colR1}{Besov bodies} with per coordinate noise of order $\penn$
-\citetext{\textcolor{gray}{\sout{\mbox{\citealp{Donoho-Johnstone-1998}}}}\textcolor{colR1}{\citealp[Theorems~4 and~5]{Donoho-Johnstone-1998}}\textcolor{colR1}{; \citealp{johnstone2019gaussian}}}; the logarithmic factor is the price of the
+\citetext{\textcolor{gray}{\sout{\mbox{\citealp{Donoho-Johnstone-1998}}}}\textcolor{colR1}{\citealp[Theorems~4 and~5]{Donoho-Johnstone-1998}}\textcolor{colR1}{; \citealp[Theorem~9.3]{johnstone2019gaussian}}}; the logarithmic factor is the price of the
 single, nonadaptive penalty level \eqref{eq:lambda}, which takes a union bound
 over the $d_n$ columns. No lower bound is proved here for $q \ge 2$: the
 comparison is with the reference of the sequence model, and the minimax lower
@@ -819,6 +819,11 @@ $s > 0$. Consequently
 $\sum_{k>M}\theta^{*2}_{(k)} \le \tau(2-\tau)^{-1}C_\tau^{2}M^{1-2/\tau}$ for
 every $M \ge 1$.
 \end{lemma}
+
+\textcolor{colR1}{The inclusion of Besov balls in weak $\ell_\tau$ balls is classical
+\citep[Proposition~9.15]{johnstone2019gaussian}; what the lemma adds is the
+constant $C_\tau$, uniform in $J$, for the oracle of the product design, which
+is the form in which the proof of Theorem~\ref{thm:main} uses it.}
 
 Theorem~\ref{thm:main} follows by reading Theorem~\ref{thm:oracle}(ii) not at
 the oracle but at the best $M$ term approximation of it, which is legitimate

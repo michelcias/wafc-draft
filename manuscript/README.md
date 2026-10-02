@@ -12,7 +12,7 @@ e carrega `ulem` para quando `k = 2` existir.
 **Versão viva: `k = 3`**, aberta em 2026-10-01 como cópia de `k = 2`
 (`ms_3.tex`, `supp_3.tex`, `references_3.bib`) para a notação da seleção
 (D40), aplicada sem marcação por lista fechada de padrões; as edições de
-E5c seguem marcadas em `colR1`. 33 e 30 páginas, `.bib` com 37 entradas, e
+E5c seguem marcadas em `colR1`. 34 e 30 páginas, `.bib` com 37 entradas, e
 o mapa da numeração global no cabeçalho do `ms_3.tex`. A `k = 2` (aberta em
 2026-09-30, E5c) fica intacta.
 

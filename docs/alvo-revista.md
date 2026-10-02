@@ -133,9 +133,13 @@ coeficientes (Corolário 8, D32; Corollary 2 no `ms_2`).
    desigualdade oráculo sem condição de cone (E1.5) e a taxa por
    compressibilidade (E1.6). O que Klopp & Pensky já têm para `q = 1` com
    `X ⊥ U` é citado, não reprovado.
-2. A leitura de que **a compressibilidade não custa hipótese**: a hipótese de
+2. O uso de que **a compressibilidade não custa hipótese**: a hipótese de
    Besov já implica weak-`ℓ_τ` (Lema 9), e é isso que separa a taxa da do
-   sieve linear quando `π < 2`.
+   sieve linear quando `π < 2`. O mergulho é clássico (Johnstone 2019,
+   Proposição 9.15, pergunta 40 do `ESTADO.md`); o que é do WAFC é a
+   versão com constantes uniformes em `J` para o oráculo do desenho de
+   produtos e o uso dela para dispensar a hipótese de compressibilidade
+   que o WALL precisava.
 3. Evidência numérica de que a adaptatividade se materializa: contra splines
    (Xue & Yang; `mgcv`), contra o spline adaptativo de Wang, Jiang & Liu
    (2024) e contra o block LASSO de K&P no mesmo desenho (E4).

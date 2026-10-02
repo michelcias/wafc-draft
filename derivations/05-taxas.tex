@@ -478,6 +478,10 @@ $\normn{\widehat f - f}^{2} \le 3(64\pen^{2}\bar M/\gtil + 16\normn{\bbar}^{2}
 
 \subsection*{Lema~\ref{lem:weak}}
 
+O mergulho de (i) é clássico (Johnstone, 2019, Proposição~9.15); o que a
+prova abaixo acrescenta são as constantes $C_\tau$ e $A_{s,\pi}$, uniformes
+em $J$, para o oráculo do desenho de produtos.
+
 \emph{(i).} Fixe $\varepsilon > 0$ e conte
 $N(\varepsilon) = \#\{a : |\theta^{*}_{a}| > \varepsilon\}$. Em um bloco
 $(\cv,\md)$ e num nível $\lev$, a desigualdade de Markov na norma
@@ -841,9 +845,13 @@ Referências fora de \texttt{docs/referencias-verificadas.bib} vão ao handoff.
     L1.) Teoremas 1 e 2 e Corolário 1: cota inferior minimax e taxa adaptativa
     em Besov com $\nu < 2$ para $q = 1$ e $\bX \perp \bU$.
   \item Johnstone, I.~M. \emph{Gaussian Estimation: Sequence and Wavelet
-    Models}. Citada pelo WALL como
-    \texttt{johnstone2019gaussian} para o mesmo risco minimax; não está no
-    \texttt{.bib} verificado. \textsc{[verificar]}
+    Models}. Rascunho de 16 de setembro de 2019
+    (\texttt{johnstone2019gaussian}, verificada em L4 e lida em
+    2026-10-01). Proposição~9.15 (\S9.7, p.~273): $b^{\alpha}_{p,q} \subset
+    w\ell_{p_\alpha}$ com $p_\alpha = 2/(2\alpha+1)$ quando $p > p_\alpha$,
+    que é o Lema~\ref{lem:weak}(i) sem as constantes; e Teorema~9.3
+    (\S9.4, p.~260), o risco minimax sobre bolas weak-$\ell_p$, da ordem
+    $C^{p}\varepsilon^{2-p}$ a menos de $2\log n + 1$ na cota superior.
 \end{itemize}
 
 \end{document}

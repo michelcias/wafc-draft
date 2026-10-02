@@ -73,7 +73,7 @@ Conferência de que tudo roda (da raiz de `wafc-draft`):
 Rscript -e 'library(WaveBased); w <- wbasis(sort(runif(64)), j0 = 0, J = 3); cat(dim(w), "\n")'   # 64 8
 cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd -   # compila
 cd manuscript/ss-template && latexmk -pdf SS-template.tex && latexmk -c && cd -   # compila (9 páginas)
-cd manuscript && latexmk -pdf ms_3.tex && latexmk -pdf supp_3.tex && latexmk -c && cd -   # versão viva k = 3; 33 e 30 páginas, sem indefinida
+cd manuscript && latexmk -pdf ms_3.tex && latexmk -pdf supp_3.tex && latexmk -c && cd -   # versão viva k = 3; 34 e 30 páginas, sem indefinida
 ```
 
 As conferências das derivações, que devem imprimir `OK` (tempos desta
@@ -143,7 +143,7 @@ WAFC_OUT=wafc/cache/e25g WAFC_TAG=e25g WAFC_METHODS=wafc.lasso,klopp.balanced WA
   exceção são as conferências de `derivations/check/`, que medem precisão
   fina.
 - **Manuscrito vivo em `k = 3`** (aberto em 2026-10-01 para a notação da
-  seleção, D40): `ms_3.tex` e `supp_3.tex` compilam limpos, em 33 e 30
+  seleção, D40): `ms_3.tex` e `supp_3.tex` compilam limpos, em 34 e 30
   páginas, com as edições de E5c marcadas em `colR1` (inclusive o
   Corolário 8 na §3.6); as pendências são a pergunta 32 do `ESTADO.md`.
 - **Bibliografia:** 82 entradas verificadas (L1, L3, L4, L5 e L8), e as citações das derivações conferidas nas fontes publicadas (L6, L7); os PDFs ficam em `refs/`, não versionado, e não viajam; pendências na pergunta 35 do `ESTADO.md`.

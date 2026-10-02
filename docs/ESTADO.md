@@ -14,7 +14,7 @@ aplicação (pergunta 2). O teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 3` (`manuscript/ms_3.tex`,
 `supp_3.tex`, `references_3.bib`), aberta em 2026-10-01 por decisão do
 autor para a notação da seleção (D40); a `k = 2` fica intacta. Os dois
-compilam limpos em **33 e 30 páginas**.
+compilam limpos em **34 e 30 páginas** (34 desde a pergunta 40).
 **Cor da rodada corrente:** `colR1`, em uso desde `k = 2` (a rodada não foi
 aceita, então a marcação de E5c segue em `colR1` na `k = 3`).
 
@@ -2506,6 +2506,23 @@ Ordenadas pelo que bloqueia mais.
      `howpublished`. É da próxima rodada do `.tex`, que copia também as 13
      entradas novas.
 
+40. **~~O Lema 9(i) é um mergulho clássico~~ (a) e (b) aplicadas em 2026-10-01:** no `ms_3`, a contribuição 2 da Introduction e uma frase depois do Lemma `lem:weak` citam a Proposição 9.15 de Johnstone e dizem o que o lema acrescenta (as constantes uniformes em `J`); a citação de Johnstone na l. 576 ganhou "Theorem 9.3"; tudo marcado em `colR1`. No `05`, a nota no início da prova do Lema 9 e a entrada de Johnstone, que perdeu o `[verificar]`; no `alvo-revista.md`, a contribuição 2 reescrita. O §3.3 remete ao lema e não repete a citação. Texto original: (2026-10-01, lendo
+   Johnstone 2019, `refs/johnstone2019.pdf`). A Proposição 9.15 dele
+   (§9.7, p. 273) é `b^α_{p,q} ⊂ wℓ_{p_α}`, `p_α = 2/(2α+1)`, sob
+   `p > p_α`, que é exatamente o Lema 9(i) de E1.6 (`τ = (s+1/2)^{−1}`, sob
+   `π(s+1/2) > 1`). O `alvo-revista.md` §4 lista como contribuição 2 "a
+   leitura de que a compressibilidade não custa hipótese", e o `ms_3`
+   (§3.3 e Lemma `lem:weak`) a apresenta sem essa citação. O que o WAFC
+   acrescenta é a versão com constantes explícitas e uniformes em `J` para
+   o oráculo do desenho de produtos, e o uso dela para dispensar a hipótese
+   de compressibilidade do WALL; o mergulho em si não é novo. Decidir: (a)
+   citar Johnstone (2019, Proposição 9.15) no Lemma `lem:weak` e no §3.3,
+   e reescrever a contribuição 2 como uso do mergulho; (b) também citar o
+   Teorema 9.3 dele (§9.4, p. 260), o risco minimax sobre bolas weak-`ℓ_p`,
+   ao lado de Donoho & Johnstone (1998) na l. 576, o que daria apoio
+   conferido à forma weak-`ℓ_τ` que a 35(h) trocou por Besov. As duas são
+   edição marcada na `k = 3`, e (a) toca o `alvo-revista.md`.
+
 ---
 
 ## 5. Próximos passos
@@ -2549,6 +2566,8 @@ devolveu no-go para a variante LASSO; o próximo passo é a pergunta 33.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-01 | Pergunta 40 aplicada: a Proposição 9.15 e o Teorema 9.3 de Johnstone (2019) citados no `ms_3` (marcado) e no `05`; contribuição 2 reescrita |
+| 2026-10-01 | Johnstone (2019) em `refs/`: a Proposição 9.15 dele é o Lema 9(i), o que tira a novidade do mergulho e pede reescrever a contribuição 2 (pergunta 40); o Teorema 9.3 dá o minimax sobre bolas weak-`ℓ_p` |
 | 2026-10-01 | PDFs da 39(a) e da 35(g) lidos: o `df` do GCV do WAFC se apoia em Tibshirani & Taylor (2012, Teorema 2 e a observação das colunas não penalizadas), não em Zou et al., que exigem posto cheio; o Lema 4 de K&P pede (A4) e `ν ≥ 1` |
 | 2026-10-01 | Pergunta 35(h) decidida, saída (a): "Besov bodies" com os Teoremas 4 e 5 de Donoho & Johnstone (1998) no `05` e no `ms_3`, marcado; os dois compilam em 10 e 33 páginas |
 | 2026-10-01 | E2.5h parou antes da rodada e mediu uma réplica: o `gam.gcv` na `mixed` custa ~900 h na grade até 120; D41 fixa a grade única `{5, 10, 20, 40, 80}`, tira o `gam.gcv` da `mixed` e junta a E2.5i de volta, ~15,5 h no total |
