@@ -255,6 +255,12 @@ ser conferido nela, o enunciado verdadeiro para `eps > 0`, e a análise de
 `s'` por componente nos três regimes. **Não vai ao manuscrito agora** (D23,
 D26).
 
+### E1.13 A taxa lenta em blocos (catalogada em 2026-10-03, D47(c))
+
+O enunciado sem condição de desenho (a Proposição 4 de E1.6, Proposition 3
+do manuscrito) na versão em blocos, como Corolário 14 do `08-blocos.tex`,
+a partir do Teorema 3(i). Fica no corpo do artigo em `k = 4`.
+
 ### E1.9 (não aberta) Cota inferior para `q ≥ 2`
 
 Klopp & Pensky (2015) têm a cota inferior minimax para `q = 1` com
@@ -408,6 +414,8 @@ nova decisão (D43): as que não forem a principal ficam como opção;
 limpo em menos de 60 s.
 
 ### E3.2 Gráficos e documentação
+
+**Catalogada em 2026-10-03**, com a correção do `wafc_thr_object()` de D48.
 
 `plot.wafc` com painel por `(j,k)` (função reconstruída e, se houver, a
 verdade) e o caminho das normas por par; `plot.cv.wafc`; cabeçalhos roxygen

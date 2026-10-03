@@ -3004,7 +3004,8 @@ recomendações das perguntas 33, 38 e 41 (D44 a D46): o WAFC é o block
 LASSO balanceado seguido do limiar `cv1se`, o LASSO fica como opção, o
 alvo continua a *Statistica Sinica*, e o spline de E4 entra com `gam.reml`
 e `gam.gcv`. **E1.12 fechada e integrada.** **E3.1** (a interface) em
-**E3.1 fechada e integrada**, com a interface ratificada (D48); E3.2 (gráficos e documentação) e E3.3 (empacotamento, do
+**E3.1 fechada e integrada**, com a interface ratificada (D48); **E3.2
+catalogada em 2026-10-03**; E3.2 (gráficos e documentação) e E3.3 (empacotamento, do
 autor) seguem. **E6.1b** (a aplicação) parou preparada, antes da rodada: o script
 10 e a fumaça estão prontos, e ela espera do autor (1) o aviso para a
 rodada, com núcleos, partições e dobras (proposta da tarefa: 4 processos,
@@ -3032,7 +3033,7 @@ entradas).
   (D47): o Corolário 11 é o enunciado principal, `ϱ` e `𝒲` aplicados, a
   lista no `notacao.md` §10. **Falta o Corolário 14** no `08`, a taxa lenta
   em blocos como corolário do Teorema 3(i) (D47(c)), com a conferência da
-  ordem; pequeno, pode ir junto da `k = 4` ou antes.
+  ordem. **Catalogado como E1.13 em 2026-10-03.**
 - (b) **O parágrafo de posicionamento de D18** (`alvo-revista.md` §4),
   reescrito para a penalidade em blocos, com a frase-tese e as
   contribuições; o texto vai ao autor antes de entrar.
@@ -3070,6 +3071,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | E1.13 (a taxa lenta em blocos, Corolário 14) e E3.2 (gráficos, documentação e o defeito de D48) catalogadas, em paralelo com a E6.1b; o parágrafo de posicionamento de D18 começa no chat principal |
 | 2026-10-03 | Pergunta 43 decidida (D48): interface de E3.1 ratificada, `thresh = 1e-4` no bloco, `grpreg` em `wafc_depends` e no `CONTINUAR.md` |
 | 2026-10-03 | E3.1 fechada e integrada (1 075 testes em 46 s, 1 300 com os lentos, oitava junção exata): `cv.wafc(x, u, y)` é o block LASSO balanceado com limiar `cv1se`, e o `wafc.block` reproduz o `klopp.balanced` à última casa; a tolerância `1e-4` do `grpreg` não muda a escolha; pergunta 43 |
 | 2026-10-03 | Pergunta 42 decidida (D47): o Corolário 11 é o enunciado principal (emenda D16); `ϱ` e `𝒲` no `08` e no `06` (14 e 11 páginas, sem aviso); `notacao.md` §10; a taxa lenta fica no corpo em versão de blocos, a escrever |
