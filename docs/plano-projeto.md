@@ -270,6 +270,19 @@ numérica ficar fraca, ela vira o peso que falta. Sob D18 o artigo se declara
 extensão de quem tem a dele, o que torna a ausência mais visível — é o risco
 assumido, registrado na pergunta 20 do `ESTADO.md`.
 
+### E1.12 A teoria em blocos (catalogada em 2026-10-03, D44)
+
+Com o block LASSO balanceado como o WAFC (D44), a sondagem de E1.11
+(`08a-sondagem-blocos.md`, com os adendos das §§ 11 e 12) vira resultado
+numerado em `08-blocos.tex`: a calibração em blocos, o oráculo sem cone com
+pesos de razão limitada, o risco ideal por pedaços sob Besov, a taxa do
+espaço de aproximação e as taxas adaptativas (o análogo do Corolário 5, sem
+logaritmo em `π ≥ 2`). O `06-selecao-limiar.tex` recebe o Corolário 8 em
+blocos e a cota de risco do estimador limiarizado (D45). Os resultados do
+LASSO (`04`, `05`) ficam como estão, para a opção coordenada (D43). Custo
+estimado em E1.11: ~5 páginas e 2 a 3 dias. Entregável e arquivos no
+catálogo do `TAREFA.md`.
+
 **Critério de saída de E1:** E1.2 a E1.6 com prova e script de conferência
 imprimindo `OK`; hipóteses numeradas e congeladas; o teorema principal
 enunciado na forma que vai ao manuscrito. **Atingido em 2026-09-19**; E1.7 é

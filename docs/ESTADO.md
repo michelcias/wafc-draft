@@ -2829,7 +2829,8 @@ Ordenadas pelo que bloqueia mais.
 recomendações das perguntas 33, 38 e 41 (D44 a D46): o WAFC é o block
 LASSO balanceado seguido do limiar `cv1se`, o LASSO fica como opção, o
 alvo continua a *Statistica Sinica*, e o spline de E4 entra com `gam.reml`
-e `gam.gcv`. Catálogo vazio, nenhum handoff pendente. O manuscrito está em
+e `gam.gcv`. **E1.12 (a teoria em blocos) catalogada**; nenhum handoff
+pendente. O manuscrito está em
 `k = 3`, ainda escrito para o LASSO; a bibliografia sem marca aberta (83
 entradas).
 
@@ -2845,7 +2846,8 @@ entradas).
   blocos, o que o autor confirma quando o enunciado existir. Os símbolos de
   E1.11 (`𝒢`, `G`, `b_n`, `|𝒢|`, `w_G`, `‖θ‖_{𝒢,w}`, `𝒢_0`, `W(𝒢_0)`, `Ψ̃_G`,
   `R_𝒢(θ; η)`, `λ_n^𝒢`) passam antes pelo `notacao.md`, com aval do autor.
-  Chat de tarefa, a catalogar.
+  **Catalogada como E1.12 em 2026-10-03** (`TAREFA.md` §3). Abertura:
+  "Leia `docs/TAREFA.md` e execute a tarefa E1.12."
 - (b) **O parágrafo de posicionamento de D18** (`alvo-revista.md` §4),
   reescrito para a penalidade em blocos, com a frase-tese e as
   contribuições; o texto vai ao autor antes de entrar.
@@ -2881,6 +2883,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | E1.12 catalogada: a sondagem de E1.11 promovida a `08-blocos.tex` (calibração, oráculo com pesos de razão limitada, risco ideal por pedaços, taxas) e, no `06`, o Corolário 8 em blocos e a cota de risco do estimador limiarizado (D45) |
 | 2026-10-03 | O autor aceitou as recomendações das perguntas 33, 38 e 41 (D44 a D46): block LASSO balanceado com limiar `cv1se` como o WAFC, LASSO como opção, *Statistica Sinica* mantida, `gam.reml` e `gam.gcv` em E4; E2.5 e E2 fechadas; §5 reescrita em torno da teoria em blocos, do posicionamento, de E3 e da `k = 4` |
 | 2026-10-03 | E2.5j fechada e integrada (1 133 testes, 37 350 linhas, sétima junção exata, 1 h 01 min em 10 processos): o `cv1se` chega ao teto no suave, no `uneven`, no nulo e em `n = 1000`; o `cvrel` repete o `+cv`; a porta do QUT tem nível acima do nominal; os cortes dos motores não tocam o `λ` escolhido |
 | 2026-10-03 | Leitura dos `.rds` da E2.5h no chat principal: com o `t` oráculo só os blocos passam a perna do não homogêneo; o `gam.gcv` (padrão do `gam()`) tira essa perna; a estrutura é a vantagem robusta; `boundary = "interval"` não está implementado. Recomendação na 33(f); D43 (nada de E2.5 é descartado); E2.5j catalogada |
