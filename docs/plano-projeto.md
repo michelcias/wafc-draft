@@ -270,7 +270,12 @@ numérica ficar fraca, ela vira o peso que falta. Sob D18 o artigo se declara
 extensão de quem tem a dele, o que torna a ausência mais visível — é o risco
 assumido, registrado na pergunta 20 do `ESTADO.md`.
 
-### E1.12 A teoria em blocos (catalogada em 2026-10-03, D44)
+### E1.12 A teoria em blocos (fechada em 2026-10-03, D44)
+
+**Fechada:** `08-blocos.tex` (Proposição 7 a Corolário 11) e o adendo do
+`06` (Lema 16, Corolários 12 e 13), com `check/08-blocos.R` imprimindo `OK`;
+números no `ESTADO.md` §2, pendências na pergunta 42. O texto abaixo é o
+registro do catálogo.
 
 Com o block LASSO balanceado como o WAFC (D44), a sondagem de E1.11
 (`08a-sondagem-blocos.md`, com os adendos das §§ 11 e 12) vira resultado

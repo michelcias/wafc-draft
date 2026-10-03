@@ -10,7 +10,13 @@
 % continua de Proposição 6, Lema 12, Teorema 2 e Corolário 7, e imprime o
 % número global via \setcounter, como 04, 05 e 07.
 %
-% Conferência numérica: derivations/check/06-selecao-limiar.R (imprime OK).
+% Adendo de E1.12 (2026-10-03, última seção antes de "O que foi transposto"):
+% o Corolário 8 com o ajuste em blocos de 08-blocos.tex (Corolário 12) e a
+% cota de risco do estimador limiarizado (Lema 16 e Corolário 13, D45). Os
+% contadores são recuados ali para imprimir esses números globais.
+%
+% Conferência numérica: derivations/check/06-selecao-limiar.R (imprime OK); a
+% do adendo é a Parte VI de derivations/check/08-blocos.R.
 % Notação: docs/notacao.md (congelada em E1.1). Macros: derivations/macros.tex.
 \documentclass[11pt,a4paper]{article}
 \usepackage[T1]{fontenc}
@@ -43,6 +49,20 @@
 \newcommand{\sepmin}{\nu_{\min}}
 \newcommand{\sepminn}{\nu_{\min,n}}
 \newcommand{\rn}{\rho}
+% --- do adendo de E1.12 (símbolos de 08-blocos.tex) ----------------------
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
+\newcommand{\lamGone}{\lambda^{\mathcal{G}}_{n,1}}
+\newcommand{\rhoG}{\rho^{\mathcal{G}}_{n}}
+\newcommand{\rhoGt}{\tilde{\rho}^{\mathcal{G}}_{n}}
+\newcommand{\ESig}{\mathcal{E}_{\Sigma}}
+\newcommand{\Acal}{\mathcal{A}_{n}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+\newcommand{\Dbl}{\Delta_{\cv\md}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\bn}{b_{n}}
 
 % A numeração global começa depois de Proposição 6, Lema 12, Teorema 2 e
 % Corolário 7 (docs/TAREFA.md, §5; E1.8 usou o 6 e o 7).
@@ -102,6 +122,12 @@ o que é um LASSO: dado qualquer estimador cujo erro por bloco seja dominado
 por $\bar{\Delta}$, ele sanduicha o conjunto limiarizado entre dois conjuntos de nível
 da verdade. O Corolário~\ref{cor:limiar} instala nele a taxa do Corolário~4 e
 produz $\Prob(\Shat = \mathcal{S}) \to 1$.
+
+O adendo de E1.12 (§\ref{sec:adendo-blocos}) acrescenta o Corolário~8 com o
+ajuste em blocos de D44 (Corolário~\ref{cor:limiar-blocos}) e a cota de risco
+do estimador limiarizado, que D45 pede porque o limiar é também o estimador
+de predição (Lema~\ref{lem:risco-limiar} e
+Corolário~\ref{cor:risco-limiar}).
 
 \section{Objetos}
 
@@ -425,6 +451,268 @@ resolução do Teorema~2. (Pergunta 32(c) do \texttt{ESTADO.md}, 2026-10-01; no
 manuscrito, o parágrafo depois do Corollary~2 e a prova na S7.)
 \end{remark}
 
+\section{Adendo de E1.12: o ajuste em blocos e o risco do estimador
+limiarizado}\label{sec:adendo-blocos}
+
+Seção acrescentada por E1.12 (2026-10-03), sem mudar as anteriores. A decisão
+D44 fez do WAFC o block LASSO balanceado seguido de limiar nas normas por
+bloco, e D45 fixou que o limiar é também o estimador de predição. Daí duas
+peças. A primeira é o Corolário~\ref{cor:limiar} com o ajuste em blocos de
+\texttt{08-blocos.tex}, cuja taxa por componente, $\rhoG =
+n^{-\seff/(2\seff+1)}$ (Corolário~10 daquele arquivo), não tem logaritmo: é a
+Observação~\ref{rem:grupos} cumprida para o block LASSO balanceado (não para
+o sparse group LASSO, que continua sem teoria). A segunda é a cota de risco do
+estimador limiarizado, para qualquer ajuste com taxa por componente: o LASSO
+de E1.6 ou o block LASSO de E1.12.
+
+\paragraph{O estimador limiarizado.} Dado um ajuste $(\chat,\thetahat)$ e
+$t \ge 0$,
+\[
+  \thetahat^{(t)}_{\cv\md,\cdot} = \thetahat_{\cv\md,\cdot}\,
+  \mathbf{1}\{(\cv,\md)\in\Shat(t)\},
+  \qquad
+  \ghat{\cv}{\md}^{(t)} = \ghat{\cv}{\md}\,\mathbf{1}\{(\cv,\md)\in\Shat(t)\},
+  \qquad
+  \widehat f^{(t)} = \Amat\chat + \Bmat\thetahat^{(t)},
+\]
+e $\betahat^{(t)} = (\chat,\thetahat^{(t)})$: os níveis e os coeficientes dos
+blocos mantidos são os do ajuste. É o estimador de \texttt{wafc\_threshold()}
+sem reajuste, o padrão de D45. Escrevemos $\Dbl =
+\lVert\ghat{\cv}{\md} - \gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}$, de modo que
+$\Delta = \max_{\cv\md}\Dbl$, e, na resolução $J$, $\mathcal{S}_{J} =
+\{(\cv,\md) : \thetastar_{\cv\md,\cdot} \ne 0\} \subseteq \mathcal{S}$. Os
+objetos de \texttt{08-blocos.tex} ($\Gcal_{n}$, $W(\cdot)$, $\lamG$, $\lamGone$,
+$\rho$, $\bar\rho$, $C_{\pen}$, $\Lambda$, $\ESig$, $\Acal$, $\Ecal$) entram com o
+significado de lá.
+
+\setcounter{lemma}{15}
+\begin{lemma}[o risco do estimador limiarizado]\label{lem:risco-limiar}
+Sejam $\{\gcomp{\cv}{\md}\}$ e $\{\ghat{\cv}{\md}\}$ famílias quaisquer de
+$L_{2}[0,1]$ e $t \ge 0$, com $\Ntrue{\cv}{\md}$, $\Nhat{\cv}{\md}$,
+$\mathcal{S}$, $\Shat(t)$ e $\Dbl$ como acima. Então:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(sem hipótese)}
+    \[
+      \sum_{\cv,\md}\bigl\lVert\ghat{\cv}{\md}^{(t)} - \gcomp{\cv}{\md}\bigr\rVert^{2}
+      = \sum_{(\cv,\md)\in\Shat(t)}\Dbl^{2}
+      + \sum_{(\cv,\md)\in\mathcal{S}\setminus\Shat(t)}\Ntrue{\cv}{\md}^{2},
+    \]
+    e todo $(\cv,\md) \in \mathcal{S}\setminus\Shat(t)$ tem
+    $\Ntrue{\cv}{\md} \le t + \Dbl$; logo
+    \[
+      \sum_{\cv,\md}\bigl\lVert\ghat{\cv}{\md}^{(t)} - \gcomp{\cv}{\md}\bigr\rVert^{2}
+      \;\le\; 2\sum_{\cv,\md}\Dbl^{2} + 2t^{2}\,|\mathcal{S}\setminus\Shat(t)|
+      \;\le\; 2\sum_{\cv,\md}\Dbl^{2} + 2t^{2}|\mathcal{S}| ;
+    \]
+  \item \textup{(sem falso negativo)} se $\mathcal{S} \subseteq \Shat(t)$,
+    $\sum_{\cv\md}\lVert\ghat{\cv}{\md}^{(t)} - \gcomp{\cv}{\md}\rVert^{2} =
+    \sum_{\Shat(t)}\Dbl^{2} \le \sum_{\cv\md}\Dbl^{2}$; se $\Shat(t) =
+    \mathcal{S}$, é $\sum_{\mathcal{S}}\Dbl^{2}$: os blocos nulos deixam de
+    contribuir;
+  \item \textup{(a norma de predição)} seja $\Gramhat = \bZ\T\bZ/n$ com
+    $\lmin(\Gramhat) > 0$, $\betastar = (\bc,\thetastar)$, $f_{J} =
+    \bZ\betastar$, $\betahat = (\chat,\thetahat)$ qualquer e $\Shat(t) =
+    \{(\cv,\md) : \norm{\thetahat_{\cv\md,\cdot}}_{2} > t\}$. Então
+    \[
+      \normn{\widehat f^{(t)} - f_{J}}^{2}
+      \;\le\; \frac{2\lmaxx(\Gramhat)}{\lmin(\Gramhat)}\,
+      \normn{\widehat f - f_{J}}^{2}
+      + 2\lmaxx(\Gramhat)\,t^{2}\,|\mathcal{S}_{J}\setminus\Shat(t)|,
+    \]
+    e, se $\mathcal{S}_{J} \subseteq \Shat(t)$, $\normn{\widehat f^{(t)} -
+    f_{J}}^{2} \le \{\lmaxx(\Gramhat)/\lmin(\Gramhat)\}
+    \normn{\widehat f - f_{J}}^{2}$.
+\end{enumerate}
+\end{lemma}
+
+Como o Lema~\ref{lem:sanduiche}, o Lema~\ref{lem:risco-limiar} é
+determinístico e cego ao estimador. O fator $2$ de (i) é atingido: um bloco
+ativo com $\ghat{\cv}{\md} = t\,\gcomp{\cv}{\md}/\Ntrue{\cv}{\md}$ e
+$\Ntrue{\cv}{\md} = 2t$ tem $\Nhat{\cv}{\md} = t$, é zerado, e paga
+$\Ntrue{\cv}{\md}^{2} = 4t^{2} = 2\Dbl^{2} + 2t^{2}$. O item (ii) é o
+mecanismo que E2.5f mediu: no \texttt{smooth}, os blocos inativos respondiam
+por cerca de $13\%$ do ISE do \texttt{klopp.balanced}, e é esse pedaço que um
+limiar sem falso negativo tira. Em (iii), a passagem entre a norma por
+componente e a de predição usa o autovalor duas vezes: $\lmin(\Gramhat)$ para
+ir da predição aos coeficientes e $\lmaxx(\Gramhat)$ para voltar; o fator é o
+número de condição de $\Gramhat$, que no evento $\ESig$ é menor que
+$2\Lambda/\gamma$.
+
+\setcounter{corollary}{11}
+\begin{corollary}[seleção de estrutura com o ajuste em blocos]\label{cor:limiar-blocos}
+Nas condições do Teorema~4 de E1.12 (hipóteses de E1.3, E1.4 e E1.5, a
+Hipótese~B daquele arquivo, $\pen = \lamG$ e $J_{n} = \min\{J : 2^{J} \ge
+n^{1/(2\seff+1)}\}$), com $\Delta$ e $\Shat(t)$ calculados no ajuste em
+blocos:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(não assintótico)} Sejam $\alpha,\alpha' \in (0,1)$ e
+    \begin{equation}
+      \label{eq:Dn-blocos}
+      \bigl(\bar\Delta_{n}^{\Gcal}\bigr)^{2}
+      \;=\; \frac{512\,(\lamG)^{2}\,W(\Gcal_{n})}{\gamma^{2}}
+      \;+\; \frac{64\,\mathcal{B}_{J_{n}}^{2}}{\alpha'\gamma}
+      \;+\; \frac{2C_{g}^{2}}{1-2^{-2\seff}}\,2^{-2J_{n}\seff},
+    \end{equation}
+    com $(\lamG)^{2}W(\Gcal_{n}) \le \rho^{2}(\lamGone)^{2}|\Gcal_{n}|$.
+    Num evento de probabilidade ao menos $1 - \alpha - \alpha' -
+    \Prob(\Acal^{c})$ vale $\Delta \le \bar\Delta_{n}^{\Gcal}$ e, pelo
+    Lema~\ref{lem:sanduiche}(iii), $\Shat(t) = \mathcal{S}$ para todo $t$ com
+    $\bar\Delta_{n}^{\Gcal} \le t < \sepmin - \bar\Delta_{n}^{\Gcal}$, janela
+    não vazia sempre que $\sepmin > 2\bar\Delta_{n}^{\Gcal}$; e
+    $\Prob(\Acal^{c}) \to 0$ (Teorema~4(i) de E1.12).
+  \item \textup{(triagem, sem hipótese de separação)} $\Delta = O_{p}(\rhoG)$ e,
+    para qualquer $t_{n}$ com $t_{n}/\rhoG \to \infty$,
+    $\Prob\{\Shat(t_{n}) \subseteq \mathcal{S}\} \to 1$.
+  \item \textup{(acerto exato)} Sob a Hipótese~\ref{ass:sep} com $\rn_{n}$
+    trocado por $\rhoG$, isto é $\sepminn/\rhoG \to \infty$, e para qualquer
+    $t_{n}$ com $t_{n}/\rhoG \to \infty$ e $\limsup_{n}t_{n}/\sepminn < 1$, vale
+    $\Prob\{\Shat(t_{n}) = \mathcal{S}\} \to 1$; a escolha canônica é
+    $t_{n} = \sqrt{\rhoG\,\sepminn}$. Como $\rn_{n}/\rhoG \asymp (\log
+    n)^{\seff/(2\seff+1)}$, a separação exigida é mais fraca que a da
+    Hipótese~\ref{ass:sep} por esse fator.
+\end{enumerate}
+\end{corollary}
+
+\begin{remark}[na resolução do Corolário~11 de E1.12]\label{rem:adaptativa-blocos}
+Como na Observação~\ref{rem:compressivel}, as partes (ii) e (iii) do
+Corolário~\ref{cor:limiar-blocos} valem também na resolução do Corolário~11 de
+E1.12, com $\rhoG$ trocado por $\rhoGt = n^{-s/(2s+1)}(\log
+n)^{(2/\pi-1)_{+}/(2(2s+1))}$: a prova só usa $\Delta = O_{p}$ da taxa por
+componente, e aquele corolário dá a soma dos erros das componentes em
+$O_{p}((\rhoGt)^{2})$. A janela não assintótica de (i) fica na resolução do
+Teorema~4.
+\end{remark}
+
+\begin{corollary}[o risco do estimador limiarizado]\label{cor:risco-limiar}
+Seja $(\chat,\thetahat)$ um dos dois ajustes: (a) o LASSO, nas condições do
+Teorema~2 de E1.6, com $r_{n} = \rn_{n}$; ou (b) o block LASSO balanceado,
+nas condições do Teorema~4 de E1.12, com $r_{n} = \rhoG$. Em ambos,
+$\normn{\widehat f - f}^{2} = O_{p}(r_{n}^{2})$ e $\sum_{\cv\md}\Dbl^{2} =
+O_{p}(r_{n}^{2})$ (Teorema~2 e Corolário~4 de E1.6; Teorema~4 e
+Corolário~10 de E1.12). Então, para toda sequência $t_{n} \ge 0$:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(sem hipótese)} $\sum_{\cv\md}\lVert\ghat{\cv}{\md}^{(t_{n})}
+    - \gcomp{\cv}{\md}\rVert^{2} = O_{p}(r_{n}^{2} + t_{n}^{2})$ e
+    $\normn{\widehat f^{(t_{n})} - f}^{2} = O_{p}(r_{n}^{2} + t_{n}^{2})$; mais
+    precisamente, no evento $\ESig$ e para todo $t$,
+    \[
+      \normn{\widehat f^{(t)} - f}^{2}
+      \;\le\; \frac{8\Lambda}{\gamma}\normn{\widehat f - f_{J_{n}}}^{2}
+      + 4\Lambda t^{2}\,|\mathcal{S}_{J_{n}}\setminus\Shat(t)| + 2\normn{\bb}^{2};
+    \]
+  \item \textup{(sob separação)} sob a Hipótese~\ref{ass:sep} com $r_{n}$ no
+    lugar de $\rn_{n}$ e $\limsup_{n}t_{n}/\sepminn < 1$,
+    $\Prob\{\mathcal{S} \subseteq \Shat(t_{n})\} \to 1$, e nesse evento
+    $\sum_{\cv\md}\lVert\ghat{\cv}{\md}^{(t_{n})} - \gcomp{\cv}{\md}\rVert^{2}
+    \le \sum_{\cv\md}\Dbl^{2}$ e, em $\ESig$,
+    $\normn{\widehat f^{(t_{n})} - f}^{2} \le
+    (4\Lambda/\gamma)\normn{\widehat f - f_{J_{n}}}^{2} + 2\normn{\bb}^{2}$: o
+    estimador limiarizado mantém a taxa $r_{n}^{2}$ do ajuste. Se além disso
+    $t_{n}/r_{n} \to \infty$, $\Prob\{\Shat(t_{n}) = \mathcal{S}\} \to 1$ e,
+    nesse evento, $\sum_{\cv\md}\lVert\ghat{\cv}{\md}^{(t_{n})} -
+    \gcomp{\cv}{\md}\rVert^{2} = \sum_{\mathcal{S}}\Dbl^{2}$.
+\end{enumerate}
+Sob alvo fixo a Hipótese~\ref{ass:sep} é automática
+(Observação~\ref{rem:fixa}), e (ii) vale para todo $t_{n} \to 0$.
+\end{corollary}
+
+\begin{remark}[o que o adendo não cobre]\label{rem:adendo-nao}
+O $t$ da regra \texttt{cv1se} de D45 é escolhido por validação cruzada e não
+tem teorema aqui, como o $\pen$; o
+Corolário~\ref{cor:risco-limiar} diz o que qualquer $t$ custa, não qual $t$ a
+regra escolhe. O reajuste por mínimos quadrados dos blocos mantidos
+(\texttt{+ls}, fora do padrão por D45) não é coberto. O fator
+$\lmaxx(\Gramhat)/\lmin(\Gramhat)$ de (iii) é o preço da passagem pelos
+coeficientes na cota, não um custo medido: a conferência mede, no platô de
+acerto, o erro de predição do limiarizado abaixo do do ajuste.
+\end{remark}
+
+\subsection*{Prova do Lema~\ref{lem:risco-limiar}}
+
+\emph{(i).} Se $(\cv,\md) \in \Shat(t)$, $\ghat{\cv}{\md}^{(t)} =
+\ghat{\cv}{\md}$ e o erro do bloco é $\Dbl^{2}$; caso contrário,
+$\ghat{\cv}{\md}^{(t)} = 0$ e o erro é $\Ntrue{\cv}{\md}^{2}$, nulo fora de
+$\mathcal{S}$. Somar dá a identidade. Para $(\cv,\md) \notin \Shat(t)$ vale
+$\Nhat{\cv}{\md} \le t$, e a desigualdade triangular dá $\Ntrue{\cv}{\md} \le
+\Nhat{\cv}{\md} + \Dbl \le t + \Dbl$, logo $\Ntrue{\cv}{\md}^{2} \le 2t^{2} +
+2\Dbl^{2}$; somar sobre $\mathcal{S}\setminus\Shat(t)$ e juntar a soma sobre
+$\Shat(t)$ dá a cota, porque $\Shat(t)$ e $\mathcal{S}\setminus\Shat(t)$ são
+disjuntos.
+
+\emph{(ii).} Se $\mathcal{S} \subseteq \Shat(t)$, a segunda soma de (i) é
+vazia.
+
+\emph{(iii).} A prova de (i) e (ii) usa só a desigualdade triangular numa
+norma; aplicada aos vetores $\thetahat_{\cv\md,\cdot}$ e
+$\thetastar_{\cv\md,\cdot}$ de $\R^{\NJ}$, com $\mathcal{S}_{J}$ no lugar de
+$\mathcal{S}$, dá $\norm{\thetahat^{(t)} - \thetastar}_{2}^{2} \le
+2\norm{\thetahat - \thetastar}_{2}^{2} + 2t^{2}|\mathcal{S}_{J}\setminus\Shat(t)|$,
+e $\norm{\thetahat^{(t)} - \thetastar}_{2}^{2} \le \norm{\thetahat -
+\thetastar}_{2}^{2}$ quando $\mathcal{S}_{J} \subseteq \Shat(t)$. Como
+$\chat$ não muda, $\norm{\betahat^{(t)} - \betastar}_{2}^{2} \le
+2\norm{\betahat - \betastar}_{2}^{2} + 2t^{2}|\mathcal{S}_{J}\setminus\Shat(t)|$
+(e $\le \norm{\betahat - \betastar}_{2}^{2}$ no segundo caso). Por fim,
+$\normn{\widehat f^{(t)} - f_{J}}^{2} = (\betahat^{(t)} - \betastar)\T\Gramhat
+(\betahat^{(t)} - \betastar) \le \lmaxx(\Gramhat)\norm{\betahat^{(t)} -
+\betastar}_{2}^{2}$ e $\norm{\betahat - \betastar}_{2}^{2} \le
+\normn{\bZ(\betahat - \betastar)}^{2}/\lmin(\Gramhat) =
+\normn{\widehat f - f_{J}}^{2}/\lmin(\Gramhat)$. Com $\eps = 0$, a norma de
+$\thetahat_{\cv\md,\cdot}$ é $\Nhat{\cv}{\md}$
+(Observação~\ref{rem:codigo}), e o $\Shat(t)$ de (iii) é o de (i). \qed
+
+\subsection*{Prova do Corolário~\ref{cor:limiar-blocos}}
+
+\emph{(i).} Intersecte $\Acal$, $\Ecal$ e $\{\normn{\bb}^{2} \le
+\mathcal{B}_{J_{n}}^{2}/\alpha'\}$; a probabilidade é ao menos $1 - \alpha -
+\alpha' - \Prob(\Acal^{c})$ (Lema~14 de E1.12 e Markov). Em $\Acal$ vale
+$\Ecal \subseteq \mathcal{T}_{\Gcal,w}$ e $\gtil > \gamma/2$ (E1.12, as duas
+consequências da Hipótese~B), e o Teorema~3(ii) de E1.12 com o comparador
+$\betastar$ e $W(\mathcal{G}_{0}(\thetastar)) \le W(\Gcal_{n})$ dá
+\[
+  \norm{v}_{2}^{2}
+  \;\le\; \frac{64(\lamG)^{2}W(\Gcal_{n})}{\gtil^{2}} + \frac{16\normn{\bb}^{2}}{\gtil}
+  \;\le\; \frac{256(\lamG)^{2}W(\Gcal_{n})}{\gamma^{2}}
+  + \frac{32\mathcal{B}_{J_{n}}^{2}}{\alpha'\gamma},
+  \qquad v = \thetahat - \thetastar .
+\]
+O resto é a prova do Corolário~\ref{cor:limiar}(i): $\Delta^{2} \le
+2\norm{v}_{2}^{2} + 2C_{g}^{2}(1-2^{-2\seff})^{-1}2^{-2J_{n}\seff} \le
+(\bar\Delta_{n}^{\Gcal})^{2}$. A cota de $(\lamG)^{2}W(\Gcal_{n})$ é o
+Lema~14(iii) de E1.12.
+
+\emph{(ii) e (iii).} Pela prova do Teorema~4(iii) de E1.12,
+$(\lamG)^{2}W(\Gcal_{n}) \le \bar\rho^{2}C_{\pen}\sigma^{2}pq(\bn +
+2^{J_{n}})/n \asymp n^{-2\seff/(2\seff+1)}$, e $2^{-2J_{n}\seff} \le
+n^{-2\seff/(2\seff+1)}$; logo $\bar\Delta_{n}^{\Gcal} \le c(\alpha')\rhoG$, e o
+resto é a prova do Corolário~\ref{cor:limiar}(ii) e (iii) com $\rhoG$ no lugar
+de $\rn_{n}$. Por fim, $\rn_{n}/\rhoG = (J_{n}^{\mathrm{T2}})^{\seff/(2\seff+1)}
+\asymp (\log n)^{\seff/(2\seff+1)}$, com $J_{n}^{\mathrm{T2}}$ a resolução do
+Teorema~2 de E1.6. \qed
+
+\subsection*{Prova do Corolário~\ref{cor:risco-limiar}}
+
+\emph{(i).} A parte das componentes é o Lema~\ref{lem:risco-limiar}(i) com
+$|\mathcal{S}| \le pq$. Para a predição, $\normn{\widehat f^{(t)} - f}^{2} \le
+2\normn{\widehat f^{(t)} - f_{J_{n}}}^{2} + 2\normn{\bb}^{2}$, e em $\ESig$
+vale $\lmaxx(\Gramhat) < \Lambda$ e $\lmin(\Gramhat) > \gamma/2$, de modo que o
+Lema~\ref{lem:risco-limiar}(iii) dá a cota do enunciado. As ordens: $\Prob(\ESig)
+\to 1$ nas duas resoluções (Teorema~2(i) de E1.6, Teorema~4(i) de E1.12);
+$\normn{\widehat f - f_{J_{n}}}^{2} \le 2\normn{\widehat f - f}^{2} +
+2\normn{\bb}^{2}$; e $\normn{\bb}^{2} = O_{p}(\mathcal{B}_{J_{n}}^{2}) =
+O_{p}(r_{n}^{2})$ nas duas, pela escolha de $J_{n}$.
+
+\emph{(ii).} Pelo Lema~\ref{lem:sanduiche}(ii), $\mathcal{S} \subseteq
+\Shat(t_{n})$ sempre que $t_{n} < \sepminn - \Delta$. Com
+$\limsup t_{n}/\sepminn < 1$ existem $\eta > 0$ e $n_{0}$ com $\sepminn - t_{n}
+\ge \eta\sepminn$ para $n \ge n_{0}$, e como $\Delta^{2} \le
+\sum_{\cv\md}\Dbl^{2} = O_{p}(r_{n}^{2})$ e $\sepminn/r_{n} \to \infty$,
+$\Prob(\Delta < \sepminn - t_{n}) \to 1$. Nesse evento valem o
+Lema~\ref{lem:risco-limiar}(ii) e, como $\mathcal{S}_{J_{n}} \subseteq
+\mathcal{S}$, o segundo caso de (iii), que em $\ESig$ dá a cota do enunciado.
+Se $t_{n}/r_{n} \to \infty$, o Corolário~\ref{cor:limiar}(iii) (ou o
+Corolário~\ref{cor:limiar-blocos}(iii)) dá $\Prob\{\Shat(t_{n}) = \mathcal{S}\}
+\to 1$, e o Lema~\ref{lem:risco-limiar}(ii) fecha. \qed
+
 \section{O que foi transposto e o que é novo}
 
 \begin{itemize}[nosep, leftmargin=*]
@@ -570,6 +858,30 @@ na parte que mede a identidade de normas. As cinco partes e o que saiu em
     (Observação~\ref{rem:grupos}); o que ela mostra é que a pergunta de E2.5
     deixou de ser ``grupos ou nada''.
 \end{itemize}
+
+\paragraph{Adendo de E1.12.} \texttt{check/08-blocos.R}, Parte~VI (o
+script inteiro imprime \texttt{OK} em cerca de $5$~min; não chama
+\texttt{wafc/R/}). O Lema~\ref{lem:risco-limiar} vale nas $14\,000$
+combinações de configuração aleatória (até $12$ blocos, metade nulos) e
+limiar: a identidade de (i), as duas cotas e a passagem de (iii) com o
+$\lmaxx/\lmin$ de uma $\Gramhat$ sorteada, sem violação; a configuração que
+atinge o fator $2$ é construída. Em simulação, no desenho de
+\texttt{08-blocos.tex} com $(1,1)$ e $(2,2)$ ativos (normas $0{,}848$ e
+$0{,}666$) e $(1,2)$, $(2,1)$ nulos, $n \in \{500, 2000\}$, $15$ réplicas, os
+dois ajustes (LASSO e block LASSO balanceado com $\sqrt{|G|}$) no $\pen$ da
+teoria e em um décimo dele, e $t$ numa grade de $0$ a $1{,}2$: o erro máximo
+por bloco fica sob $\bar\Delta$ (Corolários~\ref{cor:limiar} e
+\ref{cor:limiar-blocos}, na forma realizada) e com $t = \bar\Delta$ nenhum
+bloco nulo sobrevive, nos dois ajustes; as cotas do
+Corolário~\ref{cor:risco-limiar} valem em todo $t$. No $\pen$ da teoria os
+blocos nulos já saem zerados e o limiar não muda nada; em um décimo dele, os
+blocos nulos levam de $7\%$ a $10\%$ do erro das componentes, e no platô de
+acerto o limiar baixa esse erro para $0{,}90$ a $0{,}93$ do do ajuste,
+enquanto o erro de predição na amostra fica entre $0{,}99$ e $1{,}05$ do do
+ajuste. A segunda razão pode passar de $1$, dentro da cota de (iii): no
+LASSO os coeficientes dos blocos nulos $X_{2}\wav{\lev}{\tsl}(U_{1})$, que
+neste desenho têm correlação $0{,}65$ com os do bloco ativo
+$X_{1}\wav{\lev}{\tsl}(U_{1})$, compensam parte do encolhimento deste.
 
 \section*{Referências}
 \sloppy

@@ -1,5 +1,12 @@
 # E1.11. Sondagem: a teoria de E1.4 a E1.7c com a penalidade em blocos de Klopp & Pensky
 
+> **Nota de 2026-10-03 (E1.12):** esta sondagem foi promovida a resultados
+> numerados e provados em [`08-blocos.tex`](08-blocos.tex) (Proposição 7,
+> Lemas 14 e 15, Teoremas 3 e 4, Corolários 9 a 11), para a forma balanceada
+> de D44, e o Corolário 8 em blocos e o risco do limiarizado foram ao adendo
+> de E1.12 de [`06-selecao-limiar.tex`](06-selecao-limiar.tex) (Lema 16,
+> Corolários 12 e 13). Onde este arquivo e o `08` divergirem, o `08` manda.
+
 Documento de **sondagem**, não de prova. A pergunta é a 33(b) do
 [`../docs/ESTADO.md`](../docs/ESTADO.md): se o block LASSO de Klopp & Pensky
 (2015) com os níveis `c_ℓ` livres (o `klopp.free` de E2.5b) passar a ser a

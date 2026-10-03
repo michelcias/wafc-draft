@@ -23,9 +23,11 @@ padrão do `mgcv::gam()`) essa perna some. **E2.5j (2026-10-03):** a regra `cv1s
 nulo e em `n = 1000`, e paga em `n ≤ 500` no não homogêneo e na `mixed`;
 o `c` relativo repete o `+cv`; a porta do QUT resolve o nulo das outras
 regras com nível acima do nominal; os cortes de caminho dos dois motores
-não tocam o `λ` escolhido. Por D43, nada medido em E2.5 é descartado. **O
-próximo passo é a teoria em blocos nas derivações numeradas e o
-posicionamento** (§5). A decidir: a saída da aplicação (pergunta 2). O
+não tocam o `λ` escolhido. Por D43, nada medido em E2.5 é descartado. **E1.12
+fechou (2026-10-03):** a teoria em blocos está provada em `08-blocos.tex`
+(Corolário 11 sem logaritmo em `π ≥ 2`) e no adendo do `06` (o risco do
+limiarizado); quatro pontos esperam o autor (pergunta 42). E3.1 e E6.1b
+estão em curso (§5). A decidir: a saída da aplicação (pergunta 2). O
 teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 3` (`manuscript/ms_3.tex`,
 `supp_3.tex`, `references_3.bib`), aberta em 2026-10-01 por decisão do
@@ -2093,6 +2095,88 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-03: E1.12 fechada, a teoria em blocos provada
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: o
+`check/08-blocos.R`, rodado numa cópia congelada, imprime **`OK` em 207 s**;
+o `08-blocos.tex` compila em **14 páginas** e o `06-selecao-limiar.tex` em
+**11**, sem referência indefinida nem aviso; o diff do `06` só acrescenta
+(o texto anterior não mudou, fora uma linha de comentário do cabeçalho). O
+`check` não chama `wafc/R/`, de modo que a E3.1 em paralelo não o afeta.
+
+**Os resultados** (numeração global; mapa no `TAREFA.md` §5):
+
+- `08-blocos.tex`: **Proposição 7** (a forma balanceada: pedaços finos entre
+  `b` e `2b − 1`, o grosso com `2^{j*+1} − 1 ∈ [b − 1, 2b − 3]` colunas,
+  `|𝒢| ≤ pq(1 + 2^J/b)`, `ρ² ≤ 3` com `sqrt(|G|)`); **Lema 14** (a
+  calibração em blocos, Hsu, Kakade & Zhang 2012, Teorema 2.1, e união sobre
+  os pedaços); **Teorema 3** (o oráculo sem cone em blocos, escrito por
+  inteiro, com comparador arbitrário, as constantes de E1.5 e `W(𝒢_0)` no
+  lugar de `s_0`); **Corolário 9** (a forma de risco ideal); **Lema 15** (o
+  risco ideal por pedaços sob a Besov de E1.3, dois regimes de `π`, `π` até
+  `∞`); **Hipótese B** (o regime em blocos); **Teorema 4** (a taxa do espaço
+  de aproximação `n^{−2s'/(2s'+1)}`, sem logaritmo); **Corolário 10** (as
+  componentes, `ρ_n^𝒢 = n^{−s'/(2s'+1)}`); **Corolário 11**
+  (`n^{−2s/(2s+1)}(log n)^{(2/π−1)_+/(2s+1)}`, sem logaritmo em `π ≥ 2`, na
+  janela do Corolário 5). O `Lema 4` (perfilagem) é reimpresso em blocos sem
+  número novo.
+- `06-selecao-limiar.tex`, adendo: **Lema 16** (o risco do limiarizado,
+  determinístico: blocos mantidos não mudam, nulo zerado só reduz, ativo
+  zerado custa até `2t² + 2‖ĝ − g‖²`), **Corolário 12** (o Corolário 8 em
+  blocos, com `ρ_n^𝒢`) e **Corolário 13** (a taxa do limiarizado nos dois
+  ajustes, com a passagem à predição pelo número de condição de `Σ̂`).
+
+**A conferência:**
+
+- Proposição 7 em `b = 2..200`, `J = 1..14`; Lema 15 em 2 280 sequências
+  (19 pares `(s, π)`), razão máxima 0,823; os dois expoentes do Corolário 11
+  no risco ideal com 60 níveis (`2s/(2s+1)` a `1e−3`; o do logaritmo é
+  exatamente `(2/π − 1)/(2s+1)` em `π < 2` e entre −0,12 e 0 em `π ≥ 2`).
+- Calibração ao longo de `J_n`, `n = 250` a `4 000`: cobertura 1,000.
+- **O realizado já separa as duas taxas:** no caso denso (`π = 2`,
+  `s = 1/2`, `n` de 250 a 8 000), a inclinação do erro é **1,027 contra a
+  taxa sem logaritmo e 1,194 contra `(log n/n)^{1/2}`**, o que E1.6 não
+  conseguia mostrar; cotas do Teorema 3 e do Corolário 10 sem violação.
+- **A teoria cobre o estimador exato do código** (`klopp.balanced`, a
+  `penalty = "block"` da E3.1): a variante branca da Observação 2 (o `grpreg`
+  ortonormaliza cada pedaço), com calibração pivotal e `q_max W` no lugar de
+  `W`, conferida em `n = 500` (cobertura 1,000).
+- Lema 16 em 14 000 combinações sem violação, com o fator 2 atingido.
+
+**Achados:**
+
+- **Posicionamento:** o Teorema 2 de K&P pede `r* > (2ς)^{−1} > 1/2` (com
+  `r* = s'` em `π < 2`), e o Corolário 11 pede só `s' > s/(2s+1)`, que é
+  menor que 1/2. **O cenário não homogêneo de D27 (`s' = 1/2`) está no nosso
+  enunciado e fora do deles.** E a cota inferior de K&P vale sobre a nossa
+  classe em `q = 1` com `X ⊥ U`, o que torna o Corolário 11 ótimo em
+  `π ≥ 2` nesse caso.
+- **Para D45:** no LASSO, limiarizar no platô de acerto baixa o erro das
+  componentes, mas pode subir o de predição na amostra (até +5% em
+  `n = 500`), porque o bloco nulo correlacionado com um ativo compensa o
+  encolhimento dele; o Corolário 13 cobre isso com o número de condição de
+  `Σ̂`.
+- **Pré-assintótico:** como em E1.6, o evento de E1.4 só vale bem acima dos
+  `n` do piloto (`λ_max(Σ̂)` mediano de 2,0 a 2,7 contra `Λ = 1,458`; em
+  `J = 4` fixo, só em `n = 64 000`).
+- **Nenhum expoente do `08a` mudou ao escrever a prova;** mudaram
+  constantes: `A^𝒢 = 2 + (1 − 2^{1−π(s+1/2)})^{−1}` (`π ≤ 2`) ou
+  `2 + (1 − 2^{−2s})^{−1}`, o pedaço máximo `2b_n − 1` em `λ^𝒢_{n,1}`, e
+  `(λ_n^𝒢)² W(𝒢_n)` no `Δ̄_n`.
+- **Lição de conferência:** um script lido pelo `Rscript` enquanto é
+  editado quebra no meio; rodar sempre uma cópia congelada.
+
+**O que muda no manuscrito em `k = 4`** (revisão da tabela da §6 do `08a`):
+§2.3 passa à penalidade em blocos e à Proposição 7, com o LASSO como opção;
+o Theorem 2 passa ao Teorema 3 (e o Lema 14 ao supp); o Theorem 3 ao
+Teorema 4; o Corollary 1 ao Corolário 10; o Lemma 3 ao Lema 15; o
+Theorem 1 ao Corolário 11; o Corollary 2 e a Assumption 6 ao Corolário 12
+com `ρ_n^𝒢`; a §3.6 ganha o Corolário 13; o §1 e o "Why not block LASSO?"
+são reescritos; no supp, S5 (Teorema 3, Lema 14, variante branca), S6
+(Lema 15, Teorema 4, Corolários 10 e 11) e S7 (mais Lema 16, Corolários 12
+e 13). As Proposições 1 e 2 e os Lemas 1 e 2 do manuscrito não mudam. A
+Proposition 3 (taxa lenta) é a pergunta 42(c).
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -2825,6 +2909,22 @@ Ordenadas pelo que bloqueia mais.
      medir em que `J` e se o corte cai dentro da guarda, antes de E4.
    - (e) O `k.check()` de Wood (2017, §5.9) não foi feito.
 
+42. **Pendências de E1.12** (2026-10-03), que pedem o autor antes da
+   `k = 4`. Recomendação do chat principal em cada item:
+   - (a) **D16: o Corolário 11 passa a ser o enunciado principal**, no
+     lugar do Corolário 5. Recomendação: sim; é a consequência de D44, e é
+     o enunciado que vence o de K&P em `s'` e não tem logaritmo em `π ≥ 2`.
+   - (b) **Notação:** a razão dos pesos `ρ` colide com a taxa `ρ_n` (D40), e
+     `W(·)` encosta em `W_J`. A tarefa propõe `ϱ` e `𝒲(·)`. Recomendação:
+     aceitar os dois, e com eles a lista do handoff entra no `notacao.md`
+     §10 e no `macros.tex` (o `08` troca as macros locais).
+   - (c) **A Proposition 3 do manuscrito (a taxa lenta, a Proposição 4 de
+     E1.6):** o `08` não tem versão em blocos à parte; o Teorema 3(i) a dá
+     com `‖θ*‖_{𝒢,w} ≤ w_max‖θ*‖_1`. Recomendação: cortar do corpo e deixar
+     uma frase com a consequência no supp, o que poupa página.
+   - (d) **A Observação 2 (variante branca) vai ao supp** como o enunciado
+     que cobre o estimador exato do código. Recomendação: sim.
+
 ---
 
 ## 5. Próximos passos
@@ -2833,9 +2933,16 @@ Ordenadas pelo que bloqueia mais.
 recomendações das perguntas 33, 38 e 41 (D44 a D46): o WAFC é o block
 LASSO balanceado seguido do limiar `cv1se`, o LASSO fica como opção, o
 alvo continua a *Statistica Sinica*, e o spline de E4 entra com `gam.reml`
-e `gam.gcv`. **E1.12 (a teoria em blocos), E3.1 (a interface) e E6.1b
-(a aplicação) catalogadas**, para correr em paralelo; nenhum handoff
-pendente. O manuscrito está em
+e `gam.gcv`. **E1.12 fechada e integrada.** **E3.1** (a interface) em
+curso, com a junção exata feita e a medição da tolerância do `grpreg` por
+terminar. **E6.1b** (a aplicação) parou preparada, antes da rodada: o script
+10 e a fumaça estão prontos, e ela espera do autor (1) o aviso para a
+rodada, com núcleos, partições e dobras (proposta da tarefa: 4 processos,
+~15 h, ~18 GB, porque beijing pede ~4,5 GB por processo; cortes possíveis:
+10 partições, 5 dobras), e (2) a permissão de baixar duas candidatas novas,
+o `mydata` do `openair` (Marylebone, 621 KB) e um zip anual do parque eólico
+de Kelmarsh (Zenodo, 98 a 474 MB); a terceira, `beijing.heat`, usa o dado
+de E6.1a. O handoff parcial fica em `docs/handoff-E6.1b.md`. O manuscrito está em
 `k = 3`, ainda escrito para o LASSO; a bibliografia sem marca aberta (83
 entradas).
 
@@ -2851,8 +2958,9 @@ entradas).
   blocos, o que o autor confirma quando o enunciado existir. Os símbolos de
   E1.11 (`𝒢`, `G`, `b_n`, `|𝒢|`, `w_G`, `‖θ‖_{𝒢,w}`, `𝒢_0`, `W(𝒢_0)`, `Ψ̃_G`,
   `R_𝒢(θ; η)`, `λ_n^𝒢`) passam antes pelo `notacao.md`, com aval do autor.
-  **Catalogada como E1.12 em 2026-10-03** (`TAREFA.md` §3). Abertura:
-  "Leia `docs/TAREFA.md` e execute a tarefa E1.12."
+  **Fechada por E1.12 em 2026-10-03 (§2)**; quatro pontos para o autor na
+  pergunta 42 (o Corolário 11 como enunciado principal, `ϱ` e `𝒲`, a taxa
+  lenta, a variante branca no supp).
 - (b) **O parágrafo de posicionamento de D18** (`alvo-revista.md` §4),
   reescrito para a penalidade em blocos, com a frase-tese e as
   contribuições; o texto vai ao autor antes de entrar.
@@ -2890,6 +2998,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | E1.12 fechada e integrada (`OK` em 207 s, 14 e 11 páginas): Teorema 3 (oráculo em blocos), Lema 15, Teorema 4 e Corolário 11 sem logaritmo em `π ≥ 2`, a variante branca cobrindo o `grpreg`, e o risco do limiarizado (Lema 16, Corolários 12 e 13); o `s' = 1/2` de D27 fica dentro do nosso enunciado e fora do de K&P; pergunta 42. E6.1b parou antes da rodada, à espera do autor |
 | 2026-10-03 | E3.1 (a interface com o block LASSO balanceado e o limiar `cv1se` como padrão) e E6.1b (a aplicação no critério de D44) catalogadas, em paralelo com a E1.12, sem arquivo em comum |
 | 2026-10-03 | E1.12 catalogada: a sondagem de E1.11 promovida a `08-blocos.tex` (calibração, oráculo com pesos de razão limitada, risco ideal por pedaços, taxas) e, no `06`, o Corolário 8 em blocos e a cota de risco do estimador limiarizado (D45) |
 | 2026-10-03 | O autor aceitou as recomendações das perguntas 33, 38 e 41 (D44 a D46): block LASSO balanceado com limiar `cv1se` como o WAFC, LASSO como opção, *Statistica Sinica* mantida, `gam.reml` e `gam.gcv` em E4; E2.5 e E2 fechadas; §5 reescrita em torno da teoria em blocos, do posicionamento, de E3 e da `k = 4` |

@@ -1,0 +1,1272 @@
+% E1.12 -- a teoria em blocos: o block LASSO balanceado de D44 no desenho de
+% produtos. Promove a sondagem de E1.11 (08a-sondagem-blocos.md, inteira, com
+% os adendos das §§ 11 e 12) a resultados numerados e provados, para o
+% estimador de D44 (níveis c_l livres, os níveis com 2^j < b_n de cada bloco
+% num pedaço só, cada nível mais fino em pedaços de b_n a 2 b_n - 1 colunas,
+% pesos de razão limitada), seguido de limiar (D45; a cota do limiarizado está
+% no adendo de E1.12 de 06-selecao-limiar.tex).
+%
+% Consome: o viés de E1.3 (02-aproximacao-besov.tex, Lemas 1 e 2 e Corolário
+% 1), o autovalor de E1.4 (03-desenho-produtos.tex, Proposição 3), a
+% perfilagem e o Lema 6 de E1.5 (04-oraculo.tex) e o Lema 9(iii) e o regime de
+% E1.6 (05-taxas.tex). NÃO altera 04 nem 05: os resultados do LASSO ficam para
+% a opção coordenada (D43).
+%
+% Molde: 04-oraculo.tex e 05-taxas.tex (isto é, Bühlmann e van de Geer, 2011,
+% Seção 6.2, com a perfilagem de E1.5); a calibração é o Teorema 2.1 de Hsu,
+% Kakade e Zhang (2012) com união sobre os pedaços; o risco ideal por pedaços
+% tem a forma do Lema 4 do suplemento de Klopp e Pensky (2015).
+%
+% Numeração global (docs/TAREFA.md, §5): continua de Proposição 6, Lema 13,
+% Teorema 2 e Corolário 8, e imprime o número global via \setcounter, como
+% 04, 05, 06 e 07.
+%
+% Conferência numérica: check/08-blocos.R (imprime OK; ~5 min).
+% Notação: docs/notacao.md (congelada em E1.1). Os símbolos da teoria em
+% blocos (os de E1.11) são macros locais deste arquivo, como em 07, até
+% entrarem no notacao.md (§10) pelo chat principal.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black]{hyperref}
+\input{macros}
+
+% --- atalhos locais deste arquivo (como em 04, 05 e 07) --------------------
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\MA}{M_{\Amat}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betahat}{\widehat{\bbeta}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\GBA}{\Gramhat_{\Bmat\mid\Amat}}
+\newcommand{\thbar}{\bar{\btheta}}
+\newcommand{\bbar}{\bar{\bb}}
+\newcommand{\vbar}{\bar{v}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+% --- símbolos da teoria em blocos (E1.11; proposta para o notacao.md, §10) --
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Gzero}{\mathcal{G}_{0}}
+\newcommand{\Gbar}{\bar{\mathcal{G}}}
+\newcommand{\Hcal}{\mathcal{H}}
+\newcommand{\bn}{b_{n}}
+\newcommand{\nGw}[1]{\lVert #1\rVert_{\mathcal{G},w}}
+\newcommand{\Psitil}{\widetilde{\Psi}}
+\newcommand{\Rid}{R_{\mathcal{G}}}
+\newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
+\newcommand{\lamGone}{\lambda^{\mathcal{G}}_{n,1}}
+\newcommand{\lamz}[1]{\lambda_{0,#1}}
+\newcommand{\lamzbar}[1]{\bar{\lambda}_{0,#1}}
+\newcommand{\rhoG}{\rho^{\mathcal{G}}_{n}}
+\newcommand{\rhoGt}{\tilde{\rho}^{\mathcal{G}}_{n}}
+\newcommand{\Tw}{\mathcal{T}_{\mathcal{G},w}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\ESig}{\mathcal{E}_{\Sigma}}
+\newcommand{\Acal}{\mathcal{A}_{n}}
+\newcommand{\jst}{j^{*}}
+\newcommand{\AG}{A^{\mathcal{G}}_{s,\pi}}
+
+% Numeração global (docs/TAREFA.md, §5): Proposição 7, Lema 14, Teorema 3 e
+% Corolário 9 são os próximos números livres; os contadores abaixo fazem o
+% número impresso JÁ SER o global.
+\setcounter{proposition}{6}
+\setcounter{lemma}{13}
+\setcounter{theorem}{2}
+\setcounter{corollary}{8}
+
+% A hipótese de regime deste arquivo ganha a letra B (blocos), como a
+% Hipótese S de 06, para não colidir com a Hipótese 1 de E1.6, citada ao lado.
+\renewcommand{\theassumption}{B}
+
+\title{E1.12. A teoria em blocos: o block LASSO balanceado no desenho de
+produtos}
+\author{wafc-draft, \texttt{derivations/08-blocos.tex}}
+\date{2026-10-03}
+
+\begin{document}
+\maketitle
+
+\section*{Onde este resultado entra}
+
+A decisão D44 fez do WAFC o block LASSO na forma balanceada, seguido de limiar
+nas normas por bloco (D45), e deixou o LASSO coordenado de D3 como opção
+(D43). A teoria de E1.5 e E1.6 (\texttt{04-oraculo.tex} e
+\texttt{05-taxas.tex}) é do LASSO. A sondagem de E1.11
+(\texttt{08a-sondagem-blocos.md}) mostrou que ela transfere para a penalidade
+em blocos sem cone e com as mesmas constantes: muda a calibração, a
+compressibilidade dá lugar ao risco ideal por pedaços, e a taxa ganha um
+fator logarítmico; os adendos das §§~11 e~12 mostraram que pesos de razão
+limitada custam só uma constante, o que cobre os pesos $\sqrt{|G|}$ do
+\texttt{grpreg} na forma balanceada. Este arquivo escreve isso como
+resultados numerados e provados. São cinco peças:
+
+\begin{enumerate}[label=(\alph*), leftmargin=*, nosep]
+  \item a \textbf{forma balanceada} (Proposição~\ref{prop:balanceada}): os
+    tamanhos dos pedaços, o número deles e a razão $\rho^{2} \le 3$ dos pesos
+    $\sqrt{|G|}$;
+  \item a \textbf{calibração em blocos} (Lema~\ref{lem:calib-blocos}): Hsu,
+    Kakade e Zhang (2012) com união sobre os pedaços, um evento que não
+    depende dos pesos, e o preço $\rho$ dos pesos;
+  \item o \textbf{oráculo sem cone} (Teorema~\ref{thm:oraculo-blocos}),
+    escrito por inteiro e com comparador arbitrário, e a sua \textbf{forma de
+    risco ideal} (Corolário~\ref{cor:risco-ideal});
+  \item a \textbf{aproximação}: a hipótese de Besov de E1.3 implica a cota do
+    risco ideal por pedaços, sem hipótese nova, nos dois regimes de $\pi$
+    (Lema~\ref{lem:risco-pedacos});
+  \item as \textbf{taxas}: a do espaço de aproximação sem logaritmo
+    (Teorema~\ref{thm:taxa-blocos}), a das componentes
+    (Corolário~\ref{cor:componentes-blocos}) e a adaptativa
+    $n^{-2s/(2s+1)}(\log n)^{(2/\pi-1)_{+}/(2s+1)}$, sem logaritmo em
+    $\pi \ge 2$ (Corolário~\ref{cor:adaptativa-blocos}).
+\end{enumerate}
+
+Pelo D16 o enunciado principal do artigo é o Corolário~5 de E1.6. Com D44 o
+candidato passa a ser o Corolário~\ref{cor:adaptativa-blocos}, que é o mesmo
+enunciado com a penalidade em blocos e um fator $(\log n)^{2\seff/(2s+1)}$ a
+menos; a confirmação é do autor, na integração. O Corolário~8 com o ajuste
+em blocos e a cota de risco do estimador limiarizado estão no adendo de E1.12
+de \texttt{06-selecao-limiar.tex} (Lema~16 e Corolários~12 e~13).
+
+\section{Objetos}
+
+\paragraph{Modelo, amostra e desenho.} Como em E1.5, \texttt{04-oraculo.tex},
+§1: $(Y_{i},\bX_{i},\bU_{i})$ i.i.d.\ com $Y_{i} = f(\bX_{i},\bU_{i}) +
+\varepsilon_{i}$, $f(x,u) = \sum_{\cv}x_{\cv}\{\lvl{\cv} +
+\sum_{\md}\gcomp{\cv}{\md}(u_{\md})\}$; na ordem de colunas de D12,
+$\bZ = [\Amat\;\Bmat]$ com $\Amat_{i\cv} = X_{i\cv}$ e
+$\Bmat_{i,(\cv\md,\lev\tsl)} = X_{i\cv}\wav{\lev}{\tsl}(U_{i\md})$,
+$d = pq\NJ$, $\NJ = 2^{J}-1$, e $\Gramhat = \bZ\T\bZ/n$.
+
+\paragraph{Pedaços e pesos.} $\Gcal$ é uma partição do conjunto das $d$
+coordenadas penalizadas em \emph{pedaços} $G$, cada um contido num único bloco
+$(\cv,\md)$; $|\Gcal|$ é o número de pedaços, $|G|$ o de colunas do pedaço, e
+$\btheta_{G} \in \R^{|G|}$ o subvetor. Os pesos são $w = (w_{G})_{G\in\Gcal}$,
+$w_{G} > 0$, com razão
+\[
+  \rho \;=\; \frac{\max_{G}w_{G}}{\min_{G}w_{G}} \;\ge\; 1 ,
+\]
+e a penalidade é a norma
+\[
+  \nGw{\btheta} \;=\; \sum_{G\in\Gcal} w_{G}\,\norm{\btheta_{G}}_{2},
+  \qquad
+  \nGw{\btheta_{\Hcal}} \;=\; \sum_{G\in\Hcal} w_{G}\,\norm{\btheta_{G}}_{2}
+  \quad (\Hcal \subseteq \Gcal).
+\]
+Para $\Hcal \subseteq \Gcal$ escrevemos $W(\Hcal) = \sum_{G\in\Hcal}w_{G}^{2}$,
+e para $\btheta \in \R^{d}$, $\Gzero(\btheta) = \{G : \btheta_{G} \ne 0\}$, os
+pedaços ativos. Com $w_{G} = 1$, $W(\Gzero(\btheta))$ é o número de pedaços
+ativos; com $w_{G} = \sqrt{|G|}$, é o número de coordenadas nos pedaços
+ativos.
+
+\paragraph{Estimador.} Com $\pen > 0$,
+\begin{equation}
+  \label{eq:est-blocos}
+  \betahat = (\chat,\thetahat)
+  \;\in\; \operatorname*{arg\,min}_{(\bc,\btheta)\in\R^{p}\times\R^{d}}
+  \Bigl\{\normn{\bY - \Amat\bc - \Bmat\btheta}^{2} + 2\pen\nGw{\btheta}\Bigr\},
+  \qquad \widehat f = \Amat\chat + \Bmat\thetahat .
+\end{equation}
+Os níveis $\lvl{\cv}$ não são penalizados (D3). Na normalização de Klopp e
+Pensky (2015, eq.~3.3), $n^{-1}\norm{\bY - \Bmat\alpha}_{2}^{2} +
+\delta\norm{\alpha}_{\mathrm{block}}$, vale $\delta = 2\pen$; na do
+\texttt{grpreg}, $(2n)^{-1}\norm{\cdot}_{2}^{2} + \pen\cdot$penalidade, o $\pen$
+é o mesmo.
+
+\paragraph{A forma balanceada (D44).} Fixe um inteiro $b \ge 2$ e seja
+$\jst = \max\{\lev \ge 0 : 2^{\lev} < b\}$. Em cada bloco $(\cv,\md)$:
+\begin{enumerate}[label=(\roman*), leftmargin=*, nosep]
+  \item os níveis $\lev \le \min(\jst, J-1)$ formam um único pedaço, o
+    \emph{pedaço grosso};
+  \item cada nível $\lev$ com $\jst < \lev \le J-1$ (os \emph{níveis finos},
+    $2^{\lev} \ge b$) é cortado em $k_{\lev} = \lfloor 2^{\lev}/b\rfloor$
+    pedaços de translações consecutivas, os $k_{\lev}-1$ primeiros com $b$
+    colunas e o último com as $b + (2^{\lev} - k_{\lev}b)$ restantes.
+\end{enumerate}
+O WAFC de D44 é \eqref{eq:est-blocos} com essa partição, $b = \bn =
+\lceil\log n\rceil$ e $w_{G} = \sqrt{|G|}$; no código, é o
+\texttt{wafc\_kp\_groups(balanced = TRUE)} com o \texttt{group.multiplier}
+padrão do \texttt{grpreg}, que resolve a variante branca da
+Observação~\ref{rem:branca}.
+
+\paragraph{Perfilagem.} Como em E1.5: $\PA$ é a projeção sobre o espaço-coluna
+de $\Amat$, $\MA = I_{n} - \PA$, $\Btil = \MA\Bmat$,
+$\widetilde\bY = \MA\bY$, $\GBA = \Btil\T\Btil/n$ e
+$\gtil = \lmin(\GBA)$; por pedaço,
+\[
+  \Psitil_{G} \;=\; \Btil_{G}\T\Btil_{G}/n \in \R^{|G|\times|G|},
+\]
+com $\Btil_{G}$ as colunas de $\Btil$ em $G$; e
+$\smax^{2} = \max_{a}(\Gramhat)_{aa}$ sobre as colunas penalizadas.
+
+\paragraph{Constantes e eventos de E1.4 e E1.6.} $\gamma = \kappa_{1}c_{U}$ e
+$\Lambda = \kappa_{2}C_{U} + \gamma/2$, como em E1.6, e
+\[
+  \ESig \;=\; \bigl\{\opnorm{\Gramhat - \Gram} < \gamma/2\bigr\}.
+\]
+No evento $\ESig$, a Proposição~3(iii) de E1.4 e Weyl dão
+$\lmin(\Gramhat) > \gamma/2$ e $\lmaxx(\Gramhat) < \Lambda$ (é o Lema~9(iii) de
+E1.6), e a Proposição~3(iv) dá $\Prob(\ESig) \to 1$ quando
+$pq2^{J}\log(pq2^{J})/n \to 0$.
+
+\paragraph{Oráculo, viés e comparadores.} $\betastar = (\bc,\thetastar)$ é o
+oráculo de E1.3, com $\coefs{\cv}{\md}{\lev}{\tsl} =
+\inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$ para $\lev < J$, $f_{J} =
+\bZ\betastar$, $\bb = f - f_{J}$, e
+$\mathcal{B}_{J}^{2} = (pq)^{2}B_{X}^{2}C_{U}C_{g}^{2}(1-2^{-2\seff})^{-1}
+2^{-2J\seff}$ é a cota de $\E\normn{\bb}^{2}$ do Corolário~1 de E1.3 (com o
+$C_{X}$ de lá escrito $B_{X}$, D24). Um \emph{comparador} é qualquer
+$\bar\bbeta = (\bar\bc,\thbar) \in \R^{p}\times\R^{d}$, com resíduo
+determinístico $\bbar = f - \bZ\bar\bbeta$.
+
+\paragraph{Risco ideal por pedaços.} Para $\btheta \in \R^{d}$ e $\eta > 0$,
+\[
+  \Rid(\btheta;\eta) \;=\; \sum_{G\in\Gcal}\min\bigl(\norm{\btheta_{G}}_{2}^{2},\,\eta\bigr).
+\]
+É não decrescente em $\eta$, e como $\min(u,\kappa\eta) \le \kappa\min(u,\eta)$
+para $\kappa \ge 1$, vale $\Rid(\btheta;\kappa\eta) \le \kappa\Rid(\btheta;\eta)$.
+Com $\Gcal$ de pedaços unitários, $\Rid$ é o risco ideal da projeção
+coordenada a coordenada.
+
+\section{Hipóteses e o que se usa de E1.5}
+
+Além das hipóteses de E1.3 (base, Besov, densidade das moduladoras, $\bX$
+limitada), de E1.4 (moduladoras, covariáveis lineares, base) e das
+Hipóteses~1 (amostra i.i.d.) e~2 (erro sub-gaussiano de parâmetro $\sigma$) de
+E1.5, citadas onde entram, este arquivo usa uma hipótese de regime, a
+Hipótese~\ref{ass:regime-blocos} da §\ref{sec:taxas}, só nos enunciados
+assintóticos.
+
+O Lema~4 de E1.5 é usado com a penalidade em blocos. Ele não consome número
+novo: o contador abaixo é recuado para que apareça com o número que já tem.
+
+\setcounter{lemma}{3}
+\begin{lemma}[perfilagem; provado em E1.5 para $\norm{\cdot}_{1}$]\label{lem:perfil-blocos}
+Suponha $\Amat$ de posto $p$. Com a penalidade $\nGw{\cdot}$ em
+\eqref{eq:est-blocos}:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
+  \item $\thetahat$ minimiza $\normn{\widetilde\bY - \Btil\btheta}^{2} +
+    2\pen\nGw{\btheta}$, e $\chat = (\Amat\T\Amat)^{-1}\Amat\T(\bY -
+    \Bmat\thetahat)$;
+  \item para todo comparador $\bar\bbeta$, com $\vbar = \thetahat - \thbar$,
+    \begin{equation}
+      \label{eq:decomp-blocos}
+      \widehat f - \bZ\bar\bbeta \;=\; \Btil\vbar + \PA(\bbar + \bveps);
+    \end{equation}
+  \item $\gtil \ge \lmin(\Gramhat)$;
+  \item se $\lmin(\Gramhat) > 0$, o minimizador em \eqref{eq:est-blocos} é
+    único.
+\end{enumerate}
+\end{lemma}
+\setcounter{lemma}{13}
+
+\begin{proof}
+Em E1.5, a prova de (i) usa só que a penalidade não depende de $\bc$
+(minimizar primeiro em $\bc$ dá $\normn{\MA(\bY - \Bmat\btheta)}^{2}$), e a de
+(iv) só que ela é convexa; $\nGw{\cdot}$ tem as duas propriedades. (iii) não
+envolve a penalidade. Para (ii): por (i), $\Amat\chat = \PA(\bY -
+\Bmat\thetahat)$, e $\bY = \Amat\bar\bc + \Bmat\thbar + \bbar + \bveps$ pela
+definição de $\bbar$; logo $\Amat(\chat - \bar\bc) = \PA(\Bmat\thbar + \bbar +
+\bveps - \Bmat\thetahat) = \PA(\bbar + \bveps) - \PA\Bmat\vbar$, e
+$\widehat f - \bZ\bar\bbeta = \Amat(\chat - \bar\bc) + \Bmat\vbar =
+\MA\Bmat\vbar + \PA(\bbar + \bveps)$.
+\end{proof}
+
+\section{A forma balanceada e a calibração}
+
+\begin{proposition}[a forma balanceada]\label{prop:balanceada}
+Seja $\Gcal$ a forma balanceada com $b \ge 2$ e $J \ge 1$. Então:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
+  \item todo pedaço fino está contido num nível e tem entre $b$ e $2b-1$
+    colunas; se $J > \jst + 1$, o pedaço grosso tem $2^{\jst+1}-1$ colunas, e
+    $b - 1 \le 2^{\jst+1}-1 \le 2b-3$; se $J \le \jst + 1$, cada bloco é um
+    pedaço só, de $2^{J}-1$ colunas;
+  \item $|\Gcal| \le pq\,(1 + 2^{J}/b)$;
+  \item com $w_{G} = \sqrt{|G|}$, $\rho^{2} = \max_{G}|G|/\min_{G}|G| \le
+    (2b-1)/(b-1) \le 3$; em $b = 6$ e $b = 7$ (os $\bn$ de $n = 250$ e de
+    $n = 500$ e $1000$), $\rho^{2} \le 5/3$ e $\rho^{2} \le 11/7$ quando
+    $J \ge 5$.
+\end{enumerate}
+\end{proposition}
+
+\begin{lemma}[calibração em blocos]\label{lem:calib-blocos}
+Sob as Hipóteses~1 e~2 de E1.5, seja $\Gcal$ uma partição qualquer das
+coordenadas penalizadas, e $\alpha \in (0,1)$.
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item Com
+    \[
+      \lamz{G} \;=\; \frac{\sigma}{\sqrt n}\Bigl(\sqrt{\operatorname{tr}\Psitil_{G}}
+      + \sqrt{2\opnorm{\Psitil_{G}}\log(|\Gcal|/\alpha)}\Bigr),
+    \]
+    o evento $\Ecal = \bigl\{\norm{(\Btil\T\bveps/n)_{G}}_{2} \le \lamz{G}
+    \text{ para todo } G\bigr\}$ tem $\Prob(\Ecal \mid \bX,\bU) \ge 1 -
+    \alpha$. Em consequência, para quaisquer pesos $w$ e todo
+    $\pen \ge \pen_{w} := 2\max_{G}\lamz{G}/w_{G}$,
+    \[
+      \Ecal \;\subseteq\; \Tw \;=\; \Bigl\{\max_{G}\,
+      \norm{(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \pen/2\Bigr\},
+      \qquad \Prob(\Tw) \ge 1 - \alpha .
+    \]
+  \item \textup{(forma fechada)} $\operatorname{tr}\Psitil_{G} \le
+    |G|\smax^{2}$ e $\opnorm{\Psitil_{G}} \le \lmaxx(\Gramhat)$; logo, no
+    evento $\{\smax^{2} \le 2B_{X}^{2}C_{U}\} \cap \{\lmaxx(\Gramhat) \le
+    \Lambda\}$, vale $\lamz{G} \le \lamzbar{G}$ para todo $G$, com
+    \[
+      \lamzbar{G} \;=\; \frac{\sigma}{\sqrt n}\Bigl(B_{X}\sqrt{2C_{U}|G|}
+      + \sqrt{2\Lambda\log(|\Gcal|/\alpha)}\Bigr),
+    \]
+    que é determinístico.
+  \item \textup{(o preço dos pesos)} Com
+    \[
+      \lamG \;=\; 2\max_{G}\lamzbar{G}/w_{G},
+      \qquad
+      \lamGone \;=\; 2\max_{G}\lamzbar{G},
+    \]
+    vale $\lamG w_{G} \le \rho\,\lamGone$ para todo $G$, e portanto
+    $(\lamG)^{2}W(\Hcal) \le \rho^{2}(\lamGone)^{2}|\Hcal|$ para todo
+    $\Hcal \subseteq \Gcal$. O mesmo vale com $\pen_{w}$ e
+    $2\max_{G}\lamz{G}$ no lugar de $\lamG$ e $\lamGone$.
+\end{enumerate}
+\end{lemma}
+
+O evento $\Ecal$ não sabe dos pesos: o peso só escolhe qual pedaço dita o
+$\pen$, o de maior $\lamz{G}/w_{G}$, e o preço de pesos desiguais é o fator
+$\rho$ de (iii), pago no termo de estimação. Com $w_{G} = 1$ e pedaços de até
+$b_{\max}$ colunas, $\lamGone \asymp \sigma\sqrt{(b_{\max} +
+\log|\Gcal|)/n}$, que é o $\widehat\delta$ de Klopp e Pensky (2015, eq.~3.14) a
+menos de constantes (com $p$ fixo, as duas escalas são
+$\sigma\sqrt{\log n/n}$; §\ref{sec:kp}) e a versão sub-gaussiana do
+$\lambda_{j}$ do Lema~3.1 de Lounici et al.\ (2011).
+
+\section{O oráculo sem cone}
+
+\begin{theorem}[desigualdade oráculo em blocos]\label{thm:oraculo-blocos}
+Sob as Hipóteses~1 e~2 de E1.5, seja $\Gcal$ uma partição das coordenadas
+penalizadas em pedaços contidos em blocos, $w$ pesos positivos, $\Amat$ de
+posto $p$ e $\pen > 0$. No evento $\Tw$ do Lema~\ref{lem:calib-blocos}, que
+tem probabilidade ao menos $1-\alpha$ sempre que $\pen \ge \pen_{w}$, vale
+\emph{simultaneamente para todo comparador} $\bar\bbeta = (\bar\bc,\thbar)$,
+com
+\[
+  \bbar = f - \bZ\bar\bbeta,
+  \qquad
+  \Gbar = \Gzero(\thbar),
+  \qquad
+  \bar W = W(\Gbar),
+  \qquad
+  \vbar = \thetahat - \thbar :
+\]
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(taxa lenta; nenhuma condição de desenho)}
+    \[
+      \tfrac12\normn{\Btil\vbar}^{2} + \pen\nGw{\thetahat}
+      \;\le\; 3\pen\nGw{\thbar} + 2\normn{\bbar}^{2};
+    \]
+  \item \textup{(taxa rápida)} se $\gtil > 0$,
+    \[
+      \normn{\Btil\vbar}^{2} \le \frac{64\pen^{2}\bar W}{\gtil} + 16\normn{\bbar}^{2},
+      \quad
+      \nGw{\vbar} \le \frac{40\pen\bar W}{\gtil} + \frac{10\normn{\bbar}^{2}}{\pen},
+      \quad
+      \norm{\vbar}_{2}^{2} \le \frac{64\pen^{2}\bar W}{\gtil^{2}}
+      + \frac{16\normn{\bbar}^{2}}{\gtil};
+    \]
+  \item \textup{(erro de predição)}
+    $\normn{\widehat f - f} \le \normn{\Btil\vbar} + 2\normn{\bbar} +
+    \normn{\PA\bveps}$, e portanto
+    \begin{equation}
+      \label{eq:oraculo-min-blocos}
+      \normn{\widehat f - f}^{2}
+      \;\le\; 3\min_{\bar\bbeta}\Bigl\{\frac{64\pen^{2}\bar W}{\gtil}
+      + 20\normn{\bbar}^{2}\Bigr\} + 3\normn{\PA\bveps}^{2},
+      \qquad
+      \E\bigl[\normn{\PA\bveps}^{2}\mid\bX,\bU\bigr] \le \frac{\sigma^{2}p}{n}.
+    \end{equation}
+\end{enumerate}
+\end{theorem}
+
+Lido no oráculo, $\bar\bbeta = \betastar$, o item (ii) é o Teorema~1(ii) de
+E1.5 com $s_{0}$ trocado por $W(\Gzero(\thetastar))$ e $\norm{\cdot}_{1}$ por
+$\nGw{\cdot}$; as constantes são as mesmas. Lido num comparador qualquer, é o
+Lema~8 de E1.6 em blocos.
+
+\begin{corollary}[a forma de risco ideal]\label{cor:risco-ideal}
+Nas condições do Teorema~\ref{thm:oraculo-blocos}, no evento $\Tw \cap
+\{\gtil > 0\}$, seja $\Lambda' \ge \lmaxx(\Gramhat)$ (por exemplo
+$\Lambda' = \Lambda$ no evento $\ESig$) e
+\[
+  \eta \;=\; \frac{1{,}6\,\max_{G}(\pen w_{G})^{2}}{\Lambda'\gtil}.
+\]
+Então
+\begin{equation}
+  \label{eq:risco-ideal}
+  \normn{\widehat f - f}^{2}
+  \;\le\; 120\Lambda'\,\Rid(\thetastar;\eta) + 120\normn{\bb}^{2}
+  + 3\normn{\PA\bveps}^{2},
+  \quad
+  \norm{\thetahat - \thetastar}_{2}^{2}
+  \;\le\; \frac{82\Lambda'\,\Rid(\thetastar;\eta) + 64\normn{\bb}^{2}}{\gtil}.
+\end{equation}
+Com $\pen = \lamG$ (ou $\pen = \pen_{w}$), o Lema~\ref{lem:calib-blocos}(iii)
+dá $\eta \le \rho^{2}\eta_{1}$, com $\eta_{1} = 1{,}6(\lamGone)^{2}/(\Lambda'\gtil)$
+o limiar dos pesos~1, e $\Rid(\thetastar;\eta) \le \rho^{2}\Rid(\thetastar;\eta_{1})$.
+\end{corollary}
+
+\begin{remark}[por que não há cone, também em blocos]\label{rem:cone-blocos}
+O passo que dispensa o cone é o mesmo de E1.5: a perfilagem do
+Lema~\ref{lem:perfil-blocos} tira os níveis do problema, e o autovalor cheio
+de E1.4 controla $\nGw{\vbar_{\Gbar}} \le \sqrt{\bar W}\norm{\vbar}_{2} \le
+\sqrt{\bar W/\gtil}\,\normn{\Btil\vbar}$ por Cauchy--Schwarz, sobre o espaço
+inteiro. Lounici et al.\ (2011) precisam da condição RE em grupos no cone
+ponderado (a Hipótese~3.1 deles); aqui ela é dominada pelo autovalor cheio,
+como em E1.5, e a constante é a mesma para todo $\Gbar$.
+\end{remark}
+
+\begin{remark}[a variante branca, que é o estimador do \texttt{grpreg}]
+\label{rem:branca}
+O \texttt{grpreg} padroniza as colunas, ortonormaliza cada pedaço e penaliza
+com os pesos $\sqrt{|G|}$ as coordenadas ortonormalizadas
+(\texttt{08a-sondagem-blocos.md}, §1.3). Na escala original, a penalidade é
+$\sum_{G}w_{G}\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$, com $Q_{G} =
+\Bmat_{G}\T M_{1}\Bmat_{G}/n$ a Gram centrada do pedaço ($M_{1}$ o centrador).
+O Teorema~\ref{thm:oraculo-blocos} vale com qualquer $Q_{G}$ definida positiva
+e mensurável em $(\bX,\bU)$, com três trocas: o evento passa a ser
+$\{\max_{G}\norm{Q_{G}^{-1/2}(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \pen/2\}$ (a
+norma dual); $\bar W$ vira $q_{\max}\bar W$ em (ii) e (iii), com
+$q_{\max} = \max_{G}\lmaxx(Q_{G})$, porque o Passo~5 da prova lê
+$\sum_{G\in\Gbar}w_{G}\norm{Q_{G}^{1/2}\vbar_{G}}_{2} \le
+\sqrt{q_{\max}\bar W}\norm{\vbar}_{2}$; e a cota de $\nGw{\vbar}$ fica na
+norma com $Q$. O Lema~\ref{lem:calib-blocos}(i) vale com
+$Q_{G}^{-1/2}\Psitil_{G}Q_{G}^{-1/2}$ no lugar de $\Psitil_{G}$ (a prova é a
+mesma, com $Q_{G}^{-1/2}\Btil_{G}\T/n$ no lugar de $\Btil_{G}\T/n$). Com a
+coluna constante $X_{1}\equiv 1$ em $\Amat$, $\PA \succeq P_{1}$, logo
+$\MA \preceq M_{1}$ e $\Psitil_{G} \preceq Q_{G}$: o traço é no máximo $|G|$
+e a norma, no máximo $1$, e
+\[
+  \lamz{G} \;\le\; \frac{\sigma}{\sqrt n}\Bigl(\sqrt{|G|} + \sqrt{2\log(|\Gcal|/\alpha)}\Bigr),
+\]
+\emph{pivotal}, sem $\smax$ nem $\Lambda$; e $q_{\max} \le \lmaxx(\Gramhat)
+\le \Lambda$ em $\ESig$. As taxas da §\ref{sec:taxas} passam com a constante
+multiplicada por $\Lambda$. É o estimador exato que o \texttt{klopp.balanced}
+do piloto roda, com $\pen$ determinístico.
+\end{remark}
+
+\section{A aproximação: Besov implica o risco ideal por pedaços}
+
+\begin{lemma}[risco ideal por pedaços sob Besov]\label{lem:risco-pedacos}
+Sob as Hipóteses de base e de Besov de E1.3 (em particular $\pi \ge 1$ e
+$\seff > 0$, isto é, $\pi(s+1/2) > 1$), seja $b \ge 1$ e $\Gcal$ uma partição
+em que, em cada bloco $(\cv,\md)$, os níveis $\lev$ com $2^{\lev} < b$ formam
+no máximo um pedaço e cada nível com $2^{\lev} \ge b$ é partido em pedaços
+contidos nele com pelo menos $b$ colunas (a forma balanceada é uma delas,
+pela Proposição~\ref{prop:balanceada}(i)). Então, para todo $J$ e todo
+$\eta > 0$,
+\begin{equation}
+  \label{eq:risco-pedacos}
+  \Rid(\thetastar;\eta) \;\le\; pq\Bigl\{\AG\,C_{g}^{\tau}
+  \Bigl(\frac{\eta}{b}\Bigr)^{2s/(2s+1)} b^{(2/\pi-1)_{+}/(2s+1)} + \eta\Bigr\},
+  \qquad \tau = \frac{1}{s+1/2},
+\end{equation}
+com $\AG = 2 + (1 - 2^{1-\pi(s+1/2)})^{-1}$ se $\pi \le 2$ e
+$\AG = 2 + (1 - 2^{-2s})^{-1}$ se $\pi \ge 2$ (as duas coincidem em
+$\pi = 2$), e $2/\pi = 0$ quando $\pi = \infty$.
+\end{lemma}
+
+O expoente é o do Lema~4 do suplemento de Klopp e Pensky (2015, eq.~5.31),
+\[
+  \textstyle\sum_{l}\min(\norm{a_{l}}^{2},\varepsilon d) \le
+  C_{a}^{2/(2r+1)}\varepsilon^{2r/(2r+1)}d^{(2-\nu)_{+}/(\nu(2r+1))},
+\]
+com
+$(d,\varepsilon,r,\nu) = (b,\eta/b,s,\pi)$, mas a hipótese é mais fraca: a
+classe~(A3) deles é uma bola $\ell_{\nu}$ ponderada sobre todos os
+coeficientes,
+$\sum_{k}|a_{k}|^{\nu}(k+1)^{\nu(r+1/2-1/\nu)} \le C_{a}^{\nu}$, que em base de wavelets implica a nossa por nível com $C_{g} = C_{a}$ (no
+nível $\lev$, $k+1 \ge 2^{\lev}$), e a nossa, $\Besov{s}{\pi}{\infty}$ em
+forma de sequência, não precisa da soma sobre os níveis. É o Lema~9(i) de
+E1.6 relido: a mesma contagem por nível, mais um Hölder dentro do pedaço. O
+pedaço grosso custa no máximo um $\eta$ por bloco, e é por isso que a forma
+balanceada não tem o termo $(x_{+}+1)\eta$ da §3.2 de
+\texttt{08a-sondagem-blocos.md}, que vinha de um pedaço por nível grosso.
+
+\section{As taxas}\label{sec:taxas}
+
+\begin{assumption}[regime em blocos]\label{ass:regime-blocos}
+Na sequência de problemas da Hipótese~1 de E1.6 ($p$, $q$, $\sigma$, $B_{X}$,
+$c_{U}$, $C_{U}$, $\kappa_{1}$, $\kappa_{2}$, $C_{g}$, $s$, $\pi$ e
+$\alpha \in (0,1)$ fixos, $J = J_{n} \to \infty$), suponha $2^{J_{n}} \le 2n$,
+e tome $\bn = \lceil\log n\rceil$ ($n \ge 3$, de modo que $\bn \ge 2$),
+$\Gcal_{n}$ a forma balanceada com $b = \bn$, pesos $w^{(n)}$ com
+$\rho(w^{(n)}) \le \bar\rho < \infty$ para uma constante $\bar\rho$ fixa, e
+$\pen = \lamG$ do Lema~\ref{lem:calib-blocos}(iii).
+\end{assumption}
+
+O WAFC de D44 satisfaz a Hipótese~\ref{ass:regime-blocos} com
+$\bar\rho^{2} = 3$ (Proposição~\ref{prop:balanceada}(iii)); os pesos~1, com
+$\bar\rho = 1$. Duas consequências que as provas usam, provadas na §\ref{sec:provas}:
+\begin{equation}
+  \label{eq:ordem-lambda}
+  (\lamGone)^{2} \;\le\; C_{\pen}\,\frac{\sigma^{2}\bn}{n},
+  \qquad
+  C_{\pen} = 16\bigl\{2B_{X}^{2}C_{U} + \Lambda\bigl(1 + \tfrac12\log(2pq/\alpha)\bigr)\bigr\},
+\end{equation}
+e, com $\Acal = \{\smax^{2} \le 2B_{X}^{2}C_{U}\} \cap \ESig$: no evento
+$\Acal$, $\pen = \lamG \ge \pen_{w}$ (logo $\Ecal \subseteq \Tw$),
+$\gtil > \gamma/2$, $\Amat$ tem posto $p$ e $\lmaxx(\Gramhat) < \Lambda$; e
+$\Prob(\Acal) \to 1$ sempre que $pq2^{J_{n}}\log(pq2^{J_{n}})/n \to 0$.
+
+\begin{theorem}[taxa do espaço de aproximação, sem logaritmo]\label{thm:taxa-blocos}
+Sob as hipóteses de E1.3, E1.4 e E1.5 e a Hipótese~\ref{ass:regime-blocos},
+tome
+\begin{equation}
+  \label{eq:Jn-blocos}
+  J_{n} \;=\; \min\bigl\{J \in \mathbb{N} :\; 2^{J} \ge n^{1/(2\seff+1)}\bigr\}.
+\end{equation}
+Então:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(a condição de desenho ao longo de $J_{n}$)}
+    $pq2^{J_{n}}\log(pq2^{J_{n}})/n \asymp n^{-2\seff/(2\seff+1)}\log n \to 0$,
+    de modo que $\Prob(\Acal) \to 1$;
+  \item \textup{(taxa)}
+    $\normn{\widehat f - f}^{2} = O_{p}\bigl(n^{-2\seff/(2\seff+1)}\bigr)$;
+  \item \textup{(o balanço)} no evento $\Acal \cap \Ecal$, o termo de estimação
+    é no máximo $384\bar\rho^{2}C_{\pen}\sigma^{2}pq(\bn + 2^{J_{n}})/(\gamma n)
+    \asymp n^{-2\seff/(2\seff+1)}$, o de viés é $\mathcal{B}_{J_{n}}^{2}
+    \asymp 2^{-2J_{n}\seff} \le n^{-2\seff/(2\seff+1)}$, e o de
+    $\bn/n$ e o dos níveis, $\sigma^{2}p/n$, são de ordem estritamente menor.
+\end{enumerate}
+\end{theorem}
+
+\begin{corollary}[componentes e coeficientes funcionais]\label{cor:componentes-blocos}
+Nas condições do Teorema~\ref{thm:taxa-blocos}, com
+$\widehat g_{\cv\md} = \sum_{\lev<J_{n},\tsl}\coef{\cv}{\md}{\lev}{\tsl}
+\wav{\lev}{\tsl}$ e
+\[
+  \rhoG \;=\; n^{-\seff/(2\seff+1)},
+\]
+vale $\sum_{\cv,\md}\lVert\widehat g_{\cv\md} -
+\gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}^{2} = O_{p}\bigl((\rhoG)^{2}\bigr)$; em
+particular $\lVert\widehat g_{\cv\md} - \gcomp{\cv}{\md}\rVert_{L_{2}[0,1]} =
+O_{p}(\rhoG)$ para cada $(\cv,\md)$, $\norm{\chat - \bc}_{2} = O_{p}(\rhoG)$,
+e $\lVert\widehat{\fcoef{\cv}} - \fcoef{\cv}\rVert_{L_{2}([0,1]^{q})} =
+O_{p}(\rhoG)$, $\cv = 1,\dots,p$.
+\end{corollary}
+
+\begin{corollary}[taxa adaptativa em blocos]\label{cor:adaptativa-blocos}
+Sob as hipóteses de E1.3, E1.4 e E1.5 e a Hipótese~\ref{ass:regime-blocos},
+tome $J_{n} = \lceil c\log_{2}n\rceil$ com $c$ na janela
+\begin{equation}
+  \label{eq:janela-blocos}
+  \frac{s}{(2s+1)\seff} \;\le\; c \;<\; 1,
+\end{equation}
+não vazia se e só se $\seff > s/(2s+1)$, que é a janela do Corolário~5 de
+E1.6 (lá escrita $\max\{\tau/2,(2-\tau)/(4\seff)\} \le c < 1$, com
+$(2-\tau)/(4\seff) = s/((2s+1)\seff) \ge \tau/2$). Então
+\[
+  \normn{\widehat f - f}^{2}
+  \;=\; O_{p}\Bigl(n^{-2s/(2s+1)}(\log n)^{(2/\pi-1)_{+}/(2s+1)}\Bigr),
+\]
+e a mesma taxa vale para $\sum_{\cv\md}\lVert\widehat g_{\cv\md} -
+\gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}^{2}$. Em particular:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
+  \item em $\pi \ge 2$, a taxa é $n^{-2s/(2s+1)}$, \emph{sem logaritmo};
+  \item em $\pi < 2$, sobra $(\log n)^{(2/\pi-1)/(2s+1)}$;
+  \item o ganho sobre o Corolário~5 de E1.6, $(\log n/n)^{2s/(2s+1)}$, é de
+    $(\log n)^{2\seff/(2s+1)}$, na mesma janela de $J_{n}$;
+  \item a constante cresce com os pesos no máximo como
+    $\bar\rho^{\,4s/(2s+1)}$ no termo principal.
+\end{enumerate}
+\end{corollary}
+
+\begin{remark}[onde o logaritmo vai]\label{rem:logaritmo}
+O $\pen$ de blocos não é menor que o do LASSO: $(\lamGone)^{2} \asymp
+\sigma^{2}\log n/n$, como $\pen_{n}^{2}$ em E1.6. O que muda é o custo por
+coordenada: um pedaço fino tem pelo menos $\bn \ge \log|\Gcal_{n}| - O(1)$
+coordenadas, e o limiar do risco ideal é $\eta_{n} \asymp \bn/n$, isto é,
+$\eta_{n}/\bn \asymp 1/n$ por coordenada, contra $\pen_{n}^{2} \asymp \log n/n$
+por coordenada no LASSO. O logaritmo da união sobre as colunas é absorvido
+pelo tamanho do pedaço, e é por isso que o pedaço tem de ter pelo menos a
+ordem de $\log|\Gcal|$ coordenadas. Em $\pi < 2$ a cota cobra
+$\bn^{(2/\pi-1)/(2s+1)}$ das sequências cujos coeficientes grandes estão
+isolados, um por pedaço (a ``espiga'' da conferência); um sinal espalhado no
+nível não paga nada pelos pedaços.
+\end{remark}
+
+\begin{remark}[a cota inferior de Klopp e Pensky em $q = 1$]\label{rem:inferior}
+Para $q = 1$, $\bX \perp \bU$ e erro gaussiano, o Teorema~1 de Klopp e Pensky
+(2015, eqs.~3.6 e~3.7), com $p$ fixo, dá a cota inferior minimax
+$n^{-2r/(2r+1)}$ sobre a classe~(A3) com a base de wavelets periodizadas, que
+a (A1)(b) deles admite. Pela observação depois do
+Lema~\ref{lem:risco-pedacos}, essa classe com $(r,\nu) = (s,\pi)$ está contida
+na hipótese de Besov de E1.3 com $C_{g} = C_{a}$, de modo que a cota inferior
+vale sobre a nossa classe. Em $\pi \ge 2$ o
+Corolário~\ref{cor:adaptativa-blocos} é, portanto, ótimo a menos de
+constante nesse caso particular. Em $\pi < 2$ fica a
+$(\log n)^{(2/\pi-1)/(2s+1)}$ dela, o mesmo resto das eqs.~(3.19) e~(3.20) de
+Klopp e Pensky com $p$ fixo, e o mesmo expoente da limiarização em blocos de
+Cai (1999, Teorema~4, eq.~5.4, p.~908), que vale no modelo de sequência e com
+$\alpha \ge 1/p$ (no nosso símbolo, $s \ge 1/\pi$); a nossa condição,
+$\seff > s/(2s+1)$, é implicada por ela, porque $s \ge 1/\pi$ dá
+$\seff \ge 1/2 > s/(2s+1)$, e é estritamente mais fraca (em $\pi = 1$, é
+$s > (1+\sqrt5)/4 \approx 0{,}81$). Que esse resto seja necessário para
+este estimador não é provado aqui nem por Klopp e Pensky; para $q \ge 2$ a
+cota inferior não existe (E1.9).
+\end{remark}
+
+\begin{remark}[o regime pré-assintótico]\label{rem:pre-blocos}
+A conferência mede, como E1.6 já tinha medido, que o evento $\ESig$ não vale
+nos $n$ do piloto ao longo de $J_{n}$: no desenho da conferência
+$\lmaxx(\Gramhat)$ mediano fica entre $2{,}0$ e $2{,}7$ para $n$ de $250$ a
+$4000$, contra $\Lambda = 1{,}46$, e a $J = 4$ fixo só entra no evento em
+$n = 64000$. O $\lamG$ determinístico continua cobrindo (cobertura $1{,}000$),
+porque a calibração é conservadora por um fator perto de $2$, mas o
+$\gtil$ realizado é pequeno, e com ele o $\eta$ do
+Corolário~\ref{cor:risco-ideal} satura $\Rid$ nesses $n$. As taxas são
+assintóticas, como em E1.6.
+\end{remark}
+
+\section{Diante do Teorema~2 de Klopp e Pensky (2015)}\label{sec:kp}
+
+Lido no \emph{Annals} (L7): a norma (3.1) e o estimador (3.2)--(3.3) na
+p.~1280, as condições (3.13) e a escolha (3.14) de $\widehat\delta$ na
+p.~1283, o Teorema~2 e a Observação~2 nas pp.~1283--1284, a (A6) na p.~1278.
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{O estimador.} Os pedaços de Klopp e Pensky têm
+    $d \approx \log n$ coeficientes consecutivos no índice da base,
+    atravessando níveis, com pesos~$1$, e o coeficiente da constante é um
+    pedaço unitário penalizado. Aqui os níveis $\lvl{\cv}$ são livres (D3), os
+    pedaços finos ficam dentro de um nível e os níveis grossos formam um
+    pedaço por bloco, e os pesos são de razão limitada, o que cobre os
+    $\sqrt{|G|}$ do \texttt{grpreg} (Proposição~\ref{prop:balanceada}(iii)) e
+    a variante branca (Observação~\ref{rem:branca}).
+  \item \textbf{O $\pen$.} O Teorema~2 deles usa $\delta = 2\widehat\delta$,
+    isto é, $\pen = \widehat\delta$, com $\widehat\delta \asymp
+    \sqrt{\log p/n}$ e a condição (3.16), $p^{\mu} \ge 2n$, que com $p$ fixo
+    força $\mu\log p \ge \log(2n)$: o $\log p$ do enunciado esconde um
+    $\log n$, e $\widehat\delta \asymp \sigma\sqrt{\log n/n}$, a ordem de
+    $\lamGone$ em \eqref{eq:ordem-lambda}.
+  \item \textbf{$p$ fixo.} A (A6), $(s+s_{0})(1+\log n) \le p$, usada na
+    prova do Teorema~2 (Lema~3 do suplemento deles), é de alta dimensão e
+    falha com $p$ fixo e $n$ grande, que é o regime da
+    Hipótese~\ref{ass:regime-blocos}. Nada aqui a usa.
+  \item \textbf{O viés e a dimensão.} A (3.13) exige $L + 1 = n^{\varsigma}$,
+    $1/2 \le \varsigma < 1$, e $r^{*} = \min_{j}(r_{j}\wedge r'_{j}) \ge
+    r_{0}^{*} > (2\varsigma)^{-1}$; pela Observação~2, $\varsigma = 1/2$ pede
+    $r^{*} \ge 2$, e $\varsigma = 3/4$ pede $r^{*} \ge 1$ ao preço de
+    $n \ge N_{3}^{2}$. A razão é que o viés de truncamento,
+    $C_{a}^{2}s\,n^{-2r^{*}\varsigma}$, é levado à ordem paramétrica
+    $C_{a}^{2}s/n$, e o termo de viés no ajuste é controlado pela norma dual,
+    como o de ruído (Lema~2 do suplemento deles, eq.~5.25). Aqui o viés entra
+    por Young (Passo~2 da prova do Teorema~\ref{thm:oraculo-blocos}), sem
+    norma dual, e só precisa não dominar a taxa: a janela
+    \eqref{eq:janela-blocos} pede $\seff > s/(2s+1)$, que é sempre menor que
+    $1/2$, enquanto $r^{*} > (2\varsigma)^{-1} > 1/2$ (com $r^{*} = \seff$ em
+    $\pi < 2$ e $r^{*} = s$ em $\pi \ge 2$). Os pares com
+    $s/(2s+1) < \seff \le 1/2$ estão no Corolário~\ref{cor:adaptativa-blocos}
+    e fora do Teorema~2 deles; entre eles está o cenário não homogêneo de D27,
+    com $\seff = 1/2$ ($\pi = 1$, $s = 1$). A nossa dimensão também é
+    polinomial, $2^{J_{n}} \asymp n^{c}$, mas com $c \ge s/((2s+1)\seff)$,
+    que fica abaixo de $1/2$ quando $\pi \ge 2$ e $s > 1/2$.
+  \item \textbf{A taxa.} Com $p$ fixo e $\log p \asymp \log n$, a (3.19)
+    deles é $n^{-2r/(2r+1)}(\log n)^{(2-\nu)_{+}/(\nu(2r+1))}$, exatamente a do
+    Corolário~\ref{cor:adaptativa-blocos} com $(r,\nu) = (s,\pi)$. O
+    Corolário~1 deles, eq.~(3.21), imprime $2(2-\nu)_{+}/(\nu(2r+1))$, com um
+    fator $2$ que (3.6), (3.19) e (3.20) não sustentam
+    (\texttt{08a-sondagem-blocos.md}, §4.3, conferido em 2026-10-02).
+  \item \textbf{O que eles têm e este arquivo não.} A cota inferior
+    (Teorema~1, eqs.~3.6 e~3.7), que aqui só vale emprestada para $q = 1$ e
+    $\bX\perp\bU$ (Observação~\ref{rem:inferior}); o regime de alta dimensão,
+    $p \gg n$, com a isometria restrita em média (A5) e a Gram restrita do
+    Lema~1 deles, onde aqui se usa o autovalor cheio de E1.4, que exige
+    $pq2^{J}\log(pq2^{J})/n \to 0$; e a versão em risco quadrático médio
+    (Teorema~3). O que este arquivo tem e eles não: $q \ge 2$ moduladoras com o
+    termo cruzado, $\bX$ dependente de $\bU$ (D13), os níveis livres, pesos de
+    razão limitada, e as três condições acima ($p$ fixo sem (A6), viés sem
+    norma dual, sem $r^{*} > (2\varsigma)^{-1}$).
+\end{itemize}
+
+\section{Provas}\label{sec:provas}
+
+\subsection*{Proposição~\ref{prop:balanceada}}
+
+Todos os blocos têm a mesma estrutura, de modo que basta olhar um. O pedaço
+grosso tem $\sum_{\lev=0}^{\min(\jst,J-1)}2^{\lev} = 2^{\min(\jst,J-1)+1}-1$
+colunas. Se $J \le \jst+1$, são $2^{J}-1$ e não há nível fino. Caso
+contrário, $2^{\jst} < b \le 2^{\jst+1}$ e, $b$ sendo inteiro,
+$2^{\jst} \le b-1$; logo $b - 1 \le 2^{\jst+1}-1 \le 2b-3$. Num nível fino há
+$k_{\lev} = \lfloor 2^{\lev}/b\rfloor \ge 1$ pedaços: $k_{\lev}-1$ com $b$
+colunas e o último com $b + r_{\lev}$, $r_{\lev} = 2^{\lev} - k_{\lev}b \in
+\{0,\dots,b-1\}$; todos entre $b$ e $2b-1$, o que dá (i). Para (ii), um bloco
+tem $1 + \sum_{\lev=\jst+1}^{J-1}\lfloor 2^{\lev}/b\rfloor \le 1 +
+(2^{J}-2^{\jst+1})/b \le 1 + 2^{J}/b$ pedaços. Para (iii), com
+$w_{G} = \sqrt{|G|}$, $\rho^{2} = \max|G|/\min|G|$; sem nível fino, todos os
+pedaços têm $2^{J}-1$ colunas e $\rho = 1$; com nível fino, por (i),
+$\min|G| \ge b-1$ e $\max|G| \le 2b-1$, e $(2b-1)/(b-1) = 2 + 1/(b-1) \le 3$.
+Os valores em $b = 6$ e $7$ são os de \texttt{08a-sondagem-blocos.md},
+§11.2: o pedaço grosso tem $7$ colunas e os finos, de $6$ a $10$ ($b = 6$) e
+de $7$ a $11$ ($b = 7$). \qed
+
+\subsection*{Lema~\ref{lem:calib-blocos}}
+
+\emph{(i).} Condicione em $(\bX,\bU)$. Nessa condicional $\Btil$ é constante e,
+pelas Hipóteses~1 e~2 de E1.5, os $\varepsilon_{i}$ são independentes com
+$\E[e^{a_{i}\varepsilon_{i}}\mid\bX,\bU] \le e^{\sigma^{2}a_{i}^{2}/2}$, logo
+$\E[e^{a\T\bveps}\mid\bX,\bU] \le e^{\sigma^{2}\norm{a}_{2}^{2}/2}$ para todo
+$a \in \R^{n}$: é a hipótese (2.1) do Teorema~2.1 de Hsu, Kakade e Zhang
+(2012), com $\mu = 0$. Fixe $G$ e escreva $M_{G} = \Btil_{G}\T/n \in
+\R^{|G|\times n}$, de modo que $(\Btil\T\bveps/n)_{G} = M_{G}\bveps$, e
+$\Sigma_{G} = M_{G}\T M_{G} \in \R^{n\times n}$. O teorema publicado toma uma
+matriz quadrada $A \in \R^{n\times n}$ com $\Sigma = A\T A$; tome
+$A = \Sigma_{G}^{1/2}$, que é quadrada e tem o mesmo $\Sigma_{G}$, e note que
+$\norm{\Sigma_{G}^{1/2}\bveps}_{2}^{2} = \bveps\T\Sigma_{G}\bveps =
+\norm{M_{G}\bveps}_{2}^{2}$: a forma retangular só entra por
+$\Sigma_{G} = M_{G}\T M_{G}$. Como $\operatorname{tr}\Sigma_{G} =
+\operatorname{tr}(M_{G}M_{G}\T) = \operatorname{tr}\Psitil_{G}/n$,
+$\opnorm{\Sigma_{G}} = \opnorm{M_{G}M_{G}\T} = \opnorm{\Psitil_{G}}/n$ e
+$\operatorname{tr}(\Sigma_{G}^{2}) \le
+\opnorm{\Sigma_{G}}\operatorname{tr}\Sigma_{G}$, o teorema dá, para todo
+$t > 0$, com probabilidade condicional ao menos $1 - e^{-t}$,
+\[
+  \begin{aligned}
+  \norm{(\Btil\T\bveps/n)_{G}}_{2}^{2}
+  &\le \sigma^{2}\Bigl(\operatorname{tr}\Sigma_{G} +
+  2\sqrt{\operatorname{tr}(\Sigma_{G}^{2})\,t} + 2\opnorm{\Sigma_{G}}t\Bigr)
+  \le \sigma^{2}\Bigl(\sqrt{\operatorname{tr}\Sigma_{G}} +
+  \sqrt{2\opnorm{\Sigma_{G}}t}\Bigr)^{2}\\
+  &= \frac{\sigma^{2}}{n}\Bigl(\sqrt{\operatorname{tr}\Psitil_{G}} +
+  \sqrt{2\opnorm{\Psitil_{G}}t}\Bigr)^{2},
+  \end{aligned}
+\]
+porque $2\sqrt{\opnorm{\Sigma_{G}}\operatorname{tr}\Sigma_{G}\,t} \le
+2\sqrt{2\opnorm{\Sigma_{G}}\operatorname{tr}\Sigma_{G}\,t}$. Com
+$t = \log(|\Gcal|/\alpha)$, cada pedaço falha com probabilidade condicional no
+máximo $\alpha/|\Gcal|$; a união sobre os $|\Gcal|$ pedaços e a torre dão
+$\Prob(\Ecal) \ge 1-\alpha$. Em $\Ecal$, para todo $G$,
+$\norm{(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \lamz{G}/w_{G} \le \pen_{w}/2 \le
+\pen/2$, logo $\Ecal \subseteq \Tw$.
+
+\emph{(ii).} $\MA \preceq I_{n}$ dá $\Psitil_{G} = \Bmat_{G}\T\MA\Bmat_{G}/n
+\preceq \Bmat_{G}\T\Bmat_{G}/n = \Gramhat_{GG}$, a submatriz principal de
+$\Gramhat$ em $G$. Logo $\operatorname{tr}\Psitil_{G} \le
+\sum_{a\in G}(\Gramhat)_{aa} \le |G|\smax^{2}$ e
+$\opnorm{\Psitil_{G}} \le \lmaxx(\Gramhat_{GG}) \le \lmaxx(\Gramhat)$
+(entrelaçamento de Cauchy). No evento do enunciado,
+$\smax \le B_{X}\sqrt{2C_{U}}$ e $\lmaxx(\Gramhat) \le \Lambda$.
+
+\emph{(iii).} Para todo $G$,
+\[
+  \lamG w_{G} = 2\max_{G'}\bigl(\lamzbar{G'}w_{G}/w_{G'}\bigr) \le
+  2\max_{G'}\lamzbar{G'}\cdot\max_{G'}(w_{G}/w_{G'}) \le \rho\lamGone,
+\]
+e
+$(\lamG)^{2}W(\Hcal) = \sum_{G\in\Hcal}(\lamG w_{G})^{2} \le
+\rho^{2}(\lamGone)^{2}|\Hcal|$. A mesma conta vale com os $\lamz{G}$. \qed
+
+\subsection*{Teorema~\ref{thm:oraculo-blocos}}
+
+Fixe um comparador e escreva $\norm{\cdot}$ por $\nGw{\cdot}$ nesta prova.
+
+\emph{Passo 1 (desigualdade básica).} Pelo Lema~\ref{lem:perfil-blocos}(i),
+$\thetahat$ minimiza o objetivo residualizado; comparando com $\thbar$,
+\[
+  \normn{\widetilde\bY - \Btil\thetahat}^{2} + 2\pen\norm{\thetahat}
+  \;\le\; \normn{\widetilde\bY - \Btil\thbar}^{2} + 2\pen\norm{\thbar}.
+\]
+Como $\bY = \Amat\bar\bc + \Bmat\thbar + \bbar + \bveps$ e $\MA\Amat = 0$, vale
+$\widetilde\bY = \Btil\thbar + r$ com $r = \MA(\bbar + \bveps)$, donde
+\begin{equation}
+  \label{eq:basica-blocos}
+  \normn{\Btil\vbar}^{2} + 2\pen\norm{\thetahat}
+  \;\le\; 2\inner{r}{\Btil\vbar}_{n} + 2\pen\norm{\thbar}.
+\end{equation}
+
+\emph{Passo 2 (os dois ruídos).} Como $\MA$ é simétrica e $\MA\Btil = \Btil$,
+$\inner{r}{\Btil\vbar}_{n} = \inner{\bbar + \bveps}{\Btil\vbar}_{n}$. O termo
+estocástico, pela norma dual de $\norm{\cdot}$, que é
+$\max_{G}\norm{z_{G}}_{2}/w_{G}$: em $\Tw$,
+\[
+  2\bigl|\inner{\bveps}{\Btil\vbar}_{n}\bigr|
+  = 2\Bigl|\sum_{G}\inner{(\Btil\T\bveps/n)_{G}}{\vbar_{G}}\Bigr|
+  \le 2\max_{G}\frac{\norm{(\Btil\T\bveps/n)_{G}}_{2}}{w_{G}}
+  \sum_{G}w_{G}\norm{\vbar_{G}}_{2}
+  \le \pen\norm{\vbar}.
+\]
+O termo determinístico, por Cauchy--Schwarz e Young, como em E1.5:
+\[
+  2|\inner{\bbar}{\Btil\vbar}_{n}| = 2|\inner{\MA\bbar}{\Btil\vbar}_{n}| \le
+  2\normn{\bbar}\normn{\Btil\vbar} \le \tfrac12\normn{\Btil\vbar}^{2} +
+  2\normn{\bbar}^{2}.
+\]
+Levando os dois a \eqref{eq:basica-blocos},
+\begin{equation}
+  \label{eq:basica2-blocos}
+  \tfrac12\normn{\Btil\vbar}^{2} + 2\pen\norm{\thetahat}
+  \;\le\; \pen\norm{\vbar} + 2\pen\norm{\thbar} + 2\normn{\bbar}^{2}.
+\end{equation}
+
+\emph{Passo 3 (taxa lenta).} $\norm{\vbar} \le \norm{\thetahat} +
+\norm{\thbar}$ em \eqref{eq:basica2-blocos} dá (i). Nenhuma propriedade de
+$\Gramhat$ foi usada.
+
+\emph{Passo 4 (decomponibilidade).} Para $G \notin \Gbar$, $\thbar_{G} = 0$ e
+$\thetahat_{G} = \vbar_{G}$; para $G \in \Gbar$,
+$\norm{\thetahat_{G}}_{2} \ge \norm{\thbar_{G}}_{2} - \norm{\vbar_{G}}_{2}$.
+Logo $\norm{\thetahat} \ge \norm{\thbar} - \norm{\vbar_{\Gbar}} +
+\norm{\vbar_{\Gbar^{c}}}$, e $\norm{\vbar} = \norm{\vbar_{\Gbar}} +
+\norm{\vbar_{\Gbar^{c}}}$. Substituindo em \eqref{eq:basica2-blocos} e
+cancelando $2\pen\norm{\thbar}$,
+\begin{equation}
+  \label{eq:cone-blocos}
+  \tfrac12\normn{\Btil\vbar}^{2} + \pen\norm{\vbar_{\Gbar^{c}}}
+  \;\le\; 3\pen\norm{\vbar_{\Gbar}} + 2\normn{\bbar}^{2}.
+\end{equation}
+
+\emph{Passo 5 (os dois casos, sem cone).} Por Cauchy--Schwarz e pela
+definição de $\gtil$,
+\begin{equation}
+  \label{eq:cs-blocos}
+  \norm{\vbar_{\Gbar}} = \sum_{G\in\Gbar}w_{G}\norm{\vbar_{G}}_{2}
+  \le \Bigl(\sum_{G\in\Gbar}w_{G}^{2}\Bigr)^{1/2}
+  \Bigl(\sum_{G\in\Gbar}\norm{\vbar_{G}}_{2}^{2}\Bigr)^{1/2}
+  \le \sqrt{\bar W}\,\norm{\vbar}_{2}
+  \le \sqrt{\bar W/\gtil}\;\normn{\Btil\vbar},
+\end{equation}
+porque $\normn{\Btil\vbar}^{2} = \vbar\T\GBA\vbar \ge \gtil\norm{\vbar}_{2}^{2}$.
+\textbf{Caso 1:} $2\normn{\bbar}^{2} \le \pen\norm{\vbar_{\Gbar}}$. Então
+\eqref{eq:cone-blocos} dá $\frac12\normn{\Btil\vbar}^{2} +
+\pen\norm{\vbar_{\Gbar^{c}}} \le 4\pen\norm{\vbar_{\Gbar}}$, e com
+\eqref{eq:cs-blocos}, $\frac12\normn{\Btil\vbar}^{2} \le
+4\pen\sqrt{\bar W/\gtil}\,\normn{\Btil\vbar}$, isto é
+$\normn{\Btil\vbar} \le 8\pen\sqrt{\bar W/\gtil}$ e
+$\normn{\Btil\vbar}^{2} \le 64\pen^{2}\bar W/\gtil$. Do mesmo display,
+$\norm{\vbar_{\Gbar^{c}}} \le 4\norm{\vbar_{\Gbar}}$, logo $\norm{\vbar} \le
+5\norm{\vbar_{\Gbar}} \le 5\sqrt{\bar W/\gtil}\cdot 8\pen\sqrt{\bar W/\gtil}
+= 40\pen\bar W/\gtil$; e $\norm{\vbar}_{2}^{2} \le
+\normn{\Btil\vbar}^{2}/\gtil \le 64\pen^{2}\bar W/\gtil^{2}$.
+\textbf{Caso 2:} $2\normn{\bbar}^{2} > \pen\norm{\vbar_{\Gbar}}$. Então
+\eqref{eq:cone-blocos} dá $\frac12\normn{\Btil\vbar}^{2} <
+8\normn{\bbar}^{2}$, isto é $\normn{\Btil\vbar}^{2} < 16\normn{\bbar}^{2}$;
+também $\pen\norm{\vbar_{\Gbar^{c}}} < 8\normn{\bbar}^{2}$ e
+$\pen\norm{\vbar_{\Gbar}} < 2\normn{\bbar}^{2}$, donde $\norm{\vbar} <
+10\normn{\bbar}^{2}/\pen$; e $\norm{\vbar}_{2}^{2} \le
+\normn{\Btil\vbar}^{2}/\gtil < 16\normn{\bbar}^{2}/\gtil$. Cada quantidade é
+majorada pelo máximo dos dois casos e o máximo pela soma: é (ii).
+
+\emph{Passo 6 (erro de predição).} Por \eqref{eq:decomp-blocos},
+$\widehat f - f = \Btil\vbar + \PA(\bbar + \bveps) - \bbar$, e
+$\normn{\PA\bbar} \le \normn{\bbar}$; a desigualdade triangular dá a primeira
+parte de (iii), e $(x+y+z)^{2} \le 3(x^{2}+y^{2}+z^{2})$ com (ii) dá
+$\normn{\widehat f - f}^{2} \le 3(64\pen^{2}\bar W/\gtil + 16\normn{\bbar}^{2}
++ 4\normn{\bbar}^{2} + \normn{\PA\bveps}^{2})$. Como $\Tw$, $\gtil$ e $\pen$ não
+dependem do comparador, as cotas valem simultaneamente para todos, e
+pode-se tomar o mínimo. A cota de $\E[\normn{\PA\bveps}^{2}\mid\bX,\bU]$ é a
+do Passo~6 de E1.5: $\operatorname{tr}(\PA) \le p$. \qed
+
+\subsection*{Corolário~\ref{cor:risco-ideal}}
+
+Tome $T = \{G : \norm{\thetastar_{G}}_{2}^{2} > \eta\}$ e o comparador
+$\bar\bbeta = (\bc,\thbar)$ com $\thbar_{G} = \thetastar_{G}\mathbf{1}\{G\in
+T\}$. Então $\Gbar \subseteq T$ e, pela definição de $\eta$,
+$\pen^{2}\bar W \le \sum_{G\in T}(\pen w_{G})^{2} \le
+|T|\max_{G}(\pen w_{G})^{2} = |T|\,\eta\Lambda'\gtil/1{,}6$. O resíduo é
+$\bbar = \bb + \Bmat(\thetastar - \thbar)$, e como $\Bmat\T\Bmat/n$ é submatriz
+principal de $\Gramhat$,
+\[
+  \normn{\bbar}^{2} \le 2\normn{\bb}^{2} + 2\lmaxx(\Gramhat)
+  \norm{\thetastar - \thbar}_{2}^{2}
+  \le 2\normn{\bb}^{2} + 2\Lambda'\sum_{G\notin T}\norm{\thetastar_{G}}_{2}^{2}.
+\]
+Por \eqref{eq:oraculo-min-blocos},
+$\normn{\widehat f - f}^{2} \le 192\pen^{2}\bar W/\gtil + 60\normn{\bbar}^{2} +
+3\normn{\PA\bveps}^{2} \le 120\Lambda'\{\eta|T| + \sum_{G\notin
+T}\norm{\thetastar_{G}}^{2}\} + 120\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}$,
+e o termo entre chaves é exatamente $\Rid(\thetastar;\eta)$. Para as
+componentes, o Teorema~\ref{thm:oraculo-blocos}(ii) dá
+$\norm{\vbar}_{2}^{2} \le 64\pen^{2}\bar W/\gtil^{2} +
+16\normn{\bbar}^{2}/\gtil \le (40\Lambda'\eta|T| + 32\normn{\bb}^{2} +
+32\Lambda'\sum_{G\notin T}\norm{\thetastar_{G}}^{2})/\gtil \le
+(40\Lambda'\Rid + 32\normn{\bb}^{2})/\gtil$, e
+$\norm{\thetahat - \thetastar}_{2}^{2} \le 2\norm{\vbar}_{2}^{2} +
+2\norm{\thbar - \thetastar}_{2}^{2} \le (80\Lambda'\Rid +
+64\normn{\bb}^{2})/\gtil + 2\Rid$; como $\gtil \le \lmin(\Gramhat_{\Bmat\Bmat})
+\le \lmaxx(\Gramhat) \le \Lambda'$ (o complemento de Schur é dominado pelo
+bloco), $2\Rid \le 2\Lambda'\Rid/\gtil$, e sai \eqref{eq:risco-ideal}. A
+última afirmação é o Lema~\ref{lem:calib-blocos}(iii) e as duas propriedades
+de $\Rid$ da §1. \qed
+
+\subsection*{Lema~\ref{lem:risco-pedacos}}
+
+Fixe um bloco e escreva $\theta_{\lev} = \theta^{*}_{\cv\md,\lev\cdot} \in
+\R^{2^{\lev}}$ (nulo para $\lev \ge J$, o que só diminui o risco),
+$\Gcal_{\lev}$ para os pedaços do nível fino $\lev$ e
+$r_{\lev} = \sum_{G\in\Gcal_{\lev}}\min(\norm{\theta_{G}}_{2}^{2},\eta)$.
+O pedaço grosso, se houver, contribui no máximo $\eta$; logo a contribuição do
+bloco é no máximo $\eta + \sum_{\lev\text{ fino}}r_{\lev}$. A primeira cota de
+$r_{\lev}$ é a contagem: cada pedaço de $\Gcal_{\lev}$ tem pelo menos $b$ das
+$2^{\lev}$ colunas do nível, logo $r_{\lev} \le |\Gcal_{\lev}|\eta \le
+2^{\lev}\eta/b$.
+
+\emph{Caso $\pi \le 2$.} Escreva $a = \pi(s+1/2) > 1$. Para $u \ge 0$,
+$\min(u,\eta) \le \eta^{1-\pi/2}u^{\pi/2}$ (se $u \le \eta$,
+$u = u^{\pi/2}u^{1-\pi/2} \le u^{\pi/2}\eta^{1-\pi/2}$; se $u > \eta$,
+$\eta = \eta^{\pi/2}\eta^{1-\pi/2} < u^{\pi/2}\eta^{1-\pi/2}$), e
+$\norm{x}_{2} \le \norm{x}_{\pi}$ para $\pi \le 2$. Logo a segunda cota é
+\[
+  r_{\lev} \le \eta^{1-\pi/2}\sum_{G\in\Gcal_{\lev}}\norm{\theta_{G}}_{\pi}^{\pi}
+  \le \eta^{1-\pi/2}\norm{\theta_{\lev}}_{\pi}^{\pi}
+  \le \eta^{1-\pi/2}C_{g}^{\pi}2^{-\lev(a-1)},
+\]
+pela Hipótese de Besov, porque os pedaços de $\Gcal_{\lev}$ estão contidos no
+nível $\lev$ e são disjuntos. Defina $x \in \R$ por
+$2^{xa} = bC_{g}^{\pi}\eta^{-\pi/2}$, de modo que as duas cotas se igualam em
+$\lev = x$, com valor $h = 2^{x}\eta/b = \eta^{1-\pi/2}C_{g}^{\pi}2^{-x(a-1)}$.
+Somando a primeira sobre os níveis $\lev \le x$,
+$\sum_{\lev\le x}2^{\lev}\eta/b \le 2^{\lfloor x\rfloor+1}\eta/b \le 2h$ (soma
+vazia se $x < 0$); somando a segunda sobre os $\lev > x$, como o primeiro
+inteiro $\lev > x$ tem $2^{-\lev(a-1)} \le 2^{-x(a-1)}$,
+$\sum_{\lev>x}\eta^{1-\pi/2}C_{g}^{\pi}2^{-\lev(a-1)} \le
+h\sum_{i\ge0}2^{-i(a-1)} = h/(1-2^{1-a})$. A contribuição do bloco é, então,
+no máximo $\eta + \{2 + (1-2^{1-a})^{-1}\}h$. Resta calcular $h$: como
+$1/a = \tau/\pi$, $2^{x} = b^{\tau/\pi}C_{g}^{\tau}\eta^{-\tau/2}$ e
+$h = b^{\tau/\pi-1}C_{g}^{\tau}\eta^{1-\tau/2}$; com $1 - \tau/2 =
+2s/(2s+1)$,
+\[
+  h = C_{g}^{\tau}\Bigl(\frac{\eta}{b}\Bigr)^{2s/(2s+1)}
+  b^{\tau/\pi - 1 + 2s/(2s+1)}
+  = C_{g}^{\tau}\Bigl(\frac{\eta}{b}\Bigr)^{2s/(2s+1)}
+  b^{\tau(1/\pi-1/2)},
+  \qquad \tau\Bigl(\frac1\pi - \frac12\Bigr) = \frac{2/\pi - 1}{2s+1}.
+\]
+
+\emph{Caso $\pi \ge 2$.} Hölder em $\R^{2^{\lev}}$ dá
+$\norm{\theta_{\lev}}_{2} \le 2^{\lev(1/2-1/\pi)}\norm{\theta_{\lev}}_{\pi}
+\le C_{g}2^{-\lev s}$ (com $1/\pi = 0$ se $\pi = \infty$), e a segunda cota é
+$r_{\lev} \le \norm{\theta_{\lev}}_{2}^{2} \le C_{g}^{2}2^{-2\lev s}$. Com
+$2^{x(2s+1)} = C_{g}^{2}b/\eta$ e $h = 2^{x}\eta/b = C_{g}^{2}2^{-2xs}$, a
+mesma conta dá a contribuição $\eta + \{2 + (1-2^{-2s})^{-1}\}h$, e
+$h = (C_{g}^{2}b/\eta)^{1/(2s+1)}\eta/b = C_{g}^{\tau}(\eta/b)^{2s/(2s+1)}$,
+porque $2/(2s+1) = \tau$.
+
+Somar sobre os $pq$ blocos dá \eqref{eq:risco-pedacos}. Em $\pi = 2$,
+$1 - 2^{1-a} = 1 - 2^{-2s}$ e as duas constantes coincidem. \qed
+
+\subsection*{As duas consequências da Hipótese~\ref{ass:regime-blocos}}
+
+\emph{\eqref{eq:ordem-lambda}.} $(\lamGone)^{2} = 4\max_{G}\lamzbar{G}^{2}
+\le (8\sigma^{2}/n)\{2B_{X}^{2}C_{U}b_{\max} + 2\Lambda\log(|\Gcal_{n}|/\alpha)\}$
+por $(x+y)^{2} \le 2x^{2}+2y^{2}$. Pela Proposição~\ref{prop:balanceada},
+$b_{\max} = \max_{G}|G| \le 2\bn - 1 < 2\bn$ e $|\Gcal_{n}| \le pq(1 +
+2^{J_{n}}/\bn) \le pq(1+n) \le 2pqn$, porque $2^{J_{n}} \le 2n$ e
+$\bn \ge 2$; logo $\log(|\Gcal_{n}|/\alpha) \le \log(2pq/\alpha) + \log n
+\le \log(2pq/\alpha) + \bn$, e
+$(\lamGone)^{2} \le (16\sigma^{2}/n)\{(2B_{X}^{2}C_{U} + \Lambda)\bn +
+\Lambda\log(2pq/\alpha)\} \le C_{\pen}\sigma^{2}\bn/n$, usando $\bn \ge 2$.
+
+\emph{O evento $\Acal$.} Em $\Acal$, o Lema~\ref{lem:calib-blocos}(ii) dá
+$\lamz{G} \le \lamzbar{G}$ para todo $G$, logo $\lamG \ge \pen_{w}$ e, pelo
+mesmo lema, $\Ecal \subseteq \Tw$. Pela §1, $\lmin(\Gramhat) > \gamma/2$ e
+$\lmaxx(\Gramhat) < \Lambda$; o Lema~\ref{lem:perfil-blocos}(iii) dá
+$\gtil > \gamma/2$, e $\lmin(\Amat\T\Amat/n) \ge \lmin(\Gramhat) > 0$ dá o
+posto. $\Prob(\smax^{2} \le 2B_{X}^{2}C_{U}) \to 1$ pelo Lema~6 de E1.5,
+que pede $2^{J}\log d/n \to 0$, e $\Prob(\ESig) \to 1$ pela
+Proposição~3(iv) de E1.4, que pede $pq2^{J}\log(pq2^{J})/n \to 0$; a segunda
+condição implica a primeira.
+
+\subsection*{Teorema~\ref{thm:taxa-blocos}}
+
+\emph{(i).} Por \eqref{eq:Jn-blocos}, $n^{1/(2\seff+1)} \le 2^{J_{n}} <
+2n^{1/(2\seff+1)} \le 2n$, logo a Hipótese~\ref{ass:regime-blocos} vale e
+$pq2^{J_{n}}\log(pq2^{J_{n}})/n \asymp n^{1/(2\seff+1)-1}\log n =
+n^{-2\seff/(2\seff+1)}\log n \to 0$; o resto é a segunda consequência acima.
+
+\emph{(ii) e (iii).} Fixe $\epsilon > 0$ e tome $\alpha = \alpha' =
+\alpha'' = \epsilon/4$. Intersecte $\Acal$, $\Ecal$,
+$\{\normn{\bb}^{2} \le \mathcal{B}_{J_{n}}^{2}/\alpha'\}$ (Markov, porque
+$\E\normn{\bb}^{2} = \norm{f - f_{J_{n}}}_{L_{2}(P)}^{2} \le
+\mathcal{B}_{J_{n}}^{2}$ pelo Corolário~1 de E1.3) e
+$\{\normn{\PA\bveps}^{2} \le \sigma^{2}p/(n\alpha'')\}$ (Markov, pelo
+Teorema~\ref{thm:oraculo-blocos}(iii)); para $n$ grande, a interseção tem
+probabilidade ao menos $1 - \epsilon$. Nela vale $\Tw$, e o
+Teorema~\ref{thm:oraculo-blocos}(iii) com $\bar\bbeta = \betastar$ dá
+\[
+  \normn{\widehat f - f}^{2}
+  \le \frac{192\,(\lamG)^{2}W(\Gzero(\thetastar))}{\gtil}
+  + 60\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}.
+\]
+Pelo Lema~\ref{lem:calib-blocos}(iii), por \eqref{eq:ordem-lambda} e pela
+Proposição~\ref{prop:balanceada}(ii), com $\gtil > \gamma/2$,
+\[
+  \frac{192\,(\lamG)^{2}W(\Gcal_{n})}{\gtil}
+  \le \frac{384\,\bar\rho^{2}(\lamGone)^{2}|\Gcal_{n}|}{\gamma}
+  \le \frac{384\,\bar\rho^{2}C_{\pen}\sigma^{2}\bn}{\gamma n}\,
+  pq\Bigl(1 + \frac{2^{J_{n}}}{\bn}\Bigr)
+  = \frac{384\,\bar\rho^{2}C_{\pen}\sigma^{2}pq\,(\bn + 2^{J_{n}})}{\gamma n},
+\]
+que é $\asymp n^{-2\seff/(2\seff+1)}$, porque $2^{J_{n}} \asymp
+n^{1/(2\seff+1)}$ domina $\bn \asymp \log n$. O viés é
+$60\mathcal{B}_{J_{n}}^{2}/\alpha' \asymp 2^{-2J_{n}\seff} \le
+n^{-2\seff/(2\seff+1)}$, pela cota inferior de $2^{J_{n}}$, e o último termo é
+$O(1/n)$. A parcela $\bn/n$ e $\sigma^{2}p/n$ são de ordem estritamente
+menor, porque $2\seff/(2\seff+1) < 1$. Logo
+$\Prob(\normn{\widehat f - f}^{2} > M_{\epsilon}n^{-2\seff/(2\seff+1)}) <
+\epsilon$ para uma constante $M_{\epsilon}$, que é (ii). \qed
+
+\subsection*{Corolário~\ref{cor:componentes-blocos}}
+
+Pela ortonormalidade das $\{\wav{\lev}{\tsl}\}_{\lev<J_{n}}$ em $L_{2}[0,1]$
+(Corolário~3 de E1.5) e pelo Lema~1 de E1.3,
+$\sum_{\cv\md}\lVert\widehat g_{\cv\md} - \gcomp{\cv}{\md}\rVert^{2} \le
+2\norm{\thetahat - \thetastar}_{2}^{2} + 2pqC_{g}^{2}(1-2^{-2\seff})^{-1}
+2^{-2J_{n}\seff}$. No evento da prova do Teorema~\ref{thm:taxa-blocos}, o
+Teorema~\ref{thm:oraculo-blocos}(ii) com $\bar\bbeta = \betastar$ dá
+$\norm{\thetahat - \thetastar}_{2}^{2} \le 64(\lamG)^{2}W(\Gcal_{n})/\gtil^{2}
++ 16\normn{\bb}^{2}/\gtil$, com $\gtil > \gamma/2$: as duas parcelas têm a
+ordem das do Teorema~\ref{thm:taxa-blocos}, com $\gamma^{-2}$ no lugar de
+$\gamma^{-1}$. Para $\chat$, como na prova do Corolário~4 de E1.6:
+por \eqref{eq:decomp-blocos} com $\bar\bbeta = \betastar$,
+$\Amat(\chat - \bc) = \PA(\bb + \bveps) - \PA\Bmat\vbar$, logo
+$\normn{\Amat(\chat - \bc)} \le \normn{\bb} + \normn{\PA\bveps} +
+\sqrt{\Lambda}\norm{\vbar}_{2}$, e $\lmin(\Amat\T\Amat/n) > \gamma/2$ dá
+$\norm{\chat - \bc}_{2}^{2} \le 2\normn{\Amat(\chat-\bc)}^{2}/\gamma$. A
+passagem a $\fcoef{\cv}$ é a mesma de E1.6. \qed
+
+\subsection*{Corolário~\ref{cor:adaptativa-blocos}}
+
+A janela: $(2-\tau)/(4\seff) = (4s/(2s+1))/(4\seff) = s/((2s+1)\seff)$, e
+$s/((2s+1)\seff) \ge 1/(2s+1) = \tau/2$ porque $\seff \le s$; ela é não vazia
+se e só se $s/((2s+1)\seff) < 1$. Com $c < 1$, $2^{J_{n}} \le 2n^{c} \le 2n$, e
+a Hipótese~\ref{ass:regime-blocos} vale; a condição de E1.4 é
+$pq2^{J_{n}}\log(pq2^{J_{n}})/n \asymp n^{c-1}\log n \to 0$, logo
+$\Prob(\Acal) \to 1$.
+
+Fixe $\epsilon > 0$ e o mesmo evento da prova do
+Teorema~\ref{thm:taxa-blocos}. Nele, o Corolário~\ref{cor:risco-ideal} com
+$\Lambda' = \Lambda$ dá $\normn{\widehat f - f}^{2} \le
+120\Lambda\Rid(\thetastar;\eta) + 120\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}$,
+e pelo Lema~\ref{lem:calib-blocos}(iii), por \eqref{eq:ordem-lambda} e por
+$\gtil > \gamma/2$,
+\[
+  \eta = \frac{1{,}6\max_{G}(\lamG w_{G})^{2}}{\Lambda\gtil}
+  \;\le\; \frac{3{,}2\,\bar\rho^{2}(\lamGone)^{2}}{\Lambda\gamma}
+  \;\le\; \bar\eta_{n} := \kappa\,\frac{\bn}{n},
+  \qquad \kappa = \frac{3{,}2\,\bar\rho^{2}C_{\pen}\sigma^{2}}{\Lambda\gamma}.
+\]
+Como $\Rid$ é não decrescente em $\eta$, o Lema~\ref{lem:risco-pedacos} com
+$b = \bn$ dá
+\[
+  \Rid(\thetastar;\eta) \le \Rid(\thetastar;\bar\eta_{n})
+  \le pq\Bigl\{\AG C_{g}^{\tau}\kappa^{2s/(2s+1)}\,n^{-2s/(2s+1)}
+  \bn^{(2/\pi-1)_{+}/(2s+1)} + \kappa\frac{\bn}{n}\Bigr\},
+\]
+e $\bn \asymp \log n$; a segunda parcela é de ordem menor porque
+$2s/(2s+1) < 1$. O viés é $O(2^{-2J_{n}\seff}) = O(n^{-2c\seff})$ e
+$2c\seff \ge 2s/(2s+1)$ pela janela; $\sigma^{2}p/n$ é de ordem menor. Para as
+componentes, a segunda cota de \eqref{eq:risco-ideal} e o Lema~1 de E1.3,
+como no Corolário~\ref{cor:componentes-blocos}. Os itens: (i) e (ii) são o
+expoente $(2/\pi-1)_{+}$; (iii) é
+$2s/(2s+1) - (2/\pi-1)_{+}/(2s+1) = 2\seff/(2s+1)$, porque
+$2s - 2/\pi + 1 = 2(s - 1/\pi + 1/2) = 2\seff$ em $\pi < 2$ e $\seff = s$ em
+$\pi \ge 2$; (iv) é $\kappa^{2s/(2s+1)} \propto \bar\rho^{\,4s/(2s+1)}$. \qed
+
+\section{O que foi transposto e o que é novo}
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Transposto de E1.5 e E1.6} (e, por eles, de Bühlmann e van de
+    Geer, 2011, Seção~6.2, e da organização em passos do WALL teórico): os
+    seis passos do Teorema~\ref{thm:oraculo-blocos}, a perfilagem, o viés por
+    Young com os dois casos, a leitura com comparador arbitrário e o
+    risco ideal como comparador truncado.
+  \item \textbf{Transposto de Lounici et al.\ (2011):} a norma dual da norma
+    de grupos e a decomponibilidade; a observação de que grupos com pelo
+    menos $\log M$ coordenadas evitam o logaritmo que o LASSO paga
+    (Teorema~7.1 deles, a cota inferior do LASSO no modelo multitarefa).
+  \item \textbf{Transposto de Hsu, Kakade e Zhang (2012):} o Teorema~2.1, no
+    Lema~\ref{lem:calib-blocos}(i).
+  \item \textbf{Transposto de Klopp e Pensky (2015):} os pedaços de tamanho
+    $\log n$, a forma do risco ideal por pedaços (Lema~4 do suplemento) e a
+    taxa; e, de Cai (1999), a origem dos blocos de tamanho $\log n$ em
+    limiarização de wavelets.
+  \item \textbf{Novo:} a calibração em blocos com o desenho dependente e a
+    forma fechada controlada pelos eventos de E1.4 e E1.5; o preço dos pesos
+    como um fator $\rho$ no termo de estimação
+    (Lema~\ref{lem:calib-blocos}(iii)), que cobre os pesos $\sqrt{|G|}$ na
+    forma balanceada; o oráculo sem cone para grupos com os níveis livres; o
+    Lema~\ref{lem:risco-pedacos} sob a hipótese de Besov por nível, mais
+    fraca que a (A3), com o pedaço grosso custando um $\eta$; as taxas com
+    $p$ fixo, sem (A6), sem norma dual e com $\seff > s/(2s+1)$ no lugar de
+    $r^{*} > (2\varsigma)^{-1}$; e a Observação~\ref{rem:branca}, que cobre
+    o estimador exato do \texttt{grpreg}.
+\end{itemize}
+
+\section{O que isto não cobre}
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{$\pen$ e $t$ por validação cruzada.} Como em E1.5 e E1.6, a
+    teoria é para $\pen$ determinístico (ou o $\pen_{w}$ calibrado em
+    $(\bX,\bU)$). O WAFC escolhe $\pen$ por validação cruzada e o limiar $t$
+    pela regra \texttt{cv1se} (D45); nenhum dos dois tem teorema aqui.
+  \item \textbf{Pesos que dependem das respostas.} O argumento pede $w$ e, na
+    Observação~\ref{rem:branca}, $Q_{G}$ mensuráveis em $(\bX,\bU)$, e
+    $\rho$ limitado. Pesos estimados a partir de um primeiro ajuste, que
+    dependem de $\bY$, não são cobertos.
+  \item \textbf{Pedaços que atravessam níveis} (a norma (3.1) literal de Klopp
+    e Pensky). O Lema~\ref{lem:risco-pedacos} usa pedaços finos contidos num
+    nível. Com pedaços atravessando níveis cada um toca no máximo dois níveis e
+    a contagem muda por constante, mas isso não foi escrito.
+  \item \textbf{$\bn$ diferente de $\lceil\log n\rceil$.} A
+    Hipótese~\ref{ass:regime-blocos} fixa $\bn = \lceil\log n\rceil$. Com
+    $\bn$ de ordem menor que $\log|\Gcal|$ volta parte do logaritmo; com
+    $\bn$ maior, o fator $\bn^{(2/\pi-1)/(2s+1)}$ cresce. A constante ótima
+    não foi estudada.
+  \item \textbf{A cota inferior para $q \ge 2$} (E1.9). A
+    Observação~\ref{rem:inferior} só empresta a de Klopp e Pensky para
+    $q = 1$ e $\bX\perp\bU$.
+  \item \textbf{$\sigma$ desconhecido, $p$ crescente, a base do intervalo e a
+    norma populacional}, pelas mesmas razões de E1.5 e E1.6. Com $p$
+    crescente, $\log|\Gcal|$ deixa de ser $O(\bn)$ e a (A6) de Klopp e Pensky
+    volta a ser o regime natural.
+  \item \textbf{Seleção pelo estimador.} O block LASSO zera pedaços, não
+    blocos $(\cv,\md)$, e zerar todos os pedaços de um bloco nulo pediria uma
+    condição de irrepresentabilidade (E1.7a), que os pedaços não mudam. A
+    seleção de estrutura continua sendo estimação seguida de limiar, no
+    adendo de E1.12 de \texttt{06-selecao-limiar.tex}.
+  \item \textbf{Os níveis grossos livres} (\texttt{klopp.freecoarse}, §12 do
+    \texttt{08a}): cobertos pela mesma prova com $\Amat$ aumentado pelas
+    colunas dos níveis $\lev \le \jst$ e o termo $\sigma^{2}p_{0}/n$,
+    $p_{0} = p + pq(2^{\jst+1}-1)$, que é $O(\log n/n)$; não enunciado aqui,
+    porque D44 não adotou essa forma.
+\end{itemize}
+
+\section{Conferência numérica}
+
+\texttt{check/08-blocos.R} (imprime \texttt{OK}; cerca de $5$~min nesta máquina;
+dependências \texttt{WaveBased} e \texttt{glmnet}; não chama
+\texttt{wafc/R/}). Desenho de E1.4 a E1.6: Daublets com filtro $8$, $p = 2$
+com $X_{1}\equiv 1$ e $X_{2} = 1/2 + \mathrm{Unif}(-1,1)$, $q = 2$, $\bU$
+uniforme (logo $\gamma = 0{,}25$, $\kappa_{2} = 4/3$, $\Lambda = 1{,}458$),
+$\sigma = 0{,}5$, $\alpha = 0{,}05$, $\bn = \lceil\log n\rceil$ e a forma
+balanceada com pesos $\sqrt{|G|}$; o ajuste em blocos é o FISTA de
+\texttt{check/08a-blocos.R} (KKT a menos de $10^{-7}$ de $\pen$ em todos os
+ajustes) e o $\pen$ é o $\pen_{w}$ calibrado na forma fechada do
+Lema~\ref{lem:calib-blocos}(ii). O que saiu em 2026-10-03:
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Proposição~\ref{prop:balanceada}.} As três afirmações valem em
+    $b = 2,\dots,200$ e $J = 1,\dots,14$. Com $J = 8$, o $\rho^{2}$ dos pesos
+    $\sqrt{|G|}$ é $1{,}667$, $1{,}571$, $1{,}571$ e $1{,}778$ nos $\bn$ de
+    $n = 250$, $500$, $1000$ e $4000$.
+  \item \textbf{Lema~\ref{lem:risco-pedacos}.} A cota vale nas $2\,280$
+    sequências construídas ($19$ pares $(s,\pi)$ com $\pi$ até $\infty$,
+    $b \in \{2,\dots,32\}$, $\eta$ de $10^{-9}$ a $10^{-1}$, $J = 20$, três
+    formas que saturam a hipótese nível a nível), com razão máxima $0{,}823$:
+    a cota está a um fator $1{,}2$ da pior sequência.
+  \item \textbf{Os dois expoentes do Corolário~\ref{cor:adaptativa-blocos}},
+    lidos no risco ideal dos pedaços finos com $60$ níveis: o expoente de
+    $\eta/b$ é $2s/(2s+1)$ a menos de $10^{-3}$ nas duas formas e nos cinco
+    pares testados; o de $b$ é exatamente $(2/\pi-1)/(2s+1)$ na espiga em
+    $\pi < 2$ ($0{,}294$, $0{,}333$ e $0{,}128$), entre $-0{,}12$ e $0$ em
+    $\pi \ge 2$, e $0$ na sequência espalhada no nível
+    (Observação~\ref{rem:logaritmo}).
+  \item \textbf{A aritmética.} A janela \eqref{eq:janela-blocos} é a do
+    Corolário~5 em todo par da grade; dos pares testados, $(s,\pi) = (1;1)$,
+    $(0{,}6;1{,}5)$, $(0{,}3;2)$, $(0{,}3;4)$ e $(0{,}3;\infty)$ estão no
+    Corolário~\ref{cor:adaptativa-blocos} e fora do Teorema~2 de Klopp e
+    Pensky.
+  \item \textbf{O regime e a calibração} ($n = 250$ a $4000$ ao longo do
+    $J_{n}$ do Teorema~\ref{thm:taxa-blocos} com $\seff = 1/2$, $40$ réplicas
+    por $n$): a cobertura de $\Tw$ é $1{,}000$ com o $\pen_{w}$ fechado e com o
+    $\lamG$ determinístico; o $\lamz{G}$ exato fica sob a forma fechada em
+    toda réplica; $\smax^{2} \le 2B_{X}^{2}C_{U}$ sempre; $n(\lamGone)^{2}/\bn$
+    fica entre $13{,}4$ e $17{,}8$. O evento $\ESig$ não vale nesses $n$
+    ($\lmaxx(\Gramhat)$ mediano de $2{,}0$ a $2{,}7$); a $J = 4$ fixo,
+    $\lmaxx(\Gramhat)$ desce de $1{,}85$ a $1{,}40$ e $\lmin(\Gramhat)$ sobe de
+    $0{,}137$ a $0{,}234$ quando $n$ vai de $1000$ a $64000$, e só no último
+    os dois estão no evento (Observação~\ref{rem:pre-blocos}).
+  \item \textbf{Denso} ($\pi = 2$, $s = \seff = 1/2$, $n = 250$ a $8000$, $12$
+    réplicas): as cotas do Teorema~\ref{thm:oraculo-blocos}(ii)--(iii) com
+    $\bar\bbeta = \betastar$ e a do Corolário~\ref{cor:componentes-blocos}
+    valem em todos os ajustes, com folga mínima de $3\,999$ vezes;
+    $\gtil \ge \lmin(\Gramhat)$ sempre. A razão
+    $\normn{\widehat f - f}^{2}/n^{-1/2}$ vai de $9{,}0$ a $10{,}6$ (máximo sobre
+    mínimo $1{,}17$), e a inclinação de $\log(\text{erro})$ contra
+    $\log n^{-1/2}$ é $1{,}027$, contra $1{,}194$ contra a forma com logaritmo
+    $(\log n/n)^{1/2}$ do Teorema~2 de E1.6: o erro realizado segue a taxa sem
+    logaritmo, o que E1.6 não conseguia separar. A soma dos erros das
+    componentes fica a uma razão de $10{,}7$ a $18{,}7$ do alvo (máximo sobre
+    mínimo $1{,}74$), crescendo até $n = 4000$ e estável depois.
+  \item \textbf{Comprimível} ($\pi = 1$, $s = 1{,}2$, $J_{n}$ na ponta
+    inferior da janela, $n = 250$ a $8000$, $10$ réplicas): o
+    Teorema~\ref{thm:oraculo-blocos} vale com todos os comparadores truncados
+    $\thetastar\mathbf{1}\{G \in T\}$, e as duas cotas do
+    Corolário~\ref{cor:risco-ideal} e o Lema~\ref{lem:risco-pedacos} no
+    $\thetastar$ do desenho valem em todos os ajustes. O $\gtil$ mediano vai
+    de $0{,}012$ a $0{,}125$ e só chega a $\gamma/2$ em $n = 8000$; com ele, e
+    com a constante conservadora da calibração ($n\eta_{n}/\bn$ perto de
+    $200$, sob a cota $\kappa = 1017$ da prova), o $\Rid$ satura na energia
+    total nesses $n$, e os expoentes ficam conferidos no item dos dois
+    expoentes. O erro realizado fica a uma razão de $26{,}5$ a $44{,}6$ do alvo
+    (máximo sobre mínimo $1{,}68$).
+  \item \textbf{A variante branca} (Observação~\ref{rem:branca}; $n = 500$,
+    $J = 5$, duas verdades, $40$ réplicas cada): $\operatorname{tr}(Q_{G}^{-1}
+    \Psitil_{G})/|G| \le 0{,}9997$ e $\opnorm{Q_{G}^{-1/2}\Psitil_{G}
+    Q_{G}^{-1/2}} \le 1$ em todos os pedaços; cobertura $1{,}000$ com o $\pen$
+    pivotal; as três cotas com $q_{\max}\bar W$ valem em todos os $80$
+    ajustes, com folga mínima de $4\,899$ vezes; $q_{\max}/\lmaxx(\Gramhat) \le
+    0{,}66$.
+  \item \textbf{O limiarizado}: Parte~VI do script, relatada no adendo de
+    E1.12 de \texttt{06-selecao-limiar.tex}.
+\end{itemize}
+
+\section*{Referências}
+\sloppy
+
+Todas em \texttt{docs/referencias-verificadas.bib}.
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item Bühlmann, P.\ e van de Geer, S. (2011). \emph{Statistics for
+    High-Dimensional Data}. Springer. (\texttt{buhlmann2011statistics}.)
+    Usada por meio de E1.5.
+  \item Cai, T.~T. (1999). Adaptive wavelet estimation: a block thresholding
+    and oracle inequality approach. \emph{The Annals of Statistics} 27(3),
+    898--924. (\texttt{Cai-1999}, verificada em L5.) Teorema~4, eq.~(5.4),
+    p.~908: a BlockJS está a $(\log n)^{(2/p-1)/(1+2\alpha)}$ do minimax em
+    $\Besov{\alpha}{p}{q}$ com $1 \le p < 2$ e $\alpha \ge 1/p$, no modelo de
+    sequência (conferido no PDF da editora em 2026-10-03).
+  \item Hsu, D., Kakade, S.~M.\ e Zhang, T. (2012). A tail inequality for
+    quadratic forms of subgaussian random vectors. \emph{Electronic
+    Communications in Probability} 17, no.~52, 1--6.
+    (\texttt{Hsu-Kakade-Zhang-2012}, verificada em L5.) Teorema~2.1, com
+    $\mu = 0$ (Observação~2.2); o enunciado publicado toma
+    $A \in \R^{n\times n}$ e $\Sigma = A\T A$ (conferido no PDF em
+    2026-10-03).
+  \item Klopp, O.\ e Pensky, M. (2015). Sparse high-dimensional varying
+    coefficient model: nonasymptotic minimax study. \emph{The Annals of
+    Statistics} 43(3), 1273--1299. (\texttt{Klopp-Pensky-2015}, verificada em
+    L1, numeração conferida em L7.) Norma (3.1) e estimador (3.2)--(3.3),
+    p.~1280; Teorema~1, eqs.~(3.6) e~(3.7), pp.~1281--1282; (3.13), (3.14),
+    Teorema~2 e Observação~2, pp.~1283--1284; (3.19)--(3.21), p.~1285; (A1)(b)
+    e (A3), pp.~1278--1279; (A6), p.~1278; o Lema~4 do suplemento
+    (\texttt{10.1214/15-AOS1309SUPP}), eq.~(5.31), conferido no PDF em
+    2026-10-01 e de novo em 2026-10-03.
+  \item Lounici, K., Pontil, M., van de Geer, S.\ e Tsybakov, A.~B. (2011).
+    Oracle inequalities and optimal inference under group sparsity.
+    \emph{The Annals of Statistics} 39(4), 2164--2204.
+    (\texttt{Lounici-Pontil-vandeGeer-Tsybakov-2011}, verificada em L3,
+    numeração conferida em L7.) Lema~3.1 (p.~2173), Hipótese~3.1 e
+    Teorema~3.1 (pp.~2176--2177), Teorema~7.1 (p.~2187).
+\end{itemize}
+
+\end{document}
