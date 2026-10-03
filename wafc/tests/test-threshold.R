@@ -15,6 +15,14 @@
 ## its error is the one cv.wafc() reported at lambda.min. The others check
 ## the rule "max" against its definition, the oracle against its own
 ## candidates and the truth, and the two refits against lm().
+##
+## Step E2.5j adds the tests its catalogue entry names: the rules "cvrel"
+## and "cv1se" against the search redone by hand on the fold fits, for the
+## WAFC and for the block LASSO; "cvrel" invariant to the scale of the
+## response (y times 10 keeps the same blocks); and the gate of the QUT,
+## which zeroes a pure null at a large n and does not fire on a strong
+## signal, with its decision checked against the QUT penalty level and its
+## seed leaving the random stream of the caller where it was.
 
 library(testthat)
 
@@ -349,4 +357,208 @@ test_that("the block LASSO refit keeps grpreg's intercept convention", {
   r <- wafc_threshold(klopp0, rule = "max", refit = "block")
   expect_equal(predict(r), r[["fitted"]], tolerance = 1e-10)
   expect_equal(predict(r, x0, u0), r[["fitted"]], tolerance = 1e-10)
+})
+
+## ---------------------------------------------------------------------------
+## Step E2.5j: the rules "cvrel" and "cv1se", and the gate
+## ---------------------------------------------------------------------------
+
+## The search of the two rules redone by hand, from the fold fits and with
+## nothing of threshold.R but the norms: every candidate is a breakpoint,
+## each scored by the mean over folds of the squared error of the fold fit
+## thresholded there on the observations the fold left out.
+hand_search <- function(ff, des, y, relative) {
+  fid <- ff[["foldid"]]
+  K <- length(ff[["fits"]])
+  nk <- lapply(ff[["fits"]], function(f) wafc_thr_norms(f[["b"]], des))
+  if (relative) nk <- lapply(nk, function(v) if (max(v) > 0) v / max(v) else v)
+  cand <- sort(unique(c(0, unlist(nk))))
+  E <- matrix(NA_real_, K, length(cand))
+  for (k in seq_len(K)) {
+    out <- fid == k
+    f <- ff[["fits"]][[k]]
+    for (i in seq_along(cand)) {
+      b <- f[["b"]]
+      for (l in seq_len(des[["p"]])) {
+        for (m in seq_len(des[["q"]])) {
+          if (nk[[k]][l, m] > cand[i]) next
+          b[des[["blocks"]][[wafc_block_name(des, l, m)]]] <- 0
+        }
+      }
+      eta <- as.numeric(des[["Z"]][out, , drop = FALSE] %*% b) + f[["a0"]]
+      E[k, i] <- mean((y[out] - eta)^2)
+    }
+  }
+  list(cand = cand, err = colMeans(E), se = apply(E, 2L, sd) / sqrt(K))
+}
+hand_mid <- function(cand, i, top) {
+  if (i == length(cand)) top else (cand[i] + cand[i + 1L]) / 2
+}
+
+test_that("rule = \"cvrel\" is the search over c redone by hand", {
+  ff <- wafc_threshold_folds(cv0)
+  des <- f0[["design"]]
+  h <- hand_search(ff, des, y0, relative = TRUE)
+  i <- which.min(h[["err"]])
+  th <- wafc_threshold(cv0, rule = "cvrel", fold.fits = ff)
+  nrm <- th[["extra"]][["norm"]]
+  chat <- hand_mid(h[["cand"]], i, 1)
+  expect_equal(th[["extra"]][["c"]], chat, tolerance = 1e-12)
+  expect_equal(th[["extra"]][["t"]], chat * max(nrm), tolerance = 1e-12)
+  expect_equal(unname(th[["blocks"]]), unname(nrm > chat * max(nrm)))
+  cand <- th[["extra"]][["candidates"]]
+  expect_equal(cand[["lower"]], h[["cand"]])
+  expect_equal(cand[["error"]], h[["err"]], tolerance = 1e-10)
+  ## every candidate is a fraction of the largest norm of some fold, and the
+  ## last one, 1, zeroes every block
+  expect_equal(max(cand[["lower"]]), 1)
+  expect_true(all(cand[["lower"]] >= 0 & cand[["lower"]] <= 1))
+  expect_identical(th[["method"]], "wafc.lasso+cvrel")
+  ## the folds fitted inside give the same answer as the ones passed
+  expect_identical(wafc_threshold(cv0, rule = "cvrel")[["extra"]][["t"]],
+                   th[["extra"]][["t"]])
+})
+
+test_that("rule = \"cv1se\" is the one-standard-error search redone by hand", {
+  ff <- wafc_threshold_folds(cv0)
+  des <- f0[["design"]]
+  h <- hand_search(ff, des, y0, relative = FALSE)
+  imin <- which.min(h[["err"]])
+  i <- max(which(h[["err"]] <= h[["err"]][imin] + h[["se"]][imin]))
+  th <- wafc_threshold(cv0, rule = "cv1se", fold.fits = ff)
+  nrm <- th[["extra"]][["norm"]]
+  tt <- hand_mid(h[["cand"]], i, max(c(nrm, h[["cand"]])))
+  expect_equal(th[["extra"]][["t"]], tt, tolerance = 1e-12)
+  expect_equal(unname(th[["blocks"]]), unname(nrm > tt))
+  cand <- th[["extra"]][["candidates"]]
+  expect_equal(cand[["se"]], h[["se"]], tolerance = 1e-10)
+  ## the scores are the ones of "cv"; only the pick moves, towards the
+  ## larger t, so it never keeps more blocks than "cv"
+  cv <- wafc_threshold(cv0, rule = "cv", fold.fits = ff)
+  expect_identical(cand, cv[["extra"]][["candidates"]])
+  expect_gte(th[["extra"]][["t"]], cv[["extra"]][["t"]])
+  expect_true(all(cv[["blocks"]] | !th[["blocks"]]))
+  expect_identical(th[["method"]], "wafc.lasso+cv1se")
+})
+
+test_that("the two rules redone by hand on the block LASSO", {
+  skip_if_not(has("grpreg"))
+  ff <- wafc_threshold_folds(klopp0)
+  des <- klopp0[["design"]]
+  for (rel in c(TRUE, FALSE)) {
+    h <- hand_search(ff, des, y0, relative = rel)
+    th <- wafc_threshold(klopp0, rule = if (rel) "cvrel" else "cv1se",
+                         fold.fits = ff)
+    nrm <- th[["extra"]][["norm"]]
+    imin <- which.min(h[["err"]])
+    if (rel) {
+      tt <- hand_mid(h[["cand"]], imin, 1) * max(nrm)
+    } else {
+      i <- max(which(h[["err"]] <= h[["err"]][imin] + h[["se"]][imin]))
+      tt <- hand_mid(h[["cand"]], i, max(c(nrm, h[["cand"]])))
+    }
+    expect_equal(th[["extra"]][["t"]], tt, tolerance = 1e-10)
+    expect_equal(th[["blocks"]], nrm > tt)
+  }
+})
+
+test_that("rule = \"cvrel\" is invariant to the scale of the response", {
+  ## the same J and the same folds; the path of the LASSO scales with y, so
+  ## the fits at the same point of it scale too, and the fractions c do not
+  cv1 <- cv.wafc(x0, u0, y0, J = 3L, foldid = folds)
+  cv10 <- cv.wafc(x0, u0, 10 * y0, J = 3L, foldid = folds)
+  expect_equal(cv10[["lambda.min"]], 10 * cv1[["lambda.min"]],
+               tolerance = 1e-6)
+  a <- wafc_threshold(cv1, rule = "cvrel")
+  b <- wafc_threshold(cv10, rule = "cvrel")
+  expect_identical(b[["blocks"]], a[["blocks"]])
+  expect_equal(b[["extra"]][["c"]], a[["extra"]][["c"]], tolerance = 1e-6)
+  expect_equal(b[["extra"]][["t"]], 10 * a[["extra"]][["t"]],
+               tolerance = 1e-6)
+  skip_if_not(has("grpreg"))
+  k1 <- wafc_competitor("klopp", x0, u0, y0, J = 3L, foldid = folds,
+                        penalize.levels = FALSE, balanced = TRUE)
+  k10 <- wafc_competitor("klopp", x0, u0, 10 * y0, J = 3L, foldid = folds,
+                         penalize.levels = FALSE, balanced = TRUE)
+  expect_identical(wafc_threshold(k10, rule = "cvrel")[["blocks"]],
+                   wafc_threshold(k1, rule = "cvrel")[["blocks"]])
+})
+
+test_that("the gate zeroes a pure null at a large n", {
+  nb <- 1000L
+  d <- simulate_wafc(nb, p = p, q = q, scenario = "null", seed = 20261003L,
+                     sigma = 0.62)
+  cv <- cv.wafc(d[["x"]], d[["u"]], d[["y"]], J = 3:4,
+                foldid = rep_len(1:5, nb))
+  g <- wafc_threshold_gate(cv, seed = 1L)
+  expect_false(g[["reject"]])
+  expect_lt(g[["stat"]], g[["quantile"]])
+  for (rule in c("max", "cv", "cvrel", "cv1se")) {
+    th <- wafc_threshold(cv, rule = rule, gate = "qut", gate.seed = 1L)
+    expect_false(any(th[["blocks"]]))
+    expect_identical(th[["extra"]][["nzero"]], 0L)
+    expect_identical(th[["method"]], paste0("wafc.lasso+", rule, "+qut"))
+    ## the levels are the ones of the fit
+    expect_equal(th[["cc"]], wafc_threshold(cv, t = 0)[["cc"]],
+                 tolerance = 1e-12)
+  }
+  ## over 40 null responses on the same design the test rejects about
+  ## alpha of the time (P(more than 8 of 40) < 1e-3 at alpha = 0.05)
+  des <- cv[["wafc.fit"]][["design"]]
+  rej <- vapply(1:40, function(i) {
+    set.seed(500L + i)
+    yy <- 1 + stats::rnorm(nb, sd = 0.62)
+    wafc_thr_gate(list(design = des, y = yy, J = des[["J"]][1L]),
+                  alpha = 0.05, nsim = 200L, seed = i)[["reject"]]
+  }, TRUE)
+  expect_lte(sum(rej), 8L)
+})
+
+test_that("the gate does not fire on a strong signal, and leaves the rule", {
+  g <- wafc_threshold_gate(cv0, seed = 1L)
+  expect_true(g[["reject"]])
+  expect_identical(g[["J"]], cv0[["J.min"]])
+  for (rule in c("max", "cv", "cvrel", "cv1se")) {
+    a <- wafc_threshold(cv0, rule = rule)
+    b <- wafc_threshold(cv0, rule = rule, gate = "qut", gate.test = g)
+    expect_identical(b[["blocks"]], a[["blocks"]])
+    expect_identical(b[["extra"]][["t"]], a[["extra"]][["t"]])
+    expect_identical(b[["extra"]][["gate"]], g)
+  }
+  skip_if_not(has("grpreg"))
+  gk <- wafc_threshold_gate(klopp0, seed = 1L)
+  expect_true(gk[["reject"]])
+  ## the statistic is coordinatewise and does not depend on the fit, so on
+  ## the same design and response the two fits are tested alike
+  if (identical(klopp0[["extra"]][["J"]], cv0[["J.min"]])) {
+    expect_equal(gk[["stat"]], g[["stat"]], tolerance = 1e-12)
+    expect_equal(gk[["quantile"]], g[["quantile"]], tolerance = 1e-12)
+  }
+})
+
+test_that("the gate rejects exactly when the QUT leaves a coefficient", {
+  des <- f0[["design"]]
+  for (i in 1:6) {
+    set.seed(700L + i)
+    yy <- if (i <= 3) y0 else 1 + stats::rnorm(n, sd = 0.62)
+    g <- wafc_thr_gate(list(design = des, y = yy, J = des[["J"]][1L]),
+                       alpha = 0.05, nsim = 100L, seed = i)
+    lam <- wafc_lambda_qut(des, yy, alpha = 0.05, nsim = 100L, seed = i)
+    expect_identical(g[["reject"]], wafc_lambda_max(des, yy) > lam)
+  }
+})
+
+test_that("the seed of the gate leaves the random stream where it was", {
+  set.seed(42L)
+  before <- .Random.seed
+  wafc_threshold_gate(cv0, seed = 7L)
+  expect_identical(.Random.seed, before)
+  set.seed(42L)
+  a <- stats::runif(3)
+  set.seed(42L)
+  wafc_threshold(cv0, rule = "max", gate = "qut", gate.seed = 7L)
+  expect_identical(stats::runif(3), a)
+  ## and the same seed gives the same quantile
+  expect_identical(wafc_threshold_gate(cv0, seed = 7L)[["quantile"]],
+                   wafc_threshold_gate(cv0, seed = 7L)[["quantile"]])
 })

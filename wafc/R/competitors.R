@@ -862,7 +862,9 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
   block.size <- as.integer(block.size)
 
   best <- NULL
-  for (Ji in J) {
+  conv <- vector("list", length(J))
+  for (i in seq_along(J)) {
+    Ji <- J[i]
     des <- wafc_design(x, u, J = Ji, ...)
     grp <- wafc_kp_groups(des, block.size, penalize.levels, merge.coarse,
                           balanced, free.coarse)
@@ -871,6 +873,7 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
     ## as cv.grpreg scores, in the slot the cv.grpreg object would take.
     if (max(grp) == 0L) {
       cv <- wafc_kp_cv_ols(Z, y, foldid)
+      conv[[i]] <- wafc_kp_conv(Ji, NULL)
       if (is.null(best) || cv[["cve"]] < best[["cve"]]) {
         best <- list(cve = cv[["cve"]], J = Ji, design = des, cv = cv,
                      group = grp)
@@ -888,6 +891,7 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
       grpreg::cv.grpreg(Z, y, group = grp, penalty = "grLasso",
                         fold = foldid)
     }
+    conv[[i]] <- wafc_kp_conv(Ji, cv)
     val <- min(cv[["cve"]])
     if (is.null(best) || val < best[["cve"]]) {
       best <- list(cve = val, J = Ji, design = des, cv = cv, group = grp)
@@ -951,8 +955,57 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
                     merge.coarse = merge.coarse, balanced = balanced,
                     free.coarse = free.coarse,
                     lambda = best[["cv"]][["lambda.min"]], cve = best[["cve"]],
+                    conv = wafc_kp_conv_table(conv, best[["J"]]),
                     blocks.fine = nz_fine,
                     nzero = sum(b[pen & seq_along(b) %in% unlist(des[["blocks"]])] != 0)))
+}
+
+## What grpreg returned of the path at one J (step E2.5j, open question
+## 41(d) of docs/ESTADO.md), read and not acted upon. grpreg counts
+## 'max.iter' over the whole path: when the budget runs out the remaining
+## penalty levels are dropped, so the signs of a cut are a total of
+## iterations at the budget and a path shorter than asked; a level with
+## 'iter' at 'max.iter' is the case its own warning names. cv.grpreg then
+## drops every level at which some fold has no finite error, so a cut in a
+## fold shows as a cross-validated path shorter than the one of the fit.
+wafc_kp_conv <- function(J, cv) {
+  if (is.null(cv)) {
+    return(data.frame(J = J, nlambda = NA_integer_, nreturned = NA_integer_,
+                      ncv = NA_integer_, iter.total = NA_integer_,
+                      max.iter = NA_integer_, n.maxiter = NA_integer_,
+                      lambda.maxiter = NA_real_, lambda.last = NA_real_,
+                      lambda.cv.last = NA_real_, lambda.min = NA_real_))
+  }
+  fit <- cv[["fit"]]
+  mi <- as.integer(eval(formals(grpreg::grpreg)[["max.iter"]]))
+  it <- fit[["iter"]]
+  at <- it == mi
+  data.frame(J = J,
+             nlambda = as.integer(eval(formals(grpreg::grpreg)[["nlambda"]])),
+             nreturned = length(fit[["lambda"]]),
+             ncv = length(cv[["lambda"]]), iter.total = as.integer(sum(it)),
+             max.iter = mi, n.maxiter = sum(at),
+             lambda.maxiter = if (any(at)) max(fit[["lambda"]][at]) else
+               NA_real_,
+             lambda.last = min(fit[["lambda"]]),
+             lambda.cv.last = min(cv[["lambda"]]),
+             lambda.min = cv[["lambda.min"]])
+}
+
+## The rows of wafc_kp_conv() over the grid, with the flags read from them:
+## the budget of iterations spent ('budget'), the cross-validated path
+## shorter than the fit's ('cv.cut'), and whether the selected level is the
+## last one of a path that was cut ('cut.at.min'), where the minimum may
+## lie past the cut.
+wafc_kp_conv_table <- function(rows, J.min) {
+  d <- do.call(rbind, rows)
+  d[["chosen"]] <- d[["J"]] == J.min
+  d[["budget"]] <- d[["iter.total"]] >= d[["max.iter"]]
+  d[["cv.cut"]] <- d[["ncv"]] < d[["nreturned"]]
+  d[["cut.at.min"]] <- (d[["budget"]] | d[["cv.cut"]] |
+                          d[["n.maxiter"]] > 0L) &
+    d[["lambda.min"]] == d[["lambda.cv.last"]]
+  d
 }
 
 ## Least squares with an intercept, the fit of the block LASSO when no

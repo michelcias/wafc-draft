@@ -358,9 +358,11 @@ sintonizado por REML, validação cruzada e GCV numa grade única (D41), que
 não muda o veredito (E2.5h). Ficaram por testar `boundary = "interval"` e
 pesos adaptativos (o primeiro pede código antes: a reparametrização do
 bloco de escala, pergunta 33(f)). A decisão de rumo é do autor (perguntas
-33, 38 e 41); antes dela, **E2.5j** (2026-10-03) mede a regra de `t` com `c`
-relativo por validação cruzada e a porta do QUT para o nulo, nos dois
-ajustes. Nada medido em E2.5 é descartado (D43).
+33, 38 e 41). **E2.5j** (fechada em 2026-10-03) mediu a regra de `t`: a de
+um erro-padrão (`cv1se`) chega ao teto do limiar oráculo no suave, no
+`uneven`, no nulo e em `n = 1000`; o `c` relativo repete o `+cv`; a porta do
+QUT resolve o nulo das outras regras. Nada medido em E2.5 é descartado
+(D43).
 
 **Critério de saída de E2:** testes de E2.1 a E2.3 passando; tabela do
 piloto; decisão registrada.

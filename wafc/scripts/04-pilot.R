@@ -113,6 +113,28 @@
 ## '<tag>-gcv-guard.rds', how many points of the paths of 'wafc.gcv' the
 ## guard left out and whether it decided the pair.
 ##
+## Step E2.5j adds, to the thresholded rows of 'wafc.lasso' and
+## 'klopp.balanced', two rules and a gate, all without refit and from the
+## same fit and the same fold fits: '+cvrel' (the fraction c of the largest
+## norm chosen by cross-validation on the folds), '+cv1se' (the t of '+cv'
+## at one standard error between folds, towards the larger t), and the gate
+## of the QUT in front of 'max', 'cv', 'cvrel' and 'cv1se' ('+max+qut',
+## '+cv+qut', '+cvrel+qut', '+cv1se+qut'): the test of the global null of
+## wafc_threshold_gate() at alpha = 0.05 with 200 null samples, a seed per
+## replicate and the random stream of the replicate restored after it; when
+## it does not reject, every block of the row is zero. WAFC_THR_REFITS is a
+## comma separated subset of "none", "support" and "block" (all three by
+## default) and restricts the refits of the rules of step E2.5g; "none"
+## reruns '+max', '+cv' and '+oracle' and skips '+ls' and '+lsb', which were
+## almost the whole cost of step E2.5g. The rows of a rule of E2.5g are the
+## same with or without the new ones. Two side tables go beside the rows:
+## '<tag>-thr-gate.rds', the statistic, the quantile and the decision of
+## the gate on each fit, and '<tag>-conv.rds', what the engine of
+## 'wafc.lasso' (glmnet) and of the forms of 'klopp' (grpreg) returned of
+## the path at every J of the grid, on the whole sample and in the folds
+## (wafc_cv_convergence() and extra$conv of the block LASSO; open question
+## 41(d) of docs/ESTADO.md).
+##
 ## The two parts that answer a question about the code rather than about
 ## the method, 'margin' and 'j1', are capped at 20 replicates:
 ## what they measure is a ranking of margins and a frequency of selection,
@@ -263,13 +285,35 @@ methods <- c("wafc.lasso", "wafc.sglasso", "wafc.gcv", "gam", "gam.matched",
 ## 467 s). WAFC_GAM_GCV_ENGINE = "gam" switches.
 gam_gcv_engine <- Sys.getenv("WAFC_GAM_GCV_ENGINE", "bam")
 ## Step E2.5g: the thresholded rows of 'wafc.lasso' and 'klopp.balanced'.
+## Step E2.5j: the two rules and the gate, without refit, after them, and
+## WAFC_THR_REFITS to restrict the refits of the rules of E2.5g.
 thr_bases <- c("wafc.lasso", "klopp.balanced")
 thr_rules <- c("max", "cv", "oracle")
 thr_refits <- c(none = "", support = "+ls", block = "+lsb")
+if (nzchar(Sys.getenv("WAFC_THR_REFITS", ""))) {
+  want <- strsplit(Sys.getenv("WAFC_THR_REFITS"), ",", fixed = TRUE)[[1L]]
+  bad <- setdiff(want, names(thr_refits))
+  if (length(bad) > 0L) {
+    stop("Unknown refit(s) in WAFC_THR_REFITS: ", paste(bad, collapse = ", "),
+         call. = FALSE)
+  }
+  thr_refits <- thr_refits[names(thr_refits) %in% want]
+}
+thr_new <- list(c(rule = "cvrel", gate = "none"),
+                c(rule = "cv1se", gate = "none"),
+                c(rule = "max", gate = "qut"),
+                c(rule = "cv", gate = "qut"),
+                c(rule = "cvrel", gate = "qut"),
+                c(rule = "cv1se", gate = "qut"))
+thr_new_label <- function(base, z) {
+  paste0(base, "+", z[["rule"]], if (z[["gate"]] != "none")
+    paste0("+", z[["gate"]]) else "")
+}
+thr_gate_seed <- 88L
 thr_labels <- function(base) {
-  unlist(lapply(names(thr_refits), function(rf) {
+  c(unlist(lapply(names(thr_refits), function(rf) {
     paste0(base, "+", thr_rules, thr_refits[[rf]])
-  }))
+  })), vapply(thr_new, function(z) thr_new_label(base, z), ""))
 }
 method_levels <- unlist(lapply(methods, function(m) {
   c(m, if (m %in% thr_bases) thr_labels(m),
@@ -396,11 +440,12 @@ fail_row <- function(cell, n, r, method, dgp, active, err) {
 }
 
 ## The thresholded rows of one fit (step E2.5g): every rule and refit of
-## thr_rules and thr_refits, the folds refitted once for the three "cv"
-## rows. Besides the rows, two side tables: the norm of every block of the
-## fit, with its truth, and the t of every row.
+## thr_rules and thr_refits, the folds refitted once for every rule that
+## uses them, and (step E2.5j) the rules and gated rows of thr_new, with the
+## gate tested once. Besides the rows, three side tables: the norm of every
+## block of the fit, with its truth, the t of every row, and the gate.
 thr_rows <- function(cell, n, r, base, obj, base_time, dgp, test, grid,
-                     active, foldid) {
+                     active, foldid, seed) {
   rows <- list()
   tt <- list()
   truth <- list(x = test[["x"]], u = test[["u"]], f = test[["f"]])
@@ -409,34 +454,58 @@ thr_rows <- function(cell, n, r, base, obj, base_time, dgp, test, grid,
             silent = TRUE)
   ff_time <- proc.time()[["elapsed"]] - t0
   if (inherits(ff, "try-error")) ff <- NULL
+  gt <- try(wafc_threshold_gate(obj, y = dgp[["y"]],
+                                seed = seed + thr_gate_seed),
+            silent = TRUE)
   nrm <- NULL
-  for (rf in names(thr_refits)) {
-    for (rule in thr_rules) {
-      lab <- paste0(base, "+", rule, thr_refits[[rf]])
-      th <- try(wafc_threshold(obj, rule = rule, refit = rf, y = dgp[["y"]],
-                               foldid = foldid, truth = truth,
-                               fold.fits = ff), silent = TRUE)
-      if (inherits(th, "try-error")) {
-        rows[[length(rows) + 1L]] <- fail_row(cell, n, r, lab, dgp, active,
-                                              th)
-        next
-      }
-      ex <- th[["extra"]]
-      if (is.null(nrm)) nrm <- ex[["norm"]]
-      rows[[length(rows) + 1L]] <- one_row(
-        cell, n, r, lab, dgp, test, grid,
-        list(f_test = predict(th, test[["x"]], test[["u"]]),
-             beta_test = th[["beta"]](test[["u"]]),
-             time = base_time + th[["time"]] +
-               if (rule == "cv") ff_time else 0),
-        active, th[["blocks"]], wafc_grid_components(th, grid),
-        list(J = ex[["J"]], lambda = ex[["lambda"]], nzero = ex[["nzero"]]))
-      tt[[length(tt) + 1L]] <- data.frame(
-        cell = cell[["name"]], n = n, rep = r, method = lab, t = ex[["t"]],
-        c = ex[["c"]], stringsAsFactors = FALSE)
+  todo <- c(lapply(names(thr_refits), function(rf) {
+    lapply(thr_rules, function(rule) {
+      list(rule = rule, refit = rf, gate = "none",
+           label = paste0(base, "+", rule, thr_refits[[rf]]))
+    })
+  }), list(lapply(thr_new, function(z) {
+    list(rule = z[["rule"]], refit = "none", gate = z[["gate"]],
+         label = thr_new_label(base, z))
+  })))
+  todo <- unlist(todo, recursive = FALSE)
+  for (w in todo) {
+    lab <- w[["label"]]
+    rule <- w[["rule"]]
+    gated <- w[["gate"]] != "none"
+    th <- if (gated && inherits(gt, "try-error")) gt else
+      try(wafc_threshold(obj, rule = rule, refit = w[["refit"]],
+                         y = dgp[["y"]], foldid = foldid, truth = truth,
+                         fold.fits = ff, gate = w[["gate"]],
+                         gate.test = if (gated) gt else NULL),
+          silent = TRUE)
+    if (inherits(th, "try-error")) {
+      rows[[length(rows) + 1L]] <- fail_row(cell, n, r, lab, dgp, active, th)
+      next
     }
+    ex <- th[["extra"]]
+    if (is.null(nrm)) nrm <- ex[["norm"]]
+    ## the time of a row: the fit, the threshold, the fold fits when the
+    ## rule ran on them, and the gate when there is one
+    ran <- !gated || gt[["reject"]]
+    rows[[length(rows) + 1L]] <- one_row(
+      cell, n, r, lab, dgp, test, grid,
+      list(f_test = predict(th, test[["x"]], test[["u"]]),
+           beta_test = th[["beta"]](test[["u"]]),
+           time = base_time + th[["time"]] +
+             (if (ran && rule != "max" && rule != "oracle") ff_time else 0) +
+             (if (gated) gt[["time"]] else 0)),
+      active, th[["blocks"]], wafc_grid_components(th, grid),
+      list(J = ex[["J"]], lambda = ex[["lambda"]], nzero = ex[["nzero"]]))
+    tt[[length(tt) + 1L]] <- data.frame(
+      cell = cell[["name"]], n = n, rep = r, method = lab, t = ex[["t"]],
+      c = ex[["c"]], stringsAsFactors = FALSE)
   }
   side <- list(
+    "thr-gate" = if (inherits(gt, "try-error")) NULL else data.frame(
+      cell = cell[["name"]], n = n, rep = r, method = base, J = gt[["J"]],
+      stat = gt[["stat"]], quantile = gt[["quantile"]],
+      reject = gt[["reject"]], time = gt[["time"]],
+      stringsAsFactors = FALSE),
     "thr-t" = if (length(tt)) do.call(rbind, tt) else NULL,
     "thr-norms" = if (is.null(nrm)) NULL else data.frame(
       cell = cell[["name"]], n = n, rep = r, method = base,
@@ -446,9 +515,22 @@ thr_rows <- function(cell, n, r, base, obj, base_time, dgp, test, grid,
   list(rows = rows, side = side)
 }
 
-## Appends the side tables of a job to the ones it already has.
+## Appends the side tables of a job to the ones it already has. A column
+## one of the two lacks is filled with NA (step E2.5j: the table of
+## convergence has different columns for glmnet and for grpreg).
 side_add <- function(side, more) {
-  for (nm in names(more)) side[[nm]] <- rbind(side[[nm]], more[[nm]])
+  for (nm in names(more)) {
+    a <- side[[nm]]
+    b <- more[[nm]]
+    if (!is.null(a) && !is.null(b) && !identical(names(a), names(b))) {
+      all <- union(names(a), names(b))
+      for (v in setdiff(all, names(a))) a[[v]] <- NA
+      for (v in setdiff(all, names(b))) b[[v]] <- NA
+      a <- a[all]
+      b <- b[all]
+    }
+    side[[nm]] <- rbind(a, b)
+  }
   side
 }
 
@@ -507,9 +589,14 @@ run_competitors <- function(cell, n, r) {
       list(f_test = fh, beta_test = bh, time = el), active, blk, gh,
       list(J = cv[["J.min"]], lambda = lam,
            nzero = sum(cf[-1L, 1L][-f[["design"]][["unpenalized"]]] != 0)))
+    side <- side_add(side, list(conv = cbind(
+      data.frame(cell = cell[["name"]], n = n, rep = r,
+                 method = paste0("wafc.", pen), engine = "glmnet",
+                 stringsAsFactors = FALSE),
+      wafc_cv_convergence(cv))))
     if (paste0("wafc.", pen) %in% thr_bases) {
       tr <- thr_rows(cell, n, r, paste0("wafc.", pen), cv, el, dgp, test,
-                     grid, active, foldid)
+                     grid, active, foldid, seed)
       rows <- c(rows, tr[["rows"]])
       side <- side_add(side, tr[["side"]])
     }
@@ -635,9 +722,15 @@ run_competitors <- function(cell, n, r) {
       list(J = if (lab == "gam.matched") J_lasso else f[["extra"]][["J"]],
            lambda = f[["extra"]][["lambda"]],
            nzero = if (fc) f[["extra"]][["nzero"]] else NULL))
+    if (!is.null(f[["extra"]][["conv"]])) {
+      side <- side_add(side, list(conv = cbind(
+        data.frame(cell = cell[["name"]], n = n, rep = r, method = lab,
+                   engine = "grpreg", stringsAsFactors = FALSE),
+        f[["extra"]][["conv"]])))
+    }
     if (lab %in% thr_bases) {
       tr <- thr_rows(cell, n, r, lab, f, f[["time"]], dgp, test, grid,
-                     active, foldid)
+                     active, foldid, seed)
       rows <- c(rows, tr[["rows"]])
       side <- side_add(side, tr[["side"]])
     }

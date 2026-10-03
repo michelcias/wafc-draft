@@ -2,7 +2,7 @@
 
 **Última atualização:** 2026-10-03.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8,
-E1.10 e E1.11), E5a, E5c e E2.1 a E2.5h fechadas**, mais L1 a L9 e a
+E1.10 e E1.11), E5a, E5c e E2.1 a E2.5j fechadas**, mais L1 a L9 e a
 sondagem E6.1a. Falta E2.5 (go/no-go) para fechar E2. O LASSO puro levou
 no-go pelo critério literal em E2.5a; E2.5b a E2.5f mediram cinco formas
 do block LASSO (a balanceada é a que a teoria cobre e a melhor fora do
@@ -17,9 +17,12 @@ oráculo dá o teto de qualquer regra de `t`, e só o block LASSO balanceado
 passa a perna do não homogêneo com ele; contra o `gam.gcv` (o critério
 padrão do `mgcv::gam()`) essa perna some. A decisão de rumo é do autor
 (perguntas 33, 38 e 41), e a recomendação do chat principal está na
-pergunta 33(f); antes dela, **E2.5j está catalogada** (a regra de `t` com
-`c` relativo por validação cruzada e a porta do QUT para o nulo) e espera o
-aviso do autor para rodar. Por D43, nada medido em E2.5 é descartado. A
+pergunta 33(f). **E2.5j fechou (2026-10-03):** a regra `cv1se` (o maior
+`t` a um erro-padrão do mínimo) chega ao teto no suave, no `uneven`, no
+nulo e em `n = 1000`, e paga em `n ≤ 500` no não homogêneo e na `mixed`;
+o `c` relativo repete o `+cv`; a porta do QUT resolve o nulo das outras
+regras com nível acima do nominal; os cortes de caminho dos dois motores
+não tocam o `λ` escolhido. Por D43, nada medido em E2.5 é descartado. A
 decidir também: a saída da aplicação (pergunta 2). O teto de páginas fica
 para o fim (D21).
 **Versão viva do manuscrito:** `k = 3` (`manuscript/ms_3.tex`,
@@ -2009,6 +2012,85 @@ importa.
   `WaveBased::wbasis()` já tem a base. Fica fora da E2.5j e continua sendo o
   teste que o plano manda fazer antes de mudar de rumo (pergunta 33(f)).
 
+### 2026-10-03: E2.5j fechada, a regra de um erro-padrão chega ao teto onde o sinal é forte
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: **1 133 testes
+passam** (eram 1 006); `e25j-joined.rds` tem **37 350 linhas** (as 28 350
+de E2.5h mais 9 000), 0 falhas, e as 28 350 antigas coincidem com
+diferença 0 (**sétima junção exata**; a rodada refez `wafc.lasso`,
+`klopp.balanced` e os seus `+max`, `+cv` e `+oracle`); as razões abaixo
+marcadas reproduzem. Rodada: 750 tarefas, `NC = 10`, **1 h 01 min de
+relógio**, 9,9 h de processador, pico de 0,77 GB por processo (15,2 GB na
+máquina, swap 0): a estimativa de 1,4 a 1,8 h era folgada.
+
+**O que entrou:** em `wafc_threshold()`, as regras `"cvrel"` (o `c`
+relativo por validação cruzada nas mesmas dobras) e `"cv1se"` (o maior `t`
+cujo erro de validação cruzada fica a um erro-padrão entre dobras do
+mínimo, a regra do `lambda.1se`), e a porta `gate = "qut"` antes de
+qualquer regra (`wafc_threshold_gate()`; o pivô do QUT saiu para
+`wafc_qut_pivot()`, e o `wafc_lambda_qut()` ficou idêntico bit a bit); os
+registros de convergência no `wafc()` (`conv`), no `cv.wafc()` (`conv` e
+`conv.folds`, lidos por `wafc_cv_convergence()`) e no `wafc_fit_klopp()`
+(`extra$conv`); no `04-pilot.R`, seis rótulos por base, o controle
+`WAFC_THR_REFITS` e as tabelas laterais `-thr-gate.rds` e `-conv.rds`.
+Nenhum padrão de motor mudou.
+
+Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
+
+- **O `cvrel` não recupera nada:** repete o `+cv` em quase toda célula,
+  com o `c` que o `+cv` já escolhia (medianas de 0,27 a 0,58, quartis de
+  0,05 a 0,82); a escala relativa não corrige os falsos positivos do suave
+  (`P(Ŝ = S)` do `klopp.balanced+cvrel` 0,74, 0,56, 0,52, reproduzido).
+- **O `cv1se` chega ao teto no suave, no `uneven` e no nulo, nos dois
+  ajustes e nos três `n`:** a mediana é a do `+oracle`, e `P(Ŝ = S) = 1`
+  no suave e no `uneven` (no nulo, 1 no `klopp.balanced` e 0,96 a 1 no
+  `wafc.lasso`), sem porta. Fator do suave (`ISE / gam.cv`, reproduzido):
+
+  | ajuste | `smooth` | `uneven` |
+  |---|---|---|
+  | `wafc.lasso+cv1se` | 1,26, 1,44, 1,49 | 1,56, 1,49, 1,35 |
+  | `klopp.balanced+cv1se` | 1,37, 1,50, 1,52 | 1,33, 1,26, 1,25 |
+
+  Contra o `gam.reml`, no `smooth`: 1,26, 1,48, 1,53 e 1,37, 1,52, 1,52.
+- **No não homogêneo e na `mixed` o `cv1se` só chega ao teto em
+  `n = 1000`;** em `n ≤ 500` zera bloco ativo fraco (0,78 a 0,90 falsos
+  negativos por réplica em `n = 250`) e perde do `+cv`. `rmse_f / gam.cv`
+  do `klopp.balanced` (reproduzido):
+
+  | regra | não homogêneo | `mixed` |
+  |---|---|---|
+  | `+cv1se` | 1,015, 0,930, 0,895 | 1,000, 0,987, 0,932 |
+  | `+cv` | 0,964, 0,923, 0,895 | 0,978, 0,964, 0,941 |
+
+  `P(Ŝ = S)` do `klopp.balanced+cv1se`: 0,20, 0,86, 1 no não homogêneo e
+  0,30, 0,82, 1 na `mixed`. O `wafc.lasso+cv1se` dá 1,061, 1,017, 0,931 e
+  1,073, 1,079, 1,014. Contra o `gam.gcv`, o `klopp.balanced+cv1se` dá
+  1,084, 1,047, 0,982 no não homogêneo e 0,42 a 0,48 no nulo.
+- **A porta do QUT** zera tudo em 80% a 90% das réplicas nulas, em 6% a
+  16% das do não homogêneo e da `mixed` em `n = 250` (0 a 2% em 500, 0 em
+  1000) e nunca no suave e no `uneven`; decide igual nos dois ajustes em 723
+  de 750 réplicas. Com ela, o `+max`, o `+cv` e o `+cvrel` passam no nulo de
+  0,92 a 1,04 para 0,70 a 0,81 em `rmse_f` contra o `gam.cv`, e `P(Ŝ = S)`
+  de 0,08 a 0,28 para 0,80 a 0,92 (0,88, 0,92, 0,86 no
+  `klopp.balanced+cv+qut`, reproduzido); fora do nulo o custo fica em
+  `n = 250` (`klopp.balanced+cv`: 0,964 → 0,966 e 0,978 → 0,984). Ao
+  `cv1se` não acrescenta nada. **O nível não é o nominal:** rejeita 12% e
+  17% das réplicas nulas contra `α = 0,05`, até 31% onde a validação cruzada
+  escolheu `J = 2` ou `3`, e nada em `J = 5`.
+- **A pergunta 41(d) está respondida:** `glmnet` com `jerr ≠ 0` em 36 de
+  5 250 ajustes `(réplica, J)` (0,7%), quase todos em `J = 7` ou `8` e
+  `n ≥ 500`, nove no `J` escolhido, e em nenhum o `lambda.min` encosta no
+  corte nem alguma dobra foi cortada; os 4 288 caminhos curtos com
+  `jerr = 0` são a parada antecipada do próprio `glmnet`. `grpreg`: nenhum
+  caminho esgotou o `max.iter`, com pico de 9 015 de 10 000 na `mixed` em
+  `n = 250` e `J = 4`; 3 caminhos validados mais curtos, com o corte em
+  `λ ≈ 1e-4` e o `lambda.min` em 0,05 a 0,08.
+- **Custo:** as regras novas reaproveitam as dobras do `+cv` (menos de
+  0,1 s); a porta, 0,04 s de mediana.
+- **Lição:** um teste exato num `J` fixo deixa de ser exato quando o `J` é
+  escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
+  é leitura do mecanismo, não medida.
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -2463,7 +2545,12 @@ Ordenadas pelo que bloqueia mais.
      é trabalho de código (a reparametrização do bloco de escala,
      `01-identificabilidade.md` §5), não opção a ligar; é a única alavanca
      que sobra na perna (a), porque a cúbica tem quina na extensão periódica
-     (D27).
+     (D27). **Depois de E2.5j (§2):** com o `klopp.balanced+cv1se`, a perna
+     (a) fica na linha (ISE 1,37, 1,50, 1,52 contra o `gam.cv`) e a (b)
+     passa só em `n ≥ 500` (0,930 e 0,895 no não homogêneo; 0,987 e 0,932
+     na `mixed`), com `P(Ŝ = S) = 1` no suave, no `uneven`, no nulo e em
+     `n = 1000`; com o `+cv`, a (b) passa nos três `n` e a (a) reprova. A
+     recomendação não muda.
 
 34. **~~Os pesos do block LASSO~~ medidos por E2.5c e E2.5e (§2):** a
    forma balanceada (E2.5e) é coberta pela teoria com os pesos do `grpreg`
@@ -2610,8 +2697,16 @@ Ordenadas pelo que bloqueia mais.
    em `wafc_kp_groups()` e ~40 min em 8 núcleos.
 
 38. **Pendências de E2.5g** (2026-10-01), que entram na decisão de rumo.
-   **(a) e (b) catalogadas como E2.5j em 2026-10-03**, nos dois ajustes
-   (D43). Recomendação do chat principal para (c): sim, o limiar é também o
+   **(a) e (b) medidas por E2.5j (2026-10-03, §2):** o `cvrel` repete o
+   `+cv` e sai da lista; o `cv1se` chega ao teto no suave, no `uneven`, no
+   nulo e em `n = 1000`, e perde do `+cv` em `n ≤ 500` no não homogêneo e
+   na `mixed` por zerar bloco ativo fraco; a porta do QUT resolve o nulo do
+   `+max` e do `+cv`, é redundante com o `cv1se` e tem nível acima do
+   nominal (12% a 17%) porque o `J` é escolhido antes. **Recomendação do
+   chat principal:** o `cv1se` como padrão (é o que serve à tese de
+   estrutura e à perna (a)), o `+cv` como opção de predição, e a porta fora
+   do padrão, no código (D43). Não medidos: um meio-termo (meio
+   erro-padrão) e a porta seguida do `+cv`. Recomendação do chat principal para (c): sim, o limiar é também o
    estimador de predição, e falta escrever a cota de risco (bloco ativo
    zerado tem `ν ≤ t + ‖ĝ − g‖`, e os mantidos não mudam); para (d): o
    `+ls` piora os blocos fora do suave (1,12 a 1,22 no não homogêneo contra
@@ -2694,8 +2789,11 @@ Ordenadas pelo que bloqueia mais.
    e `gam.gcv`, com o `gam.cv` em nota (razão 1,000); omitir o `gam.gcv`
    seria a objeção, porque é ele que tira a perna (b) e é o padrão do
    `gam()`; (b) fica como D41; (c) o `wafc.gcv` não vai à tabela de E4 e
-   fica no código (D43); (d) **catalogada na E2.5j**, nos dois motores
-   (`glmnet` e `grpreg`); (e) em E4.
+   fica no código (D43); (d) **respondida por E2.5j (§2):** os cortes dos
+   dois motores existem e não tocam o `λ` escolhido; o `grpreg` chegou a
+   9 015 das 10 000 iterações na `mixed` em `n = 250`, e E4, com `n` ou `q`
+   maiores, relê a tabela de convergência (`wafc_cv_convergence()`,
+   `extra$conv`) antes de confiar no padrão; (e) em E4.
    - (a) **Qual `gam` vai a E4 e à tabela do manuscrito.** A tarefa propõe
      o `gam.cv` (mesmo critério e mesmas dobras do WAFC, e o mesmo erro do
      `gam.reml` e do `gam.k128`); o `gam.reml` dá o mesmo erro a um décimo
@@ -2718,13 +2816,11 @@ Ordenadas pelo que bloqueia mais.
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-03).** **E2.5j catalogada** (`TAREFA.md` §3): a regra
-de `t` com `c` relativo por validação cruzada, a porta do QUT para o nulo e
-a convergência dos dois motores, nos dois ajustes; a rodada espera o aviso
-do autor. Abertura: "Leia `docs/TAREFA.md` e execute a tarefa E2.5j." A
-leitura de 2026-10-03 (teto do limiar, `gam.gcv`) está no §2, a
-recomendação do chat principal na pergunta 33(f), e D43 guarda tudo o que
-E2.5 mediu. Nenhum handoff pendente. As medições de E2.5 estão completas (E2.5a a E2.5h): o LASSO puro
+**Onde parou (2026-10-03).** **E2.5j fechada e integrada**; catálogo vazio,
+nenhum handoff pendente. A leitura do teto do limiar e do `gam.gcv` e a
+E2.5j estão no §2; a recomendação do chat principal nas perguntas 33(f),
+38 e 41; D43 guarda tudo o que E2.5 mediu. As medições de E2.5 estão
+completas (E2.5a a E2.5j): o LASSO puro
 levou no-go pelo critério literal; o limiar do Corolário 8 e a forma
 balanceada do block LASSO são o que melhora o WAFC; e o `gam` sintonizado nos
 termos dele (E2.5h) não muda o veredito. O manuscrito está em `k = 3` com as
@@ -2744,7 +2840,9 @@ sem marca aberta (83 entradas).
   2026-10-01 (chat principal): a teoria é o ponto forte; a vantagem numérica
   sobre o spline é pequena e cresce com `n`; a recuperação de estrutura pelo
   limiar é a vantagem que o spline não tem.
-- (b) **Pergunta 38, o limiar:** qual regra de `t` (o `c = 0,15` de E1.7c
+- (b) **Pergunta 38, o limiar** (medido por E2.5j: `cv1se` no teto onde o
+  sinal é forte, `+cv` melhor no sinal fraco em `n ≤ 500`; a recomendação
+  está na pergunta): qual regra de `t` (o `c = 0,15` de E1.7c
   falha no não homogêneo; `c = 0,4` acerta 0,88 a 1 em `n ≥ 500`), a porta
   de "tudo zero" para o nulo, e se o limiar é também o estimador de
   predição.
@@ -2779,6 +2877,7 @@ reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | E2.5j fechada e integrada (1 133 testes, 37 350 linhas, sétima junção exata, 1 h 01 min em 10 processos): o `cv1se` chega ao teto no suave, no `uneven`, no nulo e em `n = 1000`; o `cvrel` repete o `+cv`; a porta do QUT tem nível acima do nominal; os cortes dos motores não tocam o `λ` escolhido |
 | 2026-10-03 | Leitura dos `.rds` da E2.5h no chat principal: com o `t` oráculo só os blocos passam a perna do não homogêneo; o `gam.gcv` (padrão do `gam()`) tira essa perna; a estrutura é a vantagem robusta; `boundary = "interval"` não está implementado. Recomendação na 33(f); D43 (nada de E2.5 é descartado); E2.5j catalogada |
 | 2026-10-02 | Documentação de continuidade revista para recomeçar em outro chat: §5 do `ESTADO.md` reescrita em torno da decisão de rumo; `CONTINUAR.md` §3 e §4, `plano-projeto.md` E2.5 e `TAREFA.md` alinhados |
 | 2026-10-02 | E2.5h fechada e integrada (1 006 testes, 28 350 linhas, sexta junção exata): com o `gam` sintonizado por REML, validação cruzada ou GCV o veredito se mantém; `gam.reml` e `gam.cv` coincidem; o GCV do WAFC não ganha nada; o posto de Tibshirani & Taylor confere; Wood (2004) no `.bib`; pergunta 41 |

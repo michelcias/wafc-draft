@@ -109,8 +109,11 @@
 #'   intercept already folded into the constant covariate), the number
 #'   \code{nzero} of non-zero wavelet coefficients, the fitted engine
 #'   object \code{fit}, the factor \code{lambda.factor} between the two
-#'   scales of \eqn{\lambda}, and the \code{group} vector of the sparse
-#'   group LASSO.
+#'   scales of \eqn{\lambda}, the \code{group} vector of the sparse
+#'   group LASSO, and \code{conv}, what the engine returned of the path it
+#'   was asked for: \code{nlambda} (asked), \code{nreturned} and its error
+#'   code \code{jerr} (\eqn{-k} when the \eqn{k}-th penalty level did not
+#'   converge and the path stops before it; step E2.5j).
 #'
 #' @seealso \code{\link{wafc_kkt}} for the verification of the
 #'   optimality conditions, \code{\link{wafc_functions}} for the
@@ -234,6 +237,13 @@ wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
   fixed <- wafc_fix_null_point(beta, a0, design, carrier, y, intercept, pen_idx)
   beta <- fixed[["beta"]]
   a0 <- fixed[["a0"]]
+  ## what the engine returned of the path asked (step E2.5j, open question
+  ## 41(d) of docs/ESTADO.md): read, not acted upon
+  conv <- list(nlambda = if (is.null(lambda)) as.integer(nlambda) else
+                 length(lambda),
+               nreturned = length(lam),
+               jerr = if (is.null(fit[["jerr"]])) NA_integer_ else
+                 as.integer(fit[["jerr"]]))
   out <- list(design = design, y = y, penalty = penalty, lambda = lam,
               beta = beta, a0 = a0,
               cc = wafc_levels(beta, a0, design, carrier),
@@ -242,7 +252,7 @@ wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
               lambda.factor = lambda.factor, group = group,
               carrier = carrier, fit = fit, n = n, p = design[["p"]],
               q = design[["q"]], nvars = nvars, npen = npen,
-              call = this_call)
+              conv = conv, call = this_call)
   class(out) <- "wafc"
   out
 }

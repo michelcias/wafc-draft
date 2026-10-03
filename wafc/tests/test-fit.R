@@ -417,3 +417,40 @@ test_that("a fit does not store a second copy of its data in a call", {
     expect_lt(sum(nchar(deparse(fg[["fit"]][["call"]]))), 1000L)
   }
 })
+
+## ---------------------------------------------------------------------------
+## What the engine returned of the path (step E2.5j)
+## ---------------------------------------------------------------------------
+
+test_that("the fit records the path asked, the path returned and jerr", {
+  fit <- wafc(design = d0, y = y0)
+  cv <- fit[["conv"]]
+  expect_identical(cv[["nlambda"]], 100L)
+  expect_identical(cv[["nreturned"]], length(fit[["lambda"]]))
+  expect_identical(cv[["jerr"]], as.integer(fit[["fit"]][["jerr"]]))
+  expect_identical(cv[["jerr"]], 0L)
+  ## a path given is asked in full
+  f2 <- wafc(design = d0, y = y0, lambda = fit[["lambda"]][1:30])
+  expect_identical(f2[["conv"]][["nlambda"]], 30L)
+  expect_identical(f2[["conv"]][["nreturned"]], 30L)
+  ## a budget of passes too small cuts the path: glmnet returns the levels
+  ## before the one that did not converge, and says which in jerr = -k
+  f3 <- suppressWarnings(wafc(design = d0, y = y0,
+                              lambda = fit[["lambda"]][1:30], maxit = 20L))
+  k <- -f3[["conv"]][["jerr"]]
+  expect_gt(k, 0L)
+  expect_identical(f3[["conv"]][["nreturned"]], k - 1L)
+  expect_identical(length(f3[["lambda"]]), k - 1L)
+  ## and the coefficients it did return are the ones of the full budget
+  expect_equal(as.matrix(f3[["beta"]]),
+               as.matrix(f2[["beta"]])[, seq_len(k - 1L), drop = FALSE],
+               tolerance = 1e-6)
+})
+
+test_that("the sparse group LASSO records the same three numbers", {
+  skip_no_sparsegl()
+  fit <- wafc(design = d0, y = y0, penalty = "sglasso")
+  expect_identical(fit[["conv"]][["nlambda"]], 100L)
+  expect_identical(fit[["conv"]][["nreturned"]], length(fit[["lambda"]]))
+  expect_true(is.integer(fit[["conv"]][["jerr"]]))
+})

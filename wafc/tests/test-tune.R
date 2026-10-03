@@ -487,3 +487,91 @@ test_that("with theta* in the basis and no noise, the GCV recovers it", {
   cf <- coef(fit, s = attr(gc, "lambda.min"))
   expect_equal(max(abs(unname(cf[-1L, 1L]) - theta)), 0, tolerance = 1e-3)
 })
+
+## ---------------------------------------------------------------------------
+## The convergence along the cross-validation (step E2.5j)
+## ---------------------------------------------------------------------------
+
+test_that("wafc_cv_convergence reads the fits of every J and fold", {
+  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds)
+  cc <- wafc_cv_convergence(cv)
+  expect_identical(cc[["J"]], 2:4)
+  expect_identical(cc[["chosen"]], 2:4 == cv[["J.min"]])
+  expect_identical(cc[["nlambda"]], rep(100L, 3L))
+  expect_identical(cc[["nreturned"]],
+                   vapply(cv[["cv"]], function(z) length(z[["lambda"]]), 0L))
+  expect_identical(cc[["lambda.min"]],
+                   vapply(cv[["cv"]], `[[`, 0, "lambda.min"))
+  expect_true(all(cc[["jerr"]] == 0L))
+  expect_false(any(cc[["cut"]] | cc[["cut.at.min"]]))
+  expect_identical(cc[["folds.cut"]], rep(0L, 3L))
+  expect_true(all(is.na(cc[["fold.lambda.cut"]])))
+  ## the record changes nothing: the table of the cross-validation is the
+  ## one of a fit whose records are removed
+  expect_identical(cv[["cvtab"]][["lambda.min"]], cc[["lambda.min"]])
+})
+
+test_that("a cut in the folds is seen, and where it falls", {
+  ## a budget of passes small enough for the folds to stop before the end of
+  ## the path of the whole sample, which wafc_raw_coef() then reads at the
+  ## last point a fold returned; the budget goes to the fold fits only, as
+  ## wafc_cv_design() passes it
+  des <- wafc_design(x0, u0, J = 3L)
+  full <- wafc(design = des, y = y0)
+  z <- suppressWarnings(wafc_cv_design(des, y0, full, folds,
+                                       function(e) e^2, "lasso", maxit = 200L))
+  z[["J"]] <- 3L
+  z[["conv"]] <- full[["conv"]]
+  obj <- structure(list(cv = list(z), J.min = 3L), class = "cv.wafc")
+  cc <- wafc_cv_convergence(obj)
+  fo <- z[["conv.folds"]]
+  nl <- length(full[["lambda"]])
+  expect_identical(nrow(fo), 5L)
+  cut <- fo[["nreturned"]] < nl | fo[["jerr"]] != 0L
+  expect_true(all(cut))
+  expect_identical(cc[["folds.cut"]], 5L)
+  expect_true(all(fo[["jerr"]] < 0L))
+  expect_identical(fo[["nreturned"]], -fo[["jerr"]] - 1L)
+  expect_identical(cc[["fold.jerr"]], fo[["jerr"]][1L])
+  expect_equal(cc[["fold.lambda.cut"]], max(fo[["lambda.last"]]))
+  expect_identical(cc[["fold.cut.above.min"]],
+                   cc[["fold.lambda.cut"]] > z[["lambda.min"]])
+  expect_false(cc[["cut"]])
+  ## a cut of the fit on the whole sample: jerr = -k, the path stops at
+  ## k - 1, and the folds, asked for that shorter path, are not cut
+  cv <- suppressWarnings(cv.wafc(x0, u0, y0, J = 3L, foldid = folds,
+                                 maxit = 200L))
+  c2 <- wafc_cv_convergence(cv)
+  expect_true(c2[["cut"]])
+  expect_identical(c2[["nreturned"]], -c2[["jerr"]] - 1L)
+  expect_identical(c2[["cut.at.min"]],
+                   c2[["lambda.min"]] == c2[["lambda.last"]])
+})
+
+test_that("wafc_lambda_qut is unchanged by the pivot it now shares", {
+  ## a frozen copy of the function as step E2.4b left it
+  old_qut <- function(design, y, alpha = 0.05, nsim = 200L, seed = NULL) {
+    n <- design[["n"]]
+    if (!is.null(seed)) set.seed(seed)
+    unp <- design[["unpenalized"]]
+    pen <- seq_len(design[["nvars"]])[-unp]
+    W <- as.matrix(design[["Z"]][, unp, drop = FALSE])
+    Zp <- design[["Z"]][, pen, drop = FALSE]
+    qrW <- qr(W)
+    resid_of <- function(v) as.numeric(v - W %*% wafc_qr_coef(qrW, v))
+    E <- matrix(stats::rnorm(n * nsim), n, nsim)
+    R <- E - W %*% wafc_qr_coef(qrW, E)
+    G <- as.matrix(Matrix::crossprod(Zp, R))
+    ratio <- apply(abs(G), 2L, max) / sqrt(colSums(R^2))
+    r0 <- resid_of(y)
+    as.numeric(stats::quantile(ratio, 1 - alpha, names = FALSE)) *
+      sqrt(sum(r0^2)) / n
+  }
+  for (J in 2:4) {
+    des <- wafc_design(x0, u0, J = J)
+    for (sd in c(1L, 11L)) {
+      expect_identical(wafc_lambda_qut(des, y0, nsim = 150L, seed = sd),
+                       old_qut(des, y0, nsim = 150L, seed = sd))
+    }
+  }
+})

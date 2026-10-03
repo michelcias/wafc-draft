@@ -143,6 +143,7 @@ cv.wafc <- function(x, u, y, J = NULL, penalty = c("lasso", "sglasso"),
                  c(list(design, y, full, foldid, loss, penalty),
                    dots[["fit"]]))
     z[["J"]] <- Ji
+    z[["conv"]] <- full[["conv"]]
     list(cv = z, fit = full)
   }
 
@@ -889,6 +890,77 @@ predict.wafc_tune <- function(object, newx, newu, ...) {
 #' @export
 wafc_lambda_qut <- function(design, y, alpha = 0.05, nsim = 200L,
                             seed = NULL) {
+  z <- wafc_qut_pivot(design, y, alpha = alpha, nsim = nsim, seed = seed)
+  z[["quantile"]] * z[["r0norm"]] / design[["n"]]
+}
+
+#' Convergence of the engine along the cross-validation of a WAFC fit
+#'
+#' One row per candidate resolution level of a \code{\link{cv.wafc}} fit:
+#' the length of the penalty path asked of the engine and returned by it,
+#' the error code of the engine (\code{jerr} of \pkg{glmnet} and
+#' \pkg{sparsegl}: \eqn{-k} when the \eqn{k}-th penalty level did not
+#' converge, in which case the path stops at the one before), the smallest
+#' penalty level of the path, and the same for the fold fits, which are
+#' asked for the path of the whole sample. It reads what the fits recorded
+#' and changes nothing (step E2.5j, open question 41(d) of
+#' \file{docs/ESTADO.md}).
+#'
+#' A path of \pkg{glmnet} shorter than asked with \code{jerr = 0} is its
+#' own early stop (the deviance stopped changing), not a failure. A fold
+#' path cut above the \code{lambda.min} of its \eqn{J} is read there at its
+#' last point, because \code{\link{wafc_raw_coef}} truncates \eqn{s} to the
+#' range of the path.
+#'
+#' @param object An object of class \code{"cv.wafc"}.
+#'
+#' @return A data frame with \code{J}, \code{chosen}, \code{nlambda}
+#'   (asked), \code{nreturned}, \code{jerr}, \code{lambda.last},
+#'   \code{lambda.min} (of that \eqn{J}), \code{cut} (\code{jerr != 0}),
+#'   \code{cut.at.min} (the path was cut and \code{lambda.min} is its last
+#'   point, so the minimum may lie past the cut), \code{folds.cut} (folds
+#'   whose path is shorter than asked or whose \code{jerr} is not zero),
+#'   \code{fold.jerr} (the first nonzero code among them),
+#'   \code{fold.lambda.cut} (the largest last point among the folds cut)
+#'   and \code{fold.cut.above.min} (that point is above \code{lambda.min}).
+#'
+#' @export
+wafc_cv_convergence <- function(object) {
+  if (!inherits(object, "cv.wafc")) {
+    stop("'object' must be a \"cv.wafc\" object.", call. = FALSE)
+  }
+  rows <- lapply(object[["cv"]], function(z) {
+    cv <- z[["conv"]]
+    fo <- z[["conv.folds"]]
+    if (is.null(cv)) {
+      stop("This \"cv.wafc\" object does not record the convergence of ",
+           "its fits; refit it.", call. = FALSE)
+    }
+    nl <- length(z[["lambda"]])
+    fcut <- fo[["nreturned"]] < nl | fo[["jerr"]] != 0L
+    fl <- if (any(fcut)) max(fo[["lambda.last"]][fcut]) else NA_real_
+    fj <- fo[["jerr"]][fo[["jerr"]] != 0L]
+    data.frame(J = z[["J"]], chosen = z[["J"]] == object[["J.min"]],
+               nlambda = cv[["nlambda"]], nreturned = cv[["nreturned"]],
+               jerr = cv[["jerr"]], lambda.last = min(z[["lambda"]]),
+               lambda.min = z[["lambda.min"]], cut = cv[["jerr"]] != 0L,
+               cut.at.min = cv[["jerr"]] != 0L &&
+                 z[["lambda.min"]] == min(z[["lambda"]]),
+               folds.cut = sum(fcut),
+               fold.jerr = if (length(fj)) fj[1L] else 0L,
+               fold.lambda.cut = fl,
+               fold.cut.above.min = isTRUE(fl > z[["lambda.min"]]))
+  })
+  do.call(rbind, rows)
+}
+
+## The pivotal statistic of the quantile universal threshold and its
+## simulated quantile under the null (wafc_lambda_qut()); it is shared with
+## the gate of wafc_threshold() (step E2.5j), which compares the two:
+## stat > quantile exactly when the QUT penalty level leaves some
+## coefficient nonzero.
+wafc_qut_pivot <- function(design, y, alpha = 0.05, nsim = 200L,
+                           seed = NULL) {
   if (!inherits(design, "wafc_design")) {
     stop("'design' must be an object returned by wafc_design().", call. = FALSE)
   }
@@ -917,8 +989,11 @@ wafc_lambda_qut <- function(design, y, alpha = 0.05, nsim = 200L,
   G <- as.matrix(Matrix::crossprod(Zp, R))
   ratio <- apply(abs(G), 2L, max) / sqrt(colSums(R^2))
   r0 <- resid_of(y)
-  as.numeric(stats::quantile(ratio, 1 - alpha, names = FALSE)) *
-    sqrt(sum(r0^2)) / n
+  r0norm <- sqrt(sum(r0^2))
+  list(quantile = as.numeric(stats::quantile(ratio, 1 - alpha,
+                                             names = FALSE)),
+       r0norm = r0norm,
+       stat = max(abs(as.numeric(Matrix::crossprod(Zp, r0)))) / r0norm)
 }
 
 ## ---------------------------------------------------------------------------
@@ -1027,10 +1102,15 @@ wafc_cv_design <- function(design, y, full, foldid, loss, penalty, ...) {
   lam <- full[["lambda"]]
   nl <- length(lam)
   err <- matrix(NA_real_, n, nl)
+  ## what each fold fit returned of the path it was asked for (step E2.5j)
+  conv <- data.frame(fold = seq_len(nfolds), nreturned = NA_integer_,
+                     jerr = NA_integer_, lambda.last = NA_real_)
   for (k in seq_len(nfolds)) {
     out <- which(foldid == k)
     fit <- wafc(design = wafc_subset_design(design, -out), y = y[-out],
                 penalty = penalty, lambda = lam, ...)
+    conv[k, -1L] <- list(fit[["conv"]][["nreturned"]],
+                         fit[["conv"]][["jerr"]], min(fit[["lambda"]]))
     cf <- wafc_raw_coef(fit, s = lam)
     eta <- as.matrix(design[["Z"]][out, , drop = FALSE] %*%
                        cf[-1L, , drop = FALSE])
@@ -1052,7 +1132,7 @@ wafc_cv_design <- function(design, y, full, foldid, loss, penalty, ...) {
        cvlo = cvm - cvsd, nzero = full[["nzero"]],
        lambda.min = lam[imin], lambda.1se = lam[i1se],
        cvm.min = cvm[imin], cvsd.min = cvsd[imin],
-       nzero.min = full[["nzero"]][imin])
+       nzero.min = full[["nzero"]][imin], conv.folds = conv)
 }
 
 wafc_cv_s <- function(object, s) {

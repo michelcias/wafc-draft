@@ -1091,3 +1091,49 @@ test_that("the choice of k by cross-validation is the search redone by hand", {
                                foldid = rep_len(1:2, length(yk))),
                "at least 3 folds")
 })
+
+## ---------------------------------------------------------------------------
+## What grpreg returned of the path of the block LASSO (step E2.5j)
+## ---------------------------------------------------------------------------
+
+test_that("the block LASSO records the path of grpreg at every J", {
+  skip_if_not(has("grpreg"))
+  k <- wafc_competitor("klopp", x0, u0, y0, J = 2:4, foldid = folds,
+                       penalize.levels = FALSE, balanced = TRUE)
+  cc <- k[["extra"]][["conv"]]
+  expect_identical(cc[["J"]], 2:4)
+  expect_identical(cc[["chosen"]], 2:4 == k[["extra"]][["J"]])
+  expect_identical(cc[["nlambda"]], rep(100L, 3L))
+  expect_identical(cc[["max.iter"]], rep(10000L, 3L))
+  ## the row of the J kept is the cv.grpreg object the fit carries
+  ch <- cc[cc[["chosen"]], ]
+  cvo <- k[["fit"]]
+  expect_identical(ch[["nreturned"]], length(cvo[["fit"]][["lambda"]]))
+  expect_identical(ch[["ncv"]], length(cvo[["lambda"]]))
+  expect_identical(ch[["iter.total"]], as.integer(sum(cvo[["fit"]][["iter"]])))
+  expect_identical(ch[["lambda.min"]], k[["extra"]][["lambda"]])
+  expect_identical(ch[["lambda.cv.last"]], min(cvo[["lambda"]]))
+  expect_false(any(cc[["budget"]] | cc[["cv.cut"]] | cc[["cut.at.min"]]))
+  ## the free coarse levels at a coarse J are least squares, with no path
+  kf <- wafc_competitor("klopp", x0, u0, y0, J = 2:3, foldid = folds,
+                        penalize.levels = FALSE, balanced = TRUE,
+                        free.coarse = TRUE)
+  cf <- kf[["extra"]][["conv"]]
+  expect_identical(nrow(cf), 2L)
+  expect_true(is.na(cf[["nreturned"]][1L]))
+})
+
+test_that("the flags of the table read a cut as grpreg makes it", {
+  ## a budget spent and a cross-validated path shorter than the fit's, built
+  ## by hand on the rows wafc_kp_conv() returns
+  r <- data.frame(J = 3:4, nlambda = 100L, nreturned = c(100L, 60L),
+                  ncv = c(90L, 60L), iter.total = c(500L, 10000L),
+                  max.iter = 10000L, n.maxiter = 0L, lambda.maxiter = NA_real_,
+                  lambda.last = c(1e-4, 0.01), lambda.cv.last = c(2e-4, 0.01),
+                  lambda.min = c(2e-4, 0.05))
+  d <- wafc_kp_conv_table(list(r[1L, ], r[2L, ]), J.min = 4L)
+  expect_identical(d[["chosen"]], c(FALSE, TRUE))
+  expect_identical(d[["budget"]], c(FALSE, TRUE))
+  expect_identical(d[["cv.cut"]], c(TRUE, FALSE))
+  expect_identical(d[["cut.at.min"]], c(TRUE, FALSE))
+})

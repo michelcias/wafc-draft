@@ -19,7 +19,7 @@
 ## blocks kept ("support", their reading, carried to blocks), or on every
 ## column of those blocks ("block").
 ##
-## Three rules choose t, and only the first two are estimators:
+## Five rules choose t, and all but the last are estimators:
 ##
 ##   "max"     t = c max_{lm} N-hat_{lm}, invariant to the scale of the
 ##             response, with c = 0.15, the value step E1.7c started from;
@@ -27,18 +27,38 @@
 ##             refitted at the (J, lambda) already chosen, with no new
 ##             search, thresholded at every candidate t and scored on the
 ##             observations it left out;
+##   "cvrel"   the fraction c of "max" chosen by cross-validation on the
+##             same folds (step E2.5j): in fold k the blocks kept are the
+##             ones with N-hat^(k) > c max N-hat^(k), and the t returned is
+##             c-hat max N-hat of the whole sample;
+##   "cv1se"   the scores of "cv", with the largest t whose error is within
+##             one standard error (between folds) of the smallest, the rule
+##             of lambda.1se carried to t (step E2.5j). "cv" breaks ties
+##             towards the smallest t, which keeps the false positives of
+##             the smooth cell;
 ##   "oracle"  the t with the smallest prediction error against the true
 ##             regression function on a test sample, which no estimator
-##             can see; it is the reference the other two are read
-##             against, and is labelled as such.
+##             can see; it is the reference the others are read against,
+##             and is labelled as such.
 ##
-## The candidates of "cv" and "oracle" are exhaustive and not a grid. A
-## thresholded fit is constant in t between two consecutive norms of its
-## blocks, so the cross-validated error is constant between two consecutive
-## norms of the fold fits, and the error of the oracle between two
-## consecutive norms of the fit; each interval is scored once, and the t
-## returned is its midpoint, or the largest norm when the interval is the
-## one in which every block is zero.
+## The candidates of the four rules that score are exhaustive and not a
+## grid. A thresholded fit is constant in t between two consecutive norms
+## of its blocks, so the cross-validated error is constant between two
+## consecutive norms of the fold fits (two consecutive ratios to the
+## largest norm of each fold, for "cvrel"), and the error of the oracle
+## between two consecutive norms of the fit; each interval is scored once,
+## and the t returned is its midpoint, or the largest norm when the
+## interval is the one in which every block is zero.
+##
+## A gate can stand before any rule (gate = "qut", step E2.5j): the test of
+## the global null "every block is zero" with the pivotal statistic of the
+## quantile universal threshold, max |Z_pen' r_0| / ||r_0||, against its
+## simulated 1 - alpha quantile (wafc_lambda_qut() of wafc/R/tune.R, which
+## rejects exactly when the QUT penalty level leaves some coefficient
+## nonzero), on the design of the fit, at its J. When the test does not
+## reject, every block goes to zero and the rule is not run. The statistic
+## is coordinatewise for the block LASSO too: it is a test, not the
+## penalty of the fit.
 ##
 ## The object returned is a "wafc_competitor" (with the class
 ## "wafc_threshold" in front), so the pilot reads it with the code it reads
@@ -57,8 +77,8 @@
 #'   \code{s} is needed, and \code{foldid} for \code{rule = "cv"}), or a
 #'   \code{"wafc_competitor"} of method \code{"klopp"}, in any of its forms.
 #' @param t The threshold. When given, \code{rule} is not used.
-#' @param rule \code{"max"}, \code{"cv"} or \code{"oracle"}; see the header
-#'   of \file{wafc/R/threshold.R}.
+#' @param rule \code{"max"}, \code{"cv"}, \code{"cvrel"}, \code{"cv1se"}
+#'   or \code{"oracle"}; see the header of \file{wafc/R/threshold.R}.
 #' @param c The fraction of the largest norm used by \code{rule = "max"}.
 #' @param refit \code{"none"} (the default, the estimator of Corollary 8),
 #'   \code{"support"} (least squares on the level terms and the nonzero
@@ -73,6 +93,14 @@
 #' @param fold.fits The fits of the folds, as returned by
 #'   \code{wafc_threshold_folds()}, so that several calls on the same
 #'   object fit the folds once.
+#' @param gate \code{"none"} (the default) or \code{"qut"}, the test of the
+#'   global null applied before the rule; see the header of
+#'   \file{wafc/R/threshold.R}.
+#' @param alpha,nsim,gate.seed The level, the number of null samples and
+#'   the seed of that test, as in \code{\link{wafc_lambda_qut}}. The seed
+#'   does not move the random stream of the caller.
+#' @param gate.test The result of \code{wafc_threshold_gate()} on the same
+#'   object, so that several calls test once.
 #' @param ... Passed to \code{\link{wafc}} when a fold of a WAFC fit is
 #'   refitted (arguments of the engine that the object does not record).
 #'
@@ -81,9 +109,11 @@
 #'   \code{lambda}, the threshold \code{t}, the \code{rule}, \code{c},
 #'   \code{refit}, the \eqn{p \times q} matrices \code{norm} (of the fit
 #'   before the threshold) and \code{kept}, \code{nzero} (nonzero wavelet
-#'   coefficients after the threshold), and, for the rules that score
-#'   candidates, \code{candidates} (a data frame of the intervals and their
-#'   error).
+#'   coefficients after the threshold), for the rules that score candidates,
+#'   \code{candidates} (a data frame of the intervals, their error and, for
+#'   the cross-validated rules, its standard error between folds; for
+#'   \code{"cvrel"} the intervals are of \eqn{c}), and \code{gate}, the
+#'   result of the test when there is one.
 #'
 #' @references van de Geer, S., Buhlmann, P. and Zhou, S. (2011). The
 #'   adaptive and the thresholded Lasso for potentially misspecified models
@@ -97,19 +127,33 @@
 #' th$blocks
 #'
 #' @export
-wafc_threshold <- function(object, t = NULL, rule = c("max", "cv", "oracle"),
+wafc_threshold <- function(object, t = NULL,
+                           rule = c("max", "cv", "cvrel", "cv1se", "oracle"),
                            c = 0.15, refit = c("none", "support", "block"),
                            s = NULL, y = NULL, foldid = NULL, truth = NULL,
-                           fold.fits = NULL, ...) {
+                           fold.fits = NULL, gate = c("none", "qut"),
+                           alpha = 0.05, nsim = 200L, gate.seed = NULL,
+                           gate.test = NULL, ...) {
   t0 <- proc.time()[["elapsed"]]
   rule <- match.arg(rule)
   refit <- match.arg(refit)
+  gate <- match.arg(gate)
   base <- wafc_thr_base(object, s = s, y = y, foldid = foldid)
   des <- base[["design"]]
   nrm <- wafc_thr_norms(base[["b"]], des)
   cand <- NULL
+  gt <- NULL
+  if (gate == "qut") {
+    gt <- if (is.null(gate.test)) {
+      wafc_thr_gate(base, alpha = alpha, nsim = nsim, seed = gate.seed)
+    } else gate.test
+  }
 
-  if (!is.null(t)) {
+  if (!is.null(gt) && !gt[["reject"]]) {
+    ## the global null is not rejected: every block goes to zero, and the
+    ## rule is not run
+    t <- max(nrm)
+  } else if (!is.null(t)) {
     if (!is.numeric(t) || length(t) != 1L || !is.finite(t) || t < 0) {
       stop("'t' must be a single non-negative value.", call. = FALSE)
     }
@@ -126,6 +170,18 @@ wafc_threshold <- function(object, t = NULL, rule = c("max", "cv", "oracle"),
     }
     cand <- wafc_thr_cv(base, fold.fits, refit)
     t <- wafc_thr_pick(cand, max(c(nrm, cand[["lower"]])))
+  } else if (rule %in% c("cvrel", "cv1se")) {
+    if (is.null(fold.fits)) {
+      fold.fits <- wafc_threshold_folds(object, s = s, y = y,
+                                        foldid = foldid, ...)
+    }
+    if (rule == "cvrel") {
+      cand <- wafc_thr_cv(base, fold.fits, refit, relative = TRUE)
+      t <- wafc_thr_pick(cand, 1) * max(nrm)
+    } else {
+      cand <- wafc_thr_cv(base, fold.fits, refit)
+      t <- wafc_thr_pick(cand, max(c(nrm, cand[["lower"]])), one.se = TRUE)
+    }
   } else {
     if (is.null(truth) || is.null(truth[["x"]]) || is.null(truth[["u"]]) ||
         is.null(truth[["f"]])) {
@@ -145,12 +201,16 @@ wafc_threshold <- function(object, t = NULL, rule = c("max", "cv", "oracle"),
   }
   out <- wafc_thr_object(est[["a0"]], est[["b"]], des, kept)
   out[["method"]] <- paste0(base[["method"]], "+", rule,
-                            if (refit != "none") paste0("+", refit) else "")
+                            if (refit != "none") paste0("+", refit) else "",
+                            if (gate != "none") paste0("+", gate) else "")
   out[["extra"]] <- c(out[["extra"]],
                       list(J = base[["J"]], lambda = base[["s"]], t = t,
-                           rule = rule, c = if (rule == "max") c else
+                           rule = rule, c = if (rule == "max" &&
+                                                (is.null(gt) || gt[["reject"]]))
+                             c else
                              if (max(nrm) > 0) t / max(nrm) else NA_real_,
-                           refit = refit, norm = nrm, candidates = cand))
+                           refit = refit, norm = nrm, candidates = cand,
+                           gate = gt))
   out[["time"]] <- proc.time()[["elapsed"]] - t0
   out
 }
@@ -193,9 +253,58 @@ wafc_threshold_folds <- function(object, s = NULL, y = NULL, foldid = NULL,
   list(foldid = fid, fits = fits)
 }
 
+#' The test of the global null in front of a threshold
+#'
+#' Tests the hypothesis that every block \eqn{(\ell, m)} of the model is
+#' zero, with the pivotal statistic of the quantile universal threshold of
+#' \code{\link{wafc_lambda_qut}}: \eqn{T = \|Z_{pen}' r_0\|_\infty /
+#' \|r_0\|_2}, with \eqn{r_0} the residual of the least squares fit on the
+#' level terms, against the \eqn{1 - \alpha} quantile of \eqn{T} simulated
+#' under the null with Gaussian errors. The test rejects exactly when the
+#' QUT penalty level leaves some wavelet coefficient nonzero. It is computed
+#' on the design of the fit, at the \eqn{J} the fit chose, whatever the
+#' penalty of the fit, and is what \code{gate = "qut"} of
+#' \code{\link{wafc_threshold}} runs.
+#'
+#' @inheritParams wafc_threshold
+#' @param seed Optional seed of the simulation. The random stream of the
+#'   caller is restored afterwards.
+#'
+#' @return A list with the statistic \code{stat}, the simulated
+#'   \code{quantile}, \code{reject} (\code{stat > quantile}), \code{alpha},
+#'   \code{nsim}, the \code{J} of the design and the seconds \code{time}.
+#'
+#' @export
+wafc_threshold_gate <- function(object, alpha = 0.05, nsim = 200L,
+                                seed = NULL, s = NULL, y = NULL) {
+  base <- wafc_thr_base(object, s = s, y = y, foldid = NULL)
+  wafc_thr_gate(base, alpha = alpha, nsim = nsim, seed = seed)
+}
+
 ## ---------------------------------------------------------------------------
 ## Internals
 ## ---------------------------------------------------------------------------
+
+## The gate on what wafc_thr_base() returns. The seed is set for the
+## simulation only: the stream of the caller is saved and put back, so that
+## a gate inside a replicate moves nothing drawn after it.
+wafc_thr_gate <- function(base, alpha, nsim, seed) {
+  t0 <- proc.time()[["elapsed"]]
+  if (!is.null(seed)) {
+    had <- exists(".Random.seed", envir = globalenv(), inherits = FALSE)
+    if (had) old <- get(".Random.seed", envir = globalenv())
+    on.exit({
+      if (had) assign(".Random.seed", old, envir = globalenv())
+      else rm(".Random.seed", envir = globalenv())
+    })
+  }
+  z <- wafc_qut_pivot(base[["design"]], base[["y"]], alpha = alpha,
+                      nsim = nsim, seed = seed)
+  list(stat = z[["stat"]], quantile = z[["quantile"]],
+       reject = isTRUE(z[["stat"]] > z[["quantile"]]), alpha = alpha,
+       nsim = as.integer(nsim), J = base[["J"]],
+       time = proc.time()[["elapsed"]] - t0)
+}
 
 ## What the threshold needs from a fit, whatever its class: the design, the
 ## response, the coefficients (a0, b) in the coordinates of the design, the
@@ -418,14 +527,22 @@ wafc_thr_object <- function(a0, b, design, kept) {
 ## them no fold fit changes, so the error of the interval [lower, upper) is
 ## the error at its lower end. Each fold scores only its distinct kept sets
 ## (at most pq + 1), and the error is the mean of the fold means, the
-## measure of cv.wafc().
-wafc_thr_cv <- function(base, folds, refit) {
+## measure of cv.wafc(), with the standard error of that mean, the cvsd of
+## cv.wafc(). With relative = TRUE the norms of each fold are divided by
+## the largest of that fold, so the candidates are fractions c of it (rule
+## "cvrel"); a fold with every block zero keeps nothing at any c.
+wafc_thr_cv <- function(base, folds, refit, relative = FALSE) {
   des <- base[["design"]]
   fid <- folds[["foldid"]]
   K <- length(folds[["fits"]])
   y <- base[["y"]]
   Z <- des[["Z"]]
   fnorm <- lapply(folds[["fits"]], function(f) wafc_thr_norms(f[["b"]], des))
+  if (relative) {
+    fnorm <- lapply(fnorm, function(v) {
+      if (max(v) > 0) v / max(v) else v
+    })
+  }
   brk <- sort(unique(c(0, unlist(fnorm))))
   fold_err <- matrix(NA_real_, K, length(brk))
   for (k in seq_len(K)) {
@@ -450,7 +567,8 @@ wafc_thr_cv <- function(base, folds, refit) {
     fold_err[k, ] <- e[which_lev]
   }
   data.frame(lower = brk, upper = c(brk[-1L], Inf),
-             error = colMeans(fold_err))
+             error = colMeans(fold_err),
+             se = apply(fold_err, 2L, stats::sd) / sqrt(K))
 }
 
 ## The error of the thresholded fit against the truth at every candidate:
@@ -478,9 +596,15 @@ wafc_thr_oracle <- function(base, nrm, refit, truth) {
 
 ## The threshold of the best interval: its midpoint, or 'top' when it is the
 ## last one, in which every block is zero. Ties go to the first interval,
-## the smallest t.
-wafc_thr_pick <- function(cand, top) {
+## the smallest t. With one.se = TRUE the interval is the last one whose
+## error is within one standard error of the smallest, the error and the
+## standard error read at the smallest (the rule of lambda.1se in
+## cv.wafc() and cv.glmnet, with t in the place of the penalty).
+wafc_thr_pick <- function(cand, top, one.se = FALSE) {
   i <- which.min(cand[["error"]])
+  if (one.se) {
+    i <- max(which(cand[["error"]] <= cand[["error"]][i] + cand[["se"]][i]))
+  }
   if (is.infinite(cand[["upper"]][i])) return(top)
   (cand[["lower"]][i] + cand[["upper"]][i]) / 2
 }
