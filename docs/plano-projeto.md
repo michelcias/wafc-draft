@@ -356,7 +356,11 @@ fora do suave (E2.5b a E2.5f); a estimação seguida de limiar, que derruba o
 fator do suave abaixo de 1,5 contra o `gam.matched` (E2.5g); e o `gam`
 sintonizado por REML, validação cruzada e GCV numa grade única (D41), que
 não muda o veredito (E2.5h). Ficaram por testar `boundary = "interval"` e
-pesos adaptativos. A decisão de rumo é do autor (perguntas 33, 38 e 41).
+pesos adaptativos (o primeiro pede código antes: a reparametrização do
+bloco de escala, pergunta 33(f)). A decisão de rumo é do autor (perguntas
+33, 38 e 41); antes dela, **E2.5j** (2026-10-03) mede a regra de `t` com `c`
+relativo por validação cruzada e a porta do QUT para o nulo, nos dois
+ajustes. Nada medido em E2.5 é descartado (D43).
 
 **Critério de saída de E2:** testes de E2.1 a E2.3 passando; tabela do
 piloto; decisão registrada.
@@ -370,7 +374,8 @@ Depois do go de E2.5, o código de `wafc/` deixa de ser exploratório.
 ### E3.1 Interface congelada
 
 Assinaturas de `wafc()`, `cv.wafc()`, `predict`, `coef`, `plot` fixadas e
-registradas em `wafc/README.md`; variantes descartadas em E2.5 removidas;
+registradas em `wafc/README.md`; nenhuma variante de E2.5 é removida sem
+nova decisão (D43): as que não forem a principal ficam como opção;
 `tests/` cobrindo cada função pública; `Rscript -e 'testthat::test_dir("wafc/tests")'`
 limpo em menos de 60 s.
 

@@ -1,6 +1,6 @@
 # Estado do trabalho, handoff de continuidade
 
-**Última atualização:** 2026-10-02.
+**Última atualização:** 2026-10-03.
 **Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8,
 E1.10 e E1.11), E5a, E5c e E2.1 a E2.5h fechadas**, mais L1 a L9 e a
 sondagem E6.1a. Falta E2.5 (go/no-go) para fechar E2. O LASSO puro levou
@@ -12,9 +12,16 @@ nos termos dele (REML, validação cruzada nas dobras do WAFC e GCV), manteve
 o veredito**: o WAFC perde no `smooth` e no `uneven` em toda forma, o
 `klopp.balanced+cv` vence no não homogêneo, na `mixed` e no nulo, e o fator
 do `wafc.lasso+max` no suave fica no limite de 1,5 (1,49 contra o `gam.cv`
-em `n = 1000`). As medições estão feitas; a decisão de rumo é do autor
-(perguntas 33, 38 e 41). A decidir também: a saída da aplicação (pergunta
-2). O teto de páginas fica para o fim (D21).
+em `n = 1000`). **Em 2026-10-03, relido no chat principal:** o limiar
+oráculo dá o teto de qualquer regra de `t`, e só o block LASSO balanceado
+passa a perna do não homogêneo com ele; contra o `gam.gcv` (o critério
+padrão do `mgcv::gam()`) essa perna some. A decisão de rumo é do autor
+(perguntas 33, 38 e 41), e a recomendação do chat principal está na
+pergunta 33(f); antes dela, **E2.5j está catalogada** (a regra de `t` com
+`c` relativo por validação cruzada e a porta do QUT para o nulo) e espera o
+aviso do autor para rodar. Por D43, nada medido em E2.5 é descartado. A
+decidir também: a saída da aplicação (pergunta 2). O teto de páginas fica
+para o fim (D21).
 **Versão viva do manuscrito:** `k = 3` (`manuscript/ms_3.tex`,
 `supp_3.tex`, `references_3.bib`), aberta em 2026-10-01 por decisão do
 autor para a notação da seleção (D40); a `k = 2` fica intacta. Os dois
@@ -1950,6 +1957,58 @@ de D41 (grade `{5, 10, 20, 40, 80}` comum, 50 réplicas, `gam.gcv` fora da
   780 a 800 s; `gam.gcv` 103 a 318 s; `wafc.gcv` 0,5 a 3,9 s; `wafc.lasso`
   6,8 a 26 s. O `k = 80` é 75% a 87% do custo da busca do `gam`.
 
+### 2026-10-03: o teto do limiar e o `gam.gcv`, lidos no chat principal
+
+Sobre o `e25h-joined.rds`, sem rodada nova (scripts e saídas em
+`wafc/cache/e25h/main-rumo*.R` e `.txt`, não versionados; os números
+abaixo são o registro). Mediana da razão dentro da réplica, `n = 250`,
+`500`, `1000`, com a fração de réplicas vencidas entre parênteses quando
+importa.
+
+- **O limiar oráculo é o teto de qualquer regra de `t`** (ele escolhe `t`
+  pelo erro contra a verdade), e acerta a estrutura quase sempre:
+  `P(Ŝ = S)` de 0,94 a 1 nos dois ajustes em `n ≥ 500`, nas quatro células
+  com componente e no nulo. Contra o `gam.cv`, `rmse_f`:
+
+  | teto | não homogêneo | `mixed` | `smooth`, ISE |
+  |---|---|---|---|
+  | `wafc.lasso+oracle` | 1,010, 0,973, 0,931 | 1,041, 1,067, 1,014 | 1,26, 1,44, 1,49 |
+  | `klopp.balanced+oracle` | 0,945, 0,916, 0,895 (88% a 100%) | 0,956, 0,955, 0,932 | 1,37, 1,50, 1,52 |
+
+  **Nenhuma regra de `t` dá ao LASSO a perna (b) do critério de E2.5**, e
+  a diferença de estrutura entre LASSO e blocos medida em E2.5g é da regra,
+  não do ajuste. O que uma regra melhor ainda pode comprar nos blocos é a
+  distância do `+cv` ao teto: 0,964 → 0,945 no não homogêneo e 0,978 →
+  0,956 na `mixed` em `n = 250`; no `smooth`, ISE 1,43, 1,65, 1,72 → 1,37,
+  1,50, 1,52; e a estrutura, de 0,40 a 0,88 para 0,94 a 1 em `n ≥ 500`.
+- **Contra o `gam.gcv` a perna (b) some:** `klopp.balanced+cv` 1,017,
+  1,047, 0,982 em `rmse_f` (38%, 14%, 60%), e o teto não passa de 1,005,
+  1,044, 0,982; o `wafc.lasso+cv`, 1,088, 1,123, 1,018. **O `GCV.Cp` é o
+  `method` padrão do `mgcv::gam()`** (o do `bam()` é `fREML`; conferido no
+  1.9-4). No nulo é o inverso: o `gam.gcv` perde de 0,57 a 0,73 em `rmse_f`
+  para os dois ajustes limiarizados.
+- **Nenhuma forma passa as duas pernas contra o `gam.cv`:** o
+  `klopp.balanced+cv` passa a (b) (0,964, 0,923, 0,895) e reprova a (a) (ISE
+  1,43, 1,65, 1,72); o `wafc.lasso+max` passa a (a) (1,27, 1,44, 1,49) e não
+  a (b) (1,048, 1,024, 0,973). A mais perto das duas é o
+  `klopp.balanced+max`: (b) 0,963, 0,940, 0,917 e (a) 1,43, 1,50, 1,52, na
+  linha.
+- **A estrutura é a vantagem que não depende do critério do `gam`:**
+  `wafc.lasso+cv+ls` acerta 0,92 a 0,98 no não homogêneo e na `mixed` em
+  `n ≥ 500` e 0,88 a 1 no suave e no `uneven`; `gam.cv` e `gam.reml`, 0,24 a
+  0,34 no não homogêneo e 0 na `mixed`.
+- **Contra o melhor dos outros concorrentes na réplica** (`bsgl`,
+  `aspline`, `vcbart`, `klopp` fiel, `wafc.sglasso`): o `klopp.balanced+cv`
+  vence no não homogêneo (0,974, 0,973, 0,970; 76% a 92%) e na `mixed`
+  (0,977, 0,925, 0,882); o `wafc.lasso+cv` perde no não homogêneo em
+  `n ≤ 500` (1,047, 1,031).
+- **Correção do que o chat principal disse em 2026-10-02:** `boundary =
+  "interval"` não é uma opção barata a medir. O `wafc_design()` recusa a
+  opção com erro, porque a reparametrização do bloco de escala que mantém a
+  identificabilidade não foi feita (`01-identificabilidade.md` §5); o
+  `WaveBased::wbasis()` já tem a base. Fica fora da E2.5j e continua sendo o
+  teste que o plano manda fazer antes de mudar de rumo (pergunta 33(f)).
+
 ### Decisões tomadas
 
 | # | Data | Decisão | Razão |
@@ -1984,6 +2043,7 @@ de D41 (grade `{5, 10, 20, 40, 80}` comum, 50 réplicas, `gam.gcv` fora da
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
 | D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
+| D43 | 10-03 | **Nada medido em E2.5 é descartado.** A decisão de rumo escolhe a variante principal, a regra de `t` e as colunas do `gam`; as outras formas (LASSO puro e limiarizado, `+ls` e `+lsb`, as cinco formas do block LASSO, `wafc.gcv`, `wafc.sglasso`, `gam.matched`, `gam.k128`, `gam.gcv`) ficam no código, nos testes e nas tabelas juntadas, como opção, como coluna ou como resposta ao referee; E3.1 não remove variante sem nova decisão | pedido do autor: os achados podem ser úteis (o LASSO limiarizado é o melhor em estrutura, o `gam.gcv` é a referência que mais aperta, o `wafc.gcv` custa um décimo) |
 | D32 | 09-20 | **A seleção de estrutura entra pela limiarização (saída (c)), e a saída (a) não abre agora.** O Corolário 8 de `06-selecao-limiar.tex` é o enunciado do artigo, com a hipótese de separação numerada e dizendo no próprio enunciado que é **estimação seguida de limiar**. A sondagem de E1.7a fica registrada como observação de meia página (a condição em grupos não depende de `J` nem da base), e a saída (a), se voltar depois de E2.5, volta pela rota de Wei & Huang (2010), não pela de Bach | veredito de E1.7a: a redução algébrica tira o risco de a condição falhar por construção, mas não o custo, e exige (BD) mais `E(XX'\|U)` constante, que contraria D13; além disso o valor de (a) continua condicionado a E2.5 escolher a variante em grupos, e E1.7c mostrou o LASSO limiarizado acertando 10 de 10 onde ela acerta 0 de 10 |
 | D31 | 09-20 | **Em avaliação numérica repetida, a base é fixada e avaliada por tabela**, não pelo algoritmo de Daubechies-Lagarias a cada ajuste: construir a tabela uma vez com `WaveBased::wtable()` para o par `(family, filter.size)` e passá-la em `wavelet.table` de `wafc_design()`, em vez de deixar a regra `use.table = "auto"` decidir réplica a réplica. Vale para o piloto (E2.4), o compêndio (E4) e a aplicação (E6). **Exceção:** conferência que mede precisão fina (as de `derivations/check/`, que leem decaimento até `1e-11`) continua com avaliação exata ou tabela com `prec.wavelet` alto, porque ali o `3.1e-06` engoliria o que se quer medir | pedido do autor, e a razão é **tempo de execução**: a tabela é o caminho rápido e a aproximação é boa o bastante (o erro de interpolação medido em E2.1 é `3.1e-06`), de modo que a variação entre os dois caminhos não é problema prático. A regra `auto` só dispara em `n q ≥ 2000 L`, isto é `n q ≥ 16000` com `L = 8`, e portanto **não dispara** nos `n` do piloto: deixá-la decidir significa pagar Daubechies-Lagarias em toda a varredura |
 | D30 | 09-19 | **O cenário suave é para ganhar, não só para não perder.** A hipótese `C^{p+1}` de Xue & Yang delimita a garantia deles, não o desempenho: com `J` e `λ` por validação cruzada o WAFC pode vencer splines também no suave, e E2.4 e E4 têm de medir isso em condição justa — o concorrente sintonizado nos termos dele (nós por BIC como no artigo deles, e `mgcv` com REML), predição e ISE relatadas em separado, e uma componente **suave de curvatura desigual** (gaussiana estreita ou `doppler` truncado longe da singularidade) acrescentada ao `dgp.R`, que é `C^∞` e portanto dentro da hipótese deles, mas com escala variando ao longo do domínio | argumento do autor; se o ganho aparecer, é ilustração forte para o artigo, e se não aparecer, a paridade no suave já é o que a Seção 5 precisa |
@@ -2384,6 +2444,26 @@ Ordenadas pelo que bloqueia mais.
      `klopp.balanced+cv` vence o `gam.matched` e o `wafc.lasso+cv` perde
      dele. A escolha entre LASSO e blocos é agora de célula, não de
      método; é o que a decisão de rumo tem de pesar.
+   - (f) **Recomendação do chat principal (2026-10-03, números no §2,
+     "o teto do limiar e o `gam.gcv`"), sem decisão do autor:** go
+     reposicionado, na *Statistica Sinica*, com o **block LASSO balanceado
+     como o WAFC** e o LASSO como opção (D43). A razão: com o `t` oráculo
+     só os blocos passam a perna (b) (0,90 a 0,95 no não homogêneo, 0,93 a
+     0,96 na `mixed` contra o `gam.cv`), a estrutura deles chega a 0,94 a 1
+     com uma regra boa, e a taxa perde o logaritmo em `π ≥ 2` (E1.11). A
+     tese numérica passa a ser: vence o spline por REML ou validação
+     cruzada no não homogêneo e na `mixed`, empata com o spline por GCV,
+     perde no suave perto do fator 1,5, e recupera a estrutura que o spline
+     não recupera. O JCGS do plano não é necessário: a SS publicou Wei,
+     Huang & Li (2011), seleção em coeficientes variáveis. Custo: E1.11 no
+     `ms` e no `supp` (~5 páginas, 2 a 3 dias, `k = 4`) e a frase "penalize
+     coefficient by coefficient rather than in blocks" do parágrafo de D18.
+     Antes da decisão: **E2.5j** (a regra de `t`, pergunta 38). O teste de
+     `boundary = "interval"` que o plano manda fazer antes de mudar de rumo
+     é trabalho de código (a reparametrização do bloco de escala,
+     `01-identificabilidade.md` §5), não opção a ligar; é a única alavanca
+     que sobra na perna (a), porque a cúbica tem quina na extensão periódica
+     (D27).
 
 34. **~~Os pesos do block LASSO~~ medidos por E2.5c e E2.5e (§2):** a
    forma balanceada (E2.5e) é coberta pela teoria com os pesos do `grpreg`
@@ -2529,7 +2609,13 @@ Ordenadas pelo que bloqueia mais.
    penalização conjunta desses níveis, e custar no nulo. Medir: uma opção
    em `wafc_kp_groups()` e ~40 min em 8 núcleos.
 
-38. **Pendências de E2.5g** (2026-10-01), que entram na decisão de rumo:
+38. **Pendências de E2.5g** (2026-10-01), que entram na decisão de rumo.
+   **(a) e (b) catalogadas como E2.5j em 2026-10-03**, nos dois ajustes
+   (D43). Recomendação do chat principal para (c): sim, o limiar é também o
+   estimador de predição, e falta escrever a cota de risco (bloco ativo
+   zerado tem `ν ≤ t + ‖ĝ − g‖`, e os mantidos não mudam); para (d): o
+   `+ls` piora os blocos fora do suave (1,12 a 1,22 no não homogêneo contra
+   o `gam.cv`) e não vai ao padrão deles, mas fica (D43).
    - (a) **Qual regra de `t` vai ao artigo e a E4.** O `max` com
      `c = 0,15` é o melhor no suave e falha no não homogêneo e na `mixed`;
      um `c` de 0,3 a 0,4 teria de ser fixado sem olhar a verdade, ou por
@@ -2603,7 +2689,13 @@ Ordenadas pelo que bloqueia mais.
    conferido à forma weak-`ℓ_τ` que a 35(h) trocou por Besov. As duas são
    edição marcada na `k = 3`, e (a) toca o `alvo-revista.md`.
 
-41. **Pendências de E2.5h** (2026-10-02), que entram na decisão de rumo:
+41. **Pendências de E2.5h** (2026-10-02), que entram na decisão de rumo.
+   Recomendação do chat principal (2026-10-03): (a) duas colunas, `gam.reml`
+   e `gam.gcv`, com o `gam.cv` em nota (razão 1,000); omitir o `gam.gcv`
+   seria a objeção, porque é ele que tira a perna (b) e é o padrão do
+   `gam()`; (b) fica como D41; (c) o `wafc.gcv` não vai à tabela de E4 e
+   fica no código (D43); (d) **catalogada na E2.5j**, nos dois motores
+   (`glmnet` e `grpreg`); (e) em E4.
    - (a) **Qual `gam` vai a E4 e à tabela do manuscrito.** A tarefa propõe
      o `gam.cv` (mesmo critério e mesmas dobras do WAFC, e o mesmo erro do
      `gam.reml` e do `gam.k128`); o `gam.reml` dá o mesmo erro a um décimo
@@ -2626,8 +2718,13 @@ Ordenadas pelo que bloqueia mais.
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-02).** Catálogo vazio, nenhum handoff pendente, tudo
-commitado. As medições de E2.5 estão completas (E2.5a a E2.5h): o LASSO puro
+**Onde parou (2026-10-03).** **E2.5j catalogada** (`TAREFA.md` §3): a regra
+de `t` com `c` relativo por validação cruzada, a porta do QUT para o nulo e
+a convergência dos dois motores, nos dois ajustes; a rodada espera o aviso
+do autor. Abertura: "Leia `docs/TAREFA.md` e execute a tarefa E2.5j." A
+leitura de 2026-10-03 (teto do limiar, `gam.gcv`) está no §2, a
+recomendação do chat principal na pergunta 33(f), e D43 guarda tudo o que
+E2.5 mediu. Nenhum handoff pendente. As medições de E2.5 estão completas (E2.5a a E2.5h): o LASSO puro
 levou no-go pelo critério literal; o limiar do Corolário 8 e a forma
 balanceada do block LASSO são o que melhora o WAFC; e o `gam` sintonizado nos
 termos dele (E2.5h) não muda o veredito. O manuscrito está em `k = 3` com as
@@ -2661,11 +2758,11 @@ sem marca aberta (83 entradas).
 **Medições candidatas para depois da decisão** (não catalogadas; todas
 disputam os 8 núcleos, uma rodada por vez): `n = 2000` no não homogêneo e
 na `mixed`, com e sem limiar, que diz se a vantagem que cresce com `n`
-continua; `boundary = "interval"` e pesos adaptativos, que o plano (E2.5 e
-tabela de riscos) manda testar antes de mudar de rumo; o `gam.k128` na
-`mixed` com 50 réplicas (36(b); hoje 15); o `c` relativo do limiar por
-validação cruzada (38(a)); a guarda de `edf` no `gam` (36(c)); e onde o
-`glmnet` deixa de convergir (41(d)).
+continua (e se o `gam.gcv` fica para trás); `boundary = "interval"` e pesos
+adaptativos, que o plano (E2.5 e tabela de riscos) manda testar antes de
+mudar de rumo (o primeiro pede código antes, pergunta 33(f)); o `gam.k128`
+na `mixed` com 50 réplicas (36(b); hoje 15); e a guarda de `edf` no `gam`
+(36(c)). O `c` relativo (38(a)) e a convergência (41(d)) estão na E2.5j.
 
 **Sem bloquear:** 12 (cenário `smooth`), 13 (nome da (BD)), 20 (cota
 inferior, o risco assumido com D18), 21
@@ -2682,6 +2779,7 @@ reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | Leitura dos `.rds` da E2.5h no chat principal: com o `t` oráculo só os blocos passam a perna do não homogêneo; o `gam.gcv` (padrão do `gam()`) tira essa perna; a estrutura é a vantagem robusta; `boundary = "interval"` não está implementado. Recomendação na 33(f); D43 (nada de E2.5 é descartado); E2.5j catalogada |
 | 2026-10-02 | Documentação de continuidade revista para recomeçar em outro chat: §5 do `ESTADO.md` reescrita em torno da decisão de rumo; `CONTINUAR.md` §3 e §4, `plano-projeto.md` E2.5 e `TAREFA.md` alinhados |
 | 2026-10-02 | E2.5h fechada e integrada (1 006 testes, 28 350 linhas, sexta junção exata): com o `gam` sintonizado por REML, validação cruzada ou GCV o veredito se mantém; `gam.reml` e `gam.cv` coincidem; o GCV do WAFC não ganha nada; o posto de Tibshirani & Taylor confere; Wood (2004) no `.bib`; pergunta 41 |
 | 2026-10-02 | Folha de rosto da impressão de Härdle et al. (1998) conferida: "Gerard" e "Alexander", como no `.bib`; o WALL diverge (35(c)) |
