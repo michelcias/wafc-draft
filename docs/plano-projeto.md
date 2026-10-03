@@ -364,6 +364,12 @@ um erro-padrão (`cv1se`) chega ao teto do limiar oráculo no suave, no
 QUT resolve o nulo das outras regras. Nada medido em E2.5 é descartado
 (D43).
 
+**Decidido em 2026-10-03 (D44 a D46, `ESTADO.md`): go reposicionado.** A
+variante principal é o block LASSO na forma balanceada seguido do limiar
+`cv1se`, com o LASSO coordenado como opção; regra de sintonia `cv.min` (D20)
+na grade `2:8` (D34); o alvo continua a *Statistica Sinica*, e a resposta
+da tabela de riscos (JCGS) não foi necessária. **E2 fechada.**
+
 **Critério de saída de E2:** testes de E2.1 a E2.3 passando; tabela do
 piloto; decisão registrada.
 

@@ -87,6 +87,13 @@ Template versionado em `manuscript/ejs-template/` (clonado em 2026-09-18,
 
 ## 4. Como o artigo se posiciona
 
+**A reescrever depois de D44 (2026-10-03):** o WAFC passou a ser o block
+LASSO na forma balanceada seguido do limiar `cv1se`, com o LASSO coordenado
+como opção. D18 continua (extensão de Klopp & Pensky), mas o parágrafo
+abaixo, a frase-tese, as contribuições e a resposta a "Why not block
+LASSO?" ainda descrevem a penalidade coordenada. O texto novo vai ao autor
+antes de entrar (`ESTADO.md` §5(b)).
+
 **Decidido em 2026-09-19 (D18):** o artigo se apresenta como **extensão de
 Klopp & Pensky (2015)**, e não como modelo diferente com eles citados de
 passagem. O parágrafo de posicionamento foi escrito e aprovado; E5a o usa

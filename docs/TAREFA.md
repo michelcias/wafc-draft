@@ -80,7 +80,8 @@ que ler antes está aqui e no plano.
 | L8 referências do `mgcv` e da escolha da dimensão | **fechada** (2026-10-01): 82 entradas; Kauermann & Opsomer usam ML, e o catálogo da E2.5h foi corrigido | `referencias-verificadas.bib`, `literatura.md` |
 | L9 as duas frases que L7 deixou | **fechada** (2026-10-01): a entrada de 1994 saiu; o risco minimax de 1998 é sobre corpos de Besov (pergunta 35(h)) | `derivations/05-taxas.tex`, `docs/busca-novidade.md` |
 | E2.5j a regra de `t` e a porta do nulo | **fechada** (2026-10-03): o `cv1se` chega ao teto no suave, no `uneven`, no nulo e em `n = 1000`; o `cvrel` repete o `+cv`; a porta do QUT com nível acima do nominal; os cortes dos motores não tocam o `λ` escolhido; 1 133 testes | `wafc/R/threshold.R`, `wafc/R/tune.R`, `wafc/R/fit.R`, `wafc/R/competitors.R`, `wafc/scripts/04-pilot.R`, `wafc/cache/e25j/` |
-| E2.5, E3, E4, E5b, E6, E7 | não abertas | |
+| E2.5 go/no-go e variante principal | **fechada** (2026-10-03, D44 a D46): go reposicionado na *Statistica Sinica*; o WAFC é o block LASSO balanceado com limiar `cv1se`, o LASSO fica como opção; `gam.reml` e `gam.gcv` em E4; E2 inteira fechada | `ESTADO.md` §2 e decisões |
+| E3, E4, E5b, E6, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
 
@@ -103,7 +104,8 @@ no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 **Catálogo vazio** (2026-10-03): E2.5j fechou. A tabela mais recente é
 `wafc/cache/e25j/e25j-joined.rds` (37 350 linhas, sétima junção exata), e é
 a ela que um método novo se junta. Desde D43 nenhuma variante sai do
-código. E2.5 espera a decisão de rumo do autor (perguntas 33, 38 e 41).
+código. E2.5 fechou com D44 a D46; o que vem a seguir está no
+`ESTADO.md` §5 (a teoria em blocos nas derivações numeradas, a catalogar).
 
 **Catálogo vazio até 2026-10-02**: E2.5h (com a E2.5i dentro), L8 e L9 fecharam; E2.5e, E2.5f, E2.5g, L6 e L7 fecharam. A repetição do piloto (E2.4c,
 E2.5a) devolveu no-go para a variante LASSO, e as medições que a pergunta
