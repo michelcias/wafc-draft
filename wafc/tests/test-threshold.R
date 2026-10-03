@@ -50,7 +50,8 @@ test0 <- simulate_wafc(400L, p = p, q = q, scenario = "smooth",
 grid0 <- cbind(seq(min(u0[, 1L]), max(u0[, 1L]), length.out = 64),
                seq(min(u0[, 2L]), max(u0[, 2L]), length.out = 64))
 
-cv0 <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds)
+cv0 <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds,
+               penalty = "lasso", threshold = "none")
 f0 <- cv0[["wafc.fit"]]
 s0 <- cv0[["lambda.min"]]
 
@@ -180,7 +181,8 @@ test_that("the sandwich of Lemma 13 holds on a fit to a truth in the basis", {
   N <- wafc_thr_norms(theta, d)
   set.seed(2)
   y <- as.numeric(d[["Z"]] %*% theta) + rnorm(n, sd = 0.5)
-  cv <- cv.wafc(x0, u0, y, J = 3L, foldid = folds, rescale = FALSE)
+  cv <- cv.wafc(x0, u0, y, J = 3L, foldid = folds, rescale = FALSE,
+                penalty = "lasso", threshold = "none")
   th0 <- wafc_threshold(cv, t = 0)
   Nh <- th0[["extra"]][["norm"]]
   D <- max(abs(Nh - N))
@@ -284,6 +286,7 @@ test_that("rule = \"cv\" works on the block LASSO and is reproducible", {
 })
 
 test_that("rule = \"oracle\" picks the candidate closest to the truth", {
+  skip_slow()
   truth <- list(x = test0[["x"]], u = test0[["u"]], f = test0[["f"]])
   th <- wafc_threshold(cv0, rule = "oracle", truth = truth)
   cand <- th[["extra"]][["candidates"]]
@@ -463,10 +466,13 @@ test_that("the two rules redone by hand on the block LASSO", {
 })
 
 test_that("rule = \"cvrel\" is invariant to the scale of the response", {
+  skip_slow()
   ## the same J and the same folds; the path of the LASSO scales with y, so
   ## the fits at the same point of it scale too, and the fractions c do not
-  cv1 <- cv.wafc(x0, u0, y0, J = 3L, foldid = folds)
-  cv10 <- cv.wafc(x0, u0, 10 * y0, J = 3L, foldid = folds)
+  cv1 <- cv.wafc(x0, u0, y0, J = 3L, foldid = folds,
+                 penalty = "lasso", threshold = "none")
+  cv10 <- cv.wafc(x0, u0, 10 * y0, J = 3L, foldid = folds,
+                  penalty = "lasso", threshold = "none")
   expect_equal(cv10[["lambda.min"]], 10 * cv1[["lambda.min"]],
                tolerance = 1e-6)
   a <- wafc_threshold(cv1, rule = "cvrel")
@@ -485,11 +491,13 @@ test_that("rule = \"cvrel\" is invariant to the scale of the response", {
 })
 
 test_that("the gate zeroes a pure null at a large n", {
+  skip_slow()
   nb <- 1000L
   d <- simulate_wafc(nb, p = p, q = q, scenario = "null", seed = 20261003L,
                      sigma = 0.62)
   cv <- cv.wafc(d[["x"]], d[["u"]], d[["y"]], J = 3:4,
-                foldid = rep_len(1:5, nb))
+                foldid = rep_len(1:5, nb),
+                penalty = "lasso", threshold = "none")
   g <- wafc_threshold_gate(cv, seed = 1L)
   expect_false(g[["reject"]])
   expect_lt(g[["stat"]], g[["quantile"]])

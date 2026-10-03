@@ -125,7 +125,8 @@ for (scen in scenarios) {
       t0 <- proc.time()[["elapsed"]]
       best <- NULL
       for (Ji in wafc_J_grid(NULL, n)) {
-        fj <- wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = Ji)
+        fj <- wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = Ji,
+                   penalty = "lasso")
         key <- as.character(Ji)
         if (is.null(dcache[[key]])) {
           dcache[[key]] <- list(

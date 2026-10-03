@@ -432,7 +432,8 @@ run_one <- function(key) {
   t0 <- proc.time()[["elapsed"]]
   cv <- cache_get(paste0("cv-", key),
                   cv.wafc(x[tr, ], u[tr, ], y[tr], trace = TRUE,
-                          wavelet.table = wtab))
+                          wavelet.table = wtab,
+                          penalty = "lasso", threshold = "none"))
   t_wafc <- proc.time()[["elapsed"]] - t0
   cat(sprintf("  cv.wafc: J = %d, lambda.min = %.6f, %d nonzero, %.1f s\n",
               cv[["J.min"]], cv[["lambda.min"]], cv[["nzero.min"]], t_wafc))
@@ -707,7 +708,8 @@ run_deep <- function(key, prev) {
   t0 <- proc.time()[["elapsed"]]
   cvd <- cache_get(sprintf("deep-%s-%d", key, Jnew),
                    cv.wafc(x[tr, ], u[tr, ], y[tr], J = Jnew, nfolds = 5L,
-                           trace = TRUE, wavelet.table = wtab))
+                           trace = TRUE, wavelet.table = wtab,
+                           penalty = "lasso", threshold = "none"))
   cat(sprintf("  J = %d, 5 folds: lambda.min = %.6f, %d nonzero, %.1f s\n",
               Jnew, cvd[["lambda.min"]], cvd[["nzero.min"]],
               proc.time()[["elapsed"]] - t0))
@@ -803,7 +805,8 @@ run_blocked <- function(key, prev) {
   cvb <- cache_get(sprintf("blocked-%s", key),
                    cv.wafc(x[tr, ], u[tr, ], y[tr], J = Jgrid,
                            foldid = foldid, trace = TRUE,
-                           wavelet.table = wtab))
+                           wavelet.table = wtab,
+                           penalty = "lasso", threshold = "none"))
   cat(sprintf("  cv.wafc on the blocked folds: J = %d, %d nonzero, %.1f s\n",
               cvb[["J.min"]], cvb[["nzero.min"]],
               proc.time()[["elapsed"]] - t0))

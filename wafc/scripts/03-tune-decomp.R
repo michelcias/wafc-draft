@@ -20,7 +20,8 @@ for (scen in scenarios) for (n in ns) {
                           seed = seed + 500000L, sigma = dgp[["sigma"]])
     Jn <- wafc_J_theory(n, s = sprime[[scen]])
     grid <- wafc_J_grid(NULL, n)
-    fits <- lapply(grid, function(Ji) wafc(dgp$x, dgp$u, dgp$y, J = Ji))
+    fits <- lapply(grid, function(Ji) wafc(dgp$x, dgp$u, dgp$y, J = Ji,
+                                           penalty = "lasso"))
     names(fits) <- as.character(grid)
     rmse_path <- lapply(fits, function(fj) {
       fh <- predict(fj, test$x, test$u)
@@ -32,7 +33,8 @@ for (scen in scenarios) for (n in ns) {
                                             sigma = dgp$sigma)
     at <- function(J, lam) {
       fj <- wafc(design = fits[[as.character(J)]]$design, y = dgp$y,
-                 lambda = wafc_path_to(lam, fits[[as.character(J)]]$design, dgp$y))
+                 lambda = wafc_path_to(lam, fits[[as.character(J)]]$design, dgp$y),
+                 penalty = "lasso")
       cf <- wafc_raw_coef(fj, s = lam)
       Zt <- wafc_design(test$x, test$u, spec = fj$design)$Z
       sqrt(mean((as.numeric(Zt %*% cf[-1L, 1L]) + cf[1L, 1L] - test$f)^2))

@@ -44,7 +44,8 @@ y_exact <- as.numeric(d0[["Z"]] %*% theta)
 ## ---------------------------------------------------------------------------
 
 test_that("cv.wafc selects a pair (J, lambda) whose optimality conditions hold", {
-  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds)
+  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds,
+                penalty = "lasso", threshold = "none")
   expect_s3_class(cv, "cv.wafc")
   expect_true(cv[["J.min"]] %in% 2:4)
   expect_equal(nrow(cv[["cvtab"]]), 3L)
@@ -70,8 +71,10 @@ test_that("cv.wafc selects a pair (J, lambda) whose optimality conditions hold",
 })
 
 test_that("the folds are fixed, so two calls with the same foldid agree", {
-  a <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds)
-  b <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds)
+  a <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds,
+               penalty = "lasso", threshold = "none")
+  b <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds,
+               penalty = "lasso", threshold = "none")
   expect_equal(a[["cvtab"]], b[["cvtab"]])
   expect_equal(a[["cv"]][[1L]][["cvm"]], b[["cv"]][[1L]][["cvm"]])
   expect_equal(a[["lambda.min"]], b[["lambda.min"]])
@@ -101,7 +104,8 @@ test_that("with theta* in the basis and no noise, the cross-validation goes to t
   ## its own path early on the deviance ratio and never reaches a small
   ## enough penalty level
   cv <- cv.wafc(x0, u0, y_exact, J = 3L, foldid = folds, rescale = FALSE,
-                lambda = c(0.1, 0.01, 1e-4, 1e-8))
+                lambda = c(0.1, 0.01, 1e-4, 1e-8),
+                penalty = "lasso", threshold = "none")
   expect_equal(cv[["J.min"]], 3L)
   lam <- cv[["wafc.fit"]][["lambda"]]
   expect_equal(cv[["lambda.min"]], min(lam))
@@ -111,7 +115,8 @@ test_that("with theta* in the basis and no noise, the cross-validation goes to t
 })
 
 test_that("coef and predict of a cv.wafc read the selected pair", {
-  cv <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds)
+  cv <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds,
+                penalty = "lasso", threshold = "none")
   fit <- cv[["wafc.fit"]]
   expect_equal(coef(cv, s = "lambda.min"), coef(fit, s = cv[["lambda.min"]]))
   expect_equal(coef(cv, s = "lambda.1se"), coef(fit, s = cv[["lambda.1se"]]))
@@ -125,14 +130,20 @@ test_that("coef and predict of a cv.wafc read the selected pair", {
 })
 
 test_that("cv.wafc validates its arguments", {
-  expect_error(cv.wafc(x0, u0, y0, J = 2.5), "integer")
-  expect_error(cv.wafc(x0, u0, y0, J = 0L), "larger than j0")
-  expect_error(cv.wafc(x0, u0, y0, J = 2L, nfolds = 2L), "at least 3")
-  expect_error(cv.wafc(x0, u0, y0, J = 2L, foldid = folds[-1L]),
+  expect_error(cv.wafc(x0, u0, y0, J = 2.5,
+                       penalty = "lasso", threshold = "none"), "integer")
+  expect_error(cv.wafc(x0, u0, y0, J = 0L,
+                       penalty = "lasso", threshold = "none"), "larger than j0")
+  expect_error(cv.wafc(x0, u0, y0, J = 2L, nfolds = 2L,
+                       penalty = "lasso", threshold = "none"), "at least 3")
+  expect_error(cv.wafc(x0, u0, y0, J = 2L, foldid = folds[-1L],
+                       penalty = "lasso", threshold = "none"),
                "one entry per observation")
-  expect_error(cv.wafc(x0, u0, y0, J = 2L, foldid = rep(1L, n)),
+  expect_error(cv.wafc(x0, u0, y0, J = 2L, foldid = rep(1L, n),
+                       penalty = "lasso", threshold = "none"),
                "at least 3 folds")
-  expect_error(cv.wafc(x0, u0, y0[-1L], J = 2L), "length")
+  expect_error(cv.wafc(x0, u0, y0[-1L], J = 2L,
+                       penalty = "lasso", threshold = "none"), "length")
 })
 
 ## ---------------------------------------------------------------------------
@@ -140,7 +151,7 @@ test_that("cv.wafc validates its arguments", {
 ## ---------------------------------------------------------------------------
 
 test_that("wafc_bic and wafc_ebic are the criteria they claim to be", {
-  fit <- wafc(x0, u0, y0, J = 3L)
+  fit <- wafc(x0, u0, y0, J = 3L, penalty = "lasso")
   ic <- wafc_bic(fit)
   expect_equal(nrow(ic), length(fit[["lambda"]]))
   expect_equal(ic[["lambda"]], fit[["lambda"]])
@@ -169,7 +180,7 @@ test_that("wafc_bic and wafc_ebic are the criteria they claim to be", {
 })
 
 test_that("the criteria can be read at a chosen penalty level", {
-  fit <- wafc(x0, u0, y0, J = 3L)
+  fit <- wafc(x0, u0, y0, J = 3L, penalty = "lasso")
   s <- fit[["lambda"]][c(20L, 40L)]
   ic <- wafc_bic(fit, s = s)
   expect_equal(ic[["lambda"]], s)
@@ -269,11 +280,13 @@ test_that("every rule returns a pair on the path whose optimality conditions hol
 })
 
 test_that("the qut rule is the cross-validated J with the penalty level of the QUT", {
+  skip_slow()
   ## Step E2.4b moved wafc_lambda_qut() here from competitors.R and made
   ## it the sixth rule. The resolution is not part of the rule, so it is
   ## the one the cross-validation of the other two rules selects, and only
   ## the penalty level changes: that is what the pilot did by hand.
-  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds)
+  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds,
+                penalty = "lasso", threshold = "none")
   tn <- wafc_tune(x0, u0, y0, rule = "qut", J = 2:4, foldid = folds,
                   nsim = 200L, qut.seed = 11L)
   expect_equal(tn[["J"]], cv[["J.min"]])
@@ -293,13 +306,17 @@ test_that("the dots of the tuning functions reach wafc() and not only wafc_desig
   ## could not be loosened through the interface at all (docs/ESTADO.md,
   ## 2026-09-21). Both callees now get what is theirs, and a name that
   ## belongs to neither is an error instead of a silent default.
-  a <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds, thresh = 1e-10)
-  b <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds, rescale = FALSE)
+  a <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds, thresh = 1e-10,
+               penalty = "lasso", threshold = "none")
+  b <- cv.wafc(x0, u0, y0, J = 2:3, foldid = folds, rescale = FALSE,
+               penalty = "lasso", threshold = "none")
   expect_s3_class(a, "cv.wafc")
-  expect_equal(a[["J.min"]], cv.wafc(x0, u0, y0, J = 2:3,
-                                     foldid = folds)[["J.min"]])
+  expect_equal(a[["J.min"]],
+               cv.wafc(x0, u0, y0, J = 2:3, foldid = folds,
+                       penalty = "lasso", threshold = "none")[["J.min"]])
   expect_false(b[["wafc.fit"]][["design"]][["rescale"]])
-  expect_error(cv.wafc(x0, u0, y0, J = 2L, foldid = folds, thrsh = 1e-7),
+  expect_error(cv.wafc(x0, u0, y0, J = 2L, foldid = folds, thrsh = 1e-7,
+                       penalty = "lasso", threshold = "none"),
                "unused argument")
   expect_error(wafc_tune(x0, u0, y0, rule = "bic", J = 2L, nope = 1),
                "unused argument")
@@ -331,7 +348,8 @@ test_that("the theory rule is exactly wafc_J_theory and wafc_lambda_theory", {
 })
 
 test_that("the cross-validation rules agree with cv.wafc on the same folds", {
-  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds)
+  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds,
+                penalty = "lasso", threshold = "none")
   a <- wafc_tune(x0, u0, y0, rule = "cv.min", J = 2:4, foldid = folds)
   b <- wafc_tune(x0, u0, y0, rule = "cv.1se", J = 2:4, foldid = folds)
   expect_equal(a[["J"]], cv[["J.min"]])
@@ -355,13 +373,14 @@ test_that("wafc_path_to ends at the level asked for and starts at the entry poin
   path <- wafc_path_to(lam, d, y0)
   expect_equal(min(path), lam)
   expect_true(!is.unsorted(rev(path)))
-  fit <- wafc(design = d, y = y0, lambda = path)
+  fit <- wafc(design = d, y = y0, lambda = path, penalty = "lasso")
   expect_equal(fit[["nzero"]][1L], 0L)
   ## the entry point is the level at which the first coefficient enters: a
   ## shade below it, the fit is no longer empty
   top <- wafc_lambda_max(d, y0)
   expect_gt(wafc(design = d, y = y0,
-                 lambda = c(top, 0.99 * top))[["nzero"]][2L], 0L)
+                 lambda = c(top, 0.99 * top),
+                 penalty = "lasso")[["nzero"]][2L], 0L)
   expect_error(wafc_path_to(-1, d, y0), "positive")
 })
 
@@ -377,8 +396,9 @@ test_that("wafc_tune validates its arguments", {
 test_that("cv.wafc keeps the fit of the selected level and only that one", {
   ## Only the best fit so far is held during the loop over J; the one
   ## returned has to be the fit at J.min, identical to fitting it directly.
-  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds)
-  direct <- wafc(x0, u0, y0, J = cv[["J.min"]])
+  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds,
+                penalty = "lasso", threshold = "none")
+  direct <- wafc(x0, u0, y0, J = cv[["J.min"]], penalty = "lasso")
   expect_equal(cv[["J.min"]], cv[["J"]][which.min(cv[["cvtab"]][["mse"]])])
   expect_equal(cv[["wafc.fit"]][["lambda"]], direct[["lambda"]])
   expect_equal(as.matrix(cv[["wafc.fit"]][["beta"]]),
@@ -392,7 +412,7 @@ test_that("wafc_lambda_max is the entry point of the engine with and without an 
                         intercept = ic)
     y1 <- d1[["y"]] + 5
     des <- wafc_design(d1[["x"]], d1[["u"]], J = 3L)
-    fit <- wafc(design = des, y = y1)
+    fit <- wafc(design = des, y = y1, penalty = "lasso")
     expect_equal(fit[["intercept"]], ic)
     expect_equal(wafc_lambda_max(des, y1), fit[["lambda"]][1L],
                  tolerance = 1e-8)
@@ -404,7 +424,7 @@ test_that("wafc_lambda_max is the entry point of the engine with and without an 
 ## ---------------------------------------------------------------------------
 
 test_that("wafc_gcv is n RSS / (n - df)^2 recomputed by hand", {
-  fit <- wafc(x0, u0, y0, J = 3L)
+  fit <- wafc(x0, u0, y0, J = 3L, penalty = "lasso")
   gc <- wafc_gcv(fit)
   expect_equal(gc[["lambda"]], fit[["lambda"]])
   ## the degrees of freedom of wafc_bic(): the non-zero wavelet
@@ -423,9 +443,10 @@ test_that("wafc_gcv is n RSS / (n - df)^2 recomputed by hand", {
 })
 
 test_that("the guard of the GCV leaves out the points with df >= n/2", {
+  skip_slow()
   ## J = 6 has 378 penalized columns for n = 250, so the end of the path
   ## goes past n/2 and, for some points, past n
-  fit <- wafc(x0, u0, y0, J = 6L, lambda.min.ratio = 1e-4)
+  fit <- wafc(x0, u0, y0, J = 6L, lambda.min.ratio = 1e-4, penalty = "lasso")
   gc <- wafc_gcv(fit)
   df <- fit[["nzero"]] + p
   expect_true(any(df >= n / 2))
@@ -446,7 +467,8 @@ test_that("the guard of the GCV leaves out the points with df >= n/2", {
   tn <- wafc_tune(x0, u0, y0, rule = "gcv", J = c(3L, 6L),
                   lambda.min.ratio = 1e-4)
   per <- lapply(c(3L, 6L), function(Ji) {
-    wafc_gcv(wafc(x0, u0, y0, J = Ji, lambda.min.ratio = 1e-4))
+    wafc_gcv(wafc(x0, u0, y0, J = Ji, lambda.min.ratio = 1e-4,
+                  penalty = "lasso"))
   })
   mins <- vapply(per, function(g) g[["gcv"]][attr(g, "which.min")], 0)
   free <- vapply(per, function(g) g[["gcv"]][attr(g, "which.min.unguarded")],
@@ -479,7 +501,7 @@ test_that("with theta* in the basis and no noise, the GCV recovers it", {
   ## path early on a noiseless response (and wafc_tune() has no 'lambda':
   ## the name would match 'lambda.min.ratio')
   fit <- wafc(x0, u0, y_exact, J = 3L, rescale = FALSE,
-              lambda = c(0.1, 0.01, 1e-4, 1e-8))
+              lambda = c(0.1, 0.01, 1e-4, 1e-8), penalty = "lasso")
   gc <- wafc_gcv(fit)
   expect_equal(attr(gc, "lambda.min"), 1e-8)
   expect_lt(gc[["df"]][4L], n / 2)
@@ -493,7 +515,8 @@ test_that("with theta* in the basis and no noise, the GCV recovers it", {
 ## ---------------------------------------------------------------------------
 
 test_that("wafc_cv_convergence reads the fits of every J and fold", {
-  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds)
+  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds,
+                penalty = "lasso", threshold = "none")
   cc <- wafc_cv_convergence(cv)
   expect_identical(cc[["J"]], 2:4)
   expect_identical(cc[["chosen"]], 2:4 == cv[["J.min"]])
@@ -517,7 +540,7 @@ test_that("a cut in the folds is seen, and where it falls", {
   ## last point a fold returned; the budget goes to the fold fits only, as
   ## wafc_cv_design() passes it
   des <- wafc_design(x0, u0, J = 3L)
-  full <- wafc(design = des, y = y0)
+  full <- wafc(design = des, y = y0, penalty = "lasso")
   z <- suppressWarnings(wafc_cv_design(des, y0, full, folds,
                                        function(e) e^2, "lasso", maxit = 200L))
   z[["J"]] <- 3L
@@ -540,7 +563,8 @@ test_that("a cut in the folds is seen, and where it falls", {
   ## a cut of the fit on the whole sample: jerr = -k, the path stops at
   ## k - 1, and the folds, asked for that shorter path, are not cut
   cv <- suppressWarnings(cv.wafc(x0, u0, y0, J = 3L, foldid = folds,
-                                 maxit = 200L))
+                                 maxit = 200L,
+                                 penalty = "lasso", threshold = "none"))
   c2 <- wafc_cv_convergence(cv)
   expect_true(c2[["cut"]])
   expect_identical(c2[["nreturned"]], -c2[["jerr"]] - 1L)

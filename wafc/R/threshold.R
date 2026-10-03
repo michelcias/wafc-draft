@@ -19,7 +19,9 @@
 ## blocks kept ("support", their reading, carried to blocks), or on every
 ## column of those blocks ("block").
 ##
-## Five rules choose t, and all but the last are estimators:
+## Five rules choose t, and all but the last are estimators. Since step
+## E3.1 the default is "cv1se", the rule of decision D45, which is also the
+## default of the threshold cv.wafc() applies; it was "max" before.
 ##
 ##   "max"     t = c max_{lm} N-hat_{lm}, invariant to the scale of the
 ##             response, with c = 0.15, the value step E1.7c started from;
@@ -73,12 +75,16 @@
 #' Corollary 8 of \file{derivations/06-selecao-limiar.tex}.
 #'
 #' @param object A \code{"cv.wafc"} object (the fit at \code{lambda.min} of
-#'   the selected \eqn{J}, with its folds), a \code{"wafc"} object (then
-#'   \code{s} is needed, and \code{foldid} for \code{rule = "cv"}), or a
-#'   \code{"wafc_competitor"} of method \code{"klopp"}, in any of its forms.
+#'   the selected \eqn{J}, with its folds, before any threshold
+#'   \code{\link{cv.wafc}} applied), a \code{"wafc"} object of any penalty
+#'   (then \code{s} is needed, and \code{foldid} for the rules that
+#'   cross-validate), or a \code{"wafc_competitor"} of method
+#'   \code{"klopp"}, in any of its forms.
 #' @param t The threshold. When given, \code{rule} is not used.
-#' @param rule \code{"max"}, \code{"cv"}, \code{"cvrel"}, \code{"cv1se"}
-#'   or \code{"oracle"}; see the header of \file{wafc/R/threshold.R}.
+#' @param rule \code{"cv1se"} (the default since step E3.1, decision D45),
+#'   \code{"max"}, \code{"cv"}, \code{"cvrel"} or \code{"oracle"}; see the
+#'   header of \file{wafc/R/threshold.R}. The rules other than
+#'   \code{"max"} and \code{"oracle"} need the folds.
 #' @param c The fraction of the largest norm used by \code{rule = "max"}.
 #' @param refit \code{"none"} (the default, the estimator of Corollary 8),
 #'   \code{"support"} (least squares on the level terms and the nonzero
@@ -102,7 +108,8 @@
 #' @param gate.test The result of \code{wafc_threshold_gate()} on the same
 #'   object, so that several calls test once.
 #' @param ... Passed to \code{\link{wafc}} when a fold of a WAFC fit is
-#'   refitted (arguments of the engine that the object does not record).
+#'   refitted (arguments of the engine that the object does not record:
+#'   \code{thresh}, \code{maxit}).
 #'
 #' @return An object of class \code{c("wafc_threshold",
 #'   "wafc_competitor")}. Its \code{extra} has the base \code{J} and
@@ -122,13 +129,14 @@
 #'
 #' @examples
 #' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
-#' cv <- cv.wafc(d$x, d$u, d$y, J = 3:4, nfolds = 5)
-#' th <- wafc_threshold(cv, rule = "max")
+#' cv <- cv.wafc(d$x, d$u, d$y, J = 3:4, nfolds = 5, threshold = "none")
+#' th <- wafc_threshold(cv)
 #' th$blocks
+#' wafc_threshold(cv, rule = "max")$blocks
 #'
 #' @export
 wafc_threshold <- function(object, t = NULL,
-                           rule = c("max", "cv", "cvrel", "cv1se", "oracle"),
+                           rule = c("cv1se", "max", "cv", "cvrel", "oracle"),
                            c = 0.15, refit = c("none", "support", "block"),
                            s = NULL, y = NULL, foldid = NULL, truth = NULL,
                            fold.fits = NULL, gate = c("none", "qut"),
@@ -347,7 +355,19 @@ wafc_thr_base_wafc <- function(object, s, y, foldid) {
     a <- list(design = wafc_subset_design(des, rows), y = y[rows],
               penalty = pen, lambda = path, intercept = object[["intercept"]])
     if (pen == "sglasso") a[["asparse"]] <- object[["asparse"]]
+    ## the chunks of the whole sample, and not the default b_n of the
+    ## fold's own n
+    if (pen == "block") a[["block.size"]] <- object[["group"]][["block.size"]]
     fi <- do.call(wafc, c(a, list(...)))
+    if (pen == "block") {
+      ## read at the point of the fold's path nearest to s, as
+      ## wafc_thr_base_klopp() reads a fold of wafc_fit_klopp(): grpreg
+      ## raises the first penalty level of a path it is given by 1e-5 when
+      ## there are unpenalized columns, so the interpolation at s would mix
+      ## two points where the fold has the one s stands for (step E3.1)
+      k <- which.min(abs(fi[["lambda"]] - s))
+      return(list(a0 = fi[["a0"]][k], b = unname(as.numeric(fi[["beta"]][, k]))))
+    }
     v <- wafc_raw_coef(fi, s = s)[, 1L]
     list(a0 = v[[1L]], b = unname(v[-1L]))
   }

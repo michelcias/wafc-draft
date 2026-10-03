@@ -187,6 +187,7 @@ test_that("the sparse design is the dense one", {
 })
 
 test_that("the lookup table reproduces the exact basis evaluation", {
+  skip_slow()
   de <- wafc_design(x0, u0, J = J, rescale = FALSE, use.table = "never")
   dt <- wafc_design(x0, u0, J = J, rescale = FALSE, use.table = "always")
   expect_null(de[["wavelet.table"]])

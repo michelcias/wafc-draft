@@ -52,7 +52,7 @@ y_exact <- as.numeric(d0[["Z"]] %*% theta)
 
 test_that("with theta* in the basis and no noise, wafc with lambda -> 0 recovers theta*", {
   fit <- wafc(design = d0, y = y_exact,
-              lambda = c(0.1, 0.01, 1e-4, 1e-8))
+              lambda = c(0.1, 0.01, 1e-4, 1e-8), penalty = "lasso")
   expect_s3_class(fit, "wafc")
   cf <- coef(fit, s = 1e-8)
   expect_equal(unname(cf["(Intercept)", 1L]), 0)
@@ -89,7 +89,7 @@ test_that("the sparse group LASSO also recovers theta* as lambda -> 0", {
 })
 
 test_that("the KKT conditions hold along the whole path, and fix the scale of lambda", {
-  fit <- wafc(x0, u0, y0, J = J)
+  fit <- wafc(x0, u0, y0, J = J, penalty = "lasso")
   k <- wafc_kkt(fit)
   expect_equal(nrow(k), length(fit[["lambda"]]))
   expect_true(all(k[["ok"]]))
@@ -142,8 +142,8 @@ test_that("a penalty level that kills the wavelet part leaves least squares on t
 test_that("the design of the fit can be reused, and sparse equals dense", {
   dd <- wafc_design(x0, u0, J = 4L, sparse = "never")
   ds <- wafc_design(x0, u0, J = 4L, sparse = "always")
-  f1 <- wafc(design = dd, y = y0)
-  f2 <- wafc(design = ds, y = y0)
+  f1 <- wafc(design = dd, y = y0, penalty = "lasso")
+  f2 <- wafc(design = ds, y = y0, penalty = "lasso")
   expect_equal(f1[["lambda"]], f2[["lambda"]], tolerance = 1e-8)
   ## glmnet drops the constant column only when the design is dense: with a
   ## sparse one it splits the level of x1 between the column and its own
@@ -157,41 +157,42 @@ test_that("the design of the fit can be reused, and sparse equals dense", {
                tolerance = 1e-8)
   expect_equal(predict(f1), predict(f2), tolerance = 1e-8)
   ## building the design inside wafc() gives the same thing
-  f3 <- wafc(x0, u0, y0, J = 4L, sparse = "never")
+  f3 <- wafc(x0, u0, y0, J = 4L, sparse = "never", penalty = "lasso")
   expect_equal(as.matrix(f3[["beta"]]), as.matrix(f1[["beta"]]),
                tolerance = 1e-10)
   expect_equal(f3[["design"]][["nvars"]], dd[["nvars"]])
 })
 
 test_that("wafc validates its arguments and refuses the ambiguous designs", {
-  expect_error(wafc(y = y0), "Supply 'x' and 'u'")
-  expect_error(wafc(design = d0, y = y0[-1L]), "length 300")
-  expect_error(wafc(x0, u0, y0, J = J, intercept = FALSE),
+  expect_error(wafc(y = y0, penalty = "lasso"), "Supply 'x' and 'u'")
+  expect_error(wafc(design = d0, y = y0[-1L], penalty = "lasso"), "length 300")
+  expect_error(wafc(x0, u0, y0, J = J, intercept = FALSE, penalty = "lasso"),
                "intercept = FALSE with the constant")
-  expect_error(wafc(design = list(), y = y0), "wafc_design")
-  expect_error(wafc(design = d0, y = y0, lambda = -1), "non-negative")
+  expect_error(wafc(design = list(), y = y0, penalty = "lasso"), "wafc_design")
+  expect_error(wafc(design = d0, y = y0, lambda = -1,
+                    penalty = "lasso"), "non-negative")
   ## two constant covariates: the level terms are not identified
   x2 <- cbind(x0, 1)
   colnames(x2) <- c(colnames(x0), "x4")
-  expect_error(wafc(x2, u0, y0, J = J), "not identified")
+  expect_error(wafc(x2, u0, y0, J = J, penalty = "lasso"), "not identified")
   ## a covariate identically zero cannot carry the intercept either
   x3 <- x0
   x3[, 1L] <- 0
-  expect_error(wafc(x3, u0, y0, J = J), "identically zero")
+  expect_error(wafc(x3, u0, y0, J = J, penalty = "lasso"), "identically zero")
   ## no constant covariate: no intercept by default, and it may be asked for
   xv <- cbind(stats::rnorm(n), x0[, 2:3])
-  fv <- wafc(xv, u0, y0, J = J)
+  fv <- wafc(xv, u0, y0, J = J, penalty = "lasso")
   expect_false(fv[["intercept"]])
   expect_true(is.na(fv[["carrier"]][["index"]]))
   expect_equal(unname(coef(fv, s = fv[["lambda"]][30])["(Intercept)", 1L]), 0)
-  fi <- wafc(xv, u0, y0, J = J, intercept = TRUE)
+  fi <- wafc(xv, u0, y0, J = J, intercept = TRUE, penalty = "lasso")
   expect_true(fi[["intercept"]])
   expect_true(all(wafc_kkt(fi)[["ok"]]))
 })
 
 test_that("a supplied path of penalty levels is the one of the objective", {
   lam <- c(0.5, 0.2, 0.05)
-  fit <- wafc(x0, u0, y0, J = J, lambda = lam)
+  fit <- wafc(x0, u0, y0, J = J, lambda = lam, penalty = "lasso")
   expect_equal(fit[["lambda"]], lam)
   expect_equal(fit[["fit"]][["lambda"]], lam / fit[["lambda.factor"]])
   expect_true(all(wafc_kkt(fit)[["ok"]]))
@@ -219,7 +220,7 @@ test_that("a supplied path of penalty levels is the one of the objective", {
 })
 
 test_that("print.wafc reports the fit", {
-  fit <- wafc(x0, u0, y0, J = J)
+  fit <- wafc(x0, u0, y0, J = J, penalty = "lasso")
   out <- utils::capture.output(print(fit))
   expect_match(out[1L], "LASSO")
   expect_true(any(grepl("carried by the intercept", out)))
@@ -231,7 +232,7 @@ test_that("print.wafc reports the fit", {
 ## ---------------------------------------------------------------------------
 
 test_that("coef folds the intercept into the level of the constant covariate", {
-  fit <- wafc(x0, u0, y0, J = J)
+  fit <- wafc(x0, u0, y0, J = J, penalty = "lasso")
   s <- fit[["lambda"]][30]
   cf <- coef(fit, s = s)
   raw <- stats::coef(fit[["fit"]], s = s / fit[["lambda.factor"]])
@@ -258,7 +259,7 @@ test_that("coef folds the intercept into the level of the constant covariate", {
 })
 
 test_that("predict reproduces the fitted values and extrapolates by the spec", {
-  fit <- wafc(x0, u0, y0, J = J)
+  fit <- wafc(x0, u0, y0, J = J, penalty = "lasso")
   s <- fit[["lambda"]][30]
   yh <- predict(fit, s = s)
   expect_equal(dim(yh), c(n, 1L))
@@ -292,7 +293,8 @@ test_that("predict reproduces the fitted values and extrapolates by the spec", {
 test_that("the reconstruction recovers the components that generated the data", {
   ## no noise and theta* in the basis: g_hat on a grid is the true
   ## expansion of the block evaluated at the same points
-  fit <- wafc(design = d0, y = y_exact, lambda = c(0.1, 0.01, 1e-4, 1e-8))
+  fit <- wafc(design = d0, y = y_exact, lambda = c(0.1, 0.01, 1e-4, 1e-8),
+              penalty = "lasso")
   fn <- wafc_functions(fit, s = 1e-8, n_grid = 64L)
   expect_s3_class(fn, "wafc_functions")
   expect_equal(dim(fn[["grid"]]), c(64L, q))
@@ -321,7 +323,7 @@ test_that("the reconstruction recovers the components that generated the data", 
 })
 
 test_that("the default grid is the range of the training sample", {
-  fit <- wafc(x0, u0, y0, J = J, rescale = TRUE)
+  fit <- wafc(x0, u0, y0, J = J, rescale = TRUE, penalty = "lasso")
   fn <- wafc_functions(fit, s = fit[["lambda"]][30], n_grid = 32L)
   expect_equal(apply(fn[["grid"]], 2L, min), apply(u0, 2L, min),
                tolerance = 1e-10, ignore_attr = TRUE)
@@ -337,7 +339,7 @@ test_that("the default grid is the range of the training sample", {
 })
 
 test_that("beta_hat is the level plus the components, and matches the truth", {
-  fit <- wafc(x0, u0, y0, J = 4L)
+  fit <- wafc(x0, u0, y0, J = 4L, penalty = "lasso")
   s <- fit[["lambda"]][40]
   bh <- predict(fit, newu = u0, s = s, type = "beta")
   expect_equal(dim(bh), c(n, p))
@@ -360,7 +362,7 @@ test_that("beta_hat is the level plus the components, and matches the truth", {
 })
 
 test_that("wafc_blocks reads the structure, and the group variant zeroes blocks", {
-  fit <- wafc(x0, u0, y0, J = 4L)
+  fit <- wafc(x0, u0, y0, J = 4L, penalty = "lasso")
   b <- wafc_blocks(fit, s = fit[["lambda"]][40])
   expect_equal(dim(b[["nonzero"]]), c(p, q))
   expect_equal(dimnames(b[["nonzero"]]), list(colnames(x0), colnames(u0)))
@@ -405,7 +407,7 @@ test_that("a fit does not store a second copy of its data in a call", {
   ## saved fit, and printing it deparsed the matrix.
   d <- simulate_wafc(n, p = p, q = q, scenario = "smooth", seed = 1L)
   des <- do.call(wafc_design, list(x = d[["x"]], u = d[["u"]], J = 4L))
-  fit <- do.call(wafc, list(design = des, y = d[["y"]]))
+  fit <- do.call(wafc, list(design = des, y = d[["y"]], penalty = "lasso"))
   for (cl in list(des[["call"]], fit[["call"]], fit[["fit"]][["call"]])) {
     expect_lt(sum(nchar(deparse(cl))), 1000L)
   }
@@ -423,20 +425,22 @@ test_that("a fit does not store a second copy of its data in a call", {
 ## ---------------------------------------------------------------------------
 
 test_that("the fit records the path asked, the path returned and jerr", {
-  fit <- wafc(design = d0, y = y0)
+  fit <- wafc(design = d0, y = y0, penalty = "lasso")
   cv <- fit[["conv"]]
   expect_identical(cv[["nlambda"]], 100L)
   expect_identical(cv[["nreturned"]], length(fit[["lambda"]]))
   expect_identical(cv[["jerr"]], as.integer(fit[["fit"]][["jerr"]]))
   expect_identical(cv[["jerr"]], 0L)
   ## a path given is asked in full
-  f2 <- wafc(design = d0, y = y0, lambda = fit[["lambda"]][1:30])
+  f2 <- wafc(design = d0, y = y0, lambda = fit[["lambda"]][1:30],
+             penalty = "lasso")
   expect_identical(f2[["conv"]][["nlambda"]], 30L)
   expect_identical(f2[["conv"]][["nreturned"]], 30L)
   ## a budget of passes too small cuts the path: glmnet returns the levels
   ## before the one that did not converge, and says which in jerr = -k
   f3 <- suppressWarnings(wafc(design = d0, y = y0,
-                              lambda = fit[["lambda"]][1:30], maxit = 20L))
+                              lambda = fit[["lambda"]][1:30], maxit = 20L,
+                              penalty = "lasso"))
   k <- -f3[["conv"]][["jerr"]]
   expect_gt(k, 0L)
   expect_identical(f3[["conv"]][["nreturned"]], k - 1L)

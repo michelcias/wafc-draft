@@ -20,12 +20,16 @@
 #'
 #' Reconstructs, at one penalty level, the levels \eqn{\hat c_\ell} and the
 #' additive components \eqn{\hat g_{\ell m}} of a fit on a grid of values of
-#' each modulating covariate.
+#' each modulating covariate. A \code{"cv.wafc"} object is read at its
+#' selected pair, after its threshold when it has one (decision D45), which
+#' is the WAFC estimator.
 #'
-#' @param object An object of class \code{"wafc"}.
+#' @param object An object of class \code{"wafc"} or \code{"cv.wafc"}.
 #' @param s The penalty level, a single value on the scale of the objective
 #'   of \code{\link{wafc}}. \code{NULL} takes the smallest value of the
-#'   path, which is the least penalized fit.
+#'   path, which is the least penalized fit, for a \code{"wafc"} object,
+#'   and \code{"lambda.min"} for a \code{"cv.wafc"} one, which also takes
+#'   \code{"lambda.1se"} (as \code{\link{coef.cv.wafc}}).
 #' @param grid The values at which the components are evaluated, on the
 #'   scale of the modulating covariates as they were given to
 #'   \code{\link{wafc}}: a matrix with \eqn{q} columns, a vector used for
@@ -33,6 +37,8 @@
 #'   spaced points over the range each covariate had in the training
 #'   sample.
 #' @param n_grid Number of grid points when \code{grid} is \code{NULL}.
+#' @param thresholded For a \code{"cv.wafc"} object, as in
+#'   \code{\link{coef.cv.wafc}}; ignored for a \code{"wafc"} one.
 #'
 #' @return An object of class \code{"wafc_functions"}: a list with the
 #'   penalty level \code{s}, the \code{grid} (\code{n_grid} by \eqn{q}), the
@@ -47,11 +53,21 @@
 #' fn <- wafc_functions(fit, s = fit$lambda[40], n_grid = 128)
 #' fn$nonzero
 #' plot(fn$grid[, 1], fn$g[[1, 1]], type = "l")
+#' cvfit <- cv.wafc(d$x, d$u, d$y, J = 3:4, nfolds = 5)
+#' wafc_functions(cvfit, n_grid = 128)$nonzero
 #'
 #' @export
-wafc_functions <- function(object, s = NULL, grid = NULL, n_grid = 512L) {
+wafc_functions <- function(object, s = NULL, grid = NULL, n_grid = 512L,
+                           thresholded = NULL) {
+  if (inherits(object, "cv.wafc")) {
+    f <- wafc_cv_fit(object, if (is.null(s)) "lambda.min" else s,
+                     thresholded)
+    return(wafc_functions(f[["fit"]], s = f[["s"]], grid = grid,
+                          n_grid = n_grid))
+  }
   if (!inherits(object, "wafc")) {
-    stop("'object' must be an object returned by wafc().", call. = FALSE)
+    stop("'object' must be an object returned by wafc() or cv.wafc().",
+         call. = FALSE)
   }
   design <- object[["design"]]
   p <- design[["p"]]
@@ -89,11 +105,18 @@ wafc_functions <- function(object, s = NULL, grid = NULL, n_grid = 512L) {
 #' \eqn{\hat\theta_{\ell m}} in each block \eqn{(\ell, m)}. A block that is
 #' entirely zero says that the fit left \eqn{\hat\beta_\ell} free of the
 #' modulating covariate \eqn{U_m}, which is the selection of structure the
-#' sparse group LASSO variant is meant to do.
+#' sparse group LASSO variant is meant to do. A \code{"cv.wafc"} object is
+#' read at its selected pair, after its threshold when it has one (decision
+#' D45), whose blocks kept are the structure the WAFC selects.
 #'
-#' @param object An object of class \code{"wafc"}.
+#' @param object An object of class \code{"wafc"} or \code{"cv.wafc"}.
 #' @param s Penalty levels, on the scale of the objective of
-#'   \code{\link{wafc}}. \code{NULL} takes the smallest value of the path.
+#'   \code{\link{wafc}}. \code{NULL} takes the smallest value of the path
+#'   for a \code{"wafc"} object, and \code{"lambda.min"} for a
+#'   \code{"cv.wafc"} one, which takes a single level, as
+#'   \code{\link{coef.cv.wafc}} does.
+#' @param thresholded For a \code{"cv.wafc"} object, as in
+#'   \code{\link{coef.cv.wafc}}; ignored for a \code{"wafc"} one.
 #'
 #' @return With a single \code{s}, a list of two \eqn{p} by \eqn{q}
 #'   matrices, \code{nonzero} and \code{norm}. With several, the two entries
@@ -105,9 +128,15 @@ wafc_functions <- function(object, s = NULL, grid = NULL, n_grid = 512L) {
 #' wafc_blocks(fit, s = fit$lambda[30])$nonzero
 #'
 #' @export
-wafc_blocks <- function(object, s = NULL) {
+wafc_blocks <- function(object, s = NULL, thresholded = NULL) {
+  if (inherits(object, "cv.wafc")) {
+    f <- wafc_cv_fit(object, if (is.null(s)) "lambda.min" else s,
+                     thresholded)
+    return(wafc_blocks(f[["fit"]], s = f[["s"]]))
+  }
   if (!inherits(object, "wafc")) {
-    stop("'object' must be an object returned by wafc().", call. = FALSE)
+    stop("'object' must be an object returned by wafc() or cv.wafc().",
+         call. = FALSE)
   }
   design <- object[["design"]]
   p <- design[["p"]]

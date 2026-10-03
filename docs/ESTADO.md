@@ -26,8 +26,9 @@ regras com nível acima do nominal; os cortes de caminho dos dois motores
 não tocam o `λ` escolhido. Por D43, nada medido em E2.5 é descartado. **E1.12
 fechou (2026-10-03):** a teoria em blocos está provada em `08-blocos.tex`
 (Corolário 11 sem logaritmo em `π ≥ 2`) e no adendo do `06` (o risco do
-limiarizado); quatro pontos esperam o autor (pergunta 42). E3.1 e E6.1b
-estão em curso (§5). A decidir: a saída da aplicação (pergunta 2). O
+limiarizado); a pergunta 42 foi decidida (D47). **E3.1 fechou
+(2026-10-03):** `cv.wafc(x, u, y)` é o WAFC de D44 e D45, a interface espera
+a ratificação do autor (pergunta 43). E6.1b parou antes da rodada (§5). A decidir: a saída da aplicação (pergunta 2). O
 teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 3` (`manuscript/ms_3.tex`,
 `supp_3.tex`, `references_3.bib`), aberta em 2026-10-01 por decisão do
@@ -2095,6 +2096,51 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-03: E3.1 fechada, o WAFC numa chamada só
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: a suíte padrão
+passa com **1 075 expectativas em 46 s** (17 puladas) e a inteira
+(`WAFC_SLOW_TESTS=1`) com **1 300 em 103 s**, 0 falhas nas duas; a
+**oitava junção exata** reproduz (as 3 000 linhas de `wafc.lasso`,
+`klopp.balanced` e dos 18 rótulos limiarizados na célula `smooth` iguais
+às do `e25j-joined.rds` em toda coluna fora o tempo, 0 erros); e o
+`wafc.block` coincide com o `klopp.balanced` nas 150 réplicas (mesmo `J`,
+`rmse_f` a 1,1e-16; o `+cv1se` com ISE igual).
+
+- **A interface** (`wafc/README.md`, "Interface (E3.1, proposta para
+  ratificação)"): `wafc(penalty = c("block", "lasso", "sglasso"))` e
+  `cv.wafc()` com o block LASSO balanceado como padrão, pelo `grpreg` nos
+  pedaços de `wafc_kp_groups(penalize.levels = FALSE, balanced = TRUE)`, e
+  `block.size` (padrão `⌈log n⌉`); `cv.wafc(..., threshold = c("cv1se",
+  "cv", "max", "none"))`, depois do `...` para não casar com `thresh`; o
+  limiar fica em `$threshold`, e `coef`, `predict`, `wafc_functions` e
+  `wafc_blocks` leem o ajuste limiarizado em `lambda.min` (`thresholded =
+  NULL`). `wafc_threshold()` passou a `rule = "cv1se"`. No bloco,
+  `intercept = FALSE` e `standardize = TRUE` são erro (o `grpreg` sempre
+  ajusta intercepto e ortonormaliza), o `cvm` segue a convenção do
+  `cv.grpreg` (média sobre as observações) e `thresh` é `1e-4`. O
+  `wafc_tune()`, o `wafc_sigma()` e o `wafc_fit_oracle()` continuam no
+  LASSO.
+- **Compatibilidade (D43):** 85 chamadas dos testes e os scripts 02 a 08
+  fixam o padrão antigo (`penalty = "lasso"`, `threshold = "none"`); o
+  `04-pilot.R` ganhou o método `wafc.block` (linhas `wafc.block` e
+  `wafc.block+cv1se`). Testes novos em `test-interface.R` (158
+  expectativas) e para `wafc_k_matched` e `print.wafc_competitor`, que não
+  tinham; `helper-slow.R` com `skip_slow()` em 17 testes.
+- **A tolerância do `grpreg`:** em `1e-4` o KKT do bloco falha no fim do
+  caminho (49 de 100 pontos, resíduo até 0,79 `λ`; em `1e-8`, 100 de 100),
+  mas **não chega à escolha**: em 40 réplicas (`smooth` e não homogêneo,
+  `n = 250` e `500`), `1e-8` dá o mesmo `J`, o mesmo `λ` e os mesmos blocos,
+  `rmse_f` com razão de 0,9973 a 1,0002, a 4,1 vezes o custo (9,7 contra
+  40,0 s por ajuste).
+- **Lição:** o `grpreg` soma `1e-5` ao primeiro `λ` de um caminho dado
+  quando há grupo livre, e o devolve assim; interpolar o caminho de uma
+  dobra em `s = λ_1` mistura dois pontos, e por isso a leitura do bloco é
+  pelo ponto mais próximo.
+- **Defeito pequeno, não corrigido:** o `wafc_thr_object()` grava
+  `coef = c(0, b)` depois de dobrar o intercepto e perde o nível da
+  covariável constante; nenhum código lê o campo.
+
 ### 2026-10-03: E1.12 fechada, a teoria em blocos provada
 
 Chat de tarefa, integrado aqui. Conferido nesta máquina: o
@@ -2935,6 +2981,18 @@ Ordenadas pelo que bloqueia mais.
    - (d) **A Observação 2 (variante branca) vai ao supp** como o enunciado
      que cobre o estimador exato do código. Recomendação: sim.
 
+43. **Pendências de E3.1** (2026-10-03). Recomendação do chat principal:
+   - (a) **Ratificar a interface** do `wafc/README.md` (como D17 e D19),
+     com os padrões `penalty = "block"` e `threshold = "cv1se"`, o
+     `thresholded = NULL` e o `cvm` do bloco na convenção do `cv.grpreg`.
+     Recomendação: ratificar; é o estimador medido, reproduzido à última
+     casa.
+   - (b) **`thresh = 1e-4` no bloco:** manter; `1e-8` não muda a escolha
+     em 40 de 40 réplicas e custa 4,1 vezes.
+   - (c) **O `grpreg` passa a `wafc_depends`** no `load.R`, com a linha no
+     `CONTINUAR.md`: sim, porque o padrão depende dele.
+   - (d) O defeito do `wafc_thr_object()`: corrigir em E3.2.
+
 ---
 
 ## 5. Próximos passos
@@ -2944,8 +3002,9 @@ recomendações das perguntas 33, 38 e 41 (D44 a D46): o WAFC é o block
 LASSO balanceado seguido do limiar `cv1se`, o LASSO fica como opção, o
 alvo continua a *Statistica Sinica*, e o spline de E4 entra com `gam.reml`
 e `gam.gcv`. **E1.12 fechada e integrada.** **E3.1** (a interface) em
-curso, com a junção exata feita e a medição da tolerância do `grpreg` por
-terminar. **E6.1b** (a aplicação) parou preparada, antes da rodada: o script
+**E3.1 fechada e integrada**, com a interface à espera da ratificação
+(pergunta 43); E3.2 (gráficos e documentação) e E3.3 (empacotamento, do
+autor) seguem. **E6.1b** (a aplicação) parou preparada, antes da rodada: o script
 10 e a fumaça estão prontos, e ela espera do autor (1) o aviso para a
 rodada, com núcleos, partições e dobras (proposta da tarefa: 4 processos,
 ~15 h, ~18 GB, porque beijing pede ~4,5 GB por processo; cortes possíveis:
@@ -3010,6 +3069,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | E3.1 fechada e integrada (1 075 testes em 46 s, 1 300 com os lentos, oitava junção exata): `cv.wafc(x, u, y)` é o block LASSO balanceado com limiar `cv1se`, e o `wafc.block` reproduz o `klopp.balanced` à última casa; a tolerância `1e-4` do `grpreg` não muda a escolha; pergunta 43 |
 | 2026-10-03 | Pergunta 42 decidida (D47): o Corolário 11 é o enunciado principal (emenda D16); `ϱ` e `𝒲` no `08` e no `06` (14 e 11 páginas, sem aviso); `notacao.md` §10; a taxa lenta fica no corpo em versão de blocos, a escrever |
 | 2026-10-03 | E1.12 fechada e integrada (`OK` em 207 s, 14 e 11 páginas): Teorema 3 (oráculo em blocos), Lema 15, Teorema 4 e Corolário 11 sem logaritmo em `π ≥ 2`, a variante branca cobrindo o `grpreg`, e o risco do limiarizado (Lema 16, Corolários 12 e 13); o `s' = 1/2` de D27 fica dentro do nosso enunciado e fora do de K&P; pergunta 42. E6.1b parou antes da rodada, à espera do autor |
 | 2026-10-03 | E3.1 (a interface com o block LASSO balanceado e o limiar `cv1se` como padrão) e E6.1b (a aplicação no critério de D44) catalogadas, em paralelo com a E1.12, sem arquivo em comum |

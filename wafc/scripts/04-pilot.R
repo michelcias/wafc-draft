@@ -135,6 +135,19 @@
 ## (wafc_cv_convergence() and extra$conv of the block LASSO; open question
 ## 41(d) of docs/ESTADO.md).
 ##
+## Step E3.1 adds 'wafc.block', the WAFC of decisions D44 and D45 through the
+## interface: cv.wafc() with the penalty and the threshold at their
+## defaults (the block LASSO by balanced chunks, the threshold "cv1se"), on
+## the folds of the replicate, read the way a user reads it, by predict(),
+## wafc_grid_components() and wafc_blocks() of the "cv.wafc" object. Two
+## rows: 'wafc.block', the fit at the selected pair without the threshold
+## (thresholded = FALSE), and 'wafc.block+cv1se', the estimator. They are
+## the proof that the interface is the estimator the tables of E2.5
+## measured: the first has to coincide with 'klopp.balanced' and the second
+## with 'klopp.balanced+cv1se' in every column but the time. Its nzero is
+## NA without the threshold and the number of nonzero wavelet coefficients
+## after it, as for those two. It takes no part of the random stream.
+##
 ## The two parts that answer a question about the code rather than about
 ## the method, 'margin' and 'j1', are capped at 20 replicates:
 ## what they measure is a ranking of margins and a frequency of selection,
@@ -274,8 +287,8 @@ if (length(args) >= 5L && nzchar(args[5L])) {
 methods <- c("wafc.lasso", "wafc.sglasso", "wafc.gcv", "gam", "gam.matched",
              "gam.reml", "gam.gcv", "gam.cv", "bsgl",
              "klopp", "klopp.free", "klopp.unit", "klopp.merged",
-             "klopp.balanced", "klopp.freecoarse", "aspline", "vcbart",
-             "linear", "oracle")
+             "klopp.balanced", "klopp.freecoarse", "wafc.block", "aspline",
+             "vcbart", "linear", "oracle")
 ## The engine of 'gam.gcv' (step E2.5h): bam discretizes the covariates only
 ## under REML, and with method = "GCV.Cp" it warns and fits without the
 ## discretization, so the choice is between bam and gam without it. bam by
@@ -317,7 +330,8 @@ thr_labels <- function(base) {
 }
 method_levels <- unlist(lapply(methods, function(m) {
   c(m, if (m %in% thr_bases) thr_labels(m),
-    if (m == "wafc.gcv") "wafc.gcv+max")
+    if (m == "wafc.gcv") "wafc.gcv+max",
+    if (m == "wafc.block") "wafc.block+cv1se")
 }))
 run_methods <- methods
 if (nzchar(Sys.getenv("WAFC_METHODS", ""))) {
@@ -566,7 +580,8 @@ run_competitors <- function(cell, n, r) {
     from_start()
     t0 <- proc.time()[["elapsed"]]
     cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], penalty = pen,
-                      foldid = foldid, wavelet.table = wafc_pilot_table),
+                      foldid = foldid, wavelet.table = wafc_pilot_table,
+                      threshold = "none"),
               silent = TRUE)
     if (inherits(cv, "try-error")) {
       rows[[length(rows) + 1L]] <- fail_row(cell, n, r, paste0("wafc.", pen),
@@ -662,6 +677,39 @@ run_competitors <- function(cell, n, r) {
     }
   }
 
+  ## 'wafc.block' (step E3.1): the WAFC of D44 and D45 through cv.wafc(),
+  ## every argument of the estimator at its default; see the header.
+  if ("wafc.block" %in% run_methods) {
+    from_start()
+    t0 <- proc.time()[["elapsed"]]
+    cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], foldid = foldid,
+                      wavelet.table = wafc_pilot_table), silent = TRUE)
+    el <- proc.time()[["elapsed"]] - t0
+    if (inherits(cv, "try-error")) {
+      for (lab in c("wafc.block", "wafc.block+cv1se")) {
+        rows[[length(rows) + 1L]] <- fail_row(cell, n, r, lab, dgp, active,
+                                              cv)
+      }
+    } else {
+      for (thr in c(FALSE, TRUE)) {
+        rows[[length(rows) + 1L]] <- one_row(
+          cell, n, r, if (thr) "wafc.block+cv1se" else "wafc.block", dgp,
+          test, grid,
+          list(f_test = as.numeric(predict(cv, test[["x"]], test[["u"]],
+                                           thresholded = thr)),
+               beta_test = predict(cv, newu = test[["u"]], type = "beta",
+                                   thresholded = thr),
+               time = el),
+          active, wafc_blocks(cv, thresholded = thr)[["nonzero"]] > 0L,
+          if (thr) wafc_grid_components(cv, grid) else
+            wafc_grid_components(cv[["wafc.fit"]], grid,
+                                 s = cv[["lambda.min"]]),
+          list(J = cv[["J.min"]], lambda = cv[["lambda.min"]],
+               nzero = if (thr) cv[["threshold"]][["nzero"]] else NULL))
+      }
+    }
+  }
+
   ## 'gam.matched' is mgcv with the basis dimension of each smooth matched to
   ## the 2^J wavelet columns of a block at the J the WAFC with the LASSO
   ## selected on this replicate (wafc_k_matched(), step E2.4b), fitted by
@@ -673,7 +721,7 @@ run_competitors <- function(cell, n, r) {
   ## variants of step E2.5c, the one of step E2.5e and the one of step
   ## E2.5f keep the levels free as well.
   for (lab in setdiff(run_methods, c("wafc.lasso", "wafc.sglasso",
-                                     "wafc.gcv"))) {
+                                     "wafc.gcv", "wafc.block"))) {
     from_start()
     mth <- sub(
       "\\.(matched|reml|gcv|cv|free|unit|merged|balanced|freecoarse)$", "",
@@ -806,7 +854,8 @@ run_lambda <- function(cell, n, r) {
   ## plus, for the QUT, its own simulation and refit.
   t0 <- proc.time()[["elapsed"]]
   cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], foldid = foldid,
-                    wavelet.table = wafc_pilot_table), silent = TRUE)
+                    wavelet.table = wafc_pilot_table,
+                    penalty = "lasso", threshold = "none"), silent = TRUE)
   el_cv <- proc.time()[["elapsed"]] - t0
   if (inherits(cv, "try-error")) {
     for (rule in c("cv.min", "cv.1se", "qut")) {
@@ -841,7 +890,8 @@ run_lambda <- function(cell, n, r) {
     lq <- wafc_lambda_qut(fcv[["design"]], dgp[["y"]], nsim = 200L,
                           seed = seed + 5L)
     fq2 <- wafc(design = fcv[["design"]], y = dgp[["y"]],
-                lambda = wafc_path_to(lq, fcv[["design"]], dgp[["y"]]))
+                lambda = wafc_path_to(lq, fcv[["design"]], dgp[["y"]]),
+                penalty = "lasso")
     el <- el_cv + proc.time()[["elapsed"]] - t0
     rows[[length(rows) + 1L]] <- record("qut", fq2, lq, el, cv[["J.min"]])
   }
@@ -851,7 +901,7 @@ run_lambda <- function(cell, n, r) {
   best <- NULL
   for (Ji in wafc_J_grid(NULL, n)) {
     fj <- wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = Ji,
-               wavelet.table = wafc_pilot_table)
+               wavelet.table = wafc_pilot_table, penalty = "lasso")
     dd <- designs(fj)
     cfj <- wafc_raw_coef(fj)
     fh <- sweep(as.matrix(dd[["test"]][["Z"]] %*% cfj[-1L, , drop = FALSE]),
@@ -920,7 +970,8 @@ run_margin_fit <- function(cell, n, r) {
       e <- eg[[en]]
       if (e >= 0.5) next
       fit <- try(wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = J, eps = e,
-                      wavelet.table = wafc_pilot_table), silent = TRUE)
+                      wavelet.table = wafc_pilot_table,
+                      penalty = "lasso"), silent = TRUE)
       if (inherits(fit, "try-error")) next
       z <- wafc_cv_design(fit[["design"]], dgp[["y"]], fit, foldid,
                           function(v) v^2, "lasso")
@@ -965,7 +1016,8 @@ run_j1 <- function(cell, n, r) {
   for (lo in 1:2) {
     t0 <- proc.time()[["elapsed"]]
     cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = lo:Jmax,
-                      foldid = foldid, wavelet.table = wafc_pilot_table),
+                      foldid = foldid, wavelet.table = wafc_pilot_table,
+                      penalty = "lasso", threshold = "none"),
               silent = TRUE)
     if (inherits(cv, "try-error")) next
     el <- proc.time()[["elapsed"]] - t0
@@ -1011,7 +1063,8 @@ run_jgrid <- function(cell, n, r, deep = 8L) {
     Jtop <- if (lab == "short") Jshort else deep
     t0 <- proc.time()[["elapsed"]]
     cv <- try(cv.wafc(dgp[["x"]], dgp[["u"]], dgp[["y"]], J = 2:Jtop,
-                      foldid = foldid, wavelet.table = wafc_pilot_table),
+                      foldid = foldid, wavelet.table = wafc_pilot_table,
+                      penalty = "lasso", threshold = "none"),
               silent = TRUE)
     if (inherits(cv, "try-error")) next
     el <- proc.time()[["elapsed"]] - t0

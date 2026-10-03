@@ -46,7 +46,8 @@
 ## verifies it. Every lambda that goes in or comes out of the functions
 ## below is therefore on the scale of the objective.
 
-#' Cross-validation of a WAFC fit over the resolution level and the penalty
+#' Cross-validation of a WAFC fit over the resolution level and the penalty,
+#' followed by a threshold on the blocks
 #'
 #' \eqn{k}-fold cross-validation over the pair \eqn{(J, \lambda)}: for each
 #' candidate resolution level the design is built once on the whole sample,
@@ -63,6 +64,31 @@
 #' range, not a fitted quantity, and keeping it fixed is what makes the
 #' columns of the folds comparable.
 #'
+#' With \code{penalty = "block"}, the default since step E3.1 (decision
+#' D44), the cross-validation of each candidate \eqn{J} is the one of the
+#' engine, \code{\link[grpreg]{cv.grpreg}} on the same folds, which is how
+#' \code{\link{wafc_fit_klopp}} chose \eqn{(J, \lambda)} in every
+#' measurement of step E2.5: the fold fits use the standardization of the
+#' whole sample, the path is the one of the fit on the whole sample cut at
+#' the last penalty level every fold reached, \code{cvm} is the loss
+#' averaged over the \eqn{n} held-out observations (the mean of the fold
+#' means of the other two penalties when the folds have equal sizes) and
+#' \code{cvsd} its standard error over the observations,
+#' \code{sd/sqrt(n)}, where the other two penalties take the standard
+#' error over the folds. The pair selected is therefore the one of
+#' \code{wafc_fit_klopp(penalize.levels = FALSE, balanced = TRUE)} on the
+#' same folds, coefficient for coefficient.
+#'
+#' The fit at the selected pair is then thresholded on the blocks
+#' \eqn{(\ell, m)} (decision D45): \code{\link{wafc_threshold}} with the
+#' rule \code{threshold}, on the same folds, without refit. The blocks
+#' whose coefficient norm is not above the chosen \eqn{t} are set to zero,
+#' and the result is the WAFC estimator: \code{\link[=coef.cv.wafc]{coef}},
+#' \code{\link[=predict.cv.wafc]{predict}}, \code{\link{wafc_functions}}
+#' and \code{\link{wafc_blocks}} read it at \code{s = "lambda.min"}. The
+#' path itself is untouched in \code{wafc.fit}, and every other penalty
+#' level is read there, without threshold.
+#'
 #' @param x,u,y The data, as in \code{\link{wafc}}.
 #' @param J The grid of candidate resolution levels. \code{NULL} (the
 #'   default) uses \code{2:8} (decision D34). The rule of \code{cv.wall},
@@ -73,8 +99,8 @@
 #'   error of the components by 32\% in the inhomogeneous scenario at
 #'   \eqn{n = 1000}. The grid starts at 2 because step E2.4 measured that
 #'   \eqn{J = 1} is never selected; passing \code{J = 1:8} is allowed.
-#' @param penalty \code{"lasso"} or \code{"sglasso"}, as in
-#'   \code{\link{wafc}}.
+#' @param penalty \code{"block"} (the default), \code{"lasso"} or
+#'   \code{"sglasso"}, as in \code{\link{wafc}}.
 #' @param nfolds Number of folds, at least 3.
 #' @param foldid Optional vector of length \eqn{n} with the fold of each
 #'   observation, which overrides \code{nfolds}. Supplying it is how two
@@ -89,6 +115,16 @@
 #' @param trace If \code{TRUE}, prints one line per candidate \eqn{J}.
 #' @param ... Further arguments passed to \code{\link{wafc}} and through it
 #'   to \code{\link{wafc_design}}.
+#' @param threshold The rule that chooses the threshold \eqn{t} of the
+#'   blocks at the selected pair: \code{"cv1se"} (the default, decision
+#'   D45: the largest \eqn{t} whose cross-validated error is within one
+#'   standard error between folds of the smallest), \code{"cv"} (the
+#'   \eqn{t} of the smallest cross-validated error) or \code{"max"}
+#'   (\eqn{t = 0.15 \max_{\ell m} \hat\nu_{\ell m}}); see
+#'   \code{\link{wafc_threshold}}. \code{"none"} returns the fit without
+#'   threshold, which is what \code{cv.wafc()} returned before step E3.1.
+#'   It comes after \code{...}, so it is matched only by its full name, and
+#'   the \code{thresh} of \code{\link{wafc}} cannot be taken for it.
 #'
 #' @return An object of class \code{"cv.wafc"}: a list with the grid
 #'   \code{J}, the list \code{cv} of per-candidate results (\code{lambda},
@@ -96,27 +132,42 @@
 #'   \code{lambda.min}, \code{lambda.1se} and the values attained at
 #'   \code{lambda.min}), the summary \code{cvtab}, the selected
 #'   \code{J.min}, \code{lambda.min} and \code{lambda.1se}, the
-#'   \code{foldid} used, and \code{wafc.fit}, the fit on the whole sample at
-#'   \code{J.min}, which is the fit the selected pair refers to.
+#'   \code{foldid} used, the \code{penalty}, \code{wafc.fit}, the fit on
+#'   the whole sample at \code{J.min}, which is the fit the selected pair
+#'   refers to, and \code{threshold}, \code{NULL} with
+#'   \code{threshold = "none"} and otherwise a list with the \code{rule},
+#'   the threshold \code{t}, the fraction \code{c} of the largest norm,
+#'   the \eqn{p \times q} matrices \code{norm} (before the threshold) and
+#'   \code{kept}, the thresholded coefficients \code{a0} and \code{b} in
+#'   the coordinates of the design, their number \code{nzero} of non-zero
+#'   wavelet coefficients, the \code{candidates} the rule scored and the
+#'   seconds \code{time} it took (the fold fits included).
 #'
 #' @seealso \code{\link{wafc_bic}}, \code{\link{wafc_tune}},
-#'   \code{\link{wafc_J_theory}}.
+#'   \code{\link{wafc_J_theory}}, \code{\link{wafc_threshold}}.
 #'
 #' @examples
 #' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
 #' cvfit <- cv.wafc(d$x, d$u, d$y, J = 2:4, nfolds = 5)
 #' cvfit
-#' cf <- coef(cvfit, s = "lambda.1se")
+#' cvfit$threshold$kept
+#' cf <- coef(cvfit)
+#' cl <- cv.wafc(d$x, d$u, d$y, J = 2:4, nfolds = 5, penalty = "lasso",
+#'               threshold = "none")
+#' cf1 <- coef(cl, s = "lambda.1se")
 #'
 #' @export
-cv.wafc <- function(x, u, y, J = NULL, penalty = c("lasso", "sglasso"),
+cv.wafc <- function(x, u, y, J = NULL,
+                    penalty = c("block", "lasso", "sglasso"),
                     nfolds = 10L, foldid = NULL, lambda = NULL,
                     nlambda = 100L, lambda.min.ratio = NULL,
-                    type.measure = c("mse", "mae"), trace = FALSE, ...) {
+                    type.measure = c("mse", "mae"), trace = FALSE, ...,
+                    threshold = c("cv1se", "cv", "max", "none")) {
 
   this_call <- wafc_compact_call(match.call(), "cv.wafc")
   penalty <- match.arg(penalty)
   type.measure <- match.arg(type.measure)
+  threshold <- match.arg(threshold)
   x <- wafc_as_matrix(x, "x")
   u <- wafc_as_matrix(u, "u")
   n <- nrow(x)
@@ -135,6 +186,10 @@ cv.wafc <- function(x, u, y, J = NULL, penalty = c("lasso", "sglasso"),
   run_one <- function(Ji) {
     design <- do.call(wafc_design,
                       c(list(x = x, u = u, J = Ji), dots[["design"]]))
+    if (penalty == "block") {
+      return(wafc_cv_block(design, y, foldid, lambda, nlambda,
+                           lambda.min.ratio, type.measure, dots[["fit"]], Ji))
+    }
     full <- do.call(wafc, c(list(design = design, y = y, penalty = penalty,
                                  lambda = lambda, nlambda = nlambda,
                                  lambda.min.ratio = lambda.min.ratio),
@@ -188,8 +243,20 @@ cv.wafc <- function(x, u, y, J = NULL, penalty = c("lasso", "sglasso"),
               lambda.1se = z[["lambda.1se"]], cvm.min = z[["cvm.min"]],
               cvsd.min = z[["cvsd.min"]], nzero.min = z[["nzero.min"]],
               type.measure = type.measure, nfolds = nfolds, foldid = foldid,
-              penalty = penalty, wafc.fit = best_fit)
+              penalty = penalty, wafc.fit = best_fit, threshold = NULL)
   class(out) <- "cv.wafc"
+
+  ## The threshold of decision D45, on the folds of the cross-validation and
+  ## at the pair it selected. The fold fits of wafc_threshold() refit the
+  ## engine, so the controls of the engine the caller passed go with them
+  ## (the ones the object records, the penalty, the chunks and the
+  ## intercept, are set there).
+  if (threshold != "none") {
+    eng <- dots[["fit"]][names(dots[["fit"]]) %in%
+                           c("thresh", "maxit", "standardize")]
+    th <- do.call(wafc_threshold, c(list(out, rule = threshold), eng))
+    out[["threshold"]] <- wafc_cv_thr_slot(out, th)
+  }
   out
 }
 
@@ -208,16 +275,41 @@ print.cv.wafc <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
   cat("\nSelected: J =", x[["J.min"]],
       "with lambda.min =", signif(x[["lambda.min"]], digits),
       "( lambda.1se =", signif(x[["lambda.1se"]], digits), ")\n")
+  th <- x[["threshold"]]
+  if (is.null(th)) {
+    cat("No threshold on the blocks.\n")
+  } else {
+    kept <- th[["kept"]]
+    cat(sprintf("Threshold \"%s\" at lambda.min: t = %s, %d of %d block(s) kept",
+                th[["rule"]], format(th[["t"]], digits = digits), sum(kept),
+                length(kept)))
+    if (any(kept)) {
+      cat(":", paste(outer(rownames(kept), colnames(kept), paste,
+                           sep = ":")[kept], collapse = ", "))
+    }
+    cat("\n")
+  }
   invisible(x)
 }
 
 #' Coefficients and predictions at the cross-validated pair
 #'
+#' At \code{s = "lambda.min"}, the default, these read the thresholded fit
+#' when the object has one (decision D45; \code{\link{cv.wafc}}, argument
+#' \code{threshold}), which is the WAFC estimator; at any other penalty
+#' level they read the path of \code{wafc.fit}, without threshold, since
+#' the threshold was chosen at \code{lambda.min}.
+#'
 #' @param object An object of class \code{"cv.wafc"}.
 #' @param s \code{"lambda.min"}, \code{"lambda.1se"}, or a numeric penalty
 #'   level on the scale of the objective of \code{\link{wafc}}.
+#' @param thresholded \code{NULL} (the default) reads the thresholded fit
+#'   exactly when the object has one and \code{s} is \code{lambda.min};
+#'   \code{FALSE} reads the path at \code{s} in every case; \code{TRUE}
+#'   asks for the thresholded fit and is an error where there is none.
 #' @param newx,newu New covariates, as in \code{\link{predict.wafc}}.
-#' @param ... Passed to the method of the underlying \code{"wafc"} object.
+#' @param ... Passed to the method of the underlying \code{"wafc"} object
+#'   (\code{type} of \code{\link{predict.wafc}}).
 #'
 #' @return As \code{\link{coef.wafc}} and \code{\link{predict.wafc}}, at the
 #'   resolution level \code{J.min} selected by the cross-validation.
@@ -226,23 +318,30 @@ print.cv.wafc <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
 #' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
 #' cvfit <- cv.wafc(d$x, d$u, d$y, J = 2:3, nfolds = 5)
 #' dim(coef(cvfit))
-#' head(predict(cvfit, d$x, d$u, s = "lambda.min"))
+#' head(predict(cvfit, d$x, d$u))
+#' head(predict(cvfit, d$x, d$u, thresholded = FALSE))
+#' head(predict(cvfit, newu = d$u, type = "beta"))
 #'
 #' @export
-coef.cv.wafc <- function(object, s = c("lambda.min", "lambda.1se"), ...) {
-  coef(object[["wafc.fit"]], s = wafc_cv_s(object, s), ...)
+coef.cv.wafc <- function(object, s = c("lambda.min", "lambda.1se"),
+                         thresholded = NULL, ...) {
+  f <- wafc_cv_fit(object, s, thresholded)
+  coef(f[["fit"]], s = f[["s"]], ...)
 }
 
 #' @rdname coef.cv.wafc
 #' @export
 predict.cv.wafc <- function(object, newx, newu,
-                            s = c("lambda.min", "lambda.1se"), ...) {
-  s <- wafc_cv_s(object, s)
+                            s = c("lambda.min", "lambda.1se"),
+                            thresholded = NULL, ...) {
+  f <- wafc_cv_fit(object, s, thresholded)
+  fit <- f[["fit"]]
+  s <- f[["s"]]
   if (missing(newx) && missing(newu)) {
-    return(predict(object[["wafc.fit"]], s = s, ...))
+    return(predict(fit, s = s, ...))
   }
-  if (missing(newx)) return(predict(object[["wafc.fit"]], newu = newu, s = s, ...))
-  predict(object[["wafc.fit"]], newx, newu, s = s, ...)
+  if (missing(newx)) return(predict(fit, newu = newu, s = s, ...))
+  predict(fit, newx, newu, s = s, ...)
 }
 
 #' Information criteria of a WAFC fit
@@ -695,9 +794,13 @@ wafc_tune <- function(x, u, y,
   }
 
   if (rule %in% c("cv.min", "cv.1se", "qut")) {
+    ## no threshold: the rules here choose (J, lambda), and the fit they
+    ## return is read on the path (step E3.1 made the threshold the default
+    ## of cv.wafc(), which this function did not ask for before)
     cv <- cv.wafc(x, u, y, J = J, penalty = penalty, nfolds = nfolds,
                   foldid = foldid, nlambda = nlambda,
-                  lambda.min.ratio = lambda.min.ratio, ...)
+                  lambda.min.ratio = lambda.min.ratio, ...,
+                  threshold = "none")
     ## The quantile universal threshold says nothing about the
     ## resolution, so J is the cross-validated one and only lambda
     ## changes. The fit is refitted down to that lambda, because it need
@@ -912,6 +1015,15 @@ wafc_lambda_qut <- function(design, y, alpha = 0.05, nsim = 200L,
 #' last point, because \code{\link{wafc_raw_coef}} truncates \eqn{s} to the
 #' range of the path.
 #'
+#' For \code{penalty = "block"} the folds are fitted inside
+#' \code{\link[grpreg]{cv.grpreg}}, which does not report them one by one;
+#' the table is then the one \code{\link{wafc_fit_klopp}} keeps in
+#' \code{extra$conv}, read from the same objects: the path asked, returned
+#' and cross-validated (\code{cv.grpreg} drops the penalty levels some
+#' fold did not reach), the iterations against the budget of \pkg{grpreg},
+#' which it counts over the whole path, and whether the selected level is
+#' the last one of a path that was cut (\code{cut.at.min}).
+#'
 #' @param object An object of class \code{"cv.wafc"}.
 #'
 #' @return A data frame with \code{J}, \code{chosen}, \code{nlambda}
@@ -928,6 +1040,10 @@ wafc_lambda_qut <- function(design, y, alpha = 0.05, nsim = 200L,
 wafc_cv_convergence <- function(object) {
   if (!inherits(object, "cv.wafc")) {
     stop("'object' must be a \"cv.wafc\" object.", call. = FALSE)
+  }
+  if (identical(object[["penalty"]], "block")) {
+    return(wafc_kp_conv_table(lapply(object[["cv"]], `[[`, "conv"),
+                              object[["J.min"]]))
   }
   rows <- lapply(object[["cv"]], function(z) {
     cv <- z[["conv"]]
@@ -1145,6 +1261,138 @@ wafc_cv_s <- function(object, s) {
          "non-negative value.", call. = FALSE)
   }
   as.numeric(s)
+}
+
+## The fit a method of "cv.wafc" reads at 's': the thresholded fit when
+## there is one and s is lambda.min (unless thresholded = FALSE), the path
+## of wafc.fit otherwise. The thresholded fit is the "wafc" object of
+## wafc_cv_thr_view(), a path of one point, so every method of "wafc" reads
+## it unchanged.
+wafc_cv_fit <- function(object, s, thresholded = NULL) {
+  s <- wafc_cv_s(object, s)
+  if (!is.null(thresholded) &&
+      (!is.logical(thresholded) || length(thresholded) != 1L ||
+       is.na(thresholded))) {
+    stop("'thresholded' must be NULL, TRUE or FALSE.", call. = FALSE)
+  }
+  has <- !is.null(object[["threshold"]])
+  at_min <- isTRUE(s == object[["lambda.min"]])
+  use <- if (is.null(thresholded)) has && at_min else thresholded
+  if (isTRUE(use)) {
+    if (!has) {
+      stop("This \"cv.wafc\" object has no threshold (threshold = ",
+           "\"none\"); use thresholded = FALSE or NULL.", call. = FALSE)
+    }
+    if (!at_min) {
+      stop("The threshold was chosen at lambda.min; at another penalty ",
+           "level use thresholded = FALSE or NULL.", call. = FALSE)
+    }
+    return(list(fit = wafc_cv_thr_view(object), s = s))
+  }
+  list(fit = object[["wafc.fit"]], s = s)
+}
+
+## What cv.wafc() keeps of the threshold: the rule, the threshold and the
+## blocks kept, and the coefficients of the thresholded fit in the
+## coordinates of the design (the coefficients of wafc.fit at lambda.min
+## with the blocks not kept set to zero, the estimator of Corollary 8 with
+## no refit). The object of wafc_threshold() itself is not kept: its
+## functions carry the design in their environment, and a saved "cv.wafc"
+## would carry it twice.
+wafc_cv_thr_slot <- function(object, th) {
+  ex <- th[["extra"]]
+  fit <- object[["wafc.fit"]]
+  cf <- wafc_raw_coef(fit, s = object[["lambda.min"]])[, 1L]
+  est <- wafc_thr_apply(cf[[1L]], unname(cf[-1L]), fit[["design"]],
+                        ex[["kept"]])
+  pen <- seq_len(fit[["nvars"]])[-fit[["design"]][["unpenalized"]]]
+  list(rule = ex[["rule"]], t = ex[["t"]], c = ex[["c"]],
+       norm = ex[["norm"]], kept = ex[["kept"]], a0 = est[["a0"]],
+       b = est[["b"]], nzero = sum(est[["b"]][pen] != 0),
+       candidates = ex[["candidates"]], time = th[["time"]])
+}
+
+## The thresholded fit of a "cv.wafc" as a "wafc" object: wafc.fit with its
+## path replaced by the single point lambda.min and the coefficients there
+## by the thresholded ones. coef(), predict(), wafc_functions() and
+## wafc_blocks() read it as they read any fit.
+wafc_cv_thr_view <- function(object) {
+  th <- object[["threshold"]]
+  fit <- object[["wafc.fit"]]
+  des <- fit[["design"]]
+  beta <- Matrix::Matrix(matrix(th[["b"]], ncol = 1L), sparse = TRUE)
+  beta <- methods::as(beta, "CsparseMatrix")
+  dimnames(beta) <- list(colnames(des[["Z"]]), NULL)
+  fit[["lambda"]] <- object[["lambda.min"]]
+  fit[["beta"]] <- beta
+  fit[["a0"]] <- th[["a0"]]
+  fit[["cc"]] <- wafc_levels(beta, th[["a0"]], des, fit[["carrier"]])
+  fit[["nzero"]] <- as.integer(th[["nzero"]])
+  fit[["threshold"]] <- th[c("rule", "t", "kept")]
+  fit
+}
+
+## The cross-validation of one design for the block LASSO (step E3.1): the
+## one of the engine, grpreg::cv.grpreg() on the folds of cv.wafc(), called
+## as wafc_fit_klopp() calls it, so that the pair selected and the fit at it
+## are the ones of wafc_fit_klopp(penalize.levels = FALSE, balanced = TRUE).
+## The fit on the whole sample is the one cv.grpreg() returns, turned into
+## the "wafc" object wafc() returns for the same design. The loss is the
+## one of cv.grpreg() for "mse", read as it reports it, and is recomputed
+## from its held-out predictions for "mae"; in both the mean is over the n
+## observations and the standard error is sd / sqrt(n), the convention of
+## cv.grpreg().
+wafc_cv_block <- function(design, y, foldid, lambda, nlambda,
+                          lambda.min.ratio, type.measure, fit_args, Ji) {
+  if (!requireNamespace("grpreg", quietly = TRUE)) {
+    stop("penalty = \"block\" needs the package 'grpreg' ",
+         "(see docs/CONTINUAR.md, section 2).", call. = FALSE)
+  }
+  wafc_block_check(fit_args[["intercept"]],
+                   if ("standardize" %in% names(fit_args))
+                     fit_args[["standardize"]] else FALSE)
+  ## the default tolerance is the one wafc() has for this penalty, read from
+  ## its formals so that the two cannot drift apart
+  thresh <- if ("thresh" %in% names(fit_args)) fit_args[["thresh"]] else
+    eval(formals(wafc)[["thresh"]], list(penalty = "block"))
+  maxit <- fit_args[["maxit"]]
+  a <- wafc_block_args(design, y, lambda, nlambda, lambda.min.ratio,
+                       fit_args[["block.size"]], thresh, maxit)
+  cvg <- do.call(grpreg::cv.grpreg,
+                 c(a[["args"]], list(fold = foldid,
+                                     returnY = type.measure == "mae")))
+  carrier <- wafc_carrier(design)
+  full <- wafc_block_new(design, y, cvg[["fit"]], a[["blk"]], carrier,
+                         call = as.call(list(as.symbol("wafc"),
+                                             design = quote(design),
+                                             y = quote(y), penalty = "block")),
+                         nlambda = if (is.null(lambda)) as.integer(nlambda)
+                           else length(lambda),
+                         max.iter = if (is.null(maxit))
+                           wafc_grpreg_default("max.iter") else
+                             as.integer(maxit))
+  lam <- as.numeric(cvg[["lambda"]])
+  n <- length(y)
+  if (type.measure == "mse") {
+    cvm <- as.numeric(cvg[["cve"]])
+    cvsd <- as.numeric(cvg[["cvse"]])
+  } else {
+    E <- abs(y - cvg[["Y"]])
+    cvm <- colMeans(E)
+    cvsd <- apply(E, 2L, stats::sd) / sqrt(n)
+  }
+  imin <- which.min(cvm)
+  i1se <- min(which(cvm <= cvm[imin] + cvsd[imin]))
+  nz <- full[["nzero"]][match(lam, full[["lambda"]])]
+  z <- list(lambda = lam, cvm = cvm, cvsd = cvsd, cvup = cvm + cvsd,
+            cvlo = cvm - cvsd, nzero = nz, lambda.min = lam[imin],
+            lambda.1se = lam[i1se], cvm.min = cvm[imin],
+            cvsd.min = cvsd[imin], nzero.min = nz[imin], conv.folds = NULL,
+            J = Ji,
+            conv = wafc_kp_conv(Ji, cvg,
+                                nlambda = full[["conv"]][["nlambda"]],
+                                max.iter = full[["conv"]][["max.iter"]]))
+  list(cv = z, fit = full)
 }
 
 ## Residual sum of squares, degrees of freedom and criterion along a path.

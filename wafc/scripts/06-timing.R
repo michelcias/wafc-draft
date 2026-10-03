@@ -104,7 +104,8 @@ run_methods <- function(n, r) {
   Jmin <- NA_integer_
   for (pen in c("lasso", "sglasso")) {
     tn <- try(timed(cv.wafc(x, u, y, penalty = pen, foldid = foldid,
-                            wavelet.table = wafc_timing_table)), silent = TRUE)
+                            wavelet.table = wafc_timing_table,
+                            threshold = "none")), silent = TRUE)
     if (inherits(tn, "try-error")) next
     cv <- tn[["value"]]
     des <- cv[["wafc.fit"]][["design"]]
@@ -200,7 +201,7 @@ run_tolerance <- function(n, r) {
                        wavelet.table = wafc_timing_table)
     for (th in c(1e-7, 1e-8, 1e-9, 1e-10)) {
       tm <- timed({
-        f <- wafc(design = des, y = dgp[["y"]], thresh = th)
+        f <- wafc(design = des, y = dgp[["y"]], thresh = th, penalty = "lasso")
         z <- wafc_cv_design(des, dgp[["y"]], f, foldid, function(e) e^2,
                             "lasso", thresh = th)
         list(f = f, z = z)

@@ -1,5 +1,9 @@
 ## wafc/R/fit.R -- the WAFC estimator (step E2.2): the LASSO of decision D3
-## and the sparse group LASSO variant, both on the design of wafc_design().
+## and the sparse group LASSO variant, both on the design of wafc_design(),
+## and, since step E3.1, the block LASSO of decision D44, which is the
+## default: the balanced chunks of Klopp and Pensky with the level terms
+## free and the weights of grpreg, the estimator measured in steps E2.5e to
+## E2.5j as wafc_fit_klopp(penalize.levels = FALSE, balanced = TRUE).
 ##
 ## Two facts about the engines are built into this file, because both cost
 ## half a day to find (docs/ESTADO.md, E2.1 and E1.5):
@@ -20,27 +24,62 @@
 ##       wafc_kkt() verifies it on the stationarity conditions instead of
 ##       trusting the argument. sparsegl does not rescale its penalty
 ##       factors, so for the group variant the two scales coincide.
+## (iii) grpreg, the engine of the block LASSO, standardizes the columns and
+##       orthonormalizes every chunk before it fits, and its penalty is the
+##       Euclidean norm of the chunk in those coordinates. Back on the scale
+##       of the design that norm is ||Z~_G theta_G|| / sqrt(n), with Z~ the
+##       centred design, and not ||theta_G||; the two coincide when the
+##       empirical Gram of the chunk is the identity, which the orthonormal
+##       basis makes them approach. The lambda of grpreg is therefore the
+##       lambda of the objective written with that norm, and wafc_kkt()
+##       verifies it on those conditions (step E3.1). grpreg also fits an
+##       intercept always and drops the constant column, which is note (i)
+##       again, so the carrier of the intercept works for it as it does for
+##       glmnet.
 
 #' Fit the WAFC model
 #'
 #' Penalized least squares on the design of \code{\link{wafc_design}}: the
 #' wavelet coefficients of every additive component are penalized and the
-#' \eqn{p} level terms \eqn{c_\ell} are not (decision D3). Two penalties are
-#' available, the LASSO and the sparse group LASSO with one group per block
+#' \eqn{p} level terms \eqn{c_\ell} are not (decision D3). Three penalties
+#' are available: the block LASSO of decision D44, the default, whose blocks
+#' are chunks of consecutive translates inside each block \eqn{(\ell, m)};
+#' the LASSO; and the sparse group LASSO with one group per block
 #' \eqn{(\ell, m)}, the unit that decision D12 keeps contiguous in the
 #' columns of the design.
 #'
 #' The objective is
 #' \deqn{\frac{1}{2n}\|y - Z\theta\|_2^2 + \lambda P(\theta),}
 #' with \eqn{P(\theta) = \sum_{\ell m jk} |\theta_{\ell m, jk}|} for
-#' \code{penalty = "lasso"} and
+#' \code{penalty = "lasso"},
 #' \deqn{P(\theta) = \alpha \sum_{\ell m jk} |\theta_{\ell m, jk}| +
 #'   (1 - \alpha) \sum_{\ell m} \sqrt{N_J}\,\|\theta_{\ell m}\|_2}
-#' for \code{penalty = "sglasso"}, where \eqn{\alpha} is \code{asparse}. In
-#' both cases the level terms are outside the penalty. The \code{lambda} of
-#' the returned object is the \eqn{\lambda} of this objective, which for the
-#' LASSO is not the \eqn{\lambda} reported by \pkg{glmnet}; see
-#' \code{\link{wafc_kkt}}.
+#' for \code{penalty = "sglasso"}, where \eqn{\alpha} is \code{asparse},
+#' and
+#' \deqn{P(\theta) = \sum_{G} w_G\, \|\tilde Z_G \theta_G\|_2 / \sqrt{n}}
+#' for \code{penalty = "block"}, where \eqn{G} runs over the chunks,
+#' \eqn{\tilde Z_G} is the centred submatrix of the design of chunk
+#' \eqn{G} and \eqn{w_G = \sqrt{|G|}}. In the three cases the level terms
+#' are outside the penalty, and the block LASSO also has an intercept. The
+#' \code{lambda} of the returned object is the \eqn{\lambda} of this
+#' objective, which for the LASSO is not the \eqn{\lambda} reported by
+#' \pkg{glmnet}; see \code{\link{wafc_kkt}}.
+#'
+#' The chunks of \code{penalty = "block"} are the balanced ones of step
+#' E2.5e: inside each block \eqn{(\ell, m)}, the levels \eqn{j} with
+#' \eqn{2^j < b_n} form one chunk, and every finer level is cut into
+#' consecutive pieces of \eqn{b_n} translates, the remainder absorbed into
+#' the piece before it, so that each piece has between \eqn{b_n} and
+#' \eqn{2b_n - 1} columns; \eqn{b_n} is \code{block.size}. The norm of a
+#' chunk is the one \pkg{grpreg} penalizes, the Euclidean norm of the chunk
+#' after standardizing the columns and orthonormalizing the chunk, which is
+#' \eqn{\|\tilde Z_G \theta_G\|_2 / \sqrt{n}} on the scale of the design
+#' and is close to \eqn{\|\theta_G\|_2} because the basis is orthonormal;
+#' the weight is the default of \pkg{grpreg}. This is
+#' \code{\link{wafc_fit_klopp}} with \code{penalize.levels = FALSE} and
+#' \code{balanced = TRUE} at one resolution level, the estimator decision
+#' D44 made the WAFC; the other forms of the block LASSO stay in
+#' \code{\link{wafc_fit_klopp}} (decision D43).
 #'
 #' @param x Matrix (or data frame, or vector) of linear covariates, with
 #'   \eqn{n} rows and \eqn{p} columns; a constant column, the usual
@@ -52,7 +91,9 @@
 #' @param y Numeric response of length \eqn{n}.
 #' @param J Resolution level of the sieve, passed to
 #'   \code{\link{wafc_design}}.
-#' @param penalty \code{"lasso"} (the default, decision D3) or
+#' @param penalty \code{"block"} (the default since step E3.1, decision
+#'   D44), the block LASSO by balanced chunks described above, which needs
+#'   the package \pkg{grpreg}; \code{"lasso"}, the LASSO of decision D3; or
 #'   \code{"sglasso"}, the sparse group LASSO by block \eqn{(\ell, m)},
 #'   which needs the package \pkg{sparsegl}.
 #' @param lambda Optional decreasing sequence of penalty levels, on the
@@ -61,23 +102,43 @@
 #' @param nlambda Length of the path built by the engine.
 #' @param lambda.min.ratio Ratio between the smallest and the largest
 #'   penalty level of that path. \code{NULL} uses the engine default,
-#'   \eqn{0.01} when \eqn{n < } \code{nvars} and \eqn{10^{-4}} otherwise.
+#'   \eqn{0.01} when \eqn{n < } \code{nvars} and \eqn{10^{-4}} otherwise
+#'   (\pkg{grpreg}: \eqn{0.05} and \eqn{10^{-4}}).
 #' @param asparse Weight of the \eqn{\ell_1} part of the sparse group
-#'   LASSO, in \eqn{[0, 1]}; ignored when \code{penalty = "lasso"}.
+#'   LASSO, in \eqn{[0, 1]}; ignored by the other two penalties.
 #'   \code{asparse = 0} is the pure group LASSO. \code{asparse = 1} is the
 #'   LASSO in principle, but \pkg{sparsegl} does not converge reliably
 #'   there and warns: the LASSO is \code{penalty = "lasso"}.
+#' @param block.size The chunk size \eqn{b_n} of \code{penalty = "block"};
+#'   ignored by the other two. \code{NULL} (the default) is
+#'   \code{ceiling(log(n))}, the choice of the norm (3.1) of Klopp and
+#'   Pensky (2015) and of every measurement of step E2.5. A fit on a subset
+#'   of the rows that has to keep the chunks of the whole sample, as the
+#'   folds do, passes it explicitly.
 #' @param intercept Logical, or \code{NULL} (the default) for
 #'   \code{TRUE} when the design has a constant column and \code{FALSE}
 #'   otherwise. It cannot be \code{FALSE} when there is a constant column:
-#'   the engines drop that column and its level would be lost.
+#'   the engines drop that column and its level would be lost. With
+#'   \code{penalty = "block"} it is always \code{TRUE}, because
+#'   \pkg{grpreg} always fits an intercept; \code{NULL} resolves to that
+#'   and \code{FALSE} is an error.
 #' @param standardize Passed to the engine. The default \code{FALSE} is the
 #'   right one here, as in \code{WaveBased::wall}: the wavelet basis is
 #'   orthonormal and standardizing the columns would change the penalty
-#'   from level to level.
+#'   from level to level. \pkg{grpreg} standardizes and orthonormalizes
+#'   every chunk by construction (note (iii) of \file{wafc/R/fit.R}), which
+#'   is the penalty written above, so \code{penalty = "block"} accepts only
+#'   the default.
 #' @param thresh Convergence threshold of the coordinate descent,
-#'   \eqn{10^{-9}} by default. \code{NULL} uses the engine default,
-#'   \eqn{10^{-7}} for \pkg{glmnet} and \eqn{10^{-8}} for \pkg{sparsegl}.
+#'   \eqn{10^{-9}} by default for the LASSO and the sparse group LASSO and
+#'   \eqn{10^{-4}} for the block LASSO. \code{NULL} uses the engine
+#'   default, \eqn{10^{-7}} for \pkg{glmnet}, \eqn{10^{-8}} for
+#'   \pkg{sparsegl} and \eqn{10^{-4}} for \pkg{grpreg}, whose criterion is
+#'   its own (the \code{eps} of \code{\link[grpreg]{grpreg}}). The block
+#'   LASSO keeps the default of its engine because that is the estimator
+#'   steps E2.5e to E2.5j measured; at it, \code{\link{wafc_kkt}} reads
+#'   stationarity residuals of a sizeable fraction of \eqn{\lambda} at the
+#'   small end of the path, which \eqn{10^{-8}} removes (step E3.1).
 #'   The default is not the engine one because the design is not
 #'   standardized (decision D17), so the relative criterion of the engine
 #'   is read on a scale the penalty does not share: step E2.4b swept
@@ -109,27 +170,41 @@
 #'   intercept already folded into the constant covariate), the number
 #'   \code{nzero} of non-zero wavelet coefficients, the fitted engine
 #'   object \code{fit}, the factor \code{lambda.factor} between the two
-#'   scales of \eqn{\lambda}, the \code{group} vector of the sparse
-#'   group LASSO, and \code{conv}, what the engine returned of the path it
-#'   was asked for: \code{nlambda} (asked), \code{nreturned} and its error
-#'   code \code{jerr} (\eqn{-k} when the \eqn{k}-th penalty level did not
-#'   converge and the path stops before it; step E2.5j).
+#'   scales of \eqn{\lambda}, the \code{group} structure of the penalty
+#'   (for the sparse group LASSO, the groups by block; for the block LASSO,
+#'   the chunks \code{group}, with 0 on the level terms, their weights
+#'   \code{multiplier} and the \code{block.size}), and \code{conv}, what
+#'   the engine returned of the path it was asked for: \code{nlambda}
+#'   (asked), \code{nreturned} and its error code \code{jerr} (\eqn{-k}
+#'   when the \eqn{k}-th penalty level did not converge and the path stops
+#'   before it; step E2.5j). \pkg{grpreg} has no error code, and for the
+#'   block LASSO \code{jerr} is \code{NA} and \code{conv} adds the
+#'   iterations it spent (\code{iter.total}), its budget
+#'   (\code{max.iter}, counted over the whole path) and the number of
+#'   penalty levels that reached it (\code{n.maxiter}).
 #'
 #' @seealso \code{\link{wafc_kkt}} for the verification of the
 #'   optimality conditions, \code{\link{wafc_functions}} for the
 #'   reconstruction of the components, \code{\link{predict.wafc}}.
+#'
+#' @references Klopp, O. and Pensky, M. (2015). Sparse high-dimensional
+#'   varying coefficient model: nonasymptotic minimax study. \emph{The
+#'   Annals of Statistics} 43(3), 1273-1299.
 #'
 #' @examples
 #' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
 #' fit <- wafc(d$x, d$u, d$y, J = 3)
 #' print(fit)
 #' round(coef(fit, s = fit$lambda[30])[1:5, ], 4)
+#' fl <- wafc(d$x, d$u, d$y, J = 3, penalty = "lasso")
 #'
 #' @export
-wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
+wafc <- function(x, u, y, J = 4L, penalty = c("block", "lasso", "sglasso"),
                  lambda = NULL, nlambda = 100L, lambda.min.ratio = NULL,
-                 asparse = 0.05, intercept = NULL, standardize = FALSE,
-                 thresh = 1e-9, maxit = NULL, design = NULL, ...) {
+                 asparse = 0.05, block.size = NULL, intercept = NULL,
+                 standardize = FALSE,
+                 thresh = if (penalty == "block") 1e-4 else 1e-9,
+                 maxit = NULL, design = NULL, ...) {
 
   this_call <- wafc_compact_call(match.call(), "wafc")
   penalty <- match.arg(penalty)
@@ -156,6 +231,15 @@ wafc <- function(x, u, y, J = 4L, penalty = c("lasso", "sglasso"),
   ## The carrier of the intercept: at most one constant linear covariate,
   ## whose level the engine reads into its own intercept (note (i) above).
   carrier <- wafc_carrier(design)
+  if (penalty == "block") {
+    wafc_block_check(intercept, standardize)
+    return(wafc_block_fit(design, y, carrier, this_call,
+                          lambda = wafc_check_lambda(lambda),
+                          nlambda = nlambda,
+                          lambda.min.ratio = lambda.min.ratio,
+                          block.size = block.size, thresh = thresh,
+                          maxit = maxit))
+  }
   if (is.null(intercept)) intercept <- !is.na(carrier[["index"]])
   if (!isTRUE(intercept) && !is.na(carrier[["index"]])) {
     stop("intercept = FALSE with the constant linear covariate '",
@@ -378,7 +462,10 @@ print.wafc <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
   d <- x[["design"]]
   cat("WAFC fit:", switch(x[["penalty"]], lasso = "LASSO",
                           sglasso = sprintf("sparse group LASSO (asparse = %s)",
-                                            format(x[["asparse"]], digits = digits))),
+                                            format(x[["asparse"]], digits = digits)),
+                          block = sprintf("block LASSO (%d balanced chunks, b_n = %d)",
+                                          length(x[["group"]][["multiplier"]]),
+                                          x[["group"]][["block.size"]])),
       "\n")
   cat(sprintf("  n = %d, p = %d, q = %d, J = %s, %d columns (%d penalized, %d level term(s))\n",
               x[["n"]], x[["p"]], x[["q"]], paste(d[["J"]], collapse = ", "),
@@ -414,6 +501,18 @@ print.wafc <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
 #' \eqn{\|S(g_{\ell m}, \lambda\alpha)\|_2 \le \lambda(1-\alpha)\sqrt{N_J}}
 #' with \eqn{S} the soft threshold, and on an active block the
 #' stationarity equation holds coordinate by coordinate.
+#'
+#' For the block LASSO the norm of a chunk is
+#' \eqn{\|\tilde Z_G\theta_G\|_2/\sqrt{n} = (\theta_G' M_G \theta_G)^{1/2}}
+#' with \eqn{M_G = \tilde Z_G'\tilde Z_G/n} (note (iii) of
+#' \file{wafc/R/fit.R}), so, with \eqn{g_G = \tilde Z_G' r/n}, the
+#' conditions are
+#' \eqn{g_G = \lambda w_G M_G\theta_G / (\theta_G' M_G\theta_G)^{1/2}}
+#' on a chunk with a non-zero coefficient and
+#' \eqn{\|M_G^{-1/2} g_G\|_2 \le \lambda w_G} on a chunk that is zero.
+#' Those are the conditions \pkg{grpreg} satisfies, and checking them is
+#' what shows that its \eqn{\lambda} is the one of the objective of
+#' \code{\link{wafc}}, with no factor (step E3.1).
 #'
 #' @param object An object of class \code{"wafc"}.
 #' @param s Penalty levels to check. \code{NULL} checks the whole path.
@@ -456,6 +555,21 @@ wafc_kkt <- function(object, s = NULL, tol = 1e-2, tol.abs = 1e-4) {
   cf <- wafc_raw_coef(object, s)
   lam <- if (is.null(s)) object[["lambda"]] else as.numeric(s)
   soft <- function(z, t) sign(z) * pmax(abs(z) - t, 0)
+  if (object[["penalty"]] == "block") {
+    ## the Gram of each chunk of the centred design, and its inverse square
+    ## root, computed once for the whole path
+    grp <- object[["group"]][["group"]]
+    blk_Zc <- scale(as.matrix(Z), center = TRUE, scale = FALSE)
+    blk_idx <- lapply(seq_len(max(grp)), function(gg) which(grp == gg))
+    blk_M <- lapply(blk_idx, function(idx) {
+      crossprod(blk_Zc[, idx, drop = FALSE]) / n
+    })
+    blk_Mih <- lapply(blk_M, function(M) {
+      e <- eigen(M, symmetric = TRUE)
+      e[["vectors"]] %*% (t(e[["vectors"]]) / sqrt(pmax(e[["values"]],
+                                                        .Machine[["double.eps"]])))
+    })
+  }
   out <- data.frame(lambda = lam, lambda.engine = lam / object[["lambda.factor"]],
                     nzero = NA_integer_, stationarity = NA_real_,
                     stationarity.rel = NA_real_, subgradient = NA_real_,
@@ -477,6 +591,26 @@ wafc_kkt <- function(object, s = NULL, tol = 1e-2, tol.abs = 1e-4) {
       if (length(inact)) {
         sub <- max(abs(g[inact])) / le
         sub_abs <- max(0, max(abs(g[inact])) - le)
+      }
+    } else if (object[["penalty"]] == "block") {
+      ## the gradient with the centred design: the intercept condition
+      ## sum(r) = 0 makes it equal to Z' r / n at a solution, and the
+      ## centred form is the one the norm of a chunk is written with
+      gc <- as.numeric(crossprod(blk_Zc, r)) / n
+      for (gg in seq_along(blk_M)) {
+        idx <- blk_idx[[gg]]
+        w <- object[["group"]][["multiplier"]][gg]
+        M <- blk_M[[gg]]
+        bg <- b[idx]
+        if (all(bg == 0)) {
+          nrm <- sqrt(sum((blk_Mih[[gg]] %*% gc[idx])^2))
+          sub <- max(sub, nrm / (le * w))
+          sub_abs <- max(sub_abs, nrm - le * w)
+        } else {
+          Mb <- as.numeric(M %*% bg)
+          v <- gc[idx] - le * w * Mb / sqrt(sum(bg * Mb))
+          stat <- max(stat, max(abs(v)))
+        }
       }
     } else {
       grp <- object[["group"]]
@@ -534,6 +668,122 @@ wafc_kkt <- function(object, s = NULL, tol = 1e-2, tol.abs = 1e-4) {
 ## ---------------------------------------------------------------------------
 ## Internals
 ## ---------------------------------------------------------------------------
+
+## The chunks of the block LASSO of decision D44 on one design: the balanced
+## form of wafc_kp_groups() (levels free, coarse levels of each block in one
+## chunk, every finer chunk between b_n and 2 b_n - 1 columns), which is the
+## grouping wafc_fit_klopp(penalize.levels = FALSE, balanced = TRUE) builds,
+## with the same default b_n = ceiling(log n).
+wafc_block_groups <- function(design, block.size = NULL) {
+  if (is.null(block.size)) {
+    block.size <- max(1L, as.integer(ceiling(log(design[["n"]]))))
+  }
+  if (!is.numeric(block.size) || length(block.size) != 1L ||
+      !is.finite(block.size) || block.size < 1 ||
+      block.size != round(block.size)) {
+    stop("'block.size' must be a single positive integer.", call. = FALSE)
+  }
+  block.size <- as.integer(block.size)
+  grp <- wafc_kp_groups(design, block.size, penalize.levels = FALSE,
+                        merge.coarse = TRUE, balanced = TRUE,
+                        free.coarse = FALSE)
+  list(group = grp, block.size = block.size,
+       sizes = as.integer(tabulate(grp[grp > 0L], nbins = max(grp))))
+}
+
+## The two arguments of wafc() that the block LASSO cannot honour.
+wafc_block_check <- function(intercept, standardize) {
+  if (!is.null(intercept) && !isTRUE(intercept)) {
+    stop("penalty = \"block\" always has an intercept: grpreg fits one ",
+         "whatever it is asked. Leave 'intercept' at NULL or TRUE.",
+         call. = FALSE)
+  }
+  if (!identical(standardize, FALSE)) {
+    stop("penalty = \"block\" accepts only standardize = FALSE: grpreg ",
+         "standardizes and orthonormalizes every chunk by construction, ",
+         "and its penalty is written on that scale (see ?wafc).",
+         call. = FALSE)
+  }
+  invisible(TRUE)
+}
+
+## The arguments of grpreg for the block LASSO of one design, with the
+## controls of wafc() under the names of grpreg. Nothing the caller left at
+## NULL is passed, so a default of grpreg stays its own; the call is then
+## the one of wafc_fit_klopp(), whose fits steps E2.5e to E2.5j measured.
+wafc_block_args <- function(design, y, lambda, nlambda, lambda.min.ratio,
+                            block.size, thresh, maxit) {
+  blk <- wafc_block_groups(design, block.size)
+  args <- list(X = as.matrix(design[["Z"]]), y = y, group = blk[["group"]],
+               penalty = "grLasso")
+  if (!is.null(lambda)) {
+    args[["lambda"]] <- lambda
+  } else {
+    args[["nlambda"]] <- as.integer(nlambda)
+    if (!is.null(lambda.min.ratio)) args[["lambda.min"]] <- lambda.min.ratio
+  }
+  if (!is.null(thresh)) args[["eps"]] <- thresh
+  if (!is.null(maxit)) args[["max.iter"]] <- as.integer(maxit)
+  list(args = args, blk = blk)
+}
+
+## The block LASSO of wafc(): one grpreg path on the design.
+wafc_block_fit <- function(design, y, carrier, call, lambda, nlambda,
+                           lambda.min.ratio, block.size, thresh, maxit) {
+  if (!requireNamespace("grpreg", quietly = TRUE)) {
+    stop("penalty = \"block\" needs the package 'grpreg' ",
+         "(see docs/CONTINUAR.md, section 2).", call. = FALSE)
+  }
+  a <- wafc_block_args(design, y, lambda, nlambda, lambda.min.ratio,
+                       block.size, thresh, maxit)
+  fit <- do.call(grpreg::grpreg, a[["args"]])
+  wafc_block_new(design, y, fit, a[["blk"]], carrier, call,
+                 nlambda = if (is.null(lambda)) as.integer(nlambda) else
+                   length(lambda),
+                 max.iter = if (is.null(maxit)) wafc_grpreg_default("max.iter")
+                   else as.integer(maxit))
+}
+
+## A "wafc" object from a grpreg fit of the block LASSO, the full fit of
+## wafc() or the one cv.grpreg() returns inside cv.wafc(), so that the two
+## are the same object. The values of the engine are kept as they are,
+## also at the points of the path where every chunk is zero: grpreg solves
+## the level terms there itself (its intercept checks to 1e-16), and
+## replacing them by the least squares of wafc_fix_null_point(), which is
+## there for sparsegl, would move the fit away from the one of
+## wafc_fit_klopp() by the tolerance of the engine.
+wafc_block_new <- function(design, y, fit, blk, carrier, call, nlambda,
+                           max.iter) {
+  b <- fit[["beta"]]
+  a0 <- as.numeric(b[1L, ])
+  beta <- Matrix::Matrix(b[-1L, , drop = FALSE], sparse = TRUE)
+  beta <- methods::as(beta, "CsparseMatrix")
+  dimnames(beta) <- list(colnames(design[["Z"]]), NULL)
+  nvars <- design[["nvars"]]
+  pen_idx <- seq_len(nvars)[-design[["unpenalized"]]]
+  it <- fit[["iter"]]
+  conv <- list(nlambda = as.integer(nlambda),
+               nreturned = length(fit[["lambda"]]), jerr = NA_integer_,
+               iter.total = as.integer(sum(it)), max.iter = as.integer(max.iter),
+               n.maxiter = as.integer(sum(it >= max.iter)))
+  group <- c(blk, list(multiplier = as.numeric(fit[["group.multiplier"]]),
+                       penalized = seq_len(max(blk[["group"]]))))
+  out <- list(design = design, y = y, penalty = "block",
+              lambda = as.numeric(fit[["lambda"]]), beta = beta, a0 = a0,
+              cc = wafc_levels(beta, a0, design, carrier),
+              nzero = as.integer(Matrix::colSums(beta[pen_idx, , drop = FALSE] != 0)),
+              intercept = TRUE, asparse = NA_real_, lambda.factor = 1,
+              group = group, carrier = carrier, fit = fit, n = design[["n"]],
+              p = design[["p"]], q = design[["q"]], nvars = nvars,
+              npen = length(pen_idx), conv = conv, call = call)
+  class(out) <- "wafc"
+  out
+}
+
+## A default of grpreg::grpreg(), read from its formals rather than copied.
+wafc_grpreg_default <- function(name) {
+  as.integer(eval(formals(grpreg::grpreg)[[name]]))
+}
 
 wafc_check_y <- function(y, n) {
   if (is.matrix(y) && ncol(y) == 1L) y <- as.numeric(y)

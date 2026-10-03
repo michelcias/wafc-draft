@@ -204,6 +204,7 @@ test_that("the block LASSO zeroes a whole chunk at a time", {
 })
 
 test_that("the weights and the merged coarse levels are the ones asked for", {
+  skip_slow()
   ## Step E2.5c, open question 34 of docs/ESTADO.md. At J = 4 a block has
   ## the levels 0 to 3, with 1, 2, 4 and 8 columns in that order (D12).
   skip_if_not(has("grpreg"))
@@ -396,6 +397,7 @@ test_that("the balanced chunks are the ones asked for", {
 })
 
 test_that("the forms of before the balanced chunks do not move", {
+  skip_slow()
   ## The grouping of the three earlier forms is the frozen one, bit for bit,
   ## over resolutions, chunk sizes and both treatments of the levels.
   same <- logical(0)
@@ -486,6 +488,7 @@ kp_groups_e25e <- function(design, block.size, penalize.levels,
 }
 
 test_that("the free coarse levels are the ones asked for", {
+  skip_slow()
   ## Step E2.5f, open question 37. At J = 6 a block has the levels 0 to 5,
   ## with 1, 2, 4, 8, 16 and 32 columns in that order (D12); with chunks of
   ## 6 or 7 the levels 0 to 2 (7 columns) are coarse, and with free.coarse
@@ -619,6 +622,7 @@ test_that("the free coarse levels are the ones asked for", {
 })
 
 test_that("the forms of before the free coarse levels do not move", {
+  skip_slow()
   ## The four earlier forms group as the frozen copy of step E2.5e, bit for
   ## bit, over resolutions, chunk sizes, both treatments of the levels, the
   ## merge and the balance; and their fits are grpreg on the frozen groups
@@ -680,6 +684,7 @@ test_that("the forms of before the free coarse levels do not move", {
 ## ---------------------------------------------------------------------------
 
 test_that("the QUT is the quantile of the penalty level that kills the fit", {
+  skip_slow()
   des <- wafc_design(x0, u0, J = 3L)
   lam <- wafc_lambda_qut(des, y0, alpha = 0.05, nsim = 400L, seed = 11L)
   expect_true(is.finite(lam) && lam > 0)
@@ -703,7 +708,7 @@ test_that("the QUT is the quantile of the penalty level that kills the fit", {
     yy <- as.numeric(W %*% c(1, 2, -1.5)) + stats::rnorm(n, sd = 0.5)
     li <- wafc_lambda_qut(des, yy, alpha = 0.05, nsim = 200L, seed = 100L + i)
     fi <- wafc(design = des, y = yy,
-               lambda = wafc_path_to(li, des, yy))
+               lambda = wafc_path_to(li, des, yy), penalty = "lasso")
     kill[i] <- fi[["nzero"]][length(fi[["lambda"]])] == 0L
   }
   expect_gt(mean(kill), 0.85)
@@ -712,7 +717,8 @@ test_that("the QUT is the quantile of the penalty level that kills the fit", {
 test_that("the QUT is more conservative than the cross-validated penalty", {
   ## the property the pilot reports: the rule is calibrated on the null, so
   ## it penalizes more than the rule calibrated on prediction
-  cv <- cv.wafc(x0, u0, y0, J = 3L, foldid = folds)
+  cv <- cv.wafc(x0, u0, y0, J = 3L, foldid = folds,
+                penalty = "lasso", threshold = "none")
   lam <- wafc_lambda_qut(cv[["wafc.fit"]][["design"]], y0, nsim = 400L,
                          seed = 11L)
   expect_gt(lam, cv[["lambda.min"]])
@@ -723,7 +729,7 @@ test_that("the QUT is more conservative than the cross-validated penalty", {
 ## ---------------------------------------------------------------------------
 
 test_that("wafc_grid_components gives the same components as wafc_functions", {
-  fit <- wafc(x0, u0, y0, J = 3L)
+  fit <- wafc(x0, u0, y0, J = 3L, penalty = "lasso")
   s <- fit[["lambda"]][40L]
   fn <- wafc_functions(fit, s = s, grid = grid0)
   g <- wafc_grid_components(fit, grid0, s = s)
@@ -744,7 +750,8 @@ test_that("the components of a fit reproduce a truth that is in the basis", {
   theta[d0[["unpenalized"]]] <- c(1, 2, -1.5)
   theta[d0[["blocks"]][["x1:u1"]][2L]] <- 1.5
   y_exact <- as.numeric(d0[["Z"]] %*% theta)
-  fit <- wafc(design = d0, y = y_exact, lambda = c(1e-3, 1e-8))
+  fit <- wafc(design = d0, y = y_exact, lambda = c(1e-3, 1e-8),
+              penalty = "lasso")
   g <- wafc_grid_components(fit, grid0, s = 1e-8)
   d_grid <- wafc_design(matrix(1, nrow(grid0), p), grid0, spec = d0)
   truth <- as.numeric(d_grid[["Z"]][, d0[["blocks"]][["x1:u1"]][2L]]) * 1.5
@@ -757,6 +764,7 @@ test_that("the components of a fit reproduce a truth that is in the basis", {
 ## ---------------------------------------------------------------------------
 
 test_that("an argument of the basis reaches only the fitters that build one", {
+  skip_slow()
   ## The pilot passes 'wavelet.table' to every method (decision D31). It
   ## used to reach the engine of vcbart, which stopped with "unused
   ## argument" and removed the column from the table.
@@ -939,6 +947,7 @@ reml_dense <- function(fit, y, s2) {
 }
 
 test_that("the REML score is one likelihood of the same data at every k", {
+  skip_slow()
   skip_if_not(has("mgcv"))
   for (k in gridk) {
     ## with the exact engine the score is the one mgcv optimizes
@@ -959,6 +968,7 @@ test_that("the REML score is one likelihood of the same data at every k", {
 })
 
 test_that("the choice of k in each criterion is the search redone by hand", {
+  skip_slow()
   skip_if_not(has("mgcv"))
   ## REML with the exact engine: the score of each candidate is the one
   ## mgcv reports, so the search by hand reads it from mgcv alone
@@ -1003,6 +1013,7 @@ test_that("the choice of k in each criterion is the search redone by hand", {
 })
 
 test_that("the grid of k is the one of D41, truncated at the distinct values", {
+  skip_slow()
   ## the default grid of the search: Ruppert (2002, section 3) without his
   ## 120, one grid for the three criteria (decision D41)
   expect_identical(wafc_k_grid, c(5L, 10L, 20L, 40L, 80L))
@@ -1046,6 +1057,7 @@ test_that("the grid of k is the one of D41, truncated at the distinct values", {
 })
 
 test_that("the choice of k by cross-validation is the search redone by hand", {
+  skip_slow()
   skip_if_not(has("mgcv"))
   ## the folds of the replicate, REML and bam inside each fold, and the
   ## loss of cv.wafc(): the mean over folds of the mean squared error on the
@@ -1097,6 +1109,7 @@ test_that("the choice of k by cross-validation is the search redone by hand", {
 ## ---------------------------------------------------------------------------
 
 test_that("the block LASSO records the path of grpreg at every J", {
+  skip_slow()
   skip_if_not(has("grpreg"))
   k <- wafc_competitor("klopp", x0, u0, y0, J = 2:4, foldid = folds,
                        penalize.levels = FALSE, balanced = TRUE)
@@ -1136,4 +1149,31 @@ test_that("the flags of the table read a cut as grpreg makes it", {
   expect_identical(d[["budget"]], c(FALSE, TRUE))
   expect_identical(d[["cv.cut"]], c(TRUE, FALSE))
   expect_identical(d[["cut.at.min"]], c(TRUE, FALSE))
+})
+
+## ---------------------------------------------------------------------------
+## The two public functions that had no test of their own (step E3.1)
+## ---------------------------------------------------------------------------
+
+test_that("wafc_k_matched is 2^J truncated at the distinct values", {
+  expect_identical(wafc_k_matched(u0, J = 4L), c(16L, 16L))
+  expect_identical(wafc_k_matched(u0, J = c(3L, 5L)), c(8L, 32L))
+  ## 250 distinct values admit at most 249 basis functions
+  expect_identical(wafc_k_matched(u0, J = 8L), c(249L, 249L))
+  ud <- cbind(rep_len(1:5, n), u0[, 2L])
+  expect_identical(wafc_k_matched(ud, J = 4L), c(4L, 16L))
+  expect_identical(wafc_k_matched(ud, J = 1L, kmin = 3L), c(3L, 3L))
+  expect_error(wafc_k_matched(u0, J = 0L), "at least 1")
+})
+
+test_that("a competitor prints its method, its levels and its blocks", {
+  fit <- wafc_competitor("linear", x0, u0, y0)
+  out <- utils::capture.output(print(fit))
+  expect_match(out[1L], "WAFC competitor \"linear\": n = 250, p = 3, q = 2")
+  expect_true(any(grepl("levels c:", out)))
+  if (has("grpreg")) {
+    kp <- wafc_competitor("klopp", x0, u0, y0, J = 3L, foldid = folds,
+                          penalize.levels = FALSE, balanced = TRUE)
+    expect_output(print(kp), "blocks kept: [0-6] of 6")
+  }
 })

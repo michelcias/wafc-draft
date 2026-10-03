@@ -155,7 +155,8 @@ compare_staged <- function(cell, n, r, dat, penalty, thresh, part) {
   u <- dat[["dgp"]][["u"]]
   y <- dat[["dgp"]][["y"]]
   full <- timed(cv.wafc(x, u, y, penalty = penalty, foldid = dat[["foldid"]],
-                        wavelet.table = accel_table, thresh = thresh))
+                        wavelet.table = accel_table, thresh = thresh,
+                        threshold = "none"))
   stg <- timed(cv_wafc_staged(x, u, y, dat[["foldid"]], penalty, thresh))
   a <- full[["value"]]
   b <- stg[["value"]]
@@ -201,7 +202,8 @@ run_sgl <- function(cell, n, r) {
   ## the looser tolerance, on the whole path
   loose <- timed(cv.wafc(x, u, y, penalty = "sglasso",
                          foldid = dat[["foldid"]],
-                         wavelet.table = accel_table, thresh = 1e-8))
+                         wavelet.table = accel_table, thresh = 1e-8,
+                         threshold = "none"))
   b <- loose[["value"]]
   same_paths <- all(vapply(seq_along(a[["J"]]), function(i) {
     isTRUE(all.equal(a[["cv"]][[i]][["lambda"]], b[["cv"]][[i]][["lambda"]],

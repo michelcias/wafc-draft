@@ -185,10 +185,15 @@ print.wafc_competitor <- function(x, digits = max(3L, getOption("digits") - 3L),
 #' on the grid, since every method fixes the level by its own convention and
 #' only the shape is comparable.
 #'
-#' @param object A \code{"wafc"} or \code{"wafc_competitor"} object.
+#' @param object A \code{"wafc"}, \code{"cv.wafc"} or
+#'   \code{"wafc_competitor"} object. A \code{"cv.wafc"} object is read as
+#'   \code{\link{coef.cv.wafc}} reads it: at \code{lambda.min} after its
+#'   threshold, when it has one.
 #' @param grid Matrix with \eqn{q} columns at which the components are
 #'   evaluated, on the original scale of the modulating covariates.
-#' @param s For a \code{"wafc"} object, the penalty level.
+#' @param s For a \code{"wafc"} object, the penalty level; for a
+#'   \code{"cv.wafc"} object, as in \code{\link{coef.cv.wafc}}, with
+#'   \code{NULL} for \code{"lambda.min"}.
 #' @param design For a \code{"wafc"} object, an optional design already
 #'   built on \code{grid} with \code{spec} equal to the fitted design,
 #'   which is how the pilot avoids rebuilding it once per method.
@@ -207,6 +212,11 @@ print.wafc_competitor <- function(x, digits = max(3L, getOption("digits") - 3L),
 #' @export
 wafc_grid_components <- function(object, grid, s = NULL, design = NULL) {
   grid <- wafc_as_matrix(grid, "grid")
+  if (inherits(object, "cv.wafc")) {
+    f <- wafc_cv_fit(object, if (is.null(s)) "lambda.min" else s)
+    object <- f[["fit"]]
+    s <- f[["s"]]
+  }
   if (inherits(object, "wafc_competitor")) {
     if (is.null(object[["g"]])) return(NULL)
     g <- object[["g"]](grid)
@@ -227,8 +237,8 @@ wafc_grid_components <- function(object, grid, s = NULL, design = NULL) {
       }
     }
   } else {
-    stop("'object' must be a \"wafc\" or a \"wafc_competitor\" fit.",
-         call. = FALSE)
+    stop("'object' must be a \"wafc\", a \"cv.wafc\" or a ",
+         "\"wafc_competitor\" fit.", call. = FALSE)
   }
   for (i in seq_along(g)) g[[i]] <- g[[i]] - mean(g[[i]])
   g
@@ -968,7 +978,11 @@ wafc_fit_klopp <- function(x, u, y, J = NULL, block.size = NULL,
 ## 'iter' at 'max.iter' is the case its own warning names. cv.grpreg then
 ## drops every level at which some fold has no finite error, so a cut in a
 ## fold shows as a cross-validated path shorter than the one of the fit.
-wafc_kp_conv <- function(J, cv) {
+## 'nlambda' and 'max.iter' are the ones the path was asked with, the
+## defaults of grpreg for wafc_fit_klopp(), which passes neither.
+wafc_kp_conv <- function(J, cv,
+                         nlambda = wafc_grpreg_default("nlambda"),
+                         max.iter = wafc_grpreg_default("max.iter")) {
   if (is.null(cv)) {
     return(data.frame(J = J, nlambda = NA_integer_, nreturned = NA_integer_,
                       ncv = NA_integer_, iter.total = NA_integer_,
@@ -977,11 +991,11 @@ wafc_kp_conv <- function(J, cv) {
                       lambda.cv.last = NA_real_, lambda.min = NA_real_))
   }
   fit <- cv[["fit"]]
-  mi <- as.integer(eval(formals(grpreg::grpreg)[["max.iter"]]))
+  mi <- as.integer(max.iter)
   it <- fit[["iter"]]
   at <- it == mi
   data.frame(J = J,
-             nlambda = as.integer(eval(formals(grpreg::grpreg)[["nlambda"]])),
+             nlambda = as.integer(nlambda),
              nreturned = length(fit[["lambda"]]),
              ncv = length(cv[["lambda"]]), iter.total = as.integer(sum(it)),
              max.iter = mi, n.maxiter = sum(at),

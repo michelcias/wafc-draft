@@ -200,7 +200,7 @@ run_cost <- function(j) {
   out <- NULL
   for (pen in c("lasso", "sglasso")) {
     cv <- cv.wafc(d[["x"]], d[["u"]], d[["y"]], penalty = pen, foldid = foldid,
-                  wavelet.table = tab)
+                  wavelet.table = tab, threshold = "none")
     fit <- cv[["wafc.fit"]]
     dt <- wafc_design(te[["x"]], te[["u"]], spec = fit[["design"]])
     excess <- function(s) {
