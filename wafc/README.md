@@ -33,7 +33,7 @@ Rscript -e 'testthat::test_dir("wafc/tests")'
 WAFC_SLOW_TESTS=1 Rscript -e 'testthat::test_dir("wafc/tests")'
 ```
 
-## Interface (E3.1, proposta para ratificação)
+## Interface (E3.1, ratificada em 2026-10-03, D48)
 
 O estimador de D44 e D45 é uma chamada só: o block LASSO balanceado, com
 `(J, λ)` por validação cruzada, seguido do limiar `cv1se` nos blocos

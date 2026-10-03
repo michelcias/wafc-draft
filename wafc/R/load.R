@@ -14,8 +14,10 @@
 ## and by the variants of the estimator, not by the functions loaded here.
 ## VCBART is the engine of wafc_fit_vcbart(); step E2.4 used it and did not
 ## declare it, because wafc/R/load.R was outside its catalogue.
-wafc_depends <- c("WaveBased", "glmnet", "Matrix")
-wafc_suggests <- c("testthat", "sparsegl", "grpreg", "mgcv", "VCBART")
+## grpreg moved to the dependencies with D48 (2026-10-03): the default
+## estimator, penalty = "block" (D44), is fitted by it.
+wafc_depends <- c("WaveBased", "glmnet", "Matrix", "grpreg")
+wafc_suggests <- c("testthat", "sparsegl", "mgcv", "VCBART")
 
 ## Directory holding this file, resolved from the source() frame when
 ## available and from the working directory otherwise.

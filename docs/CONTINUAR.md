@@ -53,6 +53,7 @@ decisão em E3.3.
 | `latexmk`, `pdflatex`, `bibtex` | `derivations/*.tex`, templates, manuscrito | `latexmk --version` |
 | `gh` autenticado como `michelcias` (opcional) | criar repositórios, CI | `gh auth status` |
 | pacotes R: `glmnet`, `Matrix`, `mgcv`, `grpreg`, `gglasso`, `bench`, `testthat`, `devtools`, `roxygen2`, `remotes`, `renv` | protótipo, competidores, pacote | comando abaixo |
+| `grpreg` | **exigido pelo padrão** do `wafc()` e do `cv.wafc()`, `penalty = "block"` (D44, D48); está em `wafc_depends` do `load.R` desde 2026-10-03 | já no comando abaixo, ou `sudo apt install r-cran-grpreg` |
 | `sparsegl` | exigido por `wafc(penalty = "sglasso")`; o resto de `wafc/` roda sem ele, e os testes pulam os blocos de grupo se faltar | `install.packages("sparsegl")` |
 | `quadprog` | constante de compatibilidade exata em `check/03-desenho-produtos.R` (E1.4) | `install.packages("quadprog")` |
 | `VCBART` | exigido por `wafc_competitor("vcbart")` (E2.4); o resto de `wafc/` roda sem ele e os testes pulam o bloco se faltar. Instalado aqui: 1.2.5 | `install.packages("VCBART")` |

@@ -401,7 +401,7 @@ Depois do go de E2.5, o código de `wafc/` deixa de ser exploratório.
 
 **Fechada em 2026-10-03** com o estimador de D44 e D45: o block LASSO
 balanceado como `penalty = "block"`, padrão, e o limiar `cv1se` na
-interface; a ratificação da interface é a pergunta 43 do `ESTADO.md`. Assinaturas de `wafc()`, `cv.wafc()`, `predict`, `coef`, `plot` fixadas e
+interface; a interface foi ratificada em D48. Assinaturas de `wafc()`, `cv.wafc()`, `predict`, `coef`, `plot` fixadas e
 registradas em `wafc/README.md`; nenhuma variante de E2.5 é removida sem
 nova decisão (D43): as que não forem a principal ficam como opção;
 `tests/` cobrindo cada função pública; `Rscript -e 'testthat::test_dir("wafc/tests")'`
