@@ -2180,7 +2180,11 @@ Ordenadas pelo que bloqueia mais.
 
 1. **~~D5 e D8~~ ratificadas em 2026-09-19.** O alvo é a *Statistica
    Sinica* e o método se chama WAFC; **E5a está destravada**.
-2. **Aplicação (E6.1), agora com sondagem feita e negativa.** Duas saídas,
+2. **Aplicação (E6.1), agora com sondagem feita e negativa.** **Depois de
+   D44 (2026-10-03):** a tese passa a estrutura recuperada com predição
+   competitiva, o que torna a saída (b) mais forte do que era; **E6.1b
+   catalogada** para medir as duas saídas no critério novo, e a escolha
+   continua do autor. Texto original: duas saídas,
    e a escolha é do autor: **(a)** abrir uma quarta rodada de busca com o
    critério do §3.3 de E6.1a (salto documentado na literatura da área:
    limiar administrativo, limiar regulatório, quebra datada), o que atrasa
@@ -2829,7 +2833,8 @@ Ordenadas pelo que bloqueia mais.
 recomendações das perguntas 33, 38 e 41 (D44 a D46): o WAFC é o block
 LASSO balanceado seguido do limiar `cv1se`, o LASSO fica como opção, o
 alvo continua a *Statistica Sinica*, e o spline de E4 entra com `gam.reml`
-e `gam.gcv`. **E1.12 (a teoria em blocos) catalogada**; nenhum handoff
+e `gam.gcv`. **E1.12 (a teoria em blocos), E3.1 (a interface) e E6.1b
+(a aplicação) catalogadas**, para correr em paralelo; nenhum handoff
 pendente. O manuscrito está em
 `k = 3`, ainda escrito para o LASSO; a bibliografia sem marca aberta (83
 entradas).
@@ -2855,13 +2860,15 @@ entradas).
   `wafc_fit_klopp()` (concorrente) para dentro de `wafc()` e `cv.wafc()`
   como penalidade padrão, com o limiar `cv1se` na interface; o LASSO como
   `penalty = "lasso"`; nada removido (D43). E3.3 (empacotamento) é decisão
-  do autor.
+  do autor. **E3.1 catalogada em 2026-10-03.**
 - (d) **O manuscrito em `k = 4`** (D44): a teoria em blocos no `ms` e no
   `supp` (~5 páginas), o posicionamento de (b), a §3.6 com o limiar em
   blocos e a §4 com a interface de (c). Abre depois de (a) e (b).
 - (e) **E4 e E6 em paralelo**, depois de E3.1: o compêndio `wafc-studies`
   com os métodos de D46; e a aplicação, que depende da **pergunta 2**,
-  ainda aberta e a maior lacuna para o formato da revista.
+  ainda aberta e a maior lacuna para o formato da revista. **E6.1b
+  catalogada em 2026-10-03** para dar à pergunta 2 os números do critério
+  novo.
 
 **Medições opcionais** (não catalogadas; uma rodada por vez): `n = 2000`
 no não homogêneo e na `mixed`, que diz se a vantagem que cresce com `n`
@@ -2883,6 +2890,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | E3.1 (a interface com o block LASSO balanceado e o limiar `cv1se` como padrão) e E6.1b (a aplicação no critério de D44) catalogadas, em paralelo com a E1.12, sem arquivo em comum |
 | 2026-10-03 | E1.12 catalogada: a sondagem de E1.11 promovida a `08-blocos.tex` (calibração, oráculo com pesos de razão limitada, risco ideal por pedaços, taxas) e, no `06`, o Corolário 8 em blocos e a cota de risco do estimador limiarizado (D45) |
 | 2026-10-03 | O autor aceitou as recomendações das perguntas 33, 38 e 41 (D44 a D46): block LASSO balanceado com limiar `cv1se` como o WAFC, LASSO como opção, *Statistica Sinica* mantida, `gam.reml` e `gam.gcv` em E4; E2.5 e E2 fechadas; §5 reescrita em torno da teoria em blocos, do posicionamento, de E3 e da `k = 4` |
 | 2026-10-03 | E2.5j fechada e integrada (1 133 testes, 37 350 linhas, sétima junção exata, 1 h 01 min em 10 processos): o `cv1se` chega ao teto no suave, no `uneven`, no nulo e em `n = 1000`; o `cvrel` repete o `+cv`; a porta do QUT tem nível acima do nominal; os cortes dos motores não tocam o `λ` escolhido |

@@ -394,7 +394,9 @@ Depois do go de E2.5, o código de `wafc/` deixa de ser exploratório.
 
 ### E3.1 Interface congelada
 
-Assinaturas de `wafc()`, `cv.wafc()`, `predict`, `coef`, `plot` fixadas e
+**Catalogada em 2026-10-03** com o estimador de D44 e D45: o block LASSO
+balanceado como `penalty = "block"`, padrão, e o limiar `cv1se` na
+interface. Assinaturas de `wafc()`, `cv.wafc()`, `predict`, `coef`, `plot` fixadas e
 registradas em `wafc/README.md`; nenhuma variante de E2.5 é removida sem
 nova decisão (D43): as que não forem a principal ficam como opção;
 `tests/` cobrindo cada função pública; `Rscript -e 'testthat::test_dir("wafc/tests")'`
@@ -508,6 +510,12 @@ experiência; CPS ou PNAD); consumo de energia ou poluição (efeito de
 temperatura variando com hora e umidade); dados de saúde com efeito de
 tratamento modulado por idade e IMC. Entregável: `docs/aplicacao.md` com a
 escolha e a razão.
+
+**E6.1a (2026-09-20)** sondou três bases com veredito negativo no critério
+de adaptação (`aplicacao-candidatas.md`). **E6.1b (catalogada em
+2026-10-03)** refaz a sondagem no critério de D44, estrutura estável com
+predição competitiva, nas três e em até três candidatas novas com salto
+documentado; a escolha continua do autor (pergunta 2 do `ESTADO.md`).
 
 ### E6.2 Ajustar e comparar
 
