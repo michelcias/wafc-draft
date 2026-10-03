@@ -115,11 +115,11 @@ resultados numerados e provados. São cinco peças:
 
 \begin{enumerate}[label=(\alph*), leftmargin=*, nosep]
   \item a \textbf{forma balanceada} (Proposição~\ref{prop:balanceada}): os
-    tamanhos dos pedaços, o número deles e a razão $\rho^{2} \le 3$ dos pesos
+    tamanhos dos pedaços, o número deles e a razão $\varrho^{2} \le 3$ dos pesos
     $\sqrt{|G|}$;
   \item a \textbf{calibração em blocos} (Lema~\ref{lem:calib-blocos}): Hsu,
     Kakade e Zhang (2012) com união sobre os pedaços, um evento que não
-    depende dos pesos, e o preço $\rho$ dos pesos;
+    depende dos pesos, e o preço $\varrho$ dos pesos;
   \item o \textbf{oráculo sem cone} (Teorema~\ref{thm:oraculo-blocos}),
     escrito por inteiro e com comparador arbitrário, e a sua \textbf{forma de
     risco ideal} (Corolário~\ref{cor:risco-ideal});
@@ -156,7 +156,7 @@ $(\cv,\md)$; $|\Gcal|$ é o número de pedaços, $|G|$ o de colunas do pedaço, 
 $\btheta_{G} \in \R^{|G|}$ o subvetor. Os pesos são $w = (w_{G})_{G\in\Gcal}$,
 $w_{G} > 0$, com razão
 \[
-  \rho \;=\; \frac{\max_{G}w_{G}}{\min_{G}w_{G}} \;\ge\; 1 ,
+  \varrho \;=\; \frac{\max_{G}w_{G}}{\min_{G}w_{G}} \;\ge\; 1 ,
 \]
 e a penalidade é a norma
 \[
@@ -165,9 +165,9 @@ e a penalidade é a norma
   \nGw{\btheta_{\Hcal}} \;=\; \sum_{G\in\Hcal} w_{G}\,\norm{\btheta_{G}}_{2}
   \quad (\Hcal \subseteq \Gcal).
 \]
-Para $\Hcal \subseteq \Gcal$ escrevemos $W(\Hcal) = \sum_{G\in\Hcal}w_{G}^{2}$,
+Para $\Hcal \subseteq \Gcal$ escrevemos $\mathcal{W}(\Hcal) = \sum_{G\in\Hcal}w_{G}^{2}$,
 e para $\btheta \in \R^{d}$, $\Gzero(\btheta) = \{G : \btheta_{G} \ne 0\}$, os
-pedaços ativos. Com $w_{G} = 1$, $W(\Gzero(\btheta))$ é o número de pedaços
+pedaços ativos. Com $w_{G} = 1$, $\mathcal{W}(\Gzero(\btheta))$ é o número de pedaços
 ativos; com $w_{G} = \sqrt{|G|}$, é o número de coordenadas nos pedaços
 ativos.
 
@@ -294,9 +294,9 @@ Seja $\Gcal$ a forma balanceada com $b \ge 2$ e $J \ge 1$. Então:
     $b - 1 \le 2^{\jst+1}-1 \le 2b-3$; se $J \le \jst + 1$, cada bloco é um
     pedaço só, de $2^{J}-1$ colunas;
   \item $|\Gcal| \le pq\,(1 + 2^{J}/b)$;
-  \item com $w_{G} = \sqrt{|G|}$, $\rho^{2} = \max_{G}|G|/\min_{G}|G| \le
+  \item com $w_{G} = \sqrt{|G|}$, $\varrho^{2} = \max_{G}|G|/\min_{G}|G| \le
     (2b-1)/(b-1) \le 3$; em $b = 6$ e $b = 7$ (os $\bn$ de $n = 250$ e de
-    $n = 500$ e $1000$), $\rho^{2} \le 5/3$ e $\rho^{2} \le 11/7$ quando
+    $n = 500$ e $1000$), $\varrho^{2} \le 5/3$ e $\varrho^{2} \le 11/7$ quando
     $J \ge 5$.
 \end{enumerate}
 \end{proposition}
@@ -334,8 +334,8 @@ coordenadas penalizadas, e $\alpha \in (0,1)$.
       \qquad
       \lamGone \;=\; 2\max_{G}\lamzbar{G},
     \]
-    vale $\lamG w_{G} \le \rho\,\lamGone$ para todo $G$, e portanto
-    $(\lamG)^{2}W(\Hcal) \le \rho^{2}(\lamGone)^{2}|\Hcal|$ para todo
+    vale $\lamG w_{G} \le \varrho\,\lamGone$ para todo $G$, e portanto
+    $(\lamG)^{2}\mathcal{W}(\Hcal) \le \varrho^{2}(\lamGone)^{2}|\Hcal|$ para todo
     $\Hcal \subseteq \Gcal$. O mesmo vale com $\pen_{w}$ e
     $2\max_{G}\lamz{G}$ no lugar de $\lamG$ e $\lamGone$.
 \end{enumerate}
@@ -343,7 +343,7 @@ coordenadas penalizadas, e $\alpha \in (0,1)$.
 
 O evento $\Ecal$ não sabe dos pesos: o peso só escolhe qual pedaço dita o
 $\pen$, o de maior $\lamz{G}/w_{G}$, e o preço de pesos desiguais é o fator
-$\rho$ de (iii), pago no termo de estimação. Com $w_{G} = 1$ e pedaços de até
+$\varrho$ de (iii), pago no termo de estimação. Com $w_{G} = 1$ e pedaços de até
 $b_{\max}$ colunas, $\lamGone \asymp \sigma\sqrt{(b_{\max} +
 \log|\Gcal|)/n}$, que é o $\widehat\delta$ de Klopp e Pensky (2015, eq.~3.14) a
 menos de constantes (com $p$ fixo, as duas escalas são
@@ -364,7 +364,7 @@ com
   \qquad
   \Gbar = \Gzero(\thbar),
   \qquad
-  \bar W = W(\Gbar),
+  \bar{\mathcal{W}} = \mathcal{W}(\Gbar),
   \qquad
   \vbar = \thetahat - \thbar :
 \]
@@ -376,11 +376,11 @@ com
     \]
   \item \textup{(taxa rápida)} se $\gtil > 0$,
     \[
-      \normn{\Btil\vbar}^{2} \le \frac{64\pen^{2}\bar W}{\gtil} + 16\normn{\bbar}^{2},
+      \normn{\Btil\vbar}^{2} \le \frac{64\pen^{2}\bar{\mathcal{W}}}{\gtil} + 16\normn{\bbar}^{2},
       \quad
-      \nGw{\vbar} \le \frac{40\pen\bar W}{\gtil} + \frac{10\normn{\bbar}^{2}}{\pen},
+      \nGw{\vbar} \le \frac{40\pen\bar{\mathcal{W}}}{\gtil} + \frac{10\normn{\bbar}^{2}}{\pen},
       \quad
-      \norm{\vbar}_{2}^{2} \le \frac{64\pen^{2}\bar W}{\gtil^{2}}
+      \norm{\vbar}_{2}^{2} \le \frac{64\pen^{2}\bar{\mathcal{W}}}{\gtil^{2}}
       + \frac{16\normn{\bbar}^{2}}{\gtil};
     \]
   \item \textup{(erro de predição)}
@@ -389,7 +389,7 @@ com
     \begin{equation}
       \label{eq:oraculo-min-blocos}
       \normn{\widehat f - f}^{2}
-      \;\le\; 3\min_{\bar\bbeta}\Bigl\{\frac{64\pen^{2}\bar W}{\gtil}
+      \;\le\; 3\min_{\bar\bbeta}\Bigl\{\frac{64\pen^{2}\bar{\mathcal{W}}}{\gtil}
       + 20\normn{\bbar}^{2}\Bigr\} + 3\normn{\PA\bveps}^{2},
       \qquad
       \E\bigl[\normn{\PA\bveps}^{2}\mid\bX,\bU\bigr] \le \frac{\sigma^{2}p}{n}.
@@ -398,7 +398,7 @@ com
 \end{theorem}
 
 Lido no oráculo, $\bar\bbeta = \betastar$, o item (ii) é o Teorema~1(ii) de
-E1.5 com $s_{0}$ trocado por $W(\Gzero(\thetastar))$ e $\norm{\cdot}_{1}$ por
+E1.5 com $s_{0}$ trocado por $\mathcal{W}(\Gzero(\thetastar))$ e $\norm{\cdot}_{1}$ por
 $\nGw{\cdot}$; as constantes são as mesmas. Lido num comparador qualquer, é o
 Lema~8 de E1.6 em blocos.
 
@@ -420,15 +420,15 @@ Então
   \;\le\; \frac{82\Lambda'\,\Rid(\thetastar;\eta) + 64\normn{\bb}^{2}}{\gtil}.
 \end{equation}
 Com $\pen = \lamG$ (ou $\pen = \pen_{w}$), o Lema~\ref{lem:calib-blocos}(iii)
-dá $\eta \le \rho^{2}\eta_{1}$, com $\eta_{1} = 1{,}6(\lamGone)^{2}/(\Lambda'\gtil)$
-o limiar dos pesos~1, e $\Rid(\thetastar;\eta) \le \rho^{2}\Rid(\thetastar;\eta_{1})$.
+dá $\eta \le \varrho^{2}\eta_{1}$, com $\eta_{1} = 1{,}6(\lamGone)^{2}/(\Lambda'\gtil)$
+o limiar dos pesos~1, e $\Rid(\thetastar;\eta) \le \varrho^{2}\Rid(\thetastar;\eta_{1})$.
 \end{corollary}
 
 \begin{remark}[por que não há cone, também em blocos]\label{rem:cone-blocos}
 O passo que dispensa o cone é o mesmo de E1.5: a perfilagem do
 Lema~\ref{lem:perfil-blocos} tira os níveis do problema, e o autovalor cheio
-de E1.4 controla $\nGw{\vbar_{\Gbar}} \le \sqrt{\bar W}\norm{\vbar}_{2} \le
-\sqrt{\bar W/\gtil}\,\normn{\Btil\vbar}$ por Cauchy--Schwarz, sobre o espaço
+de E1.4 controla $\nGw{\vbar_{\Gbar}} \le \sqrt{\bar{\mathcal{W}}}\norm{\vbar}_{2} \le
+\sqrt{\bar{\mathcal{W}}/\gtil}\,\normn{\Btil\vbar}$ por Cauchy--Schwarz, sobre o espaço
 inteiro. Lounici et al.\ (2011) precisam da condição RE em grupos no cone
 ponderado (a Hipótese~3.1 deles); aqui ela é dominada pelo autovalor cheio,
 como em E1.5, e a constante é a mesma para todo $\Gbar$.
@@ -444,10 +444,10 @@ $\sum_{G}w_{G}\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$, com $Q_{G} =
 O Teorema~\ref{thm:oraculo-blocos} vale com qualquer $Q_{G}$ definida positiva
 e mensurável em $(\bX,\bU)$, com três trocas: o evento passa a ser
 $\{\max_{G}\norm{Q_{G}^{-1/2}(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \pen/2\}$ (a
-norma dual); $\bar W$ vira $q_{\max}\bar W$ em (ii) e (iii), com
+norma dual); $\bar{\mathcal{W}}$ vira $q_{\max}\bar{\mathcal{W}}$ em (ii) e (iii), com
 $q_{\max} = \max_{G}\lmaxx(Q_{G})$, porque o Passo~5 da prova lê
 $\sum_{G\in\Gbar}w_{G}\norm{Q_{G}^{1/2}\vbar_{G}}_{2} \le
-\sqrt{q_{\max}\bar W}\norm{\vbar}_{2}$; e a cota de $\nGw{\vbar}$ fica na
+\sqrt{q_{\max}\bar{\mathcal{W}}}\norm{\vbar}_{2}$; e a cota de $\nGw{\vbar}$ fica na
 norma com $Q$. O Lema~\ref{lem:calib-blocos}(i) vale com
 $Q_{G}^{-1/2}\Psitil_{G}Q_{G}^{-1/2}$ no lugar de $\Psitil_{G}$ (a prova é a
 mesma, com $Q_{G}^{-1/2}\Btil_{G}\T/n$ no lugar de $\Btil_{G}\T/n$). Com a
@@ -509,13 +509,13 @@ $c_{U}$, $C_{U}$, $\kappa_{1}$, $\kappa_{2}$, $C_{g}$, $s$, $\pi$ e
 $\alpha \in (0,1)$ fixos, $J = J_{n} \to \infty$), suponha $2^{J_{n}} \le 2n$,
 e tome $\bn = \lceil\log n\rceil$ ($n \ge 3$, de modo que $\bn \ge 2$),
 $\Gcal_{n}$ a forma balanceada com $b = \bn$, pesos $w^{(n)}$ com
-$\rho(w^{(n)}) \le \bar\rho < \infty$ para uma constante $\bar\rho$ fixa, e
+$\varrho(w^{(n)}) \le \bar\varrho < \infty$ para uma constante $\bar\varrho$ fixa, e
 $\pen = \lamG$ do Lema~\ref{lem:calib-blocos}(iii).
 \end{assumption}
 
 O WAFC de D44 satisfaz a Hipótese~\ref{ass:regime-blocos} com
-$\bar\rho^{2} = 3$ (Proposição~\ref{prop:balanceada}(iii)); os pesos~1, com
-$\bar\rho = 1$. Duas consequências que as provas usam, provadas na §\ref{sec:provas}:
+$\bar\varrho^{2} = 3$ (Proposição~\ref{prop:balanceada}(iii)); os pesos~1, com
+$\bar\varrho = 1$. Duas consequências que as provas usam, provadas na §\ref{sec:provas}:
 \begin{equation}
   \label{eq:ordem-lambda}
   (\lamGone)^{2} \;\le\; C_{\pen}\,\frac{\sigma^{2}\bn}{n},
@@ -542,7 +542,7 @@ Então:
   \item \textup{(taxa)}
     $\normn{\widehat f - f}^{2} = O_{p}\bigl(n^{-2\seff/(2\seff+1)}\bigr)$;
   \item \textup{(o balanço)} no evento $\Acal \cap \Ecal$, o termo de estimação
-    é no máximo $384\bar\rho^{2}C_{\pen}\sigma^{2}pq(\bn + 2^{J_{n}})/(\gamma n)
+    é no máximo $384\bar\varrho^{2}C_{\pen}\sigma^{2}pq(\bn + 2^{J_{n}})/(\gamma n)
     \asymp n^{-2\seff/(2\seff+1)}$, o de viés é $\mathcal{B}_{J_{n}}^{2}
     \asymp 2^{-2J_{n}\seff} \le n^{-2\seff/(2\seff+1)}$, e o de
     $\bn/n$ e o dos níveis, $\sigma^{2}p/n$, são de ordem estritamente menor.
@@ -586,7 +586,7 @@ e a mesma taxa vale para $\sum_{\cv\md}\lVert\widehat g_{\cv\md} -
   \item o ganho sobre o Corolário~5 de E1.6, $(\log n/n)^{2s/(2s+1)}$, é de
     $(\log n)^{2\seff/(2s+1)}$, na mesma janela de $J_{n}$;
   \item a constante cresce com os pesos no máximo como
-    $\bar\rho^{\,4s/(2s+1)}$ no termo principal.
+    $\bar\varrho^{\,4s/(2s+1)}$ no termo principal.
 \end{enumerate}
 \end{corollary}
 
@@ -712,8 +712,8 @@ colunas e o último com $b + r_{\lev}$, $r_{\lev} = 2^{\lev} - k_{\lev}b \in
 \{0,\dots,b-1\}$; todos entre $b$ e $2b-1$, o que dá (i). Para (ii), um bloco
 tem $1 + \sum_{\lev=\jst+1}^{J-1}\lfloor 2^{\lev}/b\rfloor \le 1 +
 (2^{J}-2^{\jst+1})/b \le 1 + 2^{J}/b$ pedaços. Para (iii), com
-$w_{G} = \sqrt{|G|}$, $\rho^{2} = \max|G|/\min|G|$; sem nível fino, todos os
-pedaços têm $2^{J}-1$ colunas e $\rho = 1$; com nível fino, por (i),
+$w_{G} = \sqrt{|G|}$, $\varrho^{2} = \max|G|/\min|G|$; sem nível fino, todos os
+pedaços têm $2^{J}-1$ colunas e $\varrho = 1$; com nível fino, por (i),
 $\min|G| \ge b-1$ e $\max|G| \le 2b-1$, e $(2b-1)/(b-1) = 2 + 1/(b-1) \le 3$.
 Os valores em $b = 6$ e $7$ são os de \texttt{08a-sondagem-blocos.md},
 §11.2: o pedaço grosso tem $7$ colunas e os finos, de $6$ a $10$ ($b = 6$) e
@@ -769,11 +769,11 @@ $\smax \le B_{X}\sqrt{2C_{U}}$ e $\lmaxx(\Gramhat) \le \Lambda$.
 \emph{(iii).} Para todo $G$,
 \[
   \lamG w_{G} = 2\max_{G'}\bigl(\lamzbar{G'}w_{G}/w_{G'}\bigr) \le
-  2\max_{G'}\lamzbar{G'}\cdot\max_{G'}(w_{G}/w_{G'}) \le \rho\lamGone,
+  2\max_{G'}\lamzbar{G'}\cdot\max_{G'}(w_{G}/w_{G'}) \le \varrho\lamGone,
 \]
 e
-$(\lamG)^{2}W(\Hcal) = \sum_{G\in\Hcal}(\lamG w_{G})^{2} \le
-\rho^{2}(\lamGone)^{2}|\Hcal|$. A mesma conta vale com os $\lamz{G}$. \qed
+$(\lamG)^{2}\mathcal{W}(\Hcal) = \sum_{G\in\Hcal}(\lamG w_{G})^{2} \le
+\varrho^{2}(\lamGone)^{2}|\Hcal|$. A mesma conta vale com os $\lamz{G}$. \qed
 
 \subsection*{Teorema~\ref{thm:oraculo-blocos}}
 
@@ -841,21 +841,21 @@ definição de $\gtil$,
   \norm{\vbar_{\Gbar}} = \sum_{G\in\Gbar}w_{G}\norm{\vbar_{G}}_{2}
   \le \Bigl(\sum_{G\in\Gbar}w_{G}^{2}\Bigr)^{1/2}
   \Bigl(\sum_{G\in\Gbar}\norm{\vbar_{G}}_{2}^{2}\Bigr)^{1/2}
-  \le \sqrt{\bar W}\,\norm{\vbar}_{2}
-  \le \sqrt{\bar W/\gtil}\;\normn{\Btil\vbar},
+  \le \sqrt{\bar{\mathcal{W}}}\,\norm{\vbar}_{2}
+  \le \sqrt{\bar{\mathcal{W}}/\gtil}\;\normn{\Btil\vbar},
 \end{equation}
 porque $\normn{\Btil\vbar}^{2} = \vbar\T\GBA\vbar \ge \gtil\norm{\vbar}_{2}^{2}$.
 \textbf{Caso 1:} $2\normn{\bbar}^{2} \le \pen\norm{\vbar_{\Gbar}}$. Então
 \eqref{eq:cone-blocos} dá $\frac12\normn{\Btil\vbar}^{2} +
 \pen\norm{\vbar_{\Gbar^{c}}} \le 4\pen\norm{\vbar_{\Gbar}}$, e com
 \eqref{eq:cs-blocos}, $\frac12\normn{\Btil\vbar}^{2} \le
-4\pen\sqrt{\bar W/\gtil}\,\normn{\Btil\vbar}$, isto é
-$\normn{\Btil\vbar} \le 8\pen\sqrt{\bar W/\gtil}$ e
-$\normn{\Btil\vbar}^{2} \le 64\pen^{2}\bar W/\gtil$. Do mesmo display,
+4\pen\sqrt{\bar{\mathcal{W}}/\gtil}\,\normn{\Btil\vbar}$, isto é
+$\normn{\Btil\vbar} \le 8\pen\sqrt{\bar{\mathcal{W}}/\gtil}$ e
+$\normn{\Btil\vbar}^{2} \le 64\pen^{2}\bar{\mathcal{W}}/\gtil$. Do mesmo display,
 $\norm{\vbar_{\Gbar^{c}}} \le 4\norm{\vbar_{\Gbar}}$, logo $\norm{\vbar} \le
-5\norm{\vbar_{\Gbar}} \le 5\sqrt{\bar W/\gtil}\cdot 8\pen\sqrt{\bar W/\gtil}
-= 40\pen\bar W/\gtil$; e $\norm{\vbar}_{2}^{2} \le
-\normn{\Btil\vbar}^{2}/\gtil \le 64\pen^{2}\bar W/\gtil^{2}$.
+5\norm{\vbar_{\Gbar}} \le 5\sqrt{\bar{\mathcal{W}}/\gtil}\cdot 8\pen\sqrt{\bar{\mathcal{W}}/\gtil}
+= 40\pen\bar{\mathcal{W}}/\gtil$; e $\norm{\vbar}_{2}^{2} \le
+\normn{\Btil\vbar}^{2}/\gtil \le 64\pen^{2}\bar{\mathcal{W}}/\gtil^{2}$.
 \textbf{Caso 2:} $2\normn{\bbar}^{2} > \pen\norm{\vbar_{\Gbar}}$. Então
 \eqref{eq:cone-blocos} dá $\frac12\normn{\Btil\vbar}^{2} <
 8\normn{\bbar}^{2}$, isto é $\normn{\Btil\vbar}^{2} < 16\normn{\bbar}^{2}$;
@@ -869,7 +869,7 @@ majorada pelo máximo dos dois casos e o máximo pela soma: é (ii).
 $\widehat f - f = \Btil\vbar + \PA(\bbar + \bveps) - \bbar$, e
 $\normn{\PA\bbar} \le \normn{\bbar}$; a desigualdade triangular dá a primeira
 parte de (iii), e $(x+y+z)^{2} \le 3(x^{2}+y^{2}+z^{2})$ com (ii) dá
-$\normn{\widehat f - f}^{2} \le 3(64\pen^{2}\bar W/\gtil + 16\normn{\bbar}^{2}
+$\normn{\widehat f - f}^{2} \le 3(64\pen^{2}\bar{\mathcal{W}}/\gtil + 16\normn{\bbar}^{2}
 + 4\normn{\bbar}^{2} + \normn{\PA\bveps}^{2})$. Como $\Tw$, $\gtil$ e $\pen$ não
 dependem do comparador, as cotas valem simultaneamente para todos, e
 pode-se tomar o mínimo. A cota de $\E[\normn{\PA\bveps}^{2}\mid\bX,\bU]$ é a
@@ -880,7 +880,7 @@ do Passo~6 de E1.5: $\operatorname{tr}(\PA) \le p$. \qed
 Tome $T = \{G : \norm{\thetastar_{G}}_{2}^{2} > \eta\}$ e o comparador
 $\bar\bbeta = (\bc,\thbar)$ com $\thbar_{G} = \thetastar_{G}\mathbf{1}\{G\in
 T\}$. Então $\Gbar \subseteq T$ e, pela definição de $\eta$,
-$\pen^{2}\bar W \le \sum_{G\in T}(\pen w_{G})^{2} \le
+$\pen^{2}\bar{\mathcal{W}} \le \sum_{G\in T}(\pen w_{G})^{2} \le
 |T|\max_{G}(\pen w_{G})^{2} = |T|\,\eta\Lambda'\gtil/1{,}6$. O resíduo é
 $\bbar = \bb + \Bmat(\thetastar - \thbar)$, e como $\Bmat\T\Bmat/n$ é submatriz
 principal de $\Gramhat$,
@@ -890,12 +890,12 @@ principal de $\Gramhat$,
   \le 2\normn{\bb}^{2} + 2\Lambda'\sum_{G\notin T}\norm{\thetastar_{G}}_{2}^{2}.
 \]
 Por \eqref{eq:oraculo-min-blocos},
-$\normn{\widehat f - f}^{2} \le 192\pen^{2}\bar W/\gtil + 60\normn{\bbar}^{2} +
+$\normn{\widehat f - f}^{2} \le 192\pen^{2}\bar{\mathcal{W}}/\gtil + 60\normn{\bbar}^{2} +
 3\normn{\PA\bveps}^{2} \le 120\Lambda'\{\eta|T| + \sum_{G\notin
 T}\norm{\thetastar_{G}}^{2}\} + 120\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}$,
 e o termo entre chaves é exatamente $\Rid(\thetastar;\eta)$. Para as
 componentes, o Teorema~\ref{thm:oraculo-blocos}(ii) dá
-$\norm{\vbar}_{2}^{2} \le 64\pen^{2}\bar W/\gtil^{2} +
+$\norm{\vbar}_{2}^{2} \le 64\pen^{2}\bar{\mathcal{W}}/\gtil^{2} +
 16\normn{\bbar}^{2}/\gtil \le (40\Lambda'\eta|T| + 32\normn{\bb}^{2} +
 32\Lambda'\sum_{G\notin T}\norm{\thetastar_{G}}^{2})/\gtil \le
 (40\Lambda'\Rid + 32\normn{\bb}^{2})/\gtil$, e
@@ -1003,17 +1003,17 @@ probabilidade ao menos $1 - \epsilon$. Nela vale $\Tw$, e o
 Teorema~\ref{thm:oraculo-blocos}(iii) com $\bar\bbeta = \betastar$ dá
 \[
   \normn{\widehat f - f}^{2}
-  \le \frac{192\,(\lamG)^{2}W(\Gzero(\thetastar))}{\gtil}
+  \le \frac{192\,(\lamG)^{2}\mathcal{W}(\Gzero(\thetastar))}{\gtil}
   + 60\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}.
 \]
 Pelo Lema~\ref{lem:calib-blocos}(iii), por \eqref{eq:ordem-lambda} e pela
 Proposição~\ref{prop:balanceada}(ii), com $\gtil > \gamma/2$,
 \[
-  \frac{192\,(\lamG)^{2}W(\Gcal_{n})}{\gtil}
-  \le \frac{384\,\bar\rho^{2}(\lamGone)^{2}|\Gcal_{n}|}{\gamma}
-  \le \frac{384\,\bar\rho^{2}C_{\pen}\sigma^{2}\bn}{\gamma n}\,
+  \frac{192\,(\lamG)^{2}\mathcal{W}(\Gcal_{n})}{\gtil}
+  \le \frac{384\,\bar\varrho^{2}(\lamGone)^{2}|\Gcal_{n}|}{\gamma}
+  \le \frac{384\,\bar\varrho^{2}C_{\pen}\sigma^{2}\bn}{\gamma n}\,
   pq\Bigl(1 + \frac{2^{J_{n}}}{\bn}\Bigr)
-  = \frac{384\,\bar\rho^{2}C_{\pen}\sigma^{2}pq\,(\bn + 2^{J_{n}})}{\gamma n},
+  = \frac{384\,\bar\varrho^{2}C_{\pen}\sigma^{2}pq\,(\bn + 2^{J_{n}})}{\gamma n},
 \]
 que é $\asymp n^{-2\seff/(2\seff+1)}$, porque $2^{J_{n}} \asymp
 n^{1/(2\seff+1)}$ domina $\bn \asymp \log n$. O viés é
@@ -1032,7 +1032,7 @@ $\sum_{\cv\md}\lVert\widehat g_{\cv\md} - \gcomp{\cv}{\md}\rVert^{2} \le
 2\norm{\thetahat - \thetastar}_{2}^{2} + 2pqC_{g}^{2}(1-2^{-2\seff})^{-1}
 2^{-2J_{n}\seff}$. No evento da prova do Teorema~\ref{thm:taxa-blocos}, o
 Teorema~\ref{thm:oraculo-blocos}(ii) com $\bar\bbeta = \betastar$ dá
-$\norm{\thetahat - \thetastar}_{2}^{2} \le 64(\lamG)^{2}W(\Gcal_{n})/\gtil^{2}
+$\norm{\thetahat - \thetastar}_{2}^{2} \le 64(\lamG)^{2}\mathcal{W}(\Gcal_{n})/\gtil^{2}
 + 16\normn{\bb}^{2}/\gtil$, com $\gtil > \gamma/2$: as duas parcelas têm a
 ordem das do Teorema~\ref{thm:taxa-blocos}, com $\gamma^{-2}$ no lugar de
 $\gamma^{-1}$. Para $\chat$, como na prova do Corolário~4 de E1.6:
@@ -1060,9 +1060,9 @@ e pelo Lema~\ref{lem:calib-blocos}(iii), por \eqref{eq:ordem-lambda} e por
 $\gtil > \gamma/2$,
 \[
   \eta = \frac{1{,}6\max_{G}(\lamG w_{G})^{2}}{\Lambda\gtil}
-  \;\le\; \frac{3{,}2\,\bar\rho^{2}(\lamGone)^{2}}{\Lambda\gamma}
+  \;\le\; \frac{3{,}2\,\bar\varrho^{2}(\lamGone)^{2}}{\Lambda\gamma}
   \;\le\; \bar\eta_{n} := \kappa\,\frac{\bn}{n},
-  \qquad \kappa = \frac{3{,}2\,\bar\rho^{2}C_{\pen}\sigma^{2}}{\Lambda\gamma}.
+  \qquad \kappa = \frac{3{,}2\,\bar\varrho^{2}C_{\pen}\sigma^{2}}{\Lambda\gamma}.
 \]
 Como $\Rid$ é não decrescente em $\eta$, o Lema~\ref{lem:risco-pedacos} com
 $b = \bn$ dá
@@ -1079,7 +1079,7 @@ como no Corolário~\ref{cor:componentes-blocos}. Os itens: (i) e (ii) são o
 expoente $(2/\pi-1)_{+}$; (iii) é
 $2s/(2s+1) - (2/\pi-1)_{+}/(2s+1) = 2\seff/(2s+1)$, porque
 $2s - 2/\pi + 1 = 2(s - 1/\pi + 1/2) = 2\seff$ em $\pi < 2$ e $\seff = s$ em
-$\pi \ge 2$; (iv) é $\kappa^{2s/(2s+1)} \propto \bar\rho^{\,4s/(2s+1)}$. \qed
+$\pi \ge 2$; (iv) é $\kappa^{2s/(2s+1)} \propto \bar\varrho^{\,4s/(2s+1)}$. \qed
 
 \section{O que foi transposto e o que é novo}
 
@@ -1101,7 +1101,7 @@ $\pi \ge 2$; (iv) é $\kappa^{2s/(2s+1)} \propto \bar\rho^{\,4s/(2s+1)}$. \qed
     limiarização de wavelets.
   \item \textbf{Novo:} a calibração em blocos com o desenho dependente e a
     forma fechada controlada pelos eventos de E1.4 e E1.5; o preço dos pesos
-    como um fator $\rho$ no termo de estimação
+    como um fator $\varrho$ no termo de estimação
     (Lema~\ref{lem:calib-blocos}(iii)), que cobre os pesos $\sqrt{|G|}$ na
     forma balanceada; o oráculo sem cone para grupos com os níveis livres; o
     Lema~\ref{lem:risco-pedacos} sob a hipótese de Besov por nível, mais
@@ -1120,7 +1120,7 @@ $\pi \ge 2$; (iv) é $\kappa^{2s/(2s+1)} \propto \bar\rho^{\,4s/(2s+1)}$. \qed
     pela regra \texttt{cv1se} (D45); nenhum dos dois tem teorema aqui.
   \item \textbf{Pesos que dependem das respostas.} O argumento pede $w$ e, na
     Observação~\ref{rem:branca}, $Q_{G}$ mensuráveis em $(\bX,\bU)$, e
-    $\rho$ limitado. Pesos estimados a partir de um primeiro ajuste, que
+    $\varrho$ limitado. Pesos estimados a partir de um primeiro ajuste, que
     dependem de $\bY$, não são cobertos.
   \item \textbf{Pedaços que atravessam níveis} (a norma (3.1) literal de Klopp
     e Pensky). O Lema~\ref{lem:risco-pedacos} usa pedaços finos contidos num
@@ -1165,7 +1165,7 @@ Lema~\ref{lem:calib-blocos}(ii). O que saiu em 2026-10-03:
 
 \begin{itemize}[nosep, leftmargin=*]
   \item \textbf{Proposição~\ref{prop:balanceada}.} As três afirmações valem em
-    $b = 2,\dots,200$ e $J = 1,\dots,14$. Com $J = 8$, o $\rho^{2}$ dos pesos
+    $b = 2,\dots,200$ e $J = 1,\dots,14$. Com $J = 8$, o $\varrho^{2}$ dos pesos
     $\sqrt{|G|}$ é $1{,}667$, $1{,}571$, $1{,}571$ e $1{,}778$ nos $\bn$ de
     $n = 250$, $500$, $1000$ e $4000$.
   \item \textbf{Lema~\ref{lem:risco-pedacos}.} A cota vale nas $2\,280$
@@ -1223,7 +1223,7 @@ Lema~\ref{lem:calib-blocos}(ii). O que saiu em 2026-10-03:
     $J = 5$, duas verdades, $40$ réplicas cada): $\operatorname{tr}(Q_{G}^{-1}
     \Psitil_{G})/|G| \le 0{,}9997$ e $\opnorm{Q_{G}^{-1/2}\Psitil_{G}
     Q_{G}^{-1/2}} \le 1$ em todos os pedaços; cobertura $1{,}000$ com o $\pen$
-    pivotal; as três cotas com $q_{\max}\bar W$ valem em todos os $80$
+    pivotal; as três cotas com $q_{\max}\bar{\mathcal{W}}$ valem em todos os $80$
     ajustes, com folga mínima de $4\,899$ vezes; $q_{\max}/\lmaxx(\Gramhat) \le
     0{,}66$.
   \item \textbf{O limiarizado}: Parte~VI do script, relatada no adendo de

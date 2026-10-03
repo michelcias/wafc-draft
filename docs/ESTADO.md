@@ -2192,7 +2192,7 @@ Proposition 3 (taxa lenta) é a pergunta 42(c).
 | D13 | 09-18 | **A teoria assume o caso geral** `λ_min(E[XX' \| U]) ≥ κ_1 > 0` q.c.; `X ⊥ U` vira observação (a fatoração de Kronecker) | E1.4 fechou o caso geral com `λ_min(Σ) ≥ κ_1 c_U`, conferido a 10% da verdade; assumir independência custaria generalidade sem comprar constante |
 | D14 | 09-18 | **D11 é sobre a densidade conjunta** de `U` em `[0,1]^q`, não sobre as marginais | `U_2 = U_1` tem marginais uniformes e `Σ_Ψ` singular; a prova de E1.4 usa `c_U` da conjunta, e é daí que sai a "não colinearidade entre moduladoras" |
 | D15 | 09-19 | Padrões do `wafc_design()`, ratificados do handoff de E2.1: `filter.size = 8` (contra os 20 do `wall()`), nomes de coluna `x2:u1:psi3.5` e de bloco `x2:u1`, erro informativo em `j0 != 0` e `boundary = "interval"`, e cenários com `β_1` aditivo em duas moduladoras, `β_2` em uma e `β_ℓ` constante para `ℓ ≥ 3` | o filtro 8 é o das três conferências de `derivations/check/`; o erro em vez da implementação mantém a pergunta 6 aberta sem código morto; o cenário tem de exibir o termo cruzado, que L2 apontou como o eixo do artigo |
-| D16 | 09-19 | **O enunciado principal do artigo é o Corolário 5 de E1.6** (taxa `n^{−2s/(2s+1)}` a menos de logaritmos, sob a mesma hipótese de Besov de E1.3), com o Teorema 2 como a taxa do sieve e a Proposição 4 como enunciado incondicional | ratificada pelo autor em 09-19 junto com D18: sob o posicionamento escolhido, o Corolário 5 é o paralelo direto do Teorema 2 de Klopp & Pensky |
+| D16 | 09-19 | **(Emendada por D47 em 2026-10-03: o enunciado principal passa ao Corolário 11 de E1.12.)** **O enunciado principal do artigo é o Corolário 5 de E1.6** (taxa `n^{−2s/(2s+1)}` a menos de logaritmos, sob a mesma hipótese de Besov de E1.3), com o Teorema 2 como a taxa do sieve e a Proposição 4 como enunciado incondicional | ratificada pelo autor em 09-19 junto com D18: sob o posicionamento escolhido, o Corolário 5 é o paralelo direto do Teorema 2 de Klopp & Pensky |
 | D18 | 09-19 | **O artigo se apresenta como extensão de Klopp & Pensky (2015)** a coeficientes aditivos em várias moduladoras e a desenho dependente; o parágrafo de posicionamento está escrito e aprovado em `alvo-revista.md` §4, e E5a o usa como está | decisão do autor, escolhendo entre os dois parágrafos redigidos; é a leitura honesta da literatura e a que o referee provável reconhece, ao custo de expor a falta da cota inferior para `q ≥ 2` |
 | D17 | 09-19 | **Interface de `wafc()`** (E2.2): o `λ` do objeto é o do objetivo, não o do motor; `intercept` resolvido por presença de covariável constante, com erro informativo nos casos ambíguos; `coef()` dobra o intercepto no nível e `predict()` usa os coeficientes crus; mínimo quadrado escrito no ponto nulo do caminho; `wafc_kkt()` e `wafc_blocks()` públicas | a escala de `λ` é o que liga o código à teoria de E1.5, e as outras quatro saem dos defeitos de motor medidos; ratificada pelo autor em 09-19 |
 | D5 | 09-19 | **Alvo primário: *Statistica Sinica***; reserva: *Electronic Journal of Statistics* | ratificada pelo autor; a linhagem do modelo está lá (Xue & Yang 2006; Wei, Huang & Li 2011) e o teto de 40 páginas em espaço duplo é folgado para a estrutura de ~29 planejada. O manuscrito nasce no template da revista (`manuscript/ss-template/`), com provas no suplementar |
@@ -2211,6 +2211,7 @@ Proposition 3 (taxa lenta) é a pergunta 42(c).
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
 | D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
+| D47 | 10-03 | **Pendências de E1.12 (pergunta 42):** (a) **o enunciado principal do artigo passa a ser o Corolário 11** (`08-blocos.tex`), no lugar do Corolário 5, o que emenda D16; (b) a razão dos pesos é **`ϱ`** e a soma dos pesos ao quadrado é **`𝒲(·)`**, trocados no `08` (19 `\rho`, 12 `\bar\rho`, 24 `\bar W`, 9 `W(`) e no `06` (3 `\rho` da razão, 9 `W(`) só no modo matemático e sem tocar a taxa `ρ_n` nem as macros `\rhoG`, `\rhoGt`; a lista de símbolos entrou no `notacao.md` §10, com as macros locais como no `07`; (c) **a taxa lenta (Proposition 3) fica no corpo, em versão de blocos**, como corolário do Teorema 3(i), a escrever no `08` (Corolário 14) e conferir; (d) a variante branca (Observação 2 do `08`) vai ao supp como o enunciado que cobre o estimador exato do código | recomendações do chat principal, aceitas pelo autor; a (c) foi revista antes da aceitação, porque a Proposition 3 é o único enunciado sem condição de desenho (D16) |
 | D44 | 10-03 | **Rumo de E2.5 (pergunta 33): go reposicionado, na *Statistica Sinica*.** O WAFC é o **block LASSO na forma balanceada** (níveis livres, pesos `sqrt(\|G\|)` do `grpreg`, pedaços finos entre `b_n` e `2b_n − 1` colunas, níveis com `2^j < b_n` num pedaço só; E2.5e), seguido de limiar nas normas por bloco; o LASSO coordenado de D3 fica como opção (D43). A tese numérica passa a ser: vence o spline sintonizado por REML ou validação cruzada no não homogêneo e na `mixed` em `n ≥ 500`, empata com o sintonizado por GCV, perde no suave perto do fator 1,5, e recupera a estrutura que o spline não recupera. D18 fica (extensão de K&P), com o parágrafo de posicionamento a reescrever sem "penalize coefficient by coefficient rather than in blocks"; a teoria em blocos de E1.11 (`08a`, §§ 11 e 12) vai às derivações numeradas e ao manuscrito em `k = 4` | recomendação do chat principal (33(f)), aceita pelo autor: com o limiar oráculo só os blocos passam a perna do não homogêneo; a estrutura deles chega a 1 com o `cv1se` (E2.5j); a taxa perde o logaritmo em `π ≥ 2`; a SS publica seleção em coeficientes variáveis (Wei, Huang & Li 2011), e o JCGS do plano não é necessário |
 | D45 | 10-03 | **O limiar (pergunta 38):** a regra padrão de `t` é o **`cv1se`** (o maior `t` a um erro-padrão do mínimo da validação cruzada, nas dobras do ajuste); o `+cv` fica como opção de predição; a porta do QUT e o reajuste `+ls` ficam fora do padrão e no código; **o limiar é também o estimador de predição**, e a cota de risco do estimador limiarizado tem de ser escrita (bloco ativo zerado tem `ν ≤ t + ‖ĝ − g‖`; os mantidos não mudam) | E2.5j: o `cv1se` chega ao teto do limiar oráculo no suave, no `uneven`, no nulo e em `n = 1000`, e é o que segura o fator do suave e a estrutura; o `+cv` é melhor no sinal fraco em `n ≤ 500`; a porta é redundante com o `cv1se` e tem nível acima do nominal; o `+ls` piora os blocos fora do suave; aceita pelo autor |
 | D46 | 10-03 | **O spline de E4 e da tabela do manuscrito (pergunta 41):** duas colunas, **`gam.reml`** e **`gam.gcv`**, com o `gam.cv` em nota (razão 1,000 contra o `gam.reml`); a grade de `k` é a de D41, com o custo do topo registrado; o `wafc.gcv` não vai à tabela de E4 e fica no código; o `k.check()` de Wood (2017, §5.9) entra em E4; a tabela de convergência dos motores é relida em E4 se `n` ou `q` crescerem | o `gam.gcv` é o critério padrão do `mgcv::gam()` e o que tira a vantagem no não homogêneo, e omiti-lo seria a objeção; o `gam.reml` dá o erro do `gam.cv` a um décimo do custo; aceita pelo autor |
@@ -2909,8 +2910,9 @@ Ordenadas pelo que bloqueia mais.
      medir em que `J` e se o corte cai dentro da guarda, antes de E4.
    - (e) O `k.check()` de Wood (2017, §5.9) não foi feito.
 
-42. **Pendências de E1.12** (2026-10-03), que pedem o autor antes da
-   `k = 4`. Recomendação do chat principal em cada item:
+42. **~~Pendências de E1.12~~ decididas em 2026-10-03 (D47).** Resta o
+   Corolário 14 (a taxa lenta em blocos), §5. Texto original: (2026-10-03),
+   que pedem o autor antes da `k = 4`. Recomendação do chat principal em cada item:
    - (a) **D16: o Corolário 11 passa a ser o enunciado principal**, no
      lugar do Corolário 5. Recomendação: sim; é a consequência de D44, e é
      o enunciado que vence o de K&P em `s'` e não tem logaritmo em `π ≥ 2`.
@@ -2920,8 +2922,16 @@ Ordenadas pelo que bloqueia mais.
      §10 e no `macros.tex` (o `08` troca as macros locais).
    - (c) **A Proposition 3 do manuscrito (a taxa lenta, a Proposição 4 de
      E1.6):** o `08` não tem versão em blocos à parte; o Teorema 3(i) a dá
-     com `‖θ*‖_{𝒢,w} ≤ w_max‖θ*‖_1`. Recomendação: cortar do corpo e deixar
-     uma frase com a consequência no supp, o que poupa página.
+     com `‖θ*‖_{𝒢,w} ≤ w_max‖θ*‖_1`. ~~Recomendação: cortar do corpo e
+     deixar uma frase com a consequência no supp, o que poupa página.~~
+     **Recomendação revista (2026-10-03):** manter no corpo, em versão de
+     blocos, como corolário do Teorema 3(i) com prova de uma linha. É o
+     único enunciado do artigo sem condição de desenho (D16 e o próprio
+     `ms_3`, "the unconditional statement of this paper"), e cortá-lo
+     custaria isso para poupar meia página. A ordem deve ser a mesma da
+     Proposition 3 atual, com a constante `ϱ`: com pesos 1,
+     `λ^𝒢_{n,1} ≍ sqrt(log n/n)`, a ordem do `λ` do LASSO, e
+     `‖θ*‖_{𝒢,1} ≤ ‖θ*‖_1`. Isso é leitura, a conferir ao escrever.
    - (d) **A Observação 2 (variante branca) vai ao supp** como o enunciado
      que cobre o estimador exato do código. Recomendação: sim.
 
@@ -2958,9 +2968,11 @@ entradas).
   blocos, o que o autor confirma quando o enunciado existir. Os símbolos de
   E1.11 (`𝒢`, `G`, `b_n`, `|𝒢|`, `w_G`, `‖θ‖_{𝒢,w}`, `𝒢_0`, `W(𝒢_0)`, `Ψ̃_G`,
   `R_𝒢(θ; η)`, `λ_n^𝒢`) passam antes pelo `notacao.md`, com aval do autor.
-  **Fechada por E1.12 em 2026-10-03 (§2)**; quatro pontos para o autor na
-  pergunta 42 (o Corolário 11 como enunciado principal, `ϱ` e `𝒲`, a taxa
-  lenta, a variante branca no supp).
+  **Fechada por E1.12 em 2026-10-03 (§2)**, e a pergunta 42 decidida
+  (D47): o Corolário 11 é o enunciado principal, `ϱ` e `𝒲` aplicados, a
+  lista no `notacao.md` §10. **Falta o Corolário 14** no `08`, a taxa lenta
+  em blocos como corolário do Teorema 3(i) (D47(c)), com a conferência da
+  ordem; pequeno, pode ir junto da `k = 4` ou antes.
 - (b) **O parágrafo de posicionamento de D18** (`alvo-revista.md` §4),
   reescrito para a penalidade em blocos, com a frase-tese e as
   contribuições; o texto vai ao autor antes de entrar.
@@ -2998,6 +3010,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | Pergunta 42 decidida (D47): o Corolário 11 é o enunciado principal (emenda D16); `ϱ` e `𝒲` no `08` e no `06` (14 e 11 páginas, sem aviso); `notacao.md` §10; a taxa lenta fica no corpo em versão de blocos, a escrever |
 | 2026-10-03 | E1.12 fechada e integrada (`OK` em 207 s, 14 e 11 páginas): Teorema 3 (oráculo em blocos), Lema 15, Teorema 4 e Corolário 11 sem logaritmo em `π ≥ 2`, a variante branca cobrindo o `grpreg`, e o risco do limiarizado (Lema 16, Corolários 12 e 13); o `s' = 1/2` de D27 fica dentro do nosso enunciado e fora do de K&P; pergunta 42. E6.1b parou antes da rodada, à espera do autor |
 | 2026-10-03 | E3.1 (a interface com o block LASSO balanceado e o limiar `cv1se` como padrão) e E6.1b (a aplicação no critério de D44) catalogadas, em paralelo com a E1.12, sem arquivo em comum |
 | 2026-10-03 | E1.12 catalogada: a sondagem de E1.11 promovida a `08-blocos.tex` (calibração, oráculo com pesos de razão limitada, risco ideal por pedaços, taxas) e, no `06`, o Corolário 8 em blocos e a cota de risco do estimador limiarizado (D45) |

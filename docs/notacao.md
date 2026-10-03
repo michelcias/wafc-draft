@@ -195,3 +195,35 @@ nessa resolução (pergunta 32(c)); `ρ̃_n ≤ ρ_n`. No LaTeX: `\nu`, `\wideha
 `\mathcal{S}`, `\widehat{\mathcal{S}}`, `\nu_{\min}`, `\nu_{\min,n}`,
 `\bar{\Delta}`.
 
+
+## 10. Emenda de 2026-10-03 (D47): a penalidade em blocos
+
+Com o block LASSO balanceado como o WAFC (D44), os símbolos da teoria em
+blocos (E1.11, E1.12; `derivations/08-blocos.tex` e o adendo do
+`06-selecao-limiar.tex`) entram aqui. Dois foram trocados antes de entrar,
+por colisão: a razão dos pesos é `ϱ` (`\varrho`), e não `ρ`, que é a taxa
+por componente `ρ_n` (§9); a soma dos pesos ao quadrado é `𝒲(·)`
+(`\mathcal{W}`), e não `W(·)`, que encosta no espaço `W_J`. As macros
+continuam locais no preâmbulo do `08` e do `06`, como no `07`; o manuscrito
+as copia em `k = 4`.
+
+| Símbolo | Significado | Nota |
+|---|---|---|
+| `𝒢`, `G`, `\|𝒢\|`, `\|G\|` | partição das colunas penalizadas em pedaços dentro de cada bloco `(ℓ,m)`; um pedaço; o número de pedaços; o número de colunas de um pedaço | o grupo da penalidade não é o bloco `(ℓ,m)`; a norma que se limiariza continua sendo a do bloco, `ν̂_{ℓm}` |
+| `b_n = ⌈log n⌉`, `j*` | tamanho mínimo de um pedaço fino; o nível mais fino com `2^j < b_n` | escalar; não confundir com o viés `𝐛`, em negrito |
+| `w_G`, `ϱ`, `ϱ̄` | peso do pedaço; razão `max w_G / min w_G`; sua cota em `n` | forma balanceada com `w_G = sqrt(\|G\|)`: `ϱ² ≤ 3` (Proposição 7) |
+| `‖θ‖_{𝒢,w}`, `θ_G` | norma de grupos `Σ_G w_G ‖θ_G‖_2`; subvetor do pedaço | |
+| `𝒢_0(θ)`, `𝒲(ℋ)` | pedaços ativos de `θ`; `Σ_{G∈ℋ} w_G²` | com `w_G = 1`, `𝒲(𝒢_0)` é o número de pedaços ativos, o `s_0` de E1.5 |
+| `Ψ̃_G` | Gram do pedaço residualizada nas colunas não penalizadas | |
+| `R_𝒢(θ; η)` | risco ideal por pedaços, `Σ_G min(‖θ_G‖², η)` | Corolário 9, Lema 15 |
+| `λ_{0,G}`, `λ̄_{0,G}`, `λ_w`, `λ_n^𝒢`, `λ^𝒢_{n,1}` | calibração exata do pedaço; sua cota determinística; o nível com pesos; o da teoria; o dos pesos 1 | Lema 14 |
+| `𝒯_{𝒢,w}`, `ℰ`, `ℰ_Σ`, `𝒜_n` | eventos da calibração, do ruído, da Gram (`‖Σ̂ − Σ‖ < γ/2`) e do regime | `ℰ_Σ` dá `λ_min` e `λ_max` juntos |
+| `A^𝒢_{s,π}`, `C_λ` | constante do Lema 15; constante da ordem de `λ` | `A^𝒢 = 2 + (1 − 2^{1−π(s+1/2)})^{−1}` em `π ≤ 2` |
+| `ρ_n^𝒢`, `ρ̃_n^𝒢` | taxas por componente do Teorema 4 (`n^{−s'/(2s'+1)}`) e do Corolário 11 | par de `ρ_n` e `ρ̃_n` da §9 |
+| `Q_G`, `q_max` | Gram da variante branca (o `grpreg` ortonormaliza o pedaço); seu maior autovalor | Observação 2 do `08` |
+| `θ̂^{(t)}`, `ĝ^{(t)}`, `f̂^{(t)}`, `Δ_{ℓm}`, `𝒮_J`, `Δ̄_n^𝒢` | o ajuste limiarizado em `t`; erro por bloco; estrutura no nível `J`; cota do Corolário 12 | Lema 16, Corolários 12 e 13 |
+
+No LaTeX: `\mathcal{G}`, `b_{n}`, `w_{G}`, `\varrho`, `\bar\varrho`,
+`\lVert\theta\rVert_{\mathcal{G},w}`, `\mathcal{G}_{0}`, `\mathcal{W}`,
+`\widetilde{\Psi}_{G}`, `R_{\mathcal{G}}`, `\lambda^{\mathcal{G}}_{n}`,
+`\rho^{\mathcal{G}}_{n}`.

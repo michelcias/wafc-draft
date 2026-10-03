@@ -481,8 +481,8 @@ sem reajuste, o padrão de D45. Escrevemos $\Dbl =
 \lVert\ghat{\cv}{\md} - \gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}$, de modo que
 $\Delta = \max_{\cv\md}\Dbl$, e, na resolução $J$, $\mathcal{S}_{J} =
 \{(\cv,\md) : \thetastar_{\cv\md,\cdot} \ne 0\} \subseteq \mathcal{S}$. Os
-objetos de \texttt{08-blocos.tex} ($\Gcal_{n}$, $W(\cdot)$, $\lamG$, $\lamGone$,
-$\rho$, $\bar\rho$, $C_{\pen}$, $\Lambda$, $\ESig$, $\Acal$, $\Ecal$) entram com o
+objetos de \texttt{08-blocos.tex} ($\Gcal_{n}$, $\mathcal{W}(\cdot)$, $\lamG$, $\lamGone$,
+$\varrho$, $\bar\varrho$, $C_{\pen}$, $\Lambda$, $\ESig$, $\Acal$, $\Ecal$) entram com o
 significado de lá.
 
 \setcounter{lemma}{15}
@@ -549,11 +549,11 @@ blocos:
     \begin{equation}
       \label{eq:Dn-blocos}
       \bigl(\bar\Delta_{n}^{\Gcal}\bigr)^{2}
-      \;=\; \frac{512\,(\lamG)^{2}\,W(\Gcal_{n})}{\gamma^{2}}
+      \;=\; \frac{512\,(\lamG)^{2}\,\mathcal{W}(\Gcal_{n})}{\gamma^{2}}
       \;+\; \frac{64\,\mathcal{B}_{J_{n}}^{2}}{\alpha'\gamma}
       \;+\; \frac{2C_{g}^{2}}{1-2^{-2\seff}}\,2^{-2J_{n}\seff},
     \end{equation}
-    com $(\lamG)^{2}W(\Gcal_{n}) \le \rho^{2}(\lamGone)^{2}|\Gcal_{n}|$.
+    com $(\lamG)^{2}\mathcal{W}(\Gcal_{n}) \le \varrho^{2}(\lamGone)^{2}|\Gcal_{n}|$.
     Num evento de probabilidade ao menos $1 - \alpha - \alpha' -
     \Prob(\Acal^{c})$ vale $\Delta \le \bar\Delta_{n}^{\Gcal}$ e, pelo
     Lema~\ref{lem:sanduiche}(iii), $\Shat(t) = \mathcal{S}$ para todo $t$ com
@@ -667,21 +667,21 @@ $\thetahat_{\cv\md,\cdot}$ é $\Nhat{\cv}{\md}$
 \alpha' - \Prob(\Acal^{c})$ (Lema~14 de E1.12 e Markov). Em $\Acal$ vale
 $\Ecal \subseteq \mathcal{T}_{\Gcal,w}$ e $\gtil > \gamma/2$ (E1.12, as duas
 consequências da Hipótese~B), e o Teorema~3(ii) de E1.12 com o comparador
-$\betastar$ e $W(\mathcal{G}_{0}(\thetastar)) \le W(\Gcal_{n})$ dá
+$\betastar$ e $\mathcal{W}(\mathcal{G}_{0}(\thetastar)) \le \mathcal{W}(\Gcal_{n})$ dá
 \[
   \norm{v}_{2}^{2}
-  \;\le\; \frac{64(\lamG)^{2}W(\Gcal_{n})}{\gtil^{2}} + \frac{16\normn{\bb}^{2}}{\gtil}
-  \;\le\; \frac{256(\lamG)^{2}W(\Gcal_{n})}{\gamma^{2}}
+  \;\le\; \frac{64(\lamG)^{2}\mathcal{W}(\Gcal_{n})}{\gtil^{2}} + \frac{16\normn{\bb}^{2}}{\gtil}
+  \;\le\; \frac{256(\lamG)^{2}\mathcal{W}(\Gcal_{n})}{\gamma^{2}}
   + \frac{32\mathcal{B}_{J_{n}}^{2}}{\alpha'\gamma},
   \qquad v = \thetahat - \thetastar .
 \]
 O resto é a prova do Corolário~\ref{cor:limiar}(i): $\Delta^{2} \le
 2\norm{v}_{2}^{2} + 2C_{g}^{2}(1-2^{-2\seff})^{-1}2^{-2J_{n}\seff} \le
-(\bar\Delta_{n}^{\Gcal})^{2}$. A cota de $(\lamG)^{2}W(\Gcal_{n})$ é o
+(\bar\Delta_{n}^{\Gcal})^{2}$. A cota de $(\lamG)^{2}\mathcal{W}(\Gcal_{n})$ é o
 Lema~14(iii) de E1.12.
 
 \emph{(ii) e (iii).} Pela prova do Teorema~4(iii) de E1.12,
-$(\lamG)^{2}W(\Gcal_{n}) \le \bar\rho^{2}C_{\pen}\sigma^{2}pq(\bn +
+$(\lamG)^{2}\mathcal{W}(\Gcal_{n}) \le \bar\varrho^{2}C_{\pen}\sigma^{2}pq(\bn +
 2^{J_{n}})/n \asymp n^{-2\seff/(2\seff+1)}$, e $2^{-2J_{n}\seff} \le
 n^{-2\seff/(2\seff+1)}$; logo $\bar\Delta_{n}^{\Gcal} \le c(\alpha')\rhoG$, e o
 resto é a prova do Corolário~\ref{cor:limiar}(ii) e (iii) com $\rhoG$ no lugar

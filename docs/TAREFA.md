@@ -171,8 +171,8 @@ ou **Corolário 14**, conforme o tipo. O `06-selecao-limiar.tex` imprime `Hipót
 em vez de número, porque é citada lado a lado com a `Hipótese 1` de E1.6;
 é desvio local e aceito.
 
-**O enunciado que vai ao resumo do artigo é o Corolário 5** (D16, ratificada
-em 2026-09-19).
+**O enunciado que vai ao resumo do artigo é o Corolário 11** (`08-blocos.tex`;
+D47, 2026-10-03, que emenda D16, onde era o Corolário 5).
 
 A notação está congelada (E1.1): `ψ_{jk}` com nível `j` e translação `k`,
 covariável linear `X_ℓ`, moduladora `U_m`, coeficiente `θ_{ℓm,jk}`. As
