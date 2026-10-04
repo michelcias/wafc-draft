@@ -44,8 +44,11 @@
 #'   penalty level \code{s}, the \code{grid} (\code{n_grid} by \eqn{q}), the
 #'   levels \code{cc}, the \eqn{p} by \eqn{q} list \code{g} of evaluated
 #'   components, the \eqn{p} by \eqn{q} matrices \code{nonzero} and
-#'   \code{norm} of \code{\link{wafc_blocks}}, and the names of the
-#'   covariates.
+#'   \code{norm} of \code{\link{wafc_blocks}}, the names of the
+#'   covariates, and the \code{intercept} of \code{\link{coef.wafc}}.
+#'   \code{print} returns \code{x} invisibly.
+#'
+#' @seealso \code{\link{plot.wafc}}, which draws the components.
 #'
 #' @examples
 #' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
@@ -161,6 +164,10 @@ wafc_blocks <- function(object, s = NULL, thresholded = NULL) {
   list(nonzero = nz, norm = nm)
 }
 
+#' @rdname wafc_functions
+#' @param x An object of class \code{"wafc_functions"}.
+#' @param digits Number of significant digits printed.
+#' @param ... Ignored.
 #' @export
 print.wafc_functions <- function(x, digits = max(3L, getOption("digits") - 3L),
                                  ...) {

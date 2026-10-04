@@ -570,3 +570,68 @@ test_that("the seed of the gate leaves the random stream where it was", {
   expect_identical(wafc_threshold_gate(cv0, seed = 7L)[["quantile"]],
                    wafc_threshold_gate(cv0, seed = 7L)[["quantile"]])
 })
+
+## ---------------------------------------------------------------------------
+## Step E3.2: the field 'coef' of the thresholded object (decision D48)
+## ---------------------------------------------------------------------------
+
+## 'coef' is (intercept, one coefficient per column of the design) in the
+## parametrisation of coef.wafc(): with a constant covariate the intercept is
+## zero and the level is in the column of that covariate. Before step E3.2
+## it held the coefficients of the engine with the intercept already set to
+## zero, so the level of the constant covariate was lost and
+## coef[1] + Z coef[-1] missed it.
+coef_identity <- function(th) {
+  cf <- th[["coef"]]
+  des <- th[["design"]]
+  expect_length(cf, 1L + des[["nvars"]])
+  expect_equal(as.numeric(cf[1L] + des[["Z"]] %*% cf[-1L]), th[["fitted"]],
+               tolerance = 1e-12)
+  expect_equal(cf[1L + des[["unpenalized"]]], unname(th[["cc"]]),
+               tolerance = 1e-12)
+  expect_identical(cf[1L], th[["intercept"]])
+}
+
+test_that("coef of a thresholded fit is in the parametrisation of coef.wafc", {
+  th0 <- wafc_threshold(cv0, t = 0)
+  expect_equal(th0[["coef"]], unname(coef(f0, s = s0)[, 1L]),
+               tolerance = 1e-12)
+  const <- f0[["design"]][["constant"]]
+  expect_length(const, 1L)
+  expect_identical(th0[["coef"]][1L], 0)
+  expect_gt(abs(th0[["coef"]][1L + const]), 0)
+  for (th in list(th0, wafc_threshold(cv0, rule = "max"),
+                  wafc_threshold(cv0, rule = "max", refit = "support"),
+                  wafc_threshold(cv0, rule = "max", refit = "block"))) {
+    coef_identity(th)
+  }
+  ## the blocks set to zero are zero in 'coef', and the others are the fit's
+  th <- wafc_threshold(cv0, rule = "max")
+  des <- f0[["design"]]
+  cf0 <- coef(f0, s = s0)[, 1L]
+  for (l in seq_len(p)) {
+    for (m in seq_len(q)) {
+      idx <- des[["blocks"]][[wafc_block_name(des, l, m)]]
+      expect_equal(th[["coef"]][1L + idx],
+                   if (th[["extra"]][["kept"]][l, m]) unname(cf0[1L + idx])
+                   else numeric(length(idx)), tolerance = 1e-12)
+    }
+  }
+})
+
+test_that("coef of a thresholded block LASSO, with and without a constant", {
+  skip_if_not(has("grpreg"))
+  coef_identity(wafc_threshold(klopp0, rule = "max"))
+  coef_identity(wafc_threshold(klopp0, rule = "max", refit = "block"))
+  ## without a constant covariate the intercept of the engine stays
+  d1 <- simulate_wafc(n, p = p, q = q, scenario = "smooth", seed = 20261003L,
+                      intercept = FALSE)
+  fb <- wafc(d1[["x"]], d1[["u"]], d1[["y"]], J = 3L)
+  expect_length(fb[["design"]][["constant"]], 0L)
+  s1 <- fb[["lambda"]][30L]
+  thb <- wafc_threshold(fb, s = s1, t = 0)
+  expect_equal(thb[["coef"]], unname(coef(fb, s = s1)[, 1L]),
+               tolerance = 1e-12)
+  expect_gt(abs(thb[["intercept"]]), 0)
+  coef_identity(thb)
+})

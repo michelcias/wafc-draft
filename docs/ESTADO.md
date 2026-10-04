@@ -28,7 +28,11 @@ fechou (2026-10-03):** a teoria em blocos está provada em `08-blocos.tex`
 (Corolário 11 sem logaritmo em `π ≥ 2`) e no adendo do `06` (o risco do
 limiarizado); a pergunta 42 foi decidida (D47). **E3.1 fechou
 (2026-10-03):** `cv.wafc(x, u, y)` é o WAFC de D44 e D45, a interface espera
-a ratificação do autor, dada em D48. E6.1b parou antes da rodada (§5). A decidir: a saída da aplicação (pergunta 2). O
+a ratificação do autor, dada em D48. **E1.13 e E3.2 fecharam (2026-10-03):**
+a taxa lenta em blocos (Corolário 14, que em `π ≥ 2` e `s < 1/2` dá
+`n^{−2s/(2s+1)}` sem logaritmo e sem condição de desenho) e os gráficos com
+a documentação; pendências na pergunta 44. E6.1b está pronta e espera a
+ordem do autor para rodar (§5). A decidir: a saída da aplicação (pergunta 2). O
 teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 3` (`manuscript/ms_3.tex`,
 `supp_3.tex`, `references_3.bib`), aberta em 2026-10-01 por decisão do
@@ -2096,6 +2100,83 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-03: E1.13 fechada, a taxa lenta em blocos ganha um logaritmo
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: o
+`check/08-blocos.R` (com a Parte VII nova), numa cópia congelada, imprime
+**`OK` em 209 s**; o `08-blocos.tex` compila em **18 páginas** (eram 14),
+sem aviso nem referência indefinida; o diff só acrescenta (três linhas do
+cabeçalho e da lista de peças reescritas).
+
+**Corolário 14** (`cor:lenta-blocos`, §5 do `08`): sob as Hipóteses 1 e 2
+de E1.5, as de E1.3, a Hipótese B, `A` de posto `p` e
+`pq2^{J_n} log(pq2^{J_n})/n → 0`, `‖f̂ − f‖_n² = O_p(λ_n^𝒢 ‖θ*‖_{𝒢,w} +
+𝓑²_{J_n} + p/n)`, com `λ_n^𝒢 ‖θ*‖_{𝒢,w} ≤ ϱ̄ λ^𝒢_{n,1} ‖θ*‖_{𝒢,1}`; a
+contagem sob Besov, com `ϑ_π = min(1 − 1/π, 1/2)`, dá `‖θ*‖_{𝒢,1} ≤
+pqC_g{(1 − 2^{−s'})^{−1} + b_n^{−ϑ_π} Σ_{j*<j<J_n} 2^{j(1/2−s)}}`. (i)
+`s > 1/2` e `s' > 1/4`: `(log n/n)^{1/2}`; (ii) `s < 1/2` e `s' > s/2`:
+`n^{−2s'/(1−2s+4s')}(log n)^{(2/π−1)_+ 2s'/(1−2s+4s')}`, e **em `π ≥ 2`,
+`n^{−2s/(2s+1)}` sem logaritmo**, a taxa do Teorema 4, sem condição de
+desenho.
+
+- **A leitura do chat principal estava certa só até `‖θ*‖_1`:** pela
+  cadeia `‖θ*‖_{𝒢,1} ≤ ‖θ*‖_1` o corolário reproduz a Proposição 4 com a
+  constante `ϱ̄`, e nem o `2b_n − 1` nem o `w_max` mudam o logaritmo. **Mas a
+  cadeia joga fora um ganho:** nos níveis finos `‖θ*‖_{𝒢,1}` é menor que
+  `‖θ*‖_1` por `b_n^{−ϑ_π}`, o que em (ii) cancela o `sqrt(b_n)` do tamanho
+  do pedaço e tira o logaritmo inteiro em `π ≥ 2` (nada em `π = 1`). Em (i)
+  nada muda.
+- **A conferência (Parte VII):** a cota da contagem contra o supremo exato
+  na bola de Besov em 12 pares `(s, π)`, razão máxima 0,999, e a inclinação
+  em `b` é `ϑ_π` à terceira casa; os expoentes do logaritmo em `n` de `1e20`
+  a `1e300` batem com a teoria nos blocos e no LASSO (por exemplo 0 contra
+  0,375 em `(s, π) = (0,3; 2)`); a cota em ajustes (FISTA, `λ` exato, pesos 1
+  e `sqrt(|G|)`, inclusive dois desenhos sem a condição de E1.4 e um com
+  `d > n`), sem violação, folga mínima de 27 vezes.
+- **O desenho só entra por cima:** a calibração em blocos pede
+  `λ_max(Σ̂) ≤ Λ` (a metade superior da Proposição 3 de E1.4, sem `c_U` nem
+  `κ_1`), além de `σ̂_max`; a Proposição 4 do LASSO só pedia as normas das
+  colunas. Nenhuma cota inferior de `Σ̂` é usada.
+- **Achado em E1.6:** a Proposição 4 tem duas condições implícitas. Com
+  `s' ≤ 1/4` em (i) a escolha `J_n ≥ log₂n/(4s')` dá `2^{J_n} ≥ n`, e com
+  `s' ≤ s/2` em (ii) o balanço dá `2^{J_n} ≳ n/log n`; nos dois casos o
+  Lema 6 de E1.5 não se aplica. Só afeta `π < 2` (11 pares de uma grade de
+  156). O Corolário 14 escreve as duas condições.
+- **Lição:** transpor um enunciado por uma cota grosseira de norma
+  reproduz a ordem antiga e esconde o ganho; a ordem se confere na classe,
+  com o supremo exato, antes de dizer que "é a mesma".
+
+### 2026-10-03: E3.2 fechada, gráficos e documentação
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: a suíte padrão
+passa com **1 202 expectativas em 48 s** (17 puladas) e a inteira com
+**1 427 em 104 s**, 0 falhas; as 127 novas são 86 do `test-plot.R` e 41 do
+`coef` limiarizado, e o total antigo não mudou. Fora do `plot.R` novo, o
+diff em `wafc/R/` é roxygen e a correção do `wafc_thr_object()`;
+`wafc/scripts/` intocado.
+
+- **`plot.wafc()`** (`"components"`, um painel por bloco com `ν̂_{ℓm}` e a
+  verdade deslocada para a média da estimada, porque o nível é convenção;
+  `"path"`, `ν̂_{ℓm}` contra `log λ`) e **`plot.cv.wafc()`** (`"cv"`, uma
+  curva por `J` com a faixa de um erro-padrão; `"threshold"`, o erro contra
+  `t` com a faixa que o `cv1se` lê; `"components"` limiarizadas; `"path"`),
+  em gráficos de base, sem dependência nova; cada um devolve o que desenhou.
+- **Roxygen auditado por script** nas 49 funções documentadas, 0 problemas;
+  38 de 38 exemplos executáveis rodam. As assinaturas do README batem com o
+  código nas 10 entradas.
+- **O defeito de D48 corrigido:** o `coef` do objeto limiarizado está na
+  parametrização do `coef.wafc()`; os dois testes novos falham contra o
+  código anterior (9 falhas) e passam com a correção.
+- **O exemplo do README**, de uma sessão limpa, em 16 s: no não homogêneo
+  com `n = 500`, `J = 6`, e o `cv1se` mantém exatamente os três blocos
+  ativos (normas 0,615, 0,695, 0,848) e zera os três nulos (0,178, 0,167,
+  0,051). Figuras em `wafc/man-figures/` (290 KB).
+- **Sinal:** a suíte padrão está em 48 s contra o teto de 60 s; teste caro
+  novo vai com `skip_slow()`.
+- **Lições:** o eixo da curva de validação cruzada tem de parar no erro do
+  ajuste nulo, ou os mínimos se achatam; a verdade só se compara à estimada
+  a menos de uma constante.
+
 ### 2026-10-03: E3.1 fechada, o WAFC numa chamada só
 
 Chat de tarefa, integrado aqui. Conferido nesta máquina: a suíte padrão
@@ -2221,7 +2302,10 @@ com `ρ_n^𝒢`; a §3.6 ganha o Corolário 13; o §1 e o "Why not block LASSO?"
 são reescritos; no supp, S5 (Teorema 3, Lema 14, variante branca), S6
 (Lema 15, Teorema 4, Corolários 10 e 11) e S7 (mais Lema 16, Corolários 12
 e 13). As Proposições 1 e 2 e os Lemas 1 e 2 do manuscrito não mudam. A
-Proposition 3 (taxa lenta) é a pergunta 42(c).
+Proposition 3 (taxa lenta) passa ao Corolário 14 (E1.13), no corpo, com as
+condições `s' > 1/4` em (i) e `s' > s/2` em (ii) e a frase de que em
+`s < 1/2` e `π ≥ 2` a taxa é `n^{−2s/(2s+1)}`, sem logaritmo e sem condição
+de desenho; a contagem de `‖θ*‖_{𝒢,1}` e a prova vão ao supp, em S6.
 
 ### Decisões tomadas
 
@@ -2995,6 +3079,31 @@ Ordenadas pelo que bloqueia mais.
      `CONTINUAR.md`: sim, porque o padrão depende dele.
    - (d) O defeito do `wafc_thr_object()`: corrigir em E3.2.
 
+44. **Pendências de E1.13 e E3.2** (2026-10-03). Recomendação do chat
+   principal:
+   - (a) **Emendar a Proposição 4 do `05-taxas.tex`** com as duas condições
+     implícitas (`s' > 1/4` em (i), `s' > s/2` em (ii)), uma linha no
+     enunciado e uma na prova: sim, porque o LASSO continua como opção
+     (D43) e o enunciado hoje afirma mais do que a prova dá.
+   - (b) **"No design condition" no manuscrito:** não escrever a variante
+     sem cota superior de `Σ̂`; dizer que nenhuma cota inferior é usada e
+     que a única propriedade de `Σ̂` é `λ_max(Σ̂) ≤ Λ`, que vale sem `c_U` nem
+     `κ_1`.
+   - (c) **O Corolário 14(ii) em `π ≥ 2` sobe ao §3** numa frase depois do
+     Theorem `thm:main`: a taxa do teorema principal sem condição de desenho
+     em `s < 1/2`. Recomendação: sim.
+   - (d) **Dois símbolos para o `notacao.md` §10:** `‖θ‖_{𝒢,1}`, a norma de
+     grupos com pesos 1, e `ϑ_π = min(1 − 1/π, 1/2)`, o expoente da
+     contagem (não há `\vartheta` no `ms_3` nem no `supp_3`). Recomendação:
+     aceitar.
+   - (e) **Ratificar as duas assinaturas de `plot`** do `wafc/README.md`:
+     sim, são as do código, conferidas.
+   - (f) **As figuras ficam versionadas** em `wafc/man-figures/` (290 KB):
+     sim, o README as mostra.
+   - (g) As cinco funções sem roxygen fora de "Internals" e um argumento
+     que escolha os blocos desenhados, para `p × q` grande: ficam para E3.3
+     e E6.2.
+
 ---
 
 ## 5. Próximos passos
@@ -3004,16 +3113,16 @@ recomendações das perguntas 33, 38 e 41 (D44 a D46): o WAFC é o block
 LASSO balanceado seguido do limiar `cv1se`, o LASSO fica como opção, o
 alvo continua a *Statistica Sinica*, e o spline de E4 entra com `gam.reml`
 e `gam.gcv`. **E1.12 fechada e integrada.** **E3.1** (a interface) em
-**E3.1 fechada e integrada**, com a interface ratificada (D48); **E3.2
-catalogada em 2026-10-03**; E3.2 (gráficos e documentação) e E3.3 (empacotamento, do
-autor) seguem. **E6.1b** (a aplicação) parou preparada, antes da rodada: o script
-10 e a fumaça estão prontos, e ela espera do autor (1) o aviso para a
-rodada, com núcleos, partições e dobras (proposta da tarefa: 4 processos,
-~15 h, ~18 GB, porque beijing pede ~4,5 GB por processo; cortes possíveis:
-10 partições, 5 dobras), e (2) a permissão de baixar duas candidatas novas,
-o `mydata` do `openair` (Marylebone, 621 KB) e um zip anual do parque eólico
-de Kelmarsh (Zenodo, 98 a 474 MB); a terceira, `beijing.heat`, usa o dado
-de E6.1a. O handoff parcial fica em `docs/handoff-E6.1b.md`. O manuscrito está em
+**E3.1 e E3.2 fechadas e integradas**, com a interface ratificada (D48) e
+as assinaturas de `plot` na pergunta 44; E3.2 (gráficos e documentação) e E3.3 (empacotamento, do
+autor) seguem. **E6.1b** (a aplicação) está pronta e espera a **ordem do autor** para a
+rodada de 4 processos: o script 10 cobre seis bases (as três de E6.1a,
+`beijing.heat`, `marylebone` e `kelmarsh`, as duas últimas baixadas com a
+permissão do autor), a fumaça das seis passou sem falha, e o lançamento
+está em `wafc/cache/e61b/run.sh`. A estimativa é de **~24 h de relógio em 4
+processos** (~96 h de processador, pico de ~18 GB dos 31 GB da máquina),
+com erro possível de um fator 2; 10 partições dão ~12 h, e 5 dobras cortam
+~40% do block LASSO. O handoff parcial fica em `docs/handoff-E6.1b.md`. O manuscrito está em
 `k = 3`, ainda escrito para o LASSO; a bibliografia sem marca aberta (83
 entradas).
 
@@ -3033,7 +3142,8 @@ entradas).
   (D47): o Corolário 11 é o enunciado principal, `ϱ` e `𝒲` aplicados, a
   lista no `notacao.md` §10. **Falta o Corolário 14** no `08`, a taxa lenta
   em blocos como corolário do Teorema 3(i) (D47(c)), com a conferência da
-  ordem. **Catalogado como E1.13 em 2026-10-03.**
+  ordem. **Fechado por E1.13 em 2026-10-03 (§2)**, com pendências na
+  pergunta 44.
 - (b) **O parágrafo de posicionamento de D18** (`alvo-revista.md` §4),
   reescrito para a penalidade em blocos, com a frase-tese e as
   contribuições; o texto vai ao autor antes de entrar.
@@ -3071,6 +3181,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | E1.13 fechada e integrada (`OK` em 209 s, 18 páginas): Corolário 14, a taxa lenta em blocos, que pela norma de grupos ganha um logaritmo sobre a Proposição 4 e em `π ≥ 2` dá a taxa do Teorema 4 sem condição de desenho; achadas duas condições implícitas na Proposição 4 de E1.6. E3.2 fechada e integrada (1 202 testes em 48 s, 1 427 com os lentos): `plot.wafc`, `plot.cv.wafc`, roxygen auditado, o `coef` limiarizado corrigido, exemplo no README. Pergunta 44 |
 | 2026-10-03 | E1.13 (a taxa lenta em blocos, Corolário 14) e E3.2 (gráficos, documentação e o defeito de D48) catalogadas, em paralelo com a E6.1b; o parágrafo de posicionamento de D18 começa no chat principal |
 | 2026-10-03 | Pergunta 43 decidida (D48): interface de E3.1 ratificada, `thresh = 1e-4` no bloco, `grpreg` em `wafc_depends` e no `CONTINUAR.md` |
 | 2026-10-03 | E3.1 fechada e integrada (1 075 testes em 46 s, 1 300 com os lentos, oitava junção exata): `cv.wafc(x, u, y)` é o block LASSO balanceado com limiar `cv1se`, e o `wafc.block` reproduz o `klopp.balanced` à última casa; a tolerância `1e-4` do `grpreg` não muda a escolha; pergunta 43 |

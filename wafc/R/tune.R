@@ -89,7 +89,8 @@
 #' path itself is untouched in \code{wafc.fit}, and every other penalty
 #' level is read there, without threshold.
 #'
-#' @param x,u,y The data, as in \code{\link{wafc}}.
+#' @param x,u,y The data, as in \code{\link{wafc}}. For \code{print},
+#'   \code{x} is an object of class \code{"cv.wafc"}.
 #' @param J The grid of candidate resolution levels. \code{NULL} (the
 #'   default) uses \code{2:8} (decision D34). The rule of \code{cv.wall},
 #'   \code{2:ceiling(log2(n)/2)}, used before, truncated the expansion
@@ -141,10 +142,12 @@
 #'   \code{kept}, the thresholded coefficients \code{a0} and \code{b} in
 #'   the coordinates of the design, their number \code{nzero} of non-zero
 #'   wavelet coefficients, the \code{candidates} the rule scored and the
-#'   seconds \code{time} it took (the fold fits included).
+#'   seconds \code{time} it took (the fold fits included). \code{print}
+#'   returns \code{x} invisibly.
 #'
 #' @seealso \code{\link{wafc_bic}}, \code{\link{wafc_tune}},
-#'   \code{\link{wafc_J_theory}}, \code{\link{wafc_threshold}}.
+#'   \code{\link{wafc_J_theory}}, \code{\link{wafc_threshold}},
+#'   \code{\link{plot.cv.wafc}}.
 #'
 #' @examples
 #' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
@@ -592,11 +595,7 @@ wafc_lambda_theory <- function(design, sigma = NULL, alpha = 0.05, y = NULL) {
 #' @param method \code{"cv"} or \code{"fixed.point"}; see above.
 #' @param penalty \code{"lasso"} or \code{"sglasso"}, as in
 #'   \code{\link{wafc}}.
-#' @param alpha The confidence level of the penalty level of E1.5, and of
-#'   the quantile of \code{rule = "qut"}.
-#' @param nsim Number of null samples simulated by \code{rule = "qut"}.
-#' @param qut.seed Optional seed of that simulation, so that two calls on
-#'   the same design give the same penalty level.
+#' @param alpha The confidence level of the penalty level of E1.5.
 #' @param nfolds,foldid Folds used by \code{method = "cv"}.
 #' @param sigma0 Starting value of the iteration; \code{NULL} is the
 #'   default described above.
@@ -697,7 +696,8 @@ wafc_sigma <- function(design, y, method = c("cv", "fixed.point"),
 #' \code{\link{wafc_lambda_qut}}, since the quantile universal threshold
 #' is a rule for the penalty level alone.
 #'
-#' @param x,u,y The data, as in \code{\link{wafc}}.
+#' @param x,u,y The data, as in \code{\link{wafc}}. For \code{print},
+#'   \code{x} is an object of class \code{"wafc_tune"}.
 #' @param rule The selection rule.
 #' @param J The grid of candidate resolution levels, as in
 #'   \code{\link{cv.wafc}}; ignored by \code{rule = "theory"}, which
@@ -731,6 +731,10 @@ wafc_sigma <- function(design, y, method = c("cv", "fixed.point"),
 #'   \code{guard} says how many points of the whole grid were left out and
 #'   whether the guard decided, that is, whether the pair chosen without it
 #'   (among the points with \eqn{df < n}) would have been another one.
+#'   \code{coef} and \code{predict} read \code{fit} at the selected
+#'   \eqn{\lambda}, as \code{\link{coef.wafc}} and
+#'   \code{\link{predict.wafc}} do; \code{print} returns \code{x}
+#'   invisibly.
 #'
 #' @seealso \code{\link{cv.wafc}}, \code{\link{wafc_bic}},
 #'   \code{\link{wafc_J_theory}}, \code{\link{wafc_lambda_qut}}.
@@ -914,8 +918,8 @@ wafc_tune <- function(x, u, y,
 }
 
 #' @rdname wafc_tune
-#' @param object,digits An object of class \code{"wafc_tune"} and the number
-#'   of significant digits printed.
+#' @param object An object of class \code{"wafc_tune"}.
+#' @param digits Number of significant digits printed.
 #' @export
 print.wafc_tune <- function(x, digits = max(3L, getOption("digits") - 3L),
                             ...) {
@@ -1026,7 +1030,8 @@ wafc_lambda_qut <- function(design, y, alpha = 0.05, nsim = 200L,
 #'
 #' @param object An object of class \code{"cv.wafc"}.
 #'
-#' @return A data frame with \code{J}, \code{chosen}, \code{nlambda}
+#' @return For \code{penalty = "lasso"} and \code{"sglasso"}, a data frame
+#'   with \code{J}, \code{chosen}, \code{nlambda}
 #'   (asked), \code{nreturned}, \code{jerr}, \code{lambda.last},
 #'   \code{lambda.min} (of that \eqn{J}), \code{cut} (\code{jerr != 0}),
 #'   \code{cut.at.min} (the path was cut and \code{lambda.min} is its last
@@ -1035,6 +1040,20 @@ wafc_lambda_qut <- function(design, y, alpha = 0.05, nsim = 200L,
 #'   \code{fold.jerr} (the first nonzero code among them),
 #'   \code{fold.lambda.cut} (the largest last point among the folds cut)
 #'   and \code{fold.cut.above.min} (that point is above \code{lambda.min}).
+#'   For \code{penalty = "block"}, the table of \code{\link{wafc_fit_klopp}}:
+#'   \code{J}, \code{nlambda}, \code{nreturned}, the length \code{ncv} of
+#'   the cross-validated path, \code{iter.total}, \code{max.iter},
+#'   \code{n.maxiter}, \code{lambda.maxiter}, \code{lambda.last},
+#'   \code{lambda.cv.last}, \code{lambda.min}, \code{chosen}, and the flags
+#'   \code{budget}, \code{cv.cut} and \code{cut.at.min}.
+#'
+#' @examples
+#' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
+#' cv <- cv.wafc(d$x, d$u, d$y, J = 2:4, nfolds = 5, threshold = "none")
+#' wafc_cv_convergence(cv)
+#' cl <- cv.wafc(d$x, d$u, d$y, J = 2:4, nfolds = 5, penalty = "lasso",
+#'               threshold = "none")
+#' wafc_cv_convergence(cl)
 #'
 #' @export
 wafc_cv_convergence <- function(object) {

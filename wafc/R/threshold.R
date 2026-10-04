@@ -112,7 +112,14 @@
 #'   \code{thresh}, \code{maxit}).
 #'
 #' @return An object of class \code{c("wafc_threshold",
-#'   "wafc_competitor")}. Its \code{extra} has the base \code{J} and
+#'   "wafc_competitor")}, read as every \code{\link{wafc_competitor}} is:
+#'   the levels \code{cc}, the functions \code{beta(u)} and \code{g(grid)},
+#'   the \eqn{p \times q} matrix \code{blocks} of the blocks with a nonzero
+#'   coefficient, the \code{fitted} values, the \code{intercept} (zero when
+#'   a constant covariate carries it) and \code{coef}, the intercept and one
+#'   coefficient per column of the design in the parametrisation of
+#'   \code{\link{coef.wafc}}, so that the linear predictor is
+#'   \code{coef[1] + Z \%*\% coef[-1]}. Its \code{extra} has the base \code{J} and
 #'   \code{lambda}, the threshold \code{t}, the \code{rule}, \code{c},
 #'   \code{refit}, the \eqn{p \times q} matrices \code{norm} (of the fit
 #'   before the threshold) and \code{kept}, \code{nzero} (nonzero wavelet
@@ -246,6 +253,14 @@ wafc_threshold <- function(object, t = NULL,
 #'   \code{(a0, b)} per fold, in the coordinates of the design (intercept
 #'   and one coefficient per column).
 #'
+#' @examples
+#' d <- simulate_wafc(300, p = 3, q = 2, scenario = "smooth", seed = 1)
+#' cv <- cv.wafc(d$x, d$u, d$y, J = 3:4, nfolds = 5, threshold = "none")
+#' ff <- wafc_threshold_folds(cv)
+#' a <- wafc_threshold(cv, rule = "cv", fold.fits = ff)
+#' b <- wafc_threshold(cv, rule = "cv1se", fold.fits = ff)
+#' c(a$extra$t, b$extra$t)
+#'
 #' @export
 wafc_threshold_folds <- function(object, s = NULL, y = NULL, foldid = NULL,
                                  ...) {
@@ -281,6 +296,11 @@ wafc_threshold_folds <- function(object, s = NULL, y = NULL, foldid = NULL,
 #' @return A list with the statistic \code{stat}, the simulated
 #'   \code{quantile}, \code{reject} (\code{stat > quantile}), \code{alpha},
 #'   \code{nsim}, the \code{J} of the design and the seconds \code{time}.
+#'
+#' @examples
+#' d <- simulate_wafc(300, p = 3, q = 2, scenario = "null", seed = 1)
+#' cv <- cv.wafc(d$x, d$u, d$y, J = 2:3, nfolds = 5, threshold = "none")
+#' wafc_threshold_gate(cv, nsim = 100, seed = 1)$reject
 #'
 #' @export
 wafc_threshold_gate <- function(object, alpha = 0.05, nsim = 200L,
@@ -487,7 +507,12 @@ wafc_thr_refit <- function(b, design, kept, y, rows, refit, intercept) {
 
 ## The thresholded fit as a "wafc_competitor": the levels with the intercept
 ## folded into the constant covariate when there is one, and the components
-## through the spec route, as wafc_fit_klopp() builds its object.
+## through the spec route, as wafc_fit_klopp() builds its object. 'coef' is
+## (intercept, one coefficient per column of the design) in the
+## parametrisation of coef.wafc(), the folded one, so that the linear
+## predictor is coef[1] + Z coef[-1]; it carried the coefficients of the
+## engine with the intercept already set to zero, which lost the level of
+## the constant covariate (decision D48, corrected in step E3.2).
 wafc_thr_object <- function(a0, b, design, kept) {
   p <- design[["p"]]
   q <- design[["q"]]
@@ -502,6 +527,8 @@ wafc_thr_object <- function(a0, b, design, kept) {
     cc[const] <- cc[const] + a0 / as.numeric(Z[1L, const])
     a0 <- 0
   }
+  b_model <- b
+  b_model[design[["unpenalized"]]] <- cc
   wav <- unlist(design[["blocks"]], use.names = FALSE)
   nz <- matrix(FALSE, p, q, dimnames = list(xn, un))
   for (l in seq_len(p)) {
@@ -534,7 +561,7 @@ wafc_thr_object <- function(a0, b, design, kept) {
     out
   }
   out <- list(cc = cc, beta = beta_fun, g = g_of, blocks = nz,
-              fitted = fitted, intercept = a0, coef = c(a0, b),
+              fitted = fitted, intercept = a0, coef = c(a0, b_model),
               xnames = xn, unames = un, design = design,
               n = design[["n"]], p = p, q = q,
               extra = list(kept = kept, nzero = sum(b[wav] != 0)))

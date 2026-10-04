@@ -1,7 +1,8 @@
 # E1.12. Conferência numérica de derivations/08-blocos.tex (a teoria em
 # blocos do estimador de D44: block LASSO na forma balanceada, níveis c_l
 # livres, pesos de razão limitada) e da cota do estimador limiarizado
-# acrescentada a derivations/06-selecao-limiar.tex (D45). Roda ANTES da prova;
+# acrescentada a derivations/06-selecao-limiar.tex (D45); a Parte VII (E1.13)
+# confere o Corolário 14, a taxa lenta em blocos. Roda ANTES da prova;
 # imprime OK ou falha com stop(). Notação: docs/notacao.md (congelada em
 # E1.1); os símbolos da teoria em blocos são os de E1.11 (08a, §1.4).
 #
@@ -33,6 +34,11 @@
 #   VI.  o limiarizado (06, Lema 16, Corolários 12 e 13): o lema em
 #        configurações aleatórias, a passagem pela norma de predição com o
 #        autovalor, e os dois ajustes (LASSO e blocos) em simulação.
+#   VII. a taxa lenta em blocos (Corolário 14 do 08, E1.13): a contagem de
+#        ||theta*||_{G,1} sob Besov contra o supremo exato da classe; os
+#        expoentes de n e do logaritmo da cota nos dois regimes (s > 1/2 e
+#        s < 1/2), nos pesos 1 e sqrt(|G|), ao lado da cota do LASSO
+#        (Proposição 4 de E1.6); e a cota em ajustes, também com gamma_til = 0.
 #
 # Nos scripts de conferência, elemento de lista se acessa com [[ ]] e nome
 # completo (instrucoes.md, §5).
@@ -932,5 +938,297 @@ chk(all(g10[["ganho"]] <= 1) && all(g10[["frac_exato"]] > 0),
     "com lambda/10, o platô de acerto existe e nele o erro das componentes do limiarizado não passa o do ajuste (Lema 16(ii)); a coluna nulos é a parte do erro que ele tira")
 cat("  (ganho_pred: razão do erro de predição limiarizado / ajuste no platô; pode passar de 1, dentro da cota de Lema 16(iii))\n")
 
+## ===========================================================================
+cat("\nPARTE VII. A taxa lenta em blocos (Corolário 14, E1.13): nenhuma condição de desenho\n")
+## ===========================================================================
+
+# O Corolário 14 é o Teorema 3(i) com o comparador theta*: no evento T_{G,w},
+#   ||f_hat - f||_n^2 <= 18 lambda ||theta*||_{G,w} + 24 ||b||_n^2 + 3 ||P_A eps||_n^2,
+# com lambda ||theta*||_{G,w} <= rho lambda_1 ||theta*||_{G,1} <= rho lambda_1 ||theta*||_1
+# (Lema 14(iii)), e a contagem sob Besov
+#   ||theta*||_{G,1} <= pq C_g {(1 - 2^{-s'})^{-1} + b^{-vartheta} sum_{j* < j < J} 2^{j(1/2 - s)}},
+#   vartheta = min(1 - 1/pi, 1/2).
+# VII.1 confere a contagem contra o supremo exato sobre a bola de Besov (nível
+# a nível); VII.2 lê os expoentes de n e do logaritmo da cota nos dois regimes
+# da Proposição 4 de E1.6, nos pesos 1 e sqrt(|G|), ao lado da cota do LASSO;
+# VII.3 confere a cota em ajustes, inclusive em desenhos fora da condição de
+# E1.4 (gamma_til = 0).
+
+vth_of <- function(pii) if (is.infinite(pii)) 0.5 else min(1 - 1 / pii, 0.5)
+ex_of <- function(pii) if (is.infinite(pii)) 0.5 else max(0, 0.5 - 1 / pii)   # ||x||_2 <= m^ex ||x||_pi em R^m
+ipi_of <- function(pii) if (is.infinite(pii)) 0 else 1 / pii
+jstar_of <- function(b) floor(log2(b - 1))                                     # max{j >= 0 : 2^j < b}
+# Níveis 0..Jl-1 de um bloco na forma balanceada: k_j pedaços, resto r_j = 2^j mod b
+# (calculado por recorrência, exato para j grande).
+lev_tab <- function(Jl, b) {
+  j <- 0:(Jl - 1L)
+  r <- numeric(Jl)
+  rr <- 1 %% b
+  for (i in seq_len(Jl)) {
+    r[i] <- rr
+    rr <- (2 * rr) %% b
+  }
+  list(j = j, r = r, k = (2^j - r) / b, fine = j > jstar_of(b))
+}
+# Supremo exato, sobre {theta : ||theta_j||_pi <= C_g 2^{-j(s+1/2-1/pi)} em cada nível},
+# de sum_G w_G ||theta_G||_2 num bloco, para cada J = 1..Jl. Num pedaço de m
+# colunas, sup ||theta_G||_2 = m^ex ||theta_G||_pi; entre os pedaços de um nível
+# fino, Hölder com o conjugado pi'; o grosso soma os níveis em ell_2.
+sup_Gw_path <- function(s, pii, Cg, Jl, b, wfun) {
+  lt <- lev_tab(Jl, b)
+  j <- lt[["j"]]
+  ex <- ex_of(pii)
+  Rj <- Cg * 2^(-j * (s + 0.5 - ipi_of(pii)))
+  fine_c <- vapply(seq_len(Jl), function(i) {
+    if (!lt[["fine"]][i]) return(0)
+    k <- lt[["k"]][i]
+    m2 <- b + lt[["r"]][i]
+    c1 <- if (k >= 2) wfun(b) * b^ex else 0
+    c2 <- wfun(m2) * m2^ex
+    nrm <- if (pii == 1) max(c1, c2) else if (is.infinite(pii)) (k - 1) * c1 + c2 else {
+      pc <- pii / (pii - 1)
+      cm <- max(c1, c2)
+      cm * ((k - 1) * (c1 / cm)^pc + (c2 / cm)^pc)^(1 / pc)
+    }
+    nrm * Rj[i]
+  }, 1)
+  top <- pmin(jstar_of(b), j)                       # J = j + 1: o grosso vai até min(j*, J - 1)
+  ce <- cumsum((Cg * 2^(-j * sp_of(s, pii)))^2)     # (2^{j ex} R_j)^2 = (C_g 2^{-j s'})^2
+  wfun(2^(top + 1) - 1) * sqrt(ce[top + 1L]) + cumsum(fine_c)
+}
+# A contagem do Corolário 14, por bloco, para J = 1..Jl.
+cnt14_path <- function(s, pii, Cg, Jl, b) {
+  j <- 0:(Jl - 1L)
+  Cg * (1 / (1 - 2^(-sp_of(s, pii))) + b^(-vth_of(pii)) * cumsum(ifelse(j > jstar_of(b), 2^(j * (0.5 - s)), 0)))
+}
+l1_path <- function(s, Cg, Jl) Cg * cumsum(2^((0:(Jl - 1L)) * (0.5 - s)))      # Lema 7 de E1.5, exato
+w_one <- function(m) rep(1, length(m))
+w_sqrt <- function(m) sqrt(m)
+
+## ---- VII.1 a contagem sob Besov ------------------------------------------------
+pairsVII <- list(c(0.2, 2), c(0.3, 1.5), c(0.4, 1.25), c(0.6, 1), c(1, 1), c(0.8, 1.5), c(1, 2),
+                 c(0.3, 4), c(1.5, 4), c(0.3, Inf), c(1, Inf), c(0.45, 1.6))
+cnt_tab <- do.call(rbind, lapply(pairsVII, function(sp_) {
+  s <- sp_[1]
+  pii <- sp_[2]
+  r <- unlist(lapply(2:64, function(b) {
+    ex <- sup_Gw_path(s, pii, 1, 40L, b, w_one)
+    ex / cnt14_path(s, pii, 1, 40L, b)
+  }))
+  # o expoente de b num nível fino (j = 40): sup de sum_G ||theta_G||_2 contra b
+  bs <- 2^(3:10)
+  fl <- vapply(bs, function(b) {
+    a <- sup_Gw_path(s, pii, 1, 41L, b, w_one)
+    a[41] - a[40]
+  }, 1)
+  c(s = s, pi = pii, max_razao = max(r), min_razao = min(r),
+    vartheta = vth_of(pii), incl_b = -unname(coef(lm(log(fl) ~ log(bs)))[2]))
+}))
+print(round(cnt_tab, 3))
+chk(all(cnt_tab[, "max_razao"] <= 1 + 1e-12),
+    "contagem do Corolário 14: o supremo exato de ||theta*||_{G,1} sobre a bola de Besov fica sob a cota fechada (12 pares (s, pi), b = 2..64, J = 1..40)")
+chk(all(abs(cnt_tab[, "incl_b"] - cnt_tab[, "vartheta"]) < 0.02),
+    "num nível fino, o supremo de sum_G ||theta_G||_2 cai como b^{-vartheta}, vartheta = min(1 - 1/pi, 1/2): a cota é justa em b")
+
+## ---- VII.2 os expoentes da cota nos dois regimes ---------------------------------
+# Cota do Corolário 14 com lambda = lambda_n^G (determinístico, Lema 14(iii)) e o
+# supremo de ||theta*||_{G,w} sobre a classe, para cada J admissível
+# (2^J <= n/(log n)^2), nos pesos 1 e sqrt(|G|); a do LASSO (Proposição 4 de
+# E1.6) com lambda_n de (eq. lambda-n) e o supremo de ||theta*||_1. Lê-se o
+# mínimo em J e a cota no J_n do enunciado.
+paths_VII <- function(n, s, pii, Cg, Jl) {
+  b <- as.integer(ceiling(log(n)))
+  lt <- lev_tab(Jl, b)
+  top <- pmin(jstar_of(b), lt[["j"]])
+  szc <- 2^(top + 1) - 1
+  M <- p * q * (1 + cumsum(ifelse(lt[["fine"]], lt[["k"]], 0)))
+  mxf <- cummax(ifelse(lt[["fine"]], b + lt[["r"]], 0))
+  mnf <- cummin(ifelse(lt[["fine"]], ifelse(lt[["k"]] >= 2, b, b + lt[["r"]]), Inf))
+  lbar <- function(m) sig / sqrt(n) * (B_X * sqrt(2 * C_U * m) + sqrt(2 * Lam * log(M / alpha)))
+  lam1 <- 2 * pmax(lbar(szc), ifelse(mxf > 0, lbar(mxf), 0))                       # pesos 1: o maior pedaço
+  lamS <- 2 * pmax(lbar(szc) / sqrt(szc), ifelse(is.finite(mnf), lbar(pmin(mnf, 1e300)) / sqrt(pmin(mnf, 1e300)), 0))
+  sp <- sp_of(s, pii)
+  B2 <- (p * q)^2 * B_X^2 * C_U * Cg^2 / (1 - 2^(-2 * sp)) * 2^(-2 * seq_len(Jl) * sp)
+  tail3 <- 3 * sig^2 * p / n
+  lamL <- 2 * sig * B_X * sqrt(2 * C_U) * sqrt(2 * log(2 * p * q * (2^seq_len(Jl) - 1) / alpha) / n)
+  rho <- sqrt(pmax(szc, mxf) / pmin(szc, mnf))
+  list(b = b,
+       blk1 = 18 * lam1 * p * q * sup_Gw_path(s, pii, Cg, Jl, b, w_one) + 24 * B2 + tail3,
+       blkS = 18 * lamS * p * q * sup_Gw_path(s, pii, Cg, Jl, b, w_sqrt) + 24 * B2 + tail3,
+       cadeia = 18 * rho * lam1 * p * q * cnt14_path(s, pii, Cg, Jl, b) + 24 * B2 + tail3,
+       las = 18 * lamL * p * q * l1_path(s, Cg, Jl) + 24 * B2 + tail3,
+       custo = max((lamS * sqrt(pmax(szc, mxf)))^2 / lam1^2 / rho^2))
+}
+J_c14 <- function(n, s, pii) {
+  sp <- sp_of(s, pii)
+  b <- ceiling(log(n))
+  if (s > 0.5) max(1L, as.integer(ceiling(log2(n) / (4 * sp))))
+  else as.integer(ceiling(log2((n / b^max(0, 2 / pii - 1))^(1 / (1 - 2 * s + 4 * sp)))))
+}
+expo_VII <- function(s, pii) {
+  sp <- sp_of(s, pii)
+  if (s > 0.5) c(a = -0.5, k_blk = 0.5, k_las = 0.5) else {
+    e <- 2 * sp / (1 - 2 * s + 4 * sp)
+    c(a = -e, k_blk = max(0, 2 / pii - 1) * e, k_las = e)
+  }
+}
+pairs_rate <- list(c(1, 2), c(1, Inf), c(1.2, 1), c(0.8, 1.5), c(0.3, 2), c(0.3, 4), c(0.3, Inf), c(0.4, 1.5), c(0.45, 1.6))
+ns_rate <- 10^seq(20, 300, length.out = 200)
+Cg_r <- 1
+rate_tab <- do.call(rbind, lapply(pairs_rate, function(sp_) {
+  s <- sp_[1]
+  pii <- sp_[2]
+  th <- expo_VII(s, pii)
+  rr <- t(vapply(ns_rate, function(n) {
+    Jl <- as.integer(floor(log2(n / log(n)^2)))
+    pa <- paths_VII(n, s, pii, Cg_r, Jl)
+    Jc <- J_c14(n, s, pii)
+    c(blk1 = min(pa[["blk1"]]), blkS = min(pa[["blkS"]]), cadeia = min(pa[["cadeia"]]), las = min(pa[["las"]]),
+      blk1_Jn = if (Jc <= Jl) pa[["blk1"]][Jc] else NA, blkS_Jn = if (Jc <= Jl) pa[["blkS"]][Jc] else NA,
+      Jc_ok = Jc <= Jl, custo = pa[["custo"]])
+  }, numeric(8)))
+  ln <- log(ns_rate)
+  ll <- log(ln)
+  fit2 <- function(y) unname(coef(lm(log(y) ~ ln + ll))[2:3])
+  fitk <- function(y) unname(coef(lm(log(y) - th[["a"]] * ln ~ ll))[2])
+  c(s = s, pi = pii, a = th[["a"]], k_blk = th[["k_blk"]], k_las = th[["k_las"]],
+    a_blk1 = fit2(rr[, "blk1"])[1], kh_blk1 = fitk(rr[, "blk1"]), kh_blkS = fitk(rr[, "blkS"]),
+    kh_cad = fitk(rr[, "cadeia"]), a_las = fit2(rr[, "las"])[1], kh_las = fitk(rr[, "las"]),
+    Jn_blk1 = max(rr[, "blk1_Jn"] / rr[, "blk1"], na.rm = TRUE), Jn_blkS = max(rr[, "blkS_Jn"] / rr[, "blkS"], na.rm = TRUE),
+    Jc_ok = mean(rr[, "Jc_ok"]), custo = max(rr[, "custo"]))
+}))
+print(round(rate_tab, 3))
+reg_i <- rate_tab[, "s"] > 0.5
+chk(all(abs(rate_tab[, "a_blk1"] - rate_tab[, "a"]) < 0.01) && all(abs(rate_tab[, "a_las"] - rate_tab[, "a"]) < 0.01),
+    "o expoente de n da cota é -1/2 em s > 1/2 e -2s'/(1 - 2s + 4s') em s < 1/2, nos blocos e no LASSO (a 0,01; n de 1e20 a 1e300)")
+chk(all(abs(rate_tab[, c("kh_blk1", "kh_blkS", "kh_cad")] - rate_tab[, "k_blk"]) < 0.08),
+    "o expoente do logaritmo da cota em blocos é 1/2 em s > 1/2 e (2/pi - 1)_+ 2s'/(1 - 2s + 4s') em s < 1/2, nos pesos 1 e sqrt(|G|) e na cadeia fechada (a 0,08)")
+chk(all(abs(rate_tab[, "kh_las"] - rate_tab[, "k_las"]) < 0.08),
+    "o da cota do LASSO (Proposição 4 de E1.6) é 1/2 e 2s'/(1 - 2s + 4s') (a 0,08)")
+chk(all(abs(rate_tab[reg_i, "kh_blk1"] - rate_tab[reg_i, "kh_las"]) < 0.1) &&
+      all(rate_tab[!reg_i, "kh_las"] - rate_tab[!reg_i, "kh_blk1"] > 0.25),
+    "s > 1/2: o mesmo logaritmo nos dois; s < 1/2: os blocos pagam menos logaritmo, e nada em pi >= 2")
+chk(all(rate_tab[, c("Jn_blk1", "Jn_blkS")] < 2) && all(rate_tab[, "custo"] <= 1 + 1e-9),
+    "o J_n do enunciado fica a menos de um fator 2 do melhor J da cota; (lambda_n^G w_G)^2 <= rho^2 (lambda_{n,1}^G)^2 ao longo de toda a grade")
+
+# A aritmética das escolhas de J_n: a da Proposição 4 de E1.6 e a do Corolário
+# 14 só são admissíveis (2^{J_n} = o(n)) se s' > 1/4 em s > 1/2 e s' > s/2 em
+# s < 1/2; as duas condições só mordem em pi < 2.
+grid_ar <- expand.grid(s = seq(0.05, 1.5, by = 0.05), pi = c(1, 1.25, 1.5, 2, 4, Inf))
+grid_ar[["sp"]] <- mapply(sp_of, grid_ar[["s"]], grid_ar[["pi"]])
+grid_ar <- grid_ar[grid_ar[["sp"]] > 1e-9 & abs(grid_ar[["s"]] - 0.5) > 1e-9, ]
+grid_ar[["expJ"]] <- ifelse(grid_ar[["s"]] > 0.5, 1 / (4 * grid_ar[["sp"]]),
+                            1 / (1 - 2 * grid_ar[["s"]] + 4 * grid_ar[["sp"]]))
+grid_ar[["cond"]] <- ifelse(grid_ar[["s"]] > 0.5, grid_ar[["sp"]] > 0.25, grid_ar[["sp"]] > grid_ar[["s"]] / 2)
+fora <- grid_ar[grid_ar[["expJ"]] >= 1, ]
+chk(identical(grid_ar[["expJ"]] < 1, grid_ar[["cond"]]) && all(fora[["pi"]] < 2),
+    "2^{J_n} ~ n^{expJ} com expJ < 1 exatamente quando s' > 1/4 (s > 1/2) ou s' > s/2 (s < 1/2), e as exceções têm pi < 2")
+cat(sprintf("  pares da grade (s em 0,05..1,5, pi em {1; 1,25; 1,5; 2; 4; inf}) fora da condição, onde a escolha de J_n da Proposição 4 de E1.6 também não é admissível: %d de %d, por exemplo %s\n",
+            nrow(fora), nrow(grid_ar),
+            paste(sprintf("(%.2f; %.2f)", fora[["s"]], fora[["pi"]])[c(1, 2, nrow(fora))], collapse = ", ")))
+
+## ---- VII.3 a cota em ajustes, com e sem a condição de E1.4 ----------------------
+# Regimes: (s, pi) = (1, 2) e (0,3, 2); pesos 1 e sqrt(|G|) no mesmo conjunto de
+# dados; lambda = lambda_w exato do Lema 14(i), que não pede nada de Sigma_hat.
+# Desenhos: U uniforme (n = 250 e 1000, J = J_n); U_1 ~ Unif(0, 1/2), com
+# densidade conjunta 2 em [0, 1/2] x [0, 1] e 0 no resto (n = 1000, J = 6; c_U = 0: as colunas das
+# wavelets finas com suporte em (1/2, 1] são nulas, gamma_til = 0); e d > n
+# (n = 250, J = 7, d = 508; gamma_til = 0).
+sim_VII <- function(n, theta_full, half) {
+  U <- matrix(runif(n * q), n, q)
+  if (half) U[, 1] <- U[, 1] / 2
+  X <- draw_X(n)
+  Wl <- lapply(seq_len(q), function(m) psi_block(U[, m], Jmax))
+  NJm <- 2L^Jmax - 1L
+  f <- numeric(n)
+  for (l in seq_len(p)) {
+    bl <- rep(c_true[l], n)
+    for (m in seq_len(q)) {
+      bb <- (l - 1L) * q + m
+      bl <- bl + as.numeric(Wl[[m]] %*% theta_full[(bb - 1L) * NJm + seq_len(NJm)])
+    }
+    f <- f + X[, l] * bl
+  }
+  eps <- rnorm(n, sd = sig)
+  list(X = X, Wl = Wl, f = f, eps = eps, y = f + eps)
+}
+regs_VII <- list(i = list(s = 1, pi = 2, Cg = 0.5, forma = "random"),
+                 ii = list(s = 0.3, pi = 2, Cg = 0.3, forma = "uniform"))
+th_VII <- lapply(regs_VII, function(rg) theta_besov(rg[["s"]], rg[["pi"]], rg[["Cg"]], rg[["forma"]], 70L))
+cases_VII <- list(list(nome = "unif250", n = 250L, half = FALSE, J = NA),
+                  list(nome = "unif1000", n = 1000L, half = FALSE, J = NA),
+                  list(nome = "metade1000", n = 1000L, half = TRUE, J = 6L),
+                  list(nome = "d>n", n = 250L, half = FALSE, J = 7L))
+one_VII <- function(cs, rg_nm) {
+  rg <- regs_VII[[rg_nm]]
+  s <- rg[["s"]]
+  pii <- rg[["pi"]]
+  n <- cs[["n"]]
+  Jl <- if (is.na(cs[["J"]])) J_c14(n, s, pii) else cs[["J"]]
+  b <- as.integer(ceiling(log(n)))
+  grp <- kp_groups_bal(Jl, b)
+  M <- max(grp)
+  gsize <- as.numeric(table(grp))
+  dat <- sim_VII(n, th_VII[[rg_nm]], cs[["half"]])
+  pj <- prep_J(dat, Jl, th_VII[[rg_nm]])
+  Bt <- pj[["rp"]][["Bt"]]
+  gs <- group_stats(Bt, grp)
+  l0 <- lam0_exact(n, M, gs[["tr"]], gs[["op"]])
+  z <- sqrt(as.numeric(rowsum((as.numeric(crossprod(Bt, dat[["eps"]])) / n)^2, grp)))
+  tho <- pj[["th_or"]]
+  nG <- function(th) sqrt(as.numeric(rowsum(th^2, grp)))
+  d <- length(tho)
+  lamL <- 2 * sig * pj[["smax"]] * sqrt(2 * log(2 * d / alpha) / n)    # 2 lambda_0 do LASSO (Lema 5 de E1.5)
+  out <- t(vapply(list(w_one, w_sqrt), function(wf) {
+    ws <- wf(gsize)
+    lam <- lam_w(l0, ws)
+    lam1 <- 2 * max(l0)
+    rho <- max(ws) / min(ws)
+    th <- gl_fit(pj[["G"]], pj[["h"]], grp, ws, lam, pj[["Lmax"]], tol = 1e-8, maxit = 200000L)
+    obj <- function(t) -2 * sum(t * pj[["h"]]) + sum(t * (pj[["G"]] %*% t)) + 2 * lam * sum(ws * nG(t))
+    ch <- coef_c(pj[["rp"]], dat[["y"]], th)
+    v <- th - tho
+    pred <- mean((as.numeric(pj[["Z"]] %*% c(ch, th)) - dat[["f"]])^2)
+    pen_or <- sum(ws * nG(tho))
+    lhs <- 0.5 * mean((Bt %*% v)^2) + lam * sum(ws * nG(th))
+    rhs <- 3 * lam * pen_or + 2 * pj[["bias"]]
+    b14 <- 18 * lam * pen_or + 24 * pj[["bias"]] + 3 * pj[["Peps"]]
+    c(Tw = max(z / ws) <= lam / 2, basica = obj(th) <= obj(tho) + 1e-10, thm3i = lhs <= rhs + 1e-12,
+      c14 = pred <= b14, folga = b14 / pred,
+      cad1 = lam * pen_or <= rho * lam1 * sum(nG(tho)) + 1e-12, cad2 = sum(nG(tho)) <= sum(abs(tho)) + 1e-12,
+      cnt = sum(nG(tho)) <= p * q * cnt14_path(s, pii, rg[["Cg"]], Jl, b)[Jl] + 1e-12,
+      ganho_l1 = sum(abs(tho)) / sum(nG(tho)), vs_lasso = lam * pen_or / (lamL * sum(abs(tho))),
+      gtil = pj[["gtil"]], kkt = max(kkt_gl(pj[["G"]], pj[["h"]], grp, ws, lam, th)))
+  }, numeric(12)))
+  out
+}
+RVII <- 8L
+tabVII <- do.call(rbind, lapply(names(regs_VII), function(rg_nm) {
+  do.call(rbind, lapply(cases_VII, function(cs) {
+    rr <- lapply(seq_len(RVII), function(r) one_VII(cs, rg_nm))
+    do.call(rbind, lapply(1:2, function(iw) {
+      m <- do.call(rbind, lapply(rr, function(x) x[iw, ]))
+      Jl <- if (is.na(cs[["J"]])) J_c14(cs[["n"]], regs_VII[[rg_nm]][["s"]], regs_VII[[rg_nm]][["pi"]]) else cs[["J"]]
+      data.frame(regime = rg_nm, desenho = cs[["nome"]], pesos = c("1", "sqrt")[iw], J = Jl,
+                 d = p * q * (2^Jl - 1), Tw = mean(m[, "Tw"]),
+                 basica = all(m[, "basica"] == 1), viola = sum(m[, "Tw"] == 1 & (m[, "thm3i"] == 0 | m[, "c14"] == 0)),
+                 cadeia = all(m[, c("cad1", "cad2", "cnt")] == 1), folga_min = min(m[, "folga"]),
+                 ganho_l1 = median(m[, "ganho_l1"]), vs_lasso = median(m[, "vs_lasso"]),
+                 gtil = median(m[, "gtil"]), kkt = max(m[, "kkt"]))
+    }))
+  }))
+}))
+print(tabVII, digits = 3, row.names = FALSE)
+chk(all(tabVII[["Tw"]] >= 1 - alpha), "o evento T_{G,w} do Lema 14(i) tem a probabilidade nominal em todo desenho, também com gamma_til = 0")
+chk(all(tabVII[["basica"]]) && max(tabVII[["kkt"]]) < 1e-6, "o FISTA chega ao minimizador (objetivo em theta_hat <= em theta*, KKT a 1e-6 de lambda)")
+chk(all(tabVII[["viola"]] == 0),
+    "Corolário 14: no evento T_{G,w}, o Teorema 3(i) e ||f_hat - f||_n^2 <= 18 lambda ||theta*||_{G,w} + 24 ||b||_n^2 + 3 ||P_A eps||_n^2 valem em todos os ajustes, nos dois regimes e nos dois pesos")
+chk(all(tabVII[["cadeia"]]), "a cadeia lambda ||theta*||_{G,w} <= rho lambda_1 ||theta*||_{G,1} <= rho lambda_1 ||theta*||_1 e a contagem valem no theta* de cada ajuste")
+semcond <- tabVII[["desenho"]] %in% c("metade1000", "d>n")
+chk(all(tabVII[semcond, "gtil"] < 1e-8), "nos desenhos metade1000 e d > n, gamma_til = 0: o Corolário 14 vale sem a condição de desenho")
+cat(sprintf("  ||theta*||_1 / ||theta*||_{G,1} no theta* do desenho: %s (regime i) e %s (regime ii)\n",
+            paste(sprintf("%.2f", tabVII[tabVII[["regime"]] == "i" & tabVII[["pesos"]] == "1", "ganho_l1"]), collapse = " "),
+            paste(sprintf("%.2f", tabVII[tabVII[["regime"]] == "ii" & tabVII[["pesos"]] == "1", "ganho_l1"]), collapse = " ")))
+
 cat(sprintf("\n  tempo: %.0f s\n", proc.time()[["elapsed"]] - t_start))
-if (ok) cat("OK\n") else stop("E1.12: conferência numérica FALHOU (ver linhas acima)")
+if (ok) cat("OK\n") else stop("E1.12 e E1.13: conferência numérica FALHOU (ver linhas acima)")

@@ -71,14 +71,30 @@
 #'   see the file header for what each one is.
 #' @param x Matrix of linear covariates, \eqn{n} by \eqn{p}. A constant
 #'   column, the usual \eqn{X_1 \equiv 1}, gives the additive intercept.
+#'   For \code{print}, an object of class \code{"wafc_competitor"}.
 #' @param u Matrix of modulating covariates, \eqn{n} by \eqn{q}.
 #' @param y Numeric response of length \eqn{n}.
 #' @param active Logical \eqn{p} by \eqn{q} matrix of the blocks that are
 #'   really active. Required by \code{method = "oracle"} and ignored by
 #'   every other method.
-#' @param ... Passed to the fitter of the method.
+#' @param ... Passed to the fitter of the method; ignored by
+#'   \code{predict} and \code{print}.
 #'
-#' @return An object of class \code{"wafc_competitor"}.
+#' @return An object of class \code{"wafc_competitor"}: a list with the
+#'   levels \code{cc}, the functions \code{beta(u)} (the \eqn{n} by
+#'   \eqn{p} matrix of functional coefficients) and \code{g(grid)} (the
+#'   \eqn{p} by \eqn{q} list of additive components, \code{NULL} when the
+#'   method does not decompose), the \eqn{p} by \eqn{q} logical matrix
+#'   \code{blocks} of the blocks kept (\code{NULL} when the method selects
+#'   nothing), the \code{fitted} values, the \code{intercept} that no
+#'   constant covariate carries (when the method has one), the object
+#'   \code{fit} of the engine, the \code{design} for the methods fitted on
+#'   the design of \code{\link{wafc_design}}, what is particular to the
+#'   method in \code{extra}, and the \code{method},
+#'   \code{time}, \code{n}, \code{p}, \code{q}, \code{xnames} and
+#'   \code{unames}. \code{predict} returns
+#'   \code{rowSums(newx * beta(newu))} plus the intercept, and \code{print}
+#'   returns \code{x} invisibly.
 #'
 #' @examples
 #' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
