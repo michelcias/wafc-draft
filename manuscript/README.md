@@ -9,12 +9,14 @@ mesmo índice `k`; a versão `{k+1}` copia os três e atualiza
 A versão `1` não leva marcação de alteração; o preâmbulo já define `colR1`
 e carrega `ulem` para quando `k = 2` existir.
 
-**Versão viva: `k = 3`**, aberta em 2026-10-01 como cópia de `k = 2`
-(`ms_3.tex`, `supp_3.tex`, `references_3.bib`) para a notação da seleção
-(D40), aplicada sem marcação por lista fechada de padrões; as edições de
-E5c seguem marcadas em `colR1`. 34 e 30 páginas, `.bib` com 37 entradas, e
-o mapa da numeração global no cabeçalho do `ms_3.tex`. A `k = 2` (aberta em
-2026-09-30, E5c) fica intacta.
+**Versão viva: `k = 4`**, aberta em 2026-10-04 pela E5d como cópia de
+`k = 3` (`ms_4.tex`, `supp_4.tex`, `references_4.bib`), com o estimador e a
+teoria em blocos de D44 a D51 marcados em `colR1`, e os enunciados, provas e
+displays removidos inteiros em blocos cinza sem tachado (D51); a teoria do
+lasso coordenado foi para a S8 do supp. 50 e 60 páginas com a marcação (43 e
+59 sem o texto removido), `.bib` com 40 entradas, e o mapa da numeração
+global no cabeçalho do `ms_4.tex`. As versões `k = 1` a `k = 3` ficam
+intactas; a `k = 3` (2026-10-01) é a da notação da seleção (D40).
 
 | Pasta | O que é |
 |---|---|
@@ -36,5 +38,5 @@ geradas dos arquivos de origem é item do checklist de submissão
 ## Compilar
 
 ```bash
-cd manuscript && latexmk -pdf ms_3.tex && latexmk -pdf supp_3.tex && latexmk -c
+cd manuscript && latexmk -pdf ms_4.tex && latexmk -pdf supp_4.tex && latexmk -c
 ```

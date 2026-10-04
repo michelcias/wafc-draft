@@ -1,0 +1,1654 @@
+% WAFC -- manuscrito, versao k = 4 (E5d; copia de k = 3, alteracoes marcadas em colR1; a
+% rodada nao foi aceita, entao a marcacao de k = 2 e k = 3 segue em colR1). Template da
+% Statistica Sinica (manuscript/ss-template/SS-template-bib.tex), decisao D5.
+% Secoes 1 a 4; as Secoes 5 a 7 entram em E5b. As provas estao em supp_4.tex.
+% Notacao: docs/notacao.md (congelada em E1.1; a penalidade em blocos no seu S10).
+% Os enunciados vem de derivations/01 a 08; o comentario acima de cada um diz de onde.
+% Em k = 4 (D44 a D51) o estimador passa a ser o block lasso balanceado, e a teoria
+% do lasso coordenado sai do corpo para a Secao S8 do supp (D51(a)). Enunciado,
+% prova ou matematica deslocada que sai inteiro fica no lugar, em cinza e sem
+% numero, aberto por "[removed in k = 4]" (D51(b)); o novo vem logo depois.
+%
+% Mapa da numeracao global (docs/TAREFA.md, S5) para os rotulos deste arquivo, k = 4:
+%   Proposicao 1            -> Proposition 1  (prop:identif)
+%   Lema 1                  -> Lemma 1        (lem:basis)
+%   Lema 2 e Corolario 1    -> Lemma 2        (lem:bias)
+%   Proposicao 3            -> Proposition 2  (prop:gram)
+%   Corolario 11            -> Theorem 1      (thm:main; D47(a), emenda D16)
+%   Teorema 3               -> Theorem 2      (thm:oracle); o Lema 14 e o Lemma S5.2
+%                              do supp (lem:calib-blocks), a Observacao 2 (variante
+%                              branca) e a Remark S5.2, o Corolario 9 e o
+%                              Corollary S5.1, a Proposicao 7 e a Proposition S5.1
+%   Teorema 4               -> Theorem 3      (thm:sieve)
+%   Corolario 10            -> Corollary 1    (cor:components)
+%   Corolario 14            -> Proposition 3  (prop:slow; D47(c), D49(b))
+%   Lema 15                 -> Lemma 3        (lem:weak; o rotulo ficou com o nome antigo)
+%   Corolario 12, Hipotese S com rho_n^G
+%                           -> Corollary 2 (cor:threshold), Assumption 6 (ass:sep);
+%                              o Lema 13 e o Lemma S7.1 do supp (lem:sandwich)
+%   Corolario 13            -> Corollary 3    (cor:thrisk; D45); o Lema 16 e o
+%                              Lemma S7.2 do supp (lem:thrisk)
+%   Teoria do lasso coordenado (Corolario 5, Teorema 1, Teorema 2, Corolario 4,
+%   Proposicao 4 emendada por D49, Lema 9, Corolario 8): Secao S8 do supp,
+%   como Theorems S8.1 a S8.3, Corollaries S8.1 e S8.2, Proposition S8.1 e
+%   Lemma S8.1 (D51(a)).
+%   Os rotulos sec:sieve, thm:sieve e lem:weak ficaram com o nome antigo (D33 muda
+%   o texto, nao os rotulos; em k = 4 o conteudo de thm:sieve e lem:weak mudou).
+\documentclass[12pt]{article} %***
+\usepackage[sectionbib]{natbib}
+\usepackage{array,epsfig,fancyheadings,rotating}
+\usepackage[]{hyperref}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{sectsty, secdot}
+\sectionfont{\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont}
+\renewcommand{\theequation}{\thesection\arabic{equation}}
+\subsectionfont{\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textwidth=31.9pc
+\textheight=46.5pc
+\oddsidemargin=1pc
+\evensidemargin=1pc
+\headsep=15pt
+\topmargin=.6cm
+\parindent=1.7pc
+\parskip=0pt
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{multirow}
+\usepackage{amsthm}
+
+% Marcacao de alteracoes a partir de k = 2 (docs/instrucoes.md, S3): a cor da
+% rodada corrente e colR1, e o ulem fornece o \sout das remocoes sugeridas.
+% A versao k = 1 nao leva marcacao, porque nao ha versao anterior.
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\definecolor{colR1}{RGB}{0,90,200}
+
+\setcounter{page}{1}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{assumption}{Assumption}
+% Enunciados removidos em k = 4 (D51(b)): os mesmos ambientes, sem numero, para
+% que o texto antigo fique no lugar sem deslocar a numeracao do novo.
+\newtheorem*{assumptionold}{Assumption}
+\theoremstyle{plain}
+\newtheorem*{theoremold}{Theorem}
+\newtheorem*{lemmaold}{Lemma}
+\newtheorem*{corollaryold}{Corollary}
+\newtheorem*{propositionold}{Proposition}
+\pagestyle{fancy}
+
+% --- macros -------------------------------------------------------------
+% Implementam docs/notacao.md, como derivations/macros.tex, com tres
+% diferencas exigidas pelo estilo da revista (S5 de ss-instrucoes-autores.md):
+% E(.) e P(.) em romano e com parenteses, no lugar do \mathbb{E}[.] das
+% derivacoes, e B_X no lugar dos dois simbolos C_X (E1.3) e B_X (E1.4) para a
+% cota das covariaveis lineares.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Prob}{\mathrm{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\T}{^{\top}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\normn}[1]{\left\lVert #1 \right\rVert_{n}}
+\newcommand{\normL}[1]{\left\lVert #1 \right\rVert_{L_2(P)}}
+\newcommand{\inner}[2]{\langle #1, #2 \rangle}
+\newcommand{\cv}{\ell}
+\newcommand{\md}{m}
+\newcommand{\lev}{j}
+\newcommand{\tsl}{k}
+\newcommand{\jzero}{j_{0}}
+\newcommand{\NJ}{N_{J}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\fcoef}[1]{\beta_{#1}}
+\newcommand{\lvl}[1]{c_{#1}}
+\newcommand{\gcomp}[2]{g_{#1#2}}
+\newcommand{\wav}[2]{\psi_{#1#2}}
+\newcommand{\VJ}{V_{J}}
+\newcommand{\WJ}{W_{J}}
+\newcommand{\PiJ}{\Pi_{J}}
+\newcommand{\coef}[4]{\theta_{#1#2,#3#4}}
+\newcommand{\coefs}[4]{\theta^{*}_{#1#2,#3#4}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\thetastar}{\btheta^{*}}
+\newcommand{\thetahat}{\widehat{\btheta}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\chat}{\widehat{\mathbf{c}}}
+\newcommand{\Gram}{\Sigma}
+\newcommand{\Gramhat}{\widehat{\Sigma}}
+\newcommand{\pen}{\lambda}
+\newcommand{\penn}{\lambda_{n}}
+\newcommand{\Szero}{S_{0}}
+\newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
+\newcommand{\seff}{s'}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\MA}{M_{\Amat}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\Mstar}{M^{\star}}
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+% --- a penalidade em blocos (docs/notacao.md, S10; copiadas das macros locais
+% de derivations/08-blocos.tex e 06-selecao-limiar.tex em k = 4) ---------------
+\newcommand{\thbar}{\bar{\btheta}}
+\newcommand{\bbar}{\bar{\bb}}
+\newcommand{\vbar}{\bar{v}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Gzero}{\mathcal{G}_{0}}
+\newcommand{\Gbar}{\bar{\mathcal{G}}}
+\newcommand{\Hcal}{\mathcal{H}}
+\newcommand{\Wcal}{\mathcal{W}}
+\newcommand{\bn}{b_{n}}
+\newcommand{\jst}{j^{*}}
+\newcommand{\nGw}[1]{\lVert #1\rVert_{\mathcal{G},w}}
+\newcommand{\nGone}[1]{\lVert #1\rVert_{\mathcal{G},1}}
+\newcommand{\Psitil}{\widetilde{\Psi}}
+\newcommand{\Rid}{R_{\mathcal{G}}}
+\newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
+\newcommand{\lamGone}{\lambda^{\mathcal{G}}_{n,1}}
+\newcommand{\lamz}[1]{\lambda_{0,#1}}
+\newcommand{\lamzbar}[1]{\bar{\lambda}_{0,#1}}
+\newcommand{\rhoG}{\rho^{\mathcal{G}}_{n}}
+\newcommand{\rhoGt}{\tilde{\rho}^{\mathcal{G}}_{n}}
+\newcommand{\Tw}{\mathcal{T}_{\mathcal{G},w}}
+\newcommand{\AG}{A^{\mathcal{G}}_{s,\pi}}
+% grupos de marcacao de D51(b): o texto antigo, inteiro, em cinza e sem tachado
+\newcommand{\removedk}{\par\noindent[removed in k = 4]\par}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\def\n{\noindent}
+\lhead[\fancyplain{} \leftmark]{}
+\chead[]{}
+\rhead[]{\fancyplain{}\rightmark}
+\cfoot{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\renewcommand{\baselinestretch}{2}
+
+\markright{ \hbox{\footnotesize\rm Statistica Sinica
+  }\hfill\\[-13pt]
+  \hbox{\footnotesize\rm
+  }\hfill }
+
+\markboth{\hfill{\footnotesize\rm AUTHOR(S)} \hfill}
+{\hfill {\footnotesize\rm WAVELET ADDITIVE FUNCTIONAL COEFFICIENTS} \hfill}
+
+\renewcommand{\thefootnote}{}
+$\ $\par
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont \vspace{0.8pc}
+\centerline{\large\bf SPARSE WAVELET ESTIMATION OF}
+\vspace{2pt}
+\centerline{\large\bf ADDITIVE FUNCTIONAL COEFFICIENTS}
+\vspace{.4cm}
+\centerline{Author(s)}
+\vspace{.4cm}
+\centerline{\it Affiliation(s)}
+\vspace{.55cm} \fontsize{9}{11.5pt plus.8pt minus.6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{quotation}
+\noindent {\it Abstract:}
+We study a varying coefficient model in which the effect of each linear
+covariate is additive in several modulating covariates, and each additive
+component is expanded in a periodized wavelet basis. The resulting design is
+\textcolor{colR1}{an approximation space} of products between a linear covariate and a wavelet evaluated at a
+modulator, and the components are estimated by a single \textcolor{gray}{\sout{lasso}}
+\textcolor{colR1}{block lasso} problem in
+which the levels of the coefficients are left unpenalized \textcolor{colR1}{and the
+wavelet coefficients of each resolution level are grouped in chunks of order
+$\log n$}. Three results are
+established. The population Gram matrix of the product design has its
+smallest eigenvalue bounded away from zero under a conditional second moment
+condition on the linear covariates and a bounded joint density for the
+modulators, with no independence between the two groups of covariates; the
+estimator satisfies a nonasymptotic oracle inequality that needs no cone
+condition, because the unpenalized levels are profiled out\textcolor{colR1}{, and
+that holds for any weights of bounded ratio}; and, at a
+resolution level chosen inside an explicit window, the prediction error and
+the componentwise error attain the rate of nonlinear wavelet approximation\textcolor{gray}{\sout{ up
+to a logarithmic factor}}\textcolor{colR1}{, with no logarithmic factor when the Besov
+integrability index is at least two}, under the same Besov condition that governs
+\textcolor{colR1}{linear approximation}. The last result rests on \textcolor{gray}{\sout{the observation that the Besov
+condition already implies compressibility of the}} \textcolor{gray}{\sout{wavelet}} \textcolor{gray}{\sout{coefficients}}\textcolor{colR1}{a
+bound on the ideal risk over chunks that the Besov condition already implies},
+so that adaptivity costs no additional assumption. \textcolor{colR1}{A threshold on the
+norms of the fitted components recovers which modulators act on which
+coefficients, and the thresholded estimator keeps the rate of the fit.} The
+estimator is a single convex
+program and is fit by \textcolor{gray}{\sout{coordinate descent on a sparse design matrix}}\textcolor{colR1}{standard
+group lasso software}.
+\textcolor{colR1}{An implementation in R and the code that reproduces every
+numerical result of the paper are made available with it.}
+
+\vspace{9pt}
+\noindent {\it Key words and phrases:}
+Additive coefficient model, Besov space, effective dimension, \textcolor{colR1}{group
+lasso,} lasso, oracle
+inequality, varying coefficient model, wavelets.
+\par
+\end{quotation}\par
+
+\def\thefigure{\arabic{figure}}
+\def\thetable{\arabic{table}}
+
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+% o contador de equacoes do template nao reinicia por secao, o que produzia
+% "(3.6)" logo depois de "(2.5)"; o \numberwithin reinicia.
+\numberwithin{equation}{section}
+
+\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+\label{sec:intro}
+
+Applied problems often present an effect that is not constant across the
+sample. The return to schooling changes with age and with experience, the
+effect of temperature on electricity demand changes with the hour of the day
+and with humidity, and the effect of a treatment changes with the age and the
+body mass index of the patient. The varying coefficient model of
+\citet{Hastie-Tibshirani-1993} and \citet*{Cai-Fan-Yao-2000} accommodates this
+by letting the coefficient of each covariate be a function of a modulating
+variable; see \citet{Fan-Zhang-2008} for a review. When more than one variable
+modulates the effect, a fully nonparametric coefficient runs into the curse of
+dimensionality, and the standard remedy is to make each coefficient additive
+in the modulators, which is the additive coefficient model of
+\citet{Xue-Yang-2006}, studied further by \citet{Xue-Liang-2010} and
+\citet{Liu-Yang-2010}.
+
+The estimators available for this model are built from polynomial splines and
+from kernels, and are governed by a global smoothness index, so that a
+component with a peak, a jump or a change of regime is either oversmoothed or
+paid for everywhere in the domain. Wavelet bases combined with an $\ell_1$
+penalty \textcolor{colR1}{\citep{tibshirani1996regression}} are the standard answer to this difficulty, because a function whose
+smoothness is inhomogeneous is still economically represented by a few large
+coefficients \citep{Donoho-Johnstone-1994, Donoho-Johnstone-1998,
+Antoniadis-Fan-2001}. They have been used for varying coefficients without an
+additive structure and without penalization \citep*{Zhou-You-2004,
+Montoril-Morettin-Chiann-2018}, and for additive models without a multiplying
+covariate \citep{Sardy-Tseng-2004, Zhang-Wong-2003, Haris-Simon-Shojaie-2018,
+Amato-Antoniadis-DeFeis-Gijbels-2022, Sardy-Ma-2024}; penalized estimation in
+the additive coefficient model itself has been carried out with grouped
+penalties on spline bases \citep{Wei-Huang-Li-2011,
+Antoniadis-Gijbels-LambertLacroix-2014, Ma-Carroll-Liang-Xu-2015}, again under
+global smoothness.
+
+\citet{Klopp-Pensky-2015} study the varying coefficient model in which a
+single index modulates every coefficient. They expand each coefficient
+function in an orthonormal basis, estimate the resulting array by a block
+lasso, and obtain a nonasymptotic oracle inequality, a Besov rate that adapts
+to inhomogeneous smoothness, and a matching minimax lower bound, under the
+assumption that the covariates are independent of the index. The present paper
+carries that programme to the situation an applied problem usually presents,
+in which several variables modulate a coefficient at once. We let each
+coefficient be additive in the modulators, which keeps the estimator free of
+the curse of dimensionality in their number, we allow the covariates to depend
+on the modulators, and we \textcolor{gray}{\sout{penalize coefficient by coefficient rather than in
+blocks, leaving the levels of the coefficients unpenalized. Each of these
+costs something.}} \textcolor{colR1}{keep the block lasso but leave the levels of the
+coefficients unpenalized and group the wavelet coefficients in chunks of order
+$\log n$ within a resolution level, with weights whose ratio stays bounded, so
+that the standardized weights of group lasso software are covered.}
+Additivity produces cross terms between distinct modulators,
+so the population Gram matrix no longer factorizes as a Kronecker product and
+has to be bounded directly; dependence between the covariates and the
+modulators replaces a marginal second moment by a conditional one; and the
+unpenalized levels leave a term in the risk that \textcolor{colR1}{full} block penalization does not
+incur. Our main result, Theorem~\ref{thm:main}, states that the estimator
+attains the rate of \textcolor{gray}{\sout{nonlinear wavelet approximation up to a logarithmic
+factor, under the same Besov assumption that governs}} \textcolor{gray}{\sout{linear approximation}}\textcolor{gray}{\sout{, and it
+reduces to the rate of Klopp and Pensky when a single modulator is present.}}
+\textcolor{colR1}{Klopp and Pensky, with no logarithmic factor when the Besov integrability
+index is at least two, so that with a single modulator independent of the
+covariates it is minimax optimal there. It holds under weaker conditions than
+theirs: the number of covariates is fixed, a regime their high dimensional
+condition excludes, and the effective smoothness of the components need only
+exceed $s/(2s+1)$, which is below one half, where theirs must exceed one half.
+Components with effective smoothness one half, such as the inhomogeneous
+functions of Section~5, are covered here and not there. A lower bound for
+several modulators remains open.}
+% E5b: "Section~5" e a Secao 5 (Simulation), que ainda nao existe; trocar pelo
+% \ref quando ela entrar (D50).
+
+We call the resulting procedure WAFC, for wavelet additive functional
+coefficients. Its contributions are of \textcolor{gray}{\sout{three}} \textcolor{gray}{\sout{four}} \textcolor{colR1}{three} kinds. The first is the theory of
+the additive product design: a design condition for the Gram matrix of the
+products between a linear covariate and a wavelet of a modulator, which
+carries a cross term between distinct modulators and does not assume
+independence (Proposition~\ref{prop:gram}); an oracle inequality that needs no
+cone condition, because the unpenalized levels are profiled out\textcolor{colR1}{, and
+that holds for any weights of bounded ratio, including those of the software
+that computes the estimator}
+(Theorem~\ref{thm:oracle}); and rates \textcolor{gray}{\sout{obtained by compressibility}}
+\textcolor{colR1}{that follow from the Besov assumption alone, through a bound on the
+ideal risk over chunks}
+(Theorem~\ref{thm:main}). \textcolor{gray}{\sout{The second is the reading that compressibility costs
+no assumption: the Besov condition on the components already implies that
+their wavelet coefficients lie in a weak $\ell_\tau$ ball with
+$\tau = (s+1/2)^{-1}$ (Lemma~\mbox{\ref{lem:weak}}, a form with explicit constants
+of the classical embedding in \mbox{\citealp[Proposition~9.15]{johnstone2019gaussian}}),
+and it is this that separates the rate of the estimator from the rate of linear
+approximation when the Besov integrability index is smaller than two.}}
+\textcolor{colR1}{The second is the recovery of the structure of the model, which
+modulators act on which coefficients, by a threshold on the norms of the
+fitted components (Corollary~\ref{cor:threshold}): removing the null blocks
+needs no separation condition, and the thresholded estimator keeps the rate of
+the fit (Corollary~\ref{cor:thrisk}), so that one estimator serves both for
+structure and for prediction.} The third is computational: the
+estimator is one convex program \textcolor{gray}{\sout{on a sparse design matrix}} \textcolor{colR1}{solved by
+standard group lasso software}, \textcolor{gray}{\sout{and}} the resolution
+level and the penalty are chosen jointly \textcolor{colR1}{by cross-validation, and the
+threshold by the one standard error rule on the same folds}.
+\textcolor{gray}{\sout{The fourth is the recovery of the structure of the model, which
+modulators act on which coefficients, by a threshold on the norms of the
+fitted components (Corollary~\mbox{\ref{cor:threshold}}): it needs no design
+condition beyond the one above and no irrepresentability condition, and
+removing the null blocks needs no separation condition at all.}}
+
+The rest of the paper is organized as follows. Section~\ref{sec:model}
+introduces the model, its identification, the wavelet \textcolor{colR1}{approximation space} and the estimator.
+Section~\ref{sec:theory} states the assumptions and the theory, opening with
+the main rate and then giving the three results it rests on\textcolor{colR1}{, then
+the rates, including one with no design condition,} \textcolor{colR1}{and
+closes with the recovery of the block structure by thresholding} \textcolor{colR1}{and
+the risk of the thresholded estimator}.
+Section~\ref{sec:computation} describes the computation, the scale of the
+penalty and the tuning rules\textcolor{colR1}{, the threshold among them}. Proofs are collected in the online Supplementary
+Material\textcolor{colR1}{, which also gives the theory of the coordinatewise lasso,
+offered by the software as an option}.
+% E5b: acrescentar aqui a mencao as Secoes 5 (Simulation), 6 (Application) e
+% 7 (Discussion), e a frase de fechamento do roteiro.
+
+Throughout, $\norm{a}_\pi$ is the $\ell_\pi$ norm of a vector,
+$\normn{h}^2 = n^{-1}\sum_{i\le n} h_i^2$ is the empirical norm,
+$\lmin(\cdot)$ and $\lmaxx(\cdot)$ are the extreme eigenvalues of a symmetric
+matrix, $\opnorm{\cdot}$ is the operator norm, and $a_n \asymp b_n$ means that
+$a_n/b_n$ is bounded away from zero and infinity. For a support
+$S$, $\delta_S$ is the vector that agrees with $\delta$ on $S$ and vanishes
+elsewhere.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Model and Wavelet \texorpdfstring{\textcolor{colR1}{Approximation Space}}{Approximation Space}}
+\label{sec:model}
+
+\subsection{The additive functional coefficient model}
+\label{sec:model-def}
+
+Let $Y$ be a scalar response, $\bX = (X_1,\dots,X_p)\T$ a vector of linear
+covariates and $\bU = (U_1,\dots,U_q)\T$ a vector of modulating covariates,
+taking values in $[0,1]^q$ after a monotone transformation of each
+coordinate. The model is
+\begin{equation}
+  \label{eq:model}
+  Y \;=\; \sum_{\cv=1}^{p} \fcoef{\cv}(\bU)\,X_{\cv} \;+\; \varepsilon,
+  \qquad \E(\varepsilon \mid \bX, \bU) = 0,
+\end{equation}
+with each functional coefficient additive in the modulators,
+\begin{equation}
+  \label{eq:additive}
+  \fcoef{\cv}(u) \;=\; \lvl{\cv} \;+\; \sum_{\md=1}^{q}\gcomp{\cv}{\md}(u_{\md}),
+  \qquad \int_{0}^{1}\gcomp{\cv}{\md}(v)\,dv = 0,
+  \qquad \cv = 1,\dots,p .
+\end{equation}
+The constant $\lvl{\cv}$ is the level of the $\cv$th coefficient and
+$\gcomp{\cv}{\md}$ is the component of that coefficient along the $\md$th
+modulator. The centering in \eqref{eq:additive} is with respect to Lebesgue
+measure, which is the convention of the wavelet literature and the one the
+basis of Section~\ref{sec:sieve} imposes at no cost; the parametrization
+centered at the law of $\bU$ is obtained from it by the shift
+$\lvl{\cv} \mapsto \lvl{\cv} + \sum_{\md}\E\{\gcomp{\cv}{\md}(U_{\md})\}$,
+which moves mass between the levels and the components but changes neither
+$\fcoef{\cv}$ nor the estimator.
+
+The model contains several familiar ones. With $X_1 \equiv 1$ the first
+coefficient is an additive intercept, so that $p = 1$ gives the additive model
+and $p > 1$ with $\gcomp{\cv}{\md} \equiv 0$ for $\cv \ge 2$ gives the
+partially linear additive model; $q = 1$ gives the classical varying
+coefficient model with a single index; and $\gcomp{\cv}{\md}\equiv 0$ for all
+pairs gives linear regression. Writing
+$f(x,u) = \sum_{\cv} x_{\cv}\fcoef{\cv}(u)$ for the regression function, the
+first question is whether the distribution of $(Y,\bX,\bU)$ determines the
+parameters. Two degeneracies have to be excluded: if $\bX$ is confined to a
+hyperplane given $\bU$, only a combination of the coefficients is determined,
+and if one modulator is a function of another, only the sum of the
+corresponding components is.
+
+% derivations/01-identificabilidade.md, Proposicao 1 (numeracao global).
+\begin{proposition}[Identification]
+\label{prop:identif}
+Suppose that $\E\norm{\bX}_2^2 < \infty$, that $\E(\bX\bX\T \mid \bU)$ is
+nonsingular almost surely, and that $\bU$ has a Lebesgue density on $[0,1]^q$
+that is positive almost everywhere. Then, among the parametrizations that
+satisfy \eqref{eq:additive}, the levels $\lvl{1},\dots,\lvl{p}$ and the
+components $\gcomp{\cv}{\md} \in L_2[0,1]$ are determined by $f$: the levels
+uniquely, and each component up to a Lebesgue null set.
+\end{proposition}
+
+Dependence between $\bX$ and $\bU$ is allowed, and so is dependence among the
+modulators; what the two conditions exclude is a linear combination of the
+linear covariates that is a function of the modulators, and a modulator that
+is a function of the others. Both exclusions return in quantitative form in
+Section~\ref{sec:theory}.
+
+\subsection{The wavelet \texorpdfstring{\textcolor{colR1}{approximation space}}{approximation space}}
+\label{sec:sieve}
+
+Let $\phi$ and $\psi$ be the scaling function and the mother wavelet of an
+orthonormal multiresolution analysis of $L_2(\R)$, compactly supported, with
+$\psi$ bounded and with $N$ vanishing moments, and let $L$ be the length of
+the filter, so that the support of $\psi$ is contained in $[0,L-1]$. Write
+\begin{equation}
+  \label{eq:periodized}
+  \wav{\lev}{\tsl}(u) \;=\; \sum_{\iota \in \mathbb{Z}}
+  2^{\lev/2}\psi\{2^{\lev}(u+\iota) - \tsl\},
+  \qquad \lev \ge 0, \quad \tsl = 0,\dots,2^{\lev}-1,
+\end{equation}
+for the periodization of the basis to $[0,1]$. The system
+$\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$ is an orthonormal basis of
+$L_2[0,1]$ under Lebesgue measure and every wavelet in it integrates to zero
+\citep[Section 9.3]{Daubechies-1992}. We take the coarsest level to be
+$\jzero = 0$, so that the only scaling function is the constant
+$\phi_{00}\equiv 1$, and we discard it: it is already carried by the level
+$\lvl{\cv}$. The \textcolor{colR1}{approximation space (the sieve)} of resolution $J$ is then
+\[
+  \WJ \;=\; \mathrm{span}\{\wav{\lev}{\tsl} : 0 \le \lev < J,\;
+  0 \le \tsl < 2^{\lev}\},
+  \qquad \dim \WJ = \NJ = 2^{J}-1,
+\]
+the orthogonal complement of the constants inside the multiresolution space
+$\VJ$, and $\PiJ$ is the orthogonal projection onto it. Every element of $\WJ$
+integrates to zero, so that the identification constraint of
+\eqref{eq:additive} holds by construction, no numerical restriction is imposed
+on the fit, and the \textcolor{colR1}{approximation space} is a plain linear space.
+
+% derivations/01-identificabilidade.md, Lema 1 (numeracao global).
+\begin{lemma}[The basis carries the constraint]
+\label{lem:basis}
+Under the conditions of Proposition~\ref{prop:identif}, for every $J$ the map
+\[
+  (\bc, \btheta) \;\longmapsto\;
+  \sum_{\cv=1}^{p} x_{\cv}\Bigl\{\lvl{\cv} + \sum_{\md=1}^{q}
+  \sum_{\lev<J}\sum_{\tsl} \coef{\cv}{\md}{\lev}{\tsl}
+  \wav{\lev}{\tsl}(u_{\md})\Bigr\}
+\]
+is injective on $\R^{p}\times\R^{d}$, $d = pq\NJ$; equivalently, the
+population Gram matrix of the design defined in \eqref{eq:design} is positive
+definite. If instead the column $X_{\cv}\phi_{00}(U_{\md})$ is retained in
+each block, that matrix is singular with nullity exactly $pq$.
+\end{lemma}
+
+Replacing $\gcomp{\cv}{\md}$ by $\PiJ\gcomp{\cv}{\md}$ leaves a bias, which
+Section~\ref{sec:theory} controls under a Besov condition. Two practical
+consequences of periodization deserve mention. A component whose values at the
+two ends of the interval disagree is not periodic, and its projection error
+then stalls at the order $2^{-J/2}$ in $L_2$ regardless of the interior
+smoothness (Proposition~S3.1 in the Supplementary Material). The two remedies,
+rescaling the modulators to a proper subinterval and using the basis of
+\citet*{cohen1993wavelets} adapted to the interval, are matters of computation
+and are discussed in Section~\ref{sec:computation}.
+
+\subsection{The estimator}
+\label{sec:estimator}
+
+Let $(Y_i,\bX_i,\bU_i)$, $i = 1,\dots,n$, be independent copies of
+$(Y,\bX,\bU)$. The row of the design matrix is the vector of the $p$ linear
+covariates followed by the $d = pq\NJ$ products between a linear covariate and
+a wavelet of a modulator,
+\begin{equation}
+  \label{eq:design}
+  \bZ = [\,\Amat \;\; \Bmat\,], \qquad
+  \Amat_{i\cv} = X_{i\cv}, \qquad
+  \Bmat_{i,(\cv\md,\lev\tsl)} = X_{i\cv}\,\wav{\lev}{\tsl}(U_{i\md}),
+\end{equation}
+with the blocks $(\cv,\md)$ in lexicographic order and, inside a block, the
+wavelets ordered by level and then by translation. \textcolor{colR1}{The penalty
+acts on chunks of wavelet coefficients inside a block. Fix an integer
+$b \ge 2$ and let $\jst$ be the finest level with $2^{\jst} < b$. In each block
+$(\cv,\md)$ the levels $\lev \le \jst$ form a single chunk, the coarse chunk,
+and each finer level, which has $2^{\lev} \ge b$ coefficients, is cut into
+$\lfloor 2^{\lev}/b\rfloor$ chunks of consecutive translations, all with $b$
+coefficients except the last, which also takes the remainder. Write $\Gcal$ for
+the resulting partition of the $d$ penalized coordinates, $\btheta_{G}$ and
+$|G|$ for the subvector and the size of a chunk $G$, and, for positive weights
+$w = (w_{G})_{G\in\Gcal}$, $\nGw{\btheta} = \sum_{G\in\Gcal}w_{G}\norm{\btheta_{G}}_{2}$.}
+Writing
+$\bY = (Y_1,\dots,Y_n)\T$, the estimator is
+% derivations/08-blocos.tex, eq. (est-blocos) e a forma balanceada (D44).
+{\color{gray}\removedk
+\[
+  (\chat,\thetahat) \;\in\; \mathop{\rm arg\,min}_{(\bc,\btheta)\in
+  \R^{p}\times\R^{d}}
+  \Bigl\{\normn{\bY - \Amat\bc - \Bmat\btheta}^{2}
+  \;+\; 2\pen\norm{\btheta}_{1}\Bigr\} .
+\]
+}
+{\color{colR1}
+\begin{equation}
+  \label{eq:estimator}
+  (\chat,\thetahat) \;\in\; \mathop{\rm arg\,min}_{(\bc,\btheta)\in
+  \R^{p}\times\R^{d}}
+  \Bigl\{\normn{\bY - \Amat\bc - \Bmat\btheta}^{2}
+  \;+\; 2\pen\nGw{\btheta}\Bigr\} ,
+\end{equation}
+with $b = \bn = \lceil\log n\rceil$ and $w_{G} = |G|^{1/2}$. Every chunk of a
+fine level has between $b$ and $2b-1$ coefficients, the coarse chunk has
+$2^{\jst+1}-1$, which lies between $b-1$ and $2b-3$ (when $J \le \jst+1$
+each block is a single chunk), there are at most
+$pq(1+2^{J}/b)$ chunks, and the ratio $\varrho = \max_{G}w_{G}/\min_{G}w_{G}$
+of the weights satisfies $\varrho^{2} \le (2b-1)/(b-1) \le 3$
+(Proposition~S5.1 in the Supplementary Material). The theory of
+Section~\ref{sec:theory} holds for any weights whose ratio stays bounded, and
+the bound on $\varrho$ is what makes it cover the weights $|G|^{1/2}$ that
+group lasso software uses by default.}
+The penalty does not reach the levels $\bc$: they are $p$ parameters of a
+parametric part, and shrinking them would bias every fitted coefficient by a
+constant. The fitted components and coefficients are recovered from
+$\thetahat$ by
+\[
+  \widehat{g}_{\cv\md}(v) = \sum_{\lev<J}\sum_{\tsl}
+  \widehat{\theta}_{\cv\md,\lev\tsl}\,\wav{\lev}{\tsl}(v),
+  \qquad
+  \widehat{\fcoef{\cv}}(u) = \widehat{c}_{\cv}
+  + \sum_{\md=1}^{q}\widehat{g}_{\cv\md}(u_{\md}).
+\]
+Problem \eqref{eq:estimator} is a \textcolor{gray}{\sout{lasso}} \textcolor{gray}{\sout{\mbox{\citep{tibshirani1996regression}}}}\textcolor{colR1}{group lasso} with some coordinates unpenalized, so
+it is convex, and it is strictly convex, hence uniquely solved, whenever the
+Gram matrix of $\bZ$ is nonsingular. \textcolor{gray}{\sout{Two structural variants are available at
+no conceptual cost and are discussed in Section~\mbox{\ref{sec:computation}}: a
+sparse group lasso \mbox{\citep{Simon-Friedman-Hastie-Tibshirani-2013}} whose groups
+are the blocks $(\cv,\md)$, which removes an entire component when a modulator
+does not act on a coefficient, and the block lasso of
+\mbox{\citet{Klopp-Pensky-2015}}.}} \textcolor{colR1}{It differs from the block lasso of
+\citet{Klopp-Pensky-2015} in three respects: their chunks run across resolution
+levels, their weights are equal, and their levels are penalized with everything
+else. Two other penalties are available and are discussed in
+Section~\ref{sec:computation}: the lasso \citep{tibshirani1996regression}, with
+$\norm{\btheta}_{1}$ in place of $\nGw{\btheta}$, whose theory is given in
+Section~S8 of the Supplementary Material, and a sparse group lasso
+\citep{Simon-Friedman-Hastie-Tibshirani-2013} whose groups are the blocks
+$(\cv,\md)$.} The theory below is for \eqref{eq:estimator}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Theory}
+\label{sec:theory}
+
+\subsection{Assumptions}
+\label{sec:assumptions}
+
+\begin{assumption}[Sampling and error]
+\label{ass:sample}
+The observations $(Y_i,\bX_i,\bU_i)$, $i \le n$, are independent and
+identically distributed and follow \eqref{eq:model}, and the error is
+conditionally sub-Gaussian: there is $\sigma < \infty$ with
+$\E\{\exp(t\varepsilon_i) \mid \bX_i,\bU_i\} \le \exp(\sigma^2t^2/2)$ almost
+surely, for all real $t$.
+\end{assumption}
+
+\begin{assumption}[Linear covariates]
+\label{ass:X}
+$\max_{\cv}|X_{\cv}| \le B_X$ almost surely, and there are constants
+$0 < \kappa_1 \le \kappa_2 < \infty$ with
+$\kappa_1 \le \lmin\{\E(\bX\bX\T\mid\bU)\} \le
+\lmaxx\{\E(\bX\bX\T\mid\bU)\} \le \kappa_2$ almost surely.
+\end{assumption}
+
+\begin{assumption}[Modulating covariates]
+\label{ass:U}
+$\bU$ takes values in $[0,1]^q$ and has a joint Lebesgue density $p_{\bU}$
+with $0 < c_U \le p_{\bU}(u) \le C_U < \infty$ for every $u \in [0,1]^q$.
+\end{assumption}
+
+\begin{assumption}[Basis]
+\label{ass:basis}
+The wavelets are the periodization \eqref{eq:periodized} of an orthonormal,
+compactly supported family with $\psi$ bounded and $N$ vanishing moments, and
+$\jzero = 0$.
+\end{assumption}
+
+\begin{assumption}[Besov regularity]
+\label{ass:besov}
+There are $s > 0$, $1 \le \pi, r \le \infty$ and $C_g < \infty$ such that
+every component satisfies $\int_0^1 \gcomp{\cv}{\md} = 0$ and, writing
+$\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$
+and $\theta^{*}_{\cv\md,\lev\cdot}$ for the vector of the coefficients of
+level $\lev$,
+\[
+  \norm{\theta^{*}_{\cv\md,\lev\cdot}}_{\pi} \;\le\;
+  C_g\,2^{-\lev(s + 1/2 - 1/\pi)} \qquad \text{for every } \lev \ge 0 .
+\]
+The effective regularity $\seff = s - (1/\pi - 1/2)_{+}$ is positive.
+\end{assumption}
+
+Assumptions~\ref{ass:X} and \ref{ass:U} are the quantitative forms of the two
+conditions of Proposition~\ref{prop:identif}. In the second it is the joint
+density that is bounded below, not the marginals: if $U_2 = U_1$ almost surely
+both marginals are uniform and the design is singular.
+Assumption~\ref{ass:besov} is taken as a condition on the sequence of
+coefficients rather than as membership in a function space, as in
+\citet{Klopp-Pensky-2015}; when $\psi$ has more than $s$ vanishing moments and
+enough Hölder regularity the two are equivalent, on the circle
+\citep[Section 3.6]{Cohen-2003}, and the implication that the proofs use needs
+only the vanishing moments. The index $\seff$ is the regularity that \textcolor{colR1}{linear
+approximation} sees and $s$ is the one that nonlinear approximation sees; they differ
+exactly when $\pi < 2$, which is the regime of inhomogeneous smoothness.
+
+\subsection{The main result}
+\label{sec:main}
+
+Write $\widehat{f}_i = \Amat_i\chat + \Bmat_i\thetahat$ for the fit, \textcolor{gray}{\sout{$d_n$ for
+the number of penalized columns at resolution $J_n$}}\textcolor{colR1}{$\Gcal_{n}$ for the
+partition of Section~\ref{sec:estimator} at resolution $J_n$ with $b = \bn$},
+and fix a confidence
+level $\alpha \in (0,1)$. The penalty is the one that the oracle inequality of
+Section~\ref{sec:oracle} calls for, namely\textcolor{colR1}{, with $\gamma = \kappa_1c_U$
+and $\Lambda = \kappa_2C_U + \gamma/2$ the constants of
+Proposition~\ref{prop:gram} below,}
+{\color{gray}\removedk
+\[
+  \penn \;=\; 2\sigma B_X\sqrt{2C_U}\,
+  \sqrt{\frac{2\log(2d_n/\alpha)}{n}} \;\asymp\;
+  \sigma B_X \sqrt{C_U}\,\sqrt{\frac{J_n}{n}} .
+\]
+}
+% derivations/08-blocos.tex, Lema 14(ii)-(iii) e a Hipotese B.
+{\color{colR1}
+\begin{equation}
+  \label{eq:lambda}
+  \lamG \;=\; 2\max_{G\in\Gcal_{n}}\frac{\lamzbar{G}}{w_{G}},
+  \quad
+  \lamzbar{G} \;=\; \frac{\sigma}{\sqrt{n}}\Bigl\{B_X\sqrt{2C_U|G|}
+  + \sqrt{2\Lambda\log(|\Gcal_{n}|/\alpha)}\Bigr\} .
+\end{equation}
+For every chunk, $\lamG w_{G} \le \varrho\lamGone$, where
+$\lamGone = 2\max_{G}\lamzbar{G}$ is of order $\sigma(\log n/n)^{1/2}$, the
+order of the penalty of the lasso.}
+
+% derivations/05-taxas.tex, Corolario 5 (numeracao global); D16. Substituido
+% em k = 4 pelo Corolario 11 de derivations/08-blocos.tex (D47(a)).
+{\color{gray}\removedk
+\begin{theoremold}[Rate of nonlinear approximation]
+Let Assumptions~\ref{ass:sample} to \ref{ass:besov} hold with $p$, $q$ and all
+the constants fixed as $n$ grows, and set $\tau = (s+1/2)^{-1}$. Suppose
+$\seff > s/(2s+1)$ and take $J_n = \lceil c \log_2 n\rceil$ with
+\[
+  \max\Bigl\{\frac{\tau}{2},\; \frac{2-\tau}{4\seff}\Bigr\}
+  \;\le\; c \;<\; 1 ,
+\]
+a window that is nonempty precisely under that condition. Then, with $\penn$
+as in the display above,
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\Bigr\},
+  \qquad
+  \sum_{\cv,\md}\bigl\lVert \widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\Bigr\} .
+\]
+\end{theoremold}
+}
+% derivations/08-blocos.tex, Corolario 11 (numeracao global); D47(a).
+{\color{colR1}
+\begin{theorem}[Rate of nonlinear approximation]
+\label{thm:main}
+Let Assumptions~\ref{ass:sample} to \ref{ass:besov} hold with $p$, $q$ and all
+the constants fixed as $n$ grows, and let the weights have ratio
+$\varrho \le \bar\varrho$ for a constant $\bar\varrho$ fixed as $n$ grows
+($\bar\varrho^{2} = 3$ for the weights of Section~\ref{sec:estimator}). Suppose
+$\seff > s/(2s+1)$ and take $J_n = \lceil c \log_2 n\rceil$ with
+\begin{equation}
+  \label{eq:window}
+  \frac{s}{(2s+1)\seff} \;\le\; c \;<\; 1 ,
+\end{equation}
+a window that is nonempty precisely under that condition. Then, with
+$\pen = \lamG$ as in \eqref{eq:lambda} and
+$r_n = n^{-2s/(2s+1)}(\log n)^{(2/\pi-1)_{+}/(2s+1)}$,
+\[
+  \normn{\widehat{f}-f}^{2} \;=\; O_p(r_n),
+  \qquad
+  \sum_{\cv,\md}\bigl\lVert \widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2} \;=\; O_p(r_n) .
+\]
+In particular, when $\pi \ge 2$ the rate is $n^{-2s/(2s+1)}$, with no
+logarithmic factor.
+\end{theorem}
+}
+
+Three readings of Theorem~\ref{thm:main} matter. First, the exponent is the
+one of nonlinear wavelet approximation, $2s/(2s+1)$, and not the one of
+\textcolor{colR1}{linear approximation}, $2\seff/(2\seff+1)$ of Theorem~\ref{thm:sieve} below; the two
+agree when $\pi \ge 2$ and separate when $\pi < 2$, which is where the
+\textcolor{gray}{\sout{$\ell_1$}} penalty pays for itself. Second, the rate is attained under
+Assumption~\ref{ass:besov} alone: \textcolor{gray}{\sout{no compressibility is assumed on top of it,
+because the Besov condition already implies it, with
+$\tau = (s+1/2)^{-1}$, by Lemma~\mbox{\ref{lem:weak}}.}}\textcolor{colR1}{no condition is imposed
+on the coefficients on top of it, because the Besov condition already bounds
+the ideal risk over chunks that governs the estimation error
+(Lemma~\ref{lem:weak}).} \textcolor{gray}{\sout{Third, the rate
+$(\log n/n)^{2s/(2s+1)}$ is the minimax reference of the Gaussian sequence
+model over Besov bodies with per coordinate noise of order $\penn$
+(\mbox{\citealp[Theorems~4 and~5]{Donoho-Johnstone-1998}};
+\mbox{\citealp[Theorem~9.3]{johnstone2019gaussian}}); the logarithmic factor is the price of the
+single, nonadaptive penalty level \mbox{\eqref{eq:lambda}}, which takes a union bound
+over the $d_n$ columns. No lower bound is proved here for $q \ge 2$: the
+comparison is with the reference of the sequence model, and the minimax lower
+bound of \mbox{\citet{Klopp-Pensky-2015}} covers the case of a single modulator with
+covariates independent of it.}}
+\textcolor{colR1}{Third, $n^{-2s/(2s+1)}$ is the minimax rate over Besov bodies
+in the Gaussian sequence model with noise level of order $n^{-1/2}$
+\citep[Theorems~4 and~5]{Donoho-Johnstone-1998}, and with a single modulator,
+independent of the covariates, and Gaussian errors, the minimax lower bound of
+\citet[Theorem~1]{Klopp-Pensky-2015} holds over the class of
+Assumption~\ref{ass:besov} (Remark~S6.1 in the Supplementary Material), so that
+in that case Theorem~\ref{thm:main} is minimax optimal when $\pi \ge 2$. When
+$\pi < 2$ the remaining factor $(\log n)^{(2/\pi-1)/(2s+1)}$ is the one in the
+rate of \citet[eq.~3.19]{Klopp-Pensky-2015} with a fixed number of covariates,
+and in that of block thresholding in the sequence model
+\citep[Theorem~4]{Cai-1999}; whether it is necessary for this estimator is not
+known, and no lower bound is proved here for $q \ge 2$. Compared with the
+coordinatewise lasso, whose rate under the same conditions is
+$(\log n/n)^{2s/(2s+1)}$ (Theorem~S8.3 in the Supplementary Material), the
+chunks remove a factor $(\log n)^{2\seff/(2s+1)}$. When $s < 1/2$ and
+$\pi \ge 2$, the rate $n^{-2s/(2s+1)}$ of Theorem~\ref{thm:main} is attained
+with no design condition at all, at another resolution
+(Proposition~\ref{prop:slow}(ii) below).}
+
+The proof combines three ingredients, given below: the approximation error of
+\textcolor{colR1}{$\WJ$}, the design condition, and a nonasymptotic oracle inequality.
+Section~\ref{sec:rates} assembles them, first at \textcolor{gray}{\sout{a dense reading of the
+estimation term}}\textcolor{colR1}{the oracle}, which gives the \textcolor{colR1}{rate of linear approximation}, and then at \textcolor{gray}{\sout{a sparse comparator}}\textcolor{colR1}{a
+comparator that keeps only the chunks of large energy},
+which gives Theorem~\ref{thm:main}.
+
+\subsection{Approximation and the design condition}
+\label{sec:approx}
+
+% derivations/02-aproximacao-besov.tex, Lema 2 e Corolario 1 (numeracao global).
+\begin{lemma}[\textcolor{colR1}{Approximation bias}]
+\label{lem:bias}
+Under Assumptions~\ref{ass:basis} and \ref{ass:besov}, for every pair
+$(\cv,\md)$ and every $J \ge 0$,
+\[
+  \bigl\lVert \gcomp{\cv}{\md} - \PiJ\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2}
+  \;=\; \sum_{\lev \ge J}\norm{\theta^{*}_{\cv\md,\lev\cdot}}_{2}^{2}
+  \;\le\; \frac{C_g^{2}}{1-2^{-2\seff}}\,2^{-2J\seff} .
+\]
+If in addition Assumptions~\ref{ass:X} and \ref{ass:U} hold, then, with
+$f_J(x,u) = \sum_{\cv}x_{\cv}\{\lvl{\cv} +
+\sum_{\md}(\PiJ\gcomp{\cv}{\md})(u_{\md})\}$,
+\begin{equation}
+  \label{eq:bias}
+  \bigl\lVert f - f_J\bigr\rVert_{L_2(P)}^{2} \;\le\;
+  \frac{(pq)^{2}B_X^{2}C_UC_g^{2}}{1-2^{-2\seff}}\,2^{-2J\seff}
+  \;=:\; \mathcal{B}_{J}^{2} .
+\end{equation}
+\end{lemma}
+
+The exponent is $\seff$ and not $s$, and this is where the loss
+$(1/\pi-1/2)_{+}$ enters: inside a level, an $\ell_\pi$ bound with $\pi < 2$
+controls the $\ell_2$ norm without gain. The bias uses only the bound on the
+linear covariates and the marginal density of each modulator, so dependence
+between $\bX$ and $\bU$ does not affect it. What it does affect is the passage
+from the prediction norm to the norm of each component, which is the design
+condition.
+
+Let $\bPsi(u) \in \R^{K}$, $K = 1 + q\NJ$, collect the constant and the
+wavelets of the $q$ modulators, so that the row of $\bZ$ in
+\eqref{eq:design} is a permutation of the Kronecker product
+$\bX \otimes \bPsi(\bU)$. Write $\Gram = \E(\bZ\bZ\T)$ and
+$\Gramhat = \bZ\T\bZ/n$ for the population and empirical Gram matrices and
+$\Gram_{\bPsi} = \E\{\bPsi(\bU)\bPsi(\bU)\T\}$ for the part in the modulators
+alone.
+
+% derivations/03-desenho-produtos.tex, Proposicao 3 (numeracao global).
+\begin{proposition}[Gram matrix of the product design]
+\label{prop:gram}
+Let Assumptions~\ref{ass:X} to \ref{ass:basis} hold and write $D = p + d$ and
+$\gamma = \kappa_1 c_U$.
+\begin{enumerate}
+\item[(i)] $c_U \le \lmin(\Gram_{\bPsi}) \le \lmaxx(\Gram_{\bPsi}) \le C_U$
+for every $J$, and consequently
+$\gamma \le \lmin(\Gram) \le \lmaxx(\Gram) \le \kappa_2 C_U$. If $\bX$ and
+$\bU$ are independent, $\Gram$ is, up to the permutation of columns, the
+Kronecker product $\E(\bX\bX\T)\otimes\Gram_{\bPsi}$, and the two bounds are
+attained as products of eigenvalues.
+\item[(ii)] With $R_J = pB_X^{2}(1 + qC_\psi 2^{J})$, where $C_\psi$ depends
+only on the wavelet family, $\norm{\bZ_i}_2^{2} \le R_J$ almost surely and
+\[
+  \Prob\Bigl(\lmin(\Gramhat) \ge \frac{\gamma}{2}\Bigr)
+  \;\ge\; 1 - 2D\exp\Bigl\{-\frac{n\gamma^{2}}
+  {8R_J(\kappa_2C_U + \gamma/3)}\Bigr\},
+\]
+which tends to one whenever $pq2^{J}\log(pq2^{J})/n \to 0$.
+\end{enumerate}
+\end{proposition}
+
+Part (i) is stated for the general case: independence between the covariates
+and the modulators buys the exact factorization but not a better constant. A
+lower bound on the smallest eigenvalue dominates every compatibility and
+restricted eigenvalue constant\textcolor{colR1}{, including the versions for groups
+of \citet{Lounici-Pontil-vandeGeer-Tsybakov-2011}}, on every support and with no cone restriction,
+since $\delta\T A \delta \ge \lmin(A)\norm{\delta}_2^2 \ge
+\lmin(A)\norm{\delta_S}_1^2/|S|$\textcolor{colR1}{, and likewise
+$\delta\T A\delta \ge \lmin(A)\{\sum_{G\in\Hcal}w_{G}\norm{\delta_{G}}_{2}\}^{2}/\Wcal(\Hcal)$
+for a set $\Hcal$ of chunks, with $\Wcal(\Hcal) = \sum_{G\in\Hcal}w_{G}^{2}$},
+and it is in this form that the next
+subsection consumes it. In the resolution regime of Section~\ref{sec:rates}
+the requirement of part (ii) is \textcolor{gray}{\sout{of the same order as the rate itself}}\textcolor{colR1}{the
+rate times $\log n$, which tends to zero}, so it
+costs nothing there; if $pq$ were larger than $n^{1/2}$, only the
+compatibility constant could be transferred, through the entrywise deviation
+\citep[Corollary 6.8]{buhlmann2011statistics}, at the price of a factor
+$s_0^{2}$ and of the cone.
+
+\subsection{A nonasymptotic oracle inequality}
+\label{sec:oracle}
+
+Let $\betastar = (\bc,\thetastar)$ be the \textcolor{colR1}{oracle of the approximation space}, that is the vector
+whose components are the levels and the coefficients
+$\coefs{\cv}{\md}{\lev}{\tsl}$ of Assumption~\ref{ass:besov} for $\lev < J$,
+so that $f_J$ is its fit, and let
+{\color{gray}\removedk
+\[
+  \bb = f - f_J \in \R^{n}, \qquad \Szero = \mathrm{supp}(\thetastar),
+  \qquad s_0 = |\Szero|, \qquad v = \thetahat - \thetastar .
+\]
+}
+{\color{colR1}
+\[
+  \bb = f - f_J \in \R^{n},
+  \qquad
+  \bbar = f - \bZ\bar\bbeta, \qquad \vbar = \thetahat - \thbar ,
+  \qquad \Gbar = \{G : \thbar_{G} \ne 0\},
+\]
+for a comparator $\bar\bbeta = (\bar\bc,\thbar) \in \R^{p}\times\R^{d}$, any
+vector of levels and coefficients, $\Gbar$ being its active chunks, and
+$\bar\Wcal = \Wcal(\Gbar) = \sum_{G\in\Gbar}w_{G}^{2}$.}
+Let $\PA$ be the orthogonal projection onto the column space of $\Amat$, which
+exists whenever $\Amat$ has rank $p$, let $\MA = I_n - \PA$, and let
+$\Btil = \MA\Bmat$ and $\gtil = \lmin(\Btil\T\Btil/n)$ be the residualized
+design and its smallest eigenvalue\textcolor{colR1}{, and
+$\Psitil_{G} = \Btil_{G}\T\Btil_{G}/n$ the residualized Gram matrix of the
+columns of a chunk}. Finally let
+$\smax^{2} = \max_a (\Gramhat)_{aa}$ be the largest empirical norm of a
+penalized column.
+
+% derivations/04-oraculo.tex, Teorema 1 (numeracao global). Substituido em
+% k = 4 pelo Teorema 3 de derivations/08-blocos.tex; o do lasso e o
+% Theorem S8.1 do supp.
+{\color{gray}\removedk
+\begin{theoremold}[Oracle inequality]
+Let Assumption~\ref{ass:sample} hold, suppose $\Amat$ has rank $p$, and take
+$\pen \ge 2\pen_0$ with
+$\pen_0 = \sigma\smax\{2\log(2d/\alpha)/n\}^{1/2}$. On the event
+$\mathcal{T} = \{\norm{\Btil\T\bveps/n}_{\infty} \le \pen/2\}$, which has
+probability at least $1 - \alpha$:
+\begin{enumerate}
+\item[(i)] with no condition on the design,
+$\normn{\Btil v}^{2} \le 6\pen\norm{\thetastar}_{1} + 4\normn{\bb}^{2}$;
+\item[(ii)] if $\gtil > 0$,
+\[
+  \normn{\Btil v}^{2} \le \frac{64\pen^{2}s_0}{\gtil} + 16\normn{\bb}^{2},
+  \qquad
+  \norm{v}_{2}^{2} \le \frac{64\pen^{2}s_0}{\gtil^{2}}
+  + \frac{16\normn{\bb}^{2}}{\gtil} ;
+\]
+\item[(iii)] in either regime,
+$\normn{\widehat{f}-f} \le \normn{\Btil v} + 2\normn{\bb}
++ \normn{\PA\bveps}$, and
+$\E(\normn{\PA\bveps}^{2}\mid\bX,\bU) \le \sigma^{2}p/n$.
+\end{enumerate}
+\end{theoremold}
+}
+% derivations/08-blocos.tex, Teorema 3 e Lema 14(i) (numeracao global).
+{\color{colR1}
+\begin{theorem}[Oracle inequality]
+\label{thm:oracle}
+Let Assumption~\ref{ass:sample} hold, suppose $\Amat$ has rank $p$, let the
+weights not depend on the responses, and, for $\alpha \in (0,1)$, let
+\[
+  \lamz{G} \;=\; \frac{\sigma}{\sqrt{n}}\Bigl[
+  \{\mathrm{tr}(\Psitil_{G})\}^{1/2}
+  + \bigl\{2\opnorm{\Psitil_{G}}\log(|\Gcal|/\alpha)\bigr\}^{1/2}\Bigr]
+\]
+and $\pen_{w} = 2\max_{G\in\Gcal}\lamz{G}/w_{G}$, and take $\pen \ge \pen_{w}$. On the event
+$\Tw = \{\max_{G}\norm{(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \pen/2\}$, which
+has probability at least $1 - \alpha$, the following hold simultaneously for
+every comparator $\bar\bbeta$:
+\begin{enumerate}
+\item[(i)] with no condition on the design,
+$\tfrac12\normn{\Btil\vbar}^{2} + \pen\nGw{\thetahat} \le
+3\pen\nGw{\thbar} + 2\normn{\bbar}^{2}$;
+\item[(ii)] if $\gtil > 0$,
+\[
+  \normn{\Btil\vbar}^{2} \le \frac{64\pen^{2}\bar\Wcal}{\gtil} + 16\normn{\bbar}^{2},
+  \qquad
+  \norm{\vbar}_{2}^{2} \le \frac{64\pen^{2}\bar\Wcal}{\gtil^{2}}
+  + \frac{16\normn{\bbar}^{2}}{\gtil} ;
+\]
+\item[(iii)] in either regime,
+$\normn{\widehat{f}-f} \le \normn{\Btil\vbar} + 2\normn{\bbar}
++ \normn{\PA\bveps}$, and
+$\E(\normn{\PA\bveps}^{2}\mid\bX,\bU) \le \sigma^{2}p/n$.
+\end{enumerate}
+\end{theorem}
+}
+
+\textcolor{gray}{\sout{Three}}\textcolor{colR1}{Four} features separate Theorem~\ref{thm:oracle} from the standard treatment
+\citep[Chapter 6]{buhlmann2011statistics} \textcolor{colR1}{and from that of the group
+lasso by \citet{Lounici-Pontil-vandeGeer-Tsybakov-2011}}. The unpenalized levels are not
+placed inside the support, which would require a compatibility condition on a
+cone; they are profiled out, and the Schur complement transfers the full
+smallest eigenvalue of $\Gramhat$ to the residualized block,
+$\gtil \ge \lmin(\Gramhat)$, so that Proposition~\ref{prop:gram}(ii) is used
+as it stands and the constant does not depend on \textcolor{gray}{\sout{$\Szero$}}\textcolor{colR1}{$\Gbar$}. The model is
+misspecified inside the \textcolor{colR1}{approximation space}, and the deterministic residual \textcolor{gray}{\sout{$\bb$}}\textcolor{colR1}{$\bbar$} is handled
+by Young's inequality rather than by duality, which keeps the statement
+nonasymptotic and valid also when the bias dominates\textcolor{colR1}{, and the
+statement holds for every comparator at once, which is what
+Section~\ref{sec:rates} uses}. \textcolor{gray}{\sout{The penalty is
+calibrated by the empirical column norms and not by $\max_{i,a}|Z_{ia}|$: the
+former is bounded in probability by $2B_X^2C_U$, while the latter is of order
+$2^{J/2}$ and would inflate $\pen$ by that factor and destroy the rates of
+Section~\mbox{\ref{sec:rates}}.}} \textcolor{colR1}{The penalty is calibrated chunk by
+chunk, by the tail inequality for quadratic forms of
+\citet[Theorem~2.1]{Hsu-Kakade-Zhang-2012} with a union bound over the chunks
+(Lemma~S5.2 in the Supplementary Material); the event $\Tw$ does not depend on
+the weights, which only choose the chunk that dictates $\pen_{w}$, and the
+price of unequal weights is the factor $\varrho$ in
+$\pen_{w}w_{G} \le 2\varrho\max_{G'}\lamz{G'}$, paid in the estimation term.
+Since $\mathrm{tr}(\Psitil_{G}) \le |G|\smax^{2}$ and
+$\opnorm{\Psitil_{G}} \le \lmaxx(\Gramhat)$, the deterministic level
+\eqref{eq:lambda} dominates $\pen_{w}$ whenever $\smax^{2} \le 2B_X^2C_U$ and
+$\lmaxx(\Gramhat) \le \Lambda$, two events of probability tending to one in
+the regime of Section~\ref{sec:rates}; it is the empirical column norms that
+enter, and not $\max_{i,a}|Z_{ia}|$, which is of order $2^{J/2}$ and would
+destroy the rates. The software standardizes the columns and orthonormalizes
+each chunk before penalizing it; the theorem covers that estimator as well,
+with $\Psitil_{G}$ replaced by $Q_{G}^{-1/2}\Psitil_{G}Q_{G}^{-1/2}$, $Q_{G}$
+being the centered Gram matrix of the chunk, which makes $\lamz{G}$ pivotal,
+and with $\bar\Wcal$ multiplied by $\max_{G}\lmaxx(Q_{G})$ (Remark~S5.2 in the
+Supplementary Material).} The term $\sigma^{2}p/n$ in part (iii) is the price
+of leaving the $p$ levels out of the penalty; no choice of $\pen$ removes it,
+it is of smaller order than the estimation term whenever
+\textcolor{gray}{\sout{$p \lesssim s_0\log(pq\NJ)$}}\textcolor{colR1}{$p \lesssim |\Gbar|\log n$}, and it is absent from
+\citet{Klopp-Pensky-2015}, where the levels are penalized along with
+everything else.
+
+\subsection{Rates}
+\label{sec:rates}
+
+Under Assumption~\ref{ass:besov} the \textcolor{colR1}{oracle} is generically dense: the
+coefficients decay but do not vanish, so that \textcolor{gray}{\sout{$s_0 = d$}}\textcolor{colR1}{every chunk is
+active} and part (ii) of
+Theorem~\ref{thm:oracle}, read at the oracle, delivers the rate of
+\textcolor{colR1}{linear approximation}\textcolor{colR1}{, now with no logarithmic factor}.
+
+% derivations/05-taxas.tex, Teorema 2 (numeracao global). Substituido em k = 4
+% pelo Teorema 4 de derivations/08-blocos.tex; o do lasso e o Theorem S8.2.
+{\color{gray}\removedk
+\begin{theoremold}[Rate of linear approximation]
+Let Assumptions~\ref{ass:sample} to \ref{ass:besov} hold with $p$, $q$ and the
+constants fixed, and take
+\[
+  J_n = \min\bigl\{J \in \mathbb{N} :\;
+  2^{J} \ge (n/\log n)^{1/(2\seff+1)}\bigr\},
+\]
+so that $J_n = \log_2 n/(2\seff+1) + O(\log\log n)$. Then the requirement of
+Proposition~\ref{prop:gram}(ii) holds along $J_n$, being itself of the exact
+order $(\log n/n)^{2\seff/(2\seff+1)}$, and, with $\penn$ as in
+the first display of Section~\ref{sec:main},
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2\seff/(2\seff+1)}\Bigr\} .
+\]
+At this resolution the estimation term and the bias term are of the same
+order, and the term $\sigma^{2}p/n$ of Theorem~\ref{thm:oracle}(iii) is of
+strictly smaller order.
+\end{theoremold}
+}
+% derivations/08-blocos.tex, Teorema 4 (numeracao global).
+{\color{colR1}
+\begin{theorem}[Rate of linear approximation]
+\label{thm:sieve}
+Let Assumptions~\ref{ass:sample} to \ref{ass:besov} hold with $p$, $q$ and the
+constants fixed, let the weights be as in Theorem~\ref{thm:main}, and take
+\begin{equation}
+  \label{eq:Jn}
+  J_n = \min\bigl\{J \in \mathbb{N} :\;
+  2^{J} \ge n^{1/(2\seff+1)}\bigr\}.
+\end{equation}
+Then the requirement of Proposition~\ref{prop:gram}(ii) holds along $J_n$,
+being of order $n^{-2\seff/(2\seff+1)}\log n$, and, with $\pen = \lamG$ as in
+\eqref{eq:lambda},
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\bigl(n^{-2\seff/(2\seff+1)}\bigr) .
+\]
+At this resolution the estimation term, of order $pq(\bn + 2^{J_n})/n$, and
+the bias term are of the same order, and the term $\sigma^{2}p/n$ of
+Theorem~\ref{thm:oracle}(iii) is of strictly smaller order.
+\end{theorem}
+}
+
+% derivations/05-taxas.tex, Corolario 4 (numeracao global). Substituido em
+% k = 4 pelo Corolario 10 de derivations/08-blocos.tex.
+{\color{gray}\removedk
+\begin{corollaryold}[Components and coefficients]
+In the setting of Theorem~\ref{thm:sieve}, and with $r_n$ denoting the rate of
+that theorem,
+\[
+  \sum_{\cv,\md}\bigl\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2} = O_p(r_n),
+  \qquad
+  \bigl\lVert\widehat{\fcoef{\cv}}-\fcoef{\cv}
+  \bigr\rVert_{L_2([0,1]^{q})} = O_p(r_n^{1/2}),
+  \quad \cv = 1,\dots,p,
+\]
+and the same statements hold with the rate of Theorem~\ref{thm:main} in place
+of $r_n$ under the conditions of that theorem.
+\end{corollaryold}
+}
+% derivations/08-blocos.tex, Corolario 10 (numeracao global).
+{\color{colR1}
+\begin{corollary}[Components and coefficients]
+\label{cor:components}
+In the setting of Theorem~\ref{thm:sieve}, with
+$\rhoG = n^{-\seff/(2\seff+1)}$,
+\[
+  \sum_{\cv,\md}\bigl\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2} = O_p\bigl\{(\rhoG)^{2}\bigr\},
+  \qquad
+  \bigl\lVert\widehat{\fcoef{\cv}}-\fcoef{\cv}
+  \bigr\rVert_{L_2([0,1]^{q})} = O_p(\rhoG)
+\]
+for $\cv = 1,\dots,p$, and $\norm{\chat - \bc}_{2} = O_p(\rhoG)$.
+\end{corollary}
+}
+
+The passage from the prediction norm to the norm of a single component is
+where the design condition is used a second time, and the smallest eigenvalue
+appears squared in the constant. Two further statements complete the picture.
+The first dispenses with the design condition altogether, at the price of a
+slower rate, and is the unconditional statement of this paper.
+
+% derivations/05-taxas.tex, Proposicao 4 (numeracao global). Substituida em
+% k = 4 pelo Corolario 14 de derivations/08-blocos.tex (D47(c)); a do lasso,
+% emendada por D49(a), e a Proposition S8.1.
+% E1.14 (em curso, nao integrada em 2026-10-03): acrescenta um regime (iii),
+% s' <= 1/4 com s > 1/2 e s' <= s/2 com s < 1/2, e a fronteira s = 1/2.
+{\color{gray}\removedk
+\begin{propositionold}[Slow rate, no design condition]
+Let Assumptions~\ref{ass:sample}, \ref{ass:basis} and \ref{ass:besov} hold,
+with $\Amat$ of rank $p$ and $\penn$ as in the first display of
+Section~\ref{sec:main}. Then
+$\normn{\widehat{f}-f}^{2} = O_p\{\penn\norm{\thetastar}_{1} +
+\mathcal{B}_{J_n}^{2} + p/n\}$, where
+$\norm{\thetastar}_{1} \le pqC_g\sum_{\lev<J_n}2^{\lev(1/2-s)}$ does not
+depend on $\pi$. In particular, if $s > 1/2$ then
+$\normn{\widehat{f}-f}^{2} = O_p\{(J_n/n)^{1/2}\}$ for every
+$J_n \ge \log_2 n/(4\seff)$; and if $s < 1/2$, the choice
+$2^{J_n} \asymp (n/J_n)^{1/(1-2s+4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} = O_p\{(J_n/n)^{2\seff/(1-2s+4\seff)}\}$, an
+exponent that equals $2s/(2s+1)$ when $\pi \ge 2$.
+\end{propositionold}
+}
+% derivations/08-blocos.tex, Corolario 14 (numeracao global); D47(c), D49(b).
+{\color{colR1}
+\begin{proposition}[Slow rate, no design condition]
+\label{prop:slow}
+Let Assumptions~\ref{ass:sample}, \ref{ass:basis} and \ref{ass:besov} hold,
+together with the upper bounds in Assumptions~\ref{ass:X} and \ref{ass:U}
+($\max_{\cv}|X_{\cv}| \le B_X$, $\lmaxx\{\E(\bX\bX\T\mid\bU)\} \le \kappa_2$ and
+$p_{\bU} \le C_U$), with $\Amat$ of rank $p$, the weights as in
+Theorem~\ref{thm:main}, $\pen = \lamG$ as in \eqref{eq:lambda} with any constant
+$\Lambda > \kappa_2C_U$, $2^{J_n} \le 2n$ and
+$pq2^{J_n}\log(pq2^{J_n})/n \to 0$. Then
+\[
+  \normn{\widehat{f}-f}^{2} = O_p\bigl\{\lamG\nGw{\thetastar} +
+  \mathcal{B}_{J_n}^{2} + p/n\bigr\},
+\]
+with $\lamG\nGw{\thetastar} \le \bar\varrho\,\lamGone\nGone{\thetastar}
+\le \bar\varrho\,\lamGone\norm{\thetastar}_{1}$, where $\nGone{\thetastar} = \sum_{G}\norm{\thetastar_{G}}_{2}$ and
+$(\lamGone)^{2}$ is of order $\sigma^{2}\log n/n$. Write
+$\vartheta_\pi = \min(1-1/\pi,\,1/2)$.
+\begin{enumerate}
+\item[(i)] If $s > 1/2$ and $\seff > 1/4$, then $\nGone{\thetastar} = O(1)$
+and $\normn{\widehat{f}-f}^{2} = O_p\{(\log n/n)^{1/2}\}$ for every
+$J_n \ge \log_2 n/(4\seff)$ that satisfies the conditions above, and one
+does.
+\item[(ii)] If $s < 1/2$ and $\seff > s/2$, then
+$\nGone{\thetastar} = O\{1 + \bn^{-\vartheta_\pi}2^{J_n(1/2-s)}\}$, and the
+choice $2^{J_n} \asymp \{n/\bn^{(2/\pi-1)_{+}}\}^{1/(1-2s+4\seff)}$ gives
+\[
+  \normn{\widehat{f}-f}^{2}
+  = O_p\bigl\{n^{-2\seff/(1-2s+4\seff)}
+  (\log n)^{(2/\pi-1)_{+}2\seff/(1-2s+4\seff)}\bigr\} ,
+\]
+which, when $\pi \ge 2$, is $n^{-2s/(2s+1)}$, the rate of
+Theorems~\ref{thm:main} and \ref{thm:sieve}, with no logarithmic factor.
+\end{enumerate}
+The proof uses no lower bound on $\Gramhat$, and no property of $\Gramhat$
+other than $\lmaxx(\Gramhat) \le \Lambda$.
+\end{proposition}
+}
+
+\textcolor{colR1}{The bound on $\nGone{\thetastar}$ is Lemma~S6.2 in the
+Supplementary Material. Through the chain to $\norm{\thetastar}_{1}$,
+Proposition~\ref{prop:slow} reproduces the slow rate of the lasso
+(Proposition~S8.1), with the constant $\bar\varrho$: a chunk of up to $2\bn-1$
+coefficients enters $\lamGone$ at the order of the union bound over the chunks.
+What the chain throws away is the count: at the fine levels
+$\nGone{\thetastar}$ is smaller than $\norm{\thetastar}_{1}$ by the factor
+$\bn^{-\vartheta_\pi}$, which in (ii) cancels the factor $\bn^{1/2}$ that the
+size of the chunks puts in $\lamGone$, entirely when $\pi \ge 2$ and in part
+when $\pi < 2$; in (i) the coarse chunk dominates both norms and nothing
+changes. No lower bound on $\Gramhat$ enters: the only property of $\Gramhat$
+that the proof uses is $\lmaxx(\Gramhat) \le \Lambda$, which makes the
+deterministic level \eqref{eq:lambda} admissible and holds with probability
+tending to one under the upper bounds of Assumptions~\ref{ass:X}
+and~\ref{ass:U} alone, so that neither $c_U$ nor $\kappa_1$ is needed. The
+conditions $\seff > 1/4$ in (i) and $\seff > s/2$ in (ii) bite only when
+$\pi < 2$, and make the resolution of the balance admissible.}
+
+The second is the approximation lemma that produces Theorem~\ref{thm:main}.
+\textcolor{gray}{\sout{For a vector $\btheta$ let $\theta_{(1)} \ge \theta_{(2)} \ge \cdots$ be the
+nonincreasing rearrangement of the absolute values of its entries and let
+$\btheta^{(M)}$ retain the $M$ largest of them.}}
+\textcolor{colR1}{For $\btheta \in \R^{d}$ and $\eta > 0$, let
+$\Rid(\btheta;\eta) = \sum_{G\in\Gcal}\min(\norm{\btheta_{G}}_{2}^{2},\eta)$
+be the ideal risk over chunks: the risk of an oracle that keeps a chunk when
+its energy exceeds $\eta$, at the price $\eta$, and drops it otherwise.}
+
+% derivations/05-taxas.tex, Lema 9 (numeracao global). Substituido em k = 4 pelo
+% Lema 15 de derivations/08-blocos.tex; o do lasso e o Lemma S8.1.
+{\color{gray}\removedk
+\begin{lemmaold}[Besov regularity implies compressibility]
+Under Assumptions~\ref{ass:basis} and \ref{ass:besov} with
+$\pi(s+1/2) > 1$, the oracle satisfies, for every $J$ and every
+$k \ge 1$,
+\[
+  \theta^{*}_{(k)} \;\le\; C_\tau\,k^{-1/\tau},
+  \qquad \tau = \frac{1}{s+1/2},
+  \qquad C_\tau = C_g(pq\,A_{s,\pi})^{s+1/2},
+  \qquad A_{s,\pi} = 1 + \frac{1}{1-2^{1-\pi(s+1/2)}},
+\]
+with constants that do not depend on $J$ and with $\tau \in (0,2)$ for every
+$s > 0$. Consequently
+$\sum_{k>M}\theta^{*2}_{(k)} \le \tau(2-\tau)^{-1}C_\tau^{2}M^{1-2/\tau}$ for
+every $M \ge 1$.
+\end{lemmaold}
+}
+% derivations/08-blocos.tex, Lema 15 (numeracao global).
+{\color{colR1}
+\begin{lemma}[Besov regularity bounds the ideal risk over chunks]
+\label{lem:weak}
+Under Assumptions~\ref{ass:basis} and \ref{ass:besov}, let $b \ge 1$ and let
+$\Gcal$ be a partition in which, in each block, the levels with $2^{\lev} < b$
+form at most one chunk and every level with $2^{\lev} \ge b$ is cut into
+chunks contained in it with at least $b$ coefficients each, as the partition of
+Section~\ref{sec:estimator} is. Then, for every $J$ and every $\eta > 0$,
+\[
+  \Rid(\thetastar;\eta) \;\le\; pq\Bigl\{\AG\,C_g^{\tau}
+  \Bigl(\frac{\eta}{b}\Bigr)^{2s/(2s+1)}b^{(2/\pi-1)_{+}/(2s+1)} + \eta\Bigr\},
+  \qquad \tau = \frac{1}{s+1/2},
+\]
+with $\AG = 2 + \{1-2^{1-\pi(s+1/2)}\}^{-1}$ if $\pi \le 2$ and
+$\AG = 2 + (1-2^{-2s})^{-1}$ if $\pi \ge 2$.
+\end{lemma}
+}
+
+\textcolor{gray}{\sout{The inclusion of Besov balls in weak $\ell_\tau$ balls is classical
+\mbox{\citep[Proposition~9.15]{johnstone2019gaussian}}; what the lemma adds is the
+constant $C_\tau$, uniform in $J$, for the oracle of the product design, which
+is the form in which the proof of Theorem~\mbox{\ref{thm:main}} uses it.}}
+\textcolor{colR1}{The exponent is the one of Lemma~4 in the supplementary material
+of \citet{Klopp-Pensky-2015}, but the assumption is weaker: their class is a
+weighted $\ell_\nu$ ball over all the coefficients, which implies
+Assumption~\ref{ass:besov} level by level, and Assumption~\ref{ass:besov} does
+not need the sum over the levels. The coarse chunk costs at most one $\eta$
+per block.}
+
+\textcolor{gray}{\sout{Theorem~\mbox{\ref{thm:main}} follows by reading Theorem~\mbox{\ref{thm:oracle}}(ii) not at
+the oracle but at the best $M$ term approximation of it, which is legitimate
+because the proof of that theorem uses the comparator only through the
+decomposition of $\bY$ and the size of its support. Balancing the two terms
+that result, $\pen^{2}M/\gtil$ from estimation and
+$M^{1-2/\tau}$ from the truncation, gives the effective dimension}}
+{\color{gray}\removedk
+\[
+  \Mstar_n \;\asymp\; \Bigl(\frac{n}{J_n}\Bigr)^{\tau/2}
+  \;\ll\; d_n \asymp pq\,2^{J_n},
+\]
+}
+\textcolor{gray}{\sout{and a bound of order $\penn^{2-\tau}$, which is the rate of
+Theorem~\mbox{\ref{thm:main}}. The three inequalities that define the window
+\mbox{\eqref{eq:window}} are, in order, that the minimum in $M$ be interior, that the
+approximation bias not dominate, and that the requirement of
+Proposition~\mbox{\ref{prop:gram}}(ii) hold. Nothing in this argument says that the
+estimator selects $\Mstar_n$ coordinates: no minimal signal or
+irrepresentability condition is used, and what compressibility buys is a rate
+governed by $\Mstar_n$ rather than by $d_n$, not the recovery of a support.}}
+\textcolor{colR1}{Theorem~\ref{thm:main} follows by reading
+Theorem~\ref{thm:oracle}(iii) not at the oracle but at the comparator that
+keeps the chunks of $\thetastar$ whose squared norm exceeds a level $\eta$ and
+sets the others to zero, which the theorem allows because it holds for every
+comparator at once. The estimation term then counts $\eta$ for each chunk
+kept, and the truncation leaves the energy of the others, so that the bound is
+of the order of $\Rid(\thetastar;\eta)$ (Corollary~S5.1 in the Supplementary
+Material), with $\eta$ of the order of $\max_{G}(\pen w_{G})^{2}$, that is of
+$\bn/n$. Lemma~\ref{lem:weak} with $b = \bn$ turns this into
+$n^{-2s/(2s+1)}\bn^{(2/\pi-1)_{+}/(2s+1)}$: the chunk pays $\bn$ in the level
+$\eta$ and returns it through $(\eta/b)^{2s/(2s+1)}$, so that the cost is of
+order $1/n$ per coefficient, against $\log n/n$ for the lasso, and the
+logarithm of the union bound over the columns is absorbed by the size of the
+chunks, which is why they must have at least of the order of $\log n$
+coefficients. When $\pi < 2$ the bound charges
+$\bn^{(2/\pi-1)/(2s+1)}$ to sequences whose large coefficients sit one per
+chunk; a signal spread over a level pays nothing for the chunks. The two
+inequalities that define the window \eqref{eq:window} are that the
+approximation bias not dominate and that the requirement of
+Proposition~\ref{prop:gram}(ii) hold. Nothing in this argument says that the
+estimator selects the chunks kept by the comparator: no minimal signal or
+irrepresentability condition is used.}
+\textcolor{colR1}{The recovery that matters for the model is not of coordinates
+but of blocks, and it is taken up next.}
+
+% derivations/06-selecao-limiar.tex, Lema 13, Hipotese S e Corolario 8
+% (numeracao global); D32. O Lema 13 e a prova estao no supp (Secao S7).
+{\color{colR1}
+\subsection{Which modulators act on which coefficients}
+\label{sec:selection}
+
+The structure of the model is the set of blocks whose component does not
+vanish,
+\[
+  \mathcal{S} \;=\; \bigl\{(\cv,\md) :\; \nu_{\cv\md} > 0\bigr\},
+  \qquad
+  \nu_{\cv\md} = \bigl\lVert \gcomp{\cv}{\md} \bigr\rVert_{L_2[0,1]},
+\]
+and to know it is to know which modulators act on which coefficients. The
+\textcolor{gray}{\sout{lasso}} estimator \eqref{eq:estimator} is not claimed to recover it: its
+penalty removes chunks and not blocks, under Assumption~\ref{ass:besov} the
+oracle is dense, and nothing prevents the fit from keeping nonzero
+coefficients in blocks whose component is zero. What the preceding results do give is that every block is
+estimated at the rate of Corollary~\ref{cor:components}, and that is enough to
+recover $\mathcal{S}$ in a second step, by a threshold on the norms of the fitted
+components. The procedure is estimation followed by a threshold. By the
+orthonormality of the basis, the norm of a fitted component is the Euclidean
+norm of its block of coefficients,
+\[
+  \widehat{\nu}_{\cv\md}
+  = \bigl\lVert \widehat{g}_{\cv\md} \bigr\rVert_{L_2[0,1]}
+  = \norm{\thetahat_{\cv\md,\cdot}}_{2},
+  \qquad
+  \widehat{\mathcal{S}}(t) = \bigl\{(\cv,\md) :\; \widehat{\nu}_{\cv\md} > t\bigr\},
+\]
+so that the statistic costs nothing once the estimator has been fit. Write
+\textcolor{gray}{\sout{$\rho_n = (\log n/n)^{\seff/(2\seff+1)}$}} $\rhoG = n^{-\seff/(2\seff+1)}$ for the square root of the rate of
+Theorem~\ref{thm:sieve}.
+
+\begin{assumption}[Block separation]
+\label{ass:sep}
+The components may depend on $n$, within the class of
+Assumption~\ref{ass:besov} and with its constants fixed, and so may $\mathcal{S}$; the
+smallest active block, $\nu_{\min,n} = \min_{(\cv,\md)\in \mathcal{S}} \nu_{\cv\md}$, with
+$\nu_{\min,n} = \infty$ when $\mathcal{S}$ is empty, satisfies \textcolor{gray}{\sout{$\nu_{\min,n}/\rho_n \to \infty$}} $\nu_{\min,n}/\rhoG \to \infty$.
+\end{assumption}
+
+\begin{corollary}[Block structure by thresholding]
+\label{cor:threshold}
+Let the assumptions of Theorem~\ref{thm:sieve} hold, with $J_n$ and \textcolor{gray}{\sout{$\penn$}} $\pen = \lamG$ as
+there.
+\begin{enumerate}
+\item[(i)] (Screening.) If the thresholds satisfy \textcolor{gray}{\sout{$t_n/\rho_n \to \infty$}} $t_n/\rhoG \to \infty$,
+then $\Prob\{\widehat{\mathcal{S}}(t_n) \subseteq \mathcal{S}\} \to 1$.
+\item[(ii)] (Recovery.) If, in addition, Assumption~\ref{ass:sep} holds and
+$\limsup_n t_n/\nu_{\min,n} < 1$, then $\Prob\{\widehat{\mathcal{S}}(t_n) = \mathcal{S}\} \to 1$.
+Such thresholds always exist; one is \textcolor{gray}{\sout{$t_n = (\rho_n\nu_{\min,n})^{1/2}$}} $t_n = (\rhoG\nu_{\min,n})^{1/2}$.
+\item[(iii)] \textcolor{colR1}{(A window at fixed $n$.) With $\alpha$ the level in
+\eqref{eq:lambda}, for every $n$ and every $\alpha' \in (0,1)$ there is an
+event, of probability at least
+$1 - \alpha - \alpha' - \omega_n$ with $\omega_n \to 0$ not depending on the
+components, on which $\widehat{\mathcal{S}}(t) = \mathcal{S}$ for every $t$
+with \textcolor{gray}{\sout{$\bar{\Delta}_n \le t < \nu_{\min,n} - \bar{\Delta}_n$}} $\bar{\Delta}^{\Gcal}_n \le t < \nu_{\min,n} - \bar{\Delta}^{\Gcal}_n$; here
+\textcolor{gray}{\sout{$\bar{\Delta}_n \le c(\alpha,\alpha')\rho_n$}} $\bar{\Delta}^{\Gcal}_n \le c(\alpha,\alpha')\rhoG$ is an explicit bound on
+$\max_{(\cv,\md)}\lVert \widehat{g}_{\cv\md} - \gcomp{\cv}{\md}
+\rVert_{L_2[0,1]}$, given in the proof (Section~S7 of the Supplementary
+Material).}
+\end{enumerate}
+\end{corollary}
+
+\textcolor{colR1}{Parts (i) and (ii) hold also at the resolution of
+Theorem~\ref{thm:main}, with \textcolor{gray}{\sout{$\rho_n$}} $\rhoG$ replaced by
+\textcolor{gray}{\sout{$\tilde\rho_n = (\log n/n)^{s/(2s+1)}$}} $\rhoGt = n^{-s/(2s+1)}(\log n)^{(2/\pi-1)_{+}/\{2(2s+1)\}}$, the square root of the rate of that
+theorem, both in the condition on $t_n$ and in Assumption~\ref{ass:sep}.
+Since \textcolor{gray}{\sout{$\tilde\rho_n \le \rho_n$}} $\rhoGt \le \rhoG$ for large $n$, with a gap in the exponent when $\pi < 2$,
+the separation required is weaker exactly where the components are spatially
+inhomogeneous. Part (iii) is stated at the resolution of
+Theorem~\ref{thm:sieve}, where its bound is explicit. The componentwise rate of
+the lasso at its own resolution is $(\log n/n)^{\seff/(2\seff+1)}$
+(Corollary~S8.1 in the Supplementary Material), so that the separation
+required here is weaker than for the lasso by the factor
+$(\log n)^{\seff/(2\seff+1)}$.}
+
+Part (i) uses no separation: removing the null blocks is free, and
+Assumption~\ref{ass:sep} is spent entirely on not losing a small active block.
+Under a fixed target $\nu_{\min,n}$ is a positive constant and the assumption holds
+automatically, because \textcolor{gray}{\sout{$\rho_n \to 0$}} $\rhoG \to 0$; it carries content in a triangular
+array, where it says how fast the smallest active block may shrink. It bears
+on the components and not on $(\bX,\bU)$, so that no design condition beyond
+Proposition~\ref{prop:gram} and no irrepresentability condition enters; a
+separation condition on the components plays the same role in the selection
+of variables in nonparametric additive models \citep{Huang-Horowitz-Wei-2010}.
+The proof rests on a deterministic sandwich (Lemma~S7.1 in the Supplementary
+Material): if every component is estimated within $\bar{\Delta}$ in $L_2[0,1]$, then
+$\{\nu_{\cv\md} > t + \bar{\Delta}\} \subseteq \widehat{\mathcal{S}}(t) \subseteq
+\{\nu_{\cv\md} > t - \bar{\Delta}\}$, so that every $t \in [\bar{\Delta}, \nu_{\min,n} - \bar{\Delta})$ recovers $\mathcal{S}$,
+and that window cannot be widened by the argument. Two things are left out.
+The window involves $\sigma$, the design constant and $\seff$, so the
+corollary does not say how to choose $t_n$ from the data \textcolor{colR1}{(Section~\ref{sec:threshold}
+uses the one standard error rule of cross-validation, for which no theorem is
+given here)}; and it says nothing
+about which wavelets are active inside a block.
+
+% derivations/06-selecao-limiar.tex, Lema 16 e Corolario 13 (numeracao global;
+% adendo de E1.12); D45. O Lema 16 e a prova estao no supp (Secao S7).
+Thresholding is also the estimator used for prediction
+(Section~\ref{sec:threshold}). Write $\thetahat^{(t)}$ for $\thetahat$ with the
+blocks outside $\widehat{\mathcal{S}}(t)$ set to zero, and
+$\widehat{g}^{(t)}_{\cv\md}$ and $\widehat{f}^{(t)} = \Amat\chat +
+\Bmat\thetahat^{(t)}$ for the resulting components and fit, so that the levels
+and the blocks kept are those of the fit. Setting to zero an active block
+whose fitted norm is at most $t$ costs at most its norm, which is at most
+$t + \lVert\widehat{g}_{\cv\md} - \gcomp{\cv}{\md}\rVert_{L_2[0,1]}$, setting to
+zero a null block only reduces the error, and the blocks kept do not change
+(Lemma~S7.2 in the Supplementary Material). With the rates of the fit this
+gives the risk of the thresholded estimator.
+
+\begin{corollary}[Risk of the thresholded estimator]
+\label{cor:thrisk}
+Let $(\chat,\thetahat)$ be either the fit of Theorem~\ref{thm:sieve}, with
+$r_n = \rhoG$, or the lasso at the resolution of Theorem~S8.2 in the
+Supplementary Material, with $r_n = (\log n/n)^{\seff/(2\seff+1)}$, and let
+$t_n \ge 0$.
+\begin{enumerate}
+\item[(i)] With no further assumption,
+$\sum_{\cv,\md}\lVert\widehat{g}^{(t_n)}_{\cv\md}-\gcomp{\cv}{\md}\rVert_{L_2[0,1]}^{2}
+= O_p(r_n^{2} + t_n^{2})$ and
+$\normn{\widehat{f}^{(t_n)}-f}^{2} = O_p(r_n^{2} + t_n^{2})$.
+\item[(ii)] If Assumption~\ref{ass:sep} holds with $r_n$ in place of $\rhoG$
+and $\limsup_n t_n/\nu_{\min,n} < 1$, then with probability tending to one
+$\mathcal{S} \subseteq \widehat{\mathcal{S}}(t_n)$,
+\[
+  \sum_{\cv,\md}\lVert\widehat{g}^{(t_n)}_{\cv\md}-\gcomp{\cv}{\md}\rVert_{L_2[0,1]}^{2}
+  \;\le\; \sum_{\cv,\md}\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}\rVert_{L_2[0,1]}^{2}
+\]
+and
+\[
+  \normn{\widehat{f}^{(t_n)}-f}^{2} \;\le\;
+  \frac{4\Lambda}{\gamma}\normn{\widehat{f}-f_{J_n}}^{2} + 2\normn{\bb}^{2},
+\]
+so that the thresholded estimator keeps the rate $r_n^{2}$ of the fit. If
+moreover $t_n/r_n \to \infty$, then
+$\widehat{\mathcal{S}}(t_n) = \mathcal{S}$ with probability tending to one,
+and the null blocks no longer contribute to the error of the components.
+\end{enumerate}
+\end{corollary}
+
+Under a fixed target Assumption~\ref{ass:sep} holds automatically, and (ii)
+holds for every $t_n \to 0$. The factor $4\Lambda/\gamma$ in (ii) bounds the
+condition number of $\Gramhat$, through which the bound passes from
+prediction to coefficients and back; it is a price of the argument, and the
+corollary says what any threshold costs, not which threshold a data driven
+rule selects.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Computation and Tuning}
+\label{sec:computation}
+
+\subsection{The design matrix and the solver}
+\label{sec:solver}
+
+The design \eqref{eq:design} is built one block at a time: the $n \times \NJ$
+matrix of the wavelets of $U_{\md}$ is evaluated once per modulator, by the
+cascade algorithm of \citet{Daubechies-Lagarias-1991} \textcolor{colR1}{as implemented in
+the \texttt{WaveBased} package \citep{Montoril-WaveBased-2026}}, and then multiplied
+rowwise by $X_{\cv}$. Since a compactly supported wavelet of level $\lev$ is
+nonzero on an interval of length $(L-1)2^{-\lev}$, at most $L-1$ of the
+$2^{\lev}$ columns of a level are nonzero at a given observation, so a block
+has at most $n(L-1)J$ nonzero entries out of $n\NJ$ and the design is stored in
+sparse form as soon as $J$ is moderate. Evaluating the basis once on a grid and
+looking the values up removes the cascade from the inner loop of a
+simulation.
+
+Problem \eqref{eq:estimator} is then a \textcolor{gray}{\sout{lasso}}\textcolor{colR1}{group lasso} with $p$ unpenalized coordinates,
+which \textcolor{gray}{\sout{coordinate descent}}\textcolor{colR1}{group descent} solves along a path of penalty levels; we use the
+\textcolor{gray}{\sout{\texttt{glmnet}}}\textcolor{colR1}{\texttt{grpreg}} package\textcolor{gray}{\sout{ \mbox{\citep{friedman2010regularization}}}} \textcolor{colR1}{[VERIFICAR:
+Breheny and Huang (2015) and the \texttt{grpreg} manual, not yet in the verified
+bibliography]} \textcolor{colR1}{of R
+\citep{RCoreTeam-2026}}. Two points of scale deserve care, because they are
+what ties the software to the theory. First, \textcolor{colR1}{the solver standardizes
+the columns and orthonormalizes each chunk before penalizing it, so that what
+it computes is \eqref{eq:estimator} with $\norm{\btheta_{G}}_{2}$ replaced by
+$\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$, where $Q_{G}$ is the Gram matrix of the
+columns of the chunk after centering, which is the estimator of Remark~S5.2 in
+the Supplementary Material; and its objective,
+$(2n)^{-1}\norm{\bY - \Amat\bc - \Bmat\btheta}_{2}^{2} +
+\pen\sum_{G}w_{G}\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$, is half that of
+\eqref{eq:estimator}, so that the penalty level it reports is the $\pen$ of
+\eqref{eq:estimator}, with no conversion. Second, the solver always fits an
+intercept of its own, which carries the level of the constant covariate when
+there is one. For the lasso option, solved by coordinate descent with the
+\texttt{glmnet} package \citep{friedman2010regularization},} the penalty level reported for a
+fit is the $\pen$ of \textcolor{gray}{\sout{\mbox{\eqref{eq:estimator}}}}\textcolor{colR1}{the lasso problem} and not the one of the solver, which
+rescales its own by the ratio between the total number of columns and the
+number of penalized ones when some coordinates carry zero penalty\textcolor{gray}{\sout{; the
+conversion is checked by verifying the Karush-Kuhn-Tucker conditions of
+\mbox{\eqref{eq:estimator}} at every point of the path. Second,}}\textcolor{colR1}{, and} when one linear
+covariate is the constant, its column has zero variance, and the solver may
+either drop it or share the level with its own intercept; the fit is the same
+either way, but the level $\lvl{\cv}$ of the constant covariate is only
+recovered after the intercept is added back to it. \textcolor{colR1}{For both
+penalties the scale is checked by verifying the Karush-Kuhn-Tucker conditions
+of the problem at every point of the path.}
+
+\subsection{Rescaling and the boundary}
+\label{sec:boundary}
+
+The theory places $\bU$ in $[0,1]^q$ by assumption. In practice each modulator
+is mapped to that interval by a monotone transformation\textcolor{gray}{\sout{, and,}}\textcolor{colR1}{.
+By default the image is $[0,1]$ itself, which is the setting of
+Section~\ref{sec:theory}. Optionally,} as in the
+wavelet estimators of \citet*{Montoril-Chang-Vidakovic-2019}, the image is
+$[\epsilon, 1-\epsilon]$ with $\epsilon$ \textcolor{gray}{\sout{of the order $2^{-J}$}}\textcolor{colR1}{fixed}, which keeps the
+observations away from the \textcolor{gray}{\sout{strip}}\textcolor{colR1}{point} where the periodization of
+\eqref{eq:periodized} \textcolor{gray}{\sout{leaves an artifact}}\textcolor{colR1}{joins the two ends of the interval}; the price is that the fitted
+component integrates to zero over the rescaled range and not over $[0,1]$, a
+shift of level and not of shape. \textcolor{colR1}{The margin is a finite sample
+device, and the reason to allow it is approximation: with the data away from
+the ends, a component needs to be regular only on its support, where it can be
+replaced by a periodic extension that matches at $0 \equiv 1$, built from a
+bounded extension operator \citep[Chapter~3]{Triebel-1983}. This removes the
+stall of Proposition~S3.1 and restores the bias of Lemma~\ref{lem:bias}, with
+a Besov constant of order $\epsilon^{-(s-1/\pi)}$, an order that, by the
+embedding of Besov into H\"older spaces, cannot be improved when the component
+takes different values at the two ends of its support. Two features keep the
+margin out of the theory. It has to be fixed, since with $\epsilon$ of the
+order $2^{-J}$ the exponent guaranteed for the bias is no better than that of
+periodization without a margin; and it degrades the design, since the
+wavelets supported inside the margin are invisible to the data, and the
+smallest eigenvalue of the Gram matrix of the basis restricted to the support
+of the data vanishes as soon as $2^{J} \ge (L-1)/(2\epsilon)$, so that
+Proposition~\ref{prop:gram} does not hold as stated.} The alternative is the basis adapted to the
+interval of \citet*{cohen1993wavelets}, which reproduces polynomials on $[0,1]$
+and characterizes Besov regularity without any periodicity
+\citep[Section 3.9]{Cohen-2003}, so that Lemma~\ref{lem:bias} holds with the
+Besov space of the interval and the same proof. Its cost is structural: the
+coarsest level must be large enough for the two boundary zones to be disjoint,
+the constant is no longer a single column but a combination of the scaling
+functions, and the constraint of \eqref{eq:additive} has to be imposed by
+reparametrization, which leaves $pq(2^{\jzero}-1)$ unpenalized parameters
+instead of none. We therefore keep the periodized basis as the default and
+offer the interval basis as an option.
+
+\subsection{Choosing the resolution and the penalty}
+\label{sec:tuning}
+
+The pair $(J,\pen)$ is chosen jointly. The default is $K$ fold cross
+validation on a grid of resolutions, with the folds drawn once and reused for
+every $J$, one design and one penalty path per resolution, and the usual two
+readings of the curve: the minimizer of the cross validated error and the
+largest penalty within one standard error of it\textcolor{colR1}{; the threshold
+of Section~\ref{sec:threshold} is applied to the fit at the minimizer. In the
+software the whole procedure, from the cross validation over $(J,\pen)$ to the
+threshold, is the single call \texttt{cv.wafc(x, u, y)}}. Two cheaper rules are also
+available \textcolor{colR1}{for the lasso option}, the Bayesian information criterion and its extended version, with
+degrees of freedom equal to the number of nonzero coefficients plus the $p$
+levels, which is the usual unbiased count for the lasso.
+
+The theory supplies a fourth rule, since \eqref{eq:Jn} and \eqref{eq:lambda}
+are explicit. It is not a practical competitor as it stands, because it needs
+$\sigma$, which has to be estimated, and $\seff$, which is unknown, and
+because it is a statement about order\textcolor{gray}{\sout{, so that at moderate sample sizes it can
+sit above the resolution that minimizes the realized error, the pre-asymptotic
+regime being wide when $\seff$ is small}}\textcolor{colR1}{. In our experiments} \textcolor{colR1}{with the
+lasso option} \textcolor{colR1}{the penalty}
+\textcolor{gray}{\sout{\mbox{\eqref{eq:lambda}}}} \textcolor{colR1}{of its theory} \textcolor{colR1}{is 7 to 13 times the one that minimizes the realized error,
+and it is the penalty, more than the resolution, that makes the rule costly;
+the resolution}
+\textcolor{gray}{\sout{\mbox{\eqref{eq:Jn}}}} \textcolor{colR1}{of its theory} \textcolor{colR1}{misses the best one by up to two levels, above
+or below according to $\seff$}.
+% E5d: os numeros acima sao do lasso (E2.3, E1.6); com o bloco como padrao,
+% passaram a dizer isso. Uma medida equivalente para o block lasso e da E5b.
+% E5b: ancorar os numeros acima numa tabela da Secao 5 ou do suplemento
+% (E2.3: lambda_n de 7 a 13 vezes o otimo; no nao homogeneo, J_n sozinho
+% custa 2% e 18%, lambda_n sozinho 30% e 54%; J_n dois niveis abaixo com
+% s' = 3/2, dois acima com s' = 1/4 em E1.6).
+Its interest is as a reference for
+what the cross validated choice ought to approach, and the difference between
+the two is a finite sample quantity worth measuring. The four rules are
+compared in the simulation study.
+
+A remark on the \textcolor{gray}{\sout{structural variant}}\textcolor{colR1}{other penalties}. \textcolor{colR1}{The lasso option, with
+$\norm{\btheta}_1$ in place of $\nGw{\btheta}$, is fit by \texttt{glmnet}; its
+theory is in Section~S8 of the Supplementary Material, where its rates carry
+an extra logarithmic factor, and the threshold of Section~\ref{sec:threshold}
+applies to it unchanged.} Replacing \textcolor{gray}{\sout{$\norm{\btheta}_1$}}\textcolor{colR1}{$\nGw{\btheta}$} in
+\eqref{eq:estimator} by the sparse group lasso penalty of
+\citet{Simon-Friedman-Hastie-Tibshirani-2013}, with one group per block
+$(\cv,\md)$ \textcolor{colR1}{and fit with the \texttt{sparsegl} package
+\citep{Liang-Cohen-SolonHeinsfeld-Pestilli-McDonald-2024}}, adds a second tuning parameter and removes entire components
+rather than isolated \textcolor{gray}{\sout{coefficients}}\textcolor{colR1}{chunks}, which is what a reader interested in
+knowing which modulators act on which coefficients would want\textcolor{colR1}{, although for}
+\textcolor{gray}{\sout{the lasso itself}} \textcolor{colR1}{\eqref{eq:estimator}} \textcolor{colR1}{that question is already answered by thresholding the block
+norms (Corollary~\ref{cor:threshold})}. It is a
+different estimator, with a different oracle inequality
+\citep{Lounici-Pontil-vandeGeer-Tsybakov-2011}, and the theory above does not
+cover it; the choice between the two is settled empirically.
+
+% derivations/06-selecao-limiar.tex, adendo de E1.12; D45. A regra e a
+% wafc_threshold(rule = "cv1se") de wafc/R/threshold.R, padrao do cv.wafc() (D48).
+{\color{colR1}
+\subsection{Choosing the threshold}
+\label{sec:threshold}
+
+The threshold is chosen on the folds of Section~\ref{sec:tuning}, at the pair
+$(J,\pen)$ already selected: each fold is refitted at that pair, with no new
+search, thresholded at every candidate $t$ and scored on the observations it
+left out. A thresholded fit is constant in $t$ between two consecutive block
+norms, so the candidates are exhaustive and not a grid. The default is the
+largest $t$ whose cross validated error is within one standard error, between
+folds, of the smallest, the one standard error rule of the penalty carried to
+the threshold; the minimizer of the cross validated error is available as an
+option aimed at prediction. The fit is not refitted after the threshold: the
+levels and the blocks kept are those of the fit, which is the estimator of
+Corollaries~\ref{cor:threshold} and~\ref{cor:thrisk}. Neither rule has a
+theorem here: Corollary~\ref{cor:threshold} gives the window of thresholds
+that recovers the structure, and Corollary~\ref{cor:thrisk} what any threshold
+costs.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Supplementary Materials}
+
+The online Supplementary Material contains the proofs of all the results
+stated in the paper, together with the auxiliary lemmas they use: the
+identification argument and the properties of the periodized basis, the
+approximation lemmas in $L_2$ and in the supremum norm and the proposition on
+the cost of periodization, the population and empirical bounds for the Gram
+matrix of the product design, the \textcolor{gray}{\sout{four lemmas}}\textcolor{colR1}{properties of the
+partition into chunks, the calibration of the penalty over chunks and the
+other lemmas} behind the oracle inequality \textcolor{colR1}{and its form for the
+estimator that the software computes},
+\textcolor{gray}{\sout{and}} the \textcolor{gray}{\sout{two lemmas}}\textcolor{colR1}{lemmas} behind the rates\textcolor{colR1}{, \textcolor{gray}{\sout{and}} the \textcolor{gray}{\sout{lemma}} two lemmas behind
+the recovery of the block structure by thresholding} \textcolor{colR1}{and the risk of
+the thresholded estimator, and the theory of the coordinatewise lasso, with
+its proofs}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledgements}
+
+Write the acknowledgements here.
+\par
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bibhang=1.7pc
+\bibsep=2pt
+\fontsize{9}{14pt plus.8pt minus .6pt}\selectfont
+\renewcommand\bibname{\large \bf References}
+\expandafter\ifx\csname
+natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL}\fi
+
+\bibliographystyle{chicago}
+\bibliography{references_4}
+
+%-------------------------------------------
+\vskip .65cm
+\noindent
+first author affiliation
+\vskip 2pt
+\noindent
+E-mail: (first author email)
+\vskip 2pt
+
+\noindent
+second author affiliation
+\vskip 2pt
+\noindent
+E-mail: (second author email)
+
+\end{document}

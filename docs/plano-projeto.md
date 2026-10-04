@@ -261,7 +261,7 @@ O enunciado sem condição de desenho (a Proposição 4 de E1.6, Proposition 3
 do manuscrito) na versão em blocos, como Corolário 14 do `08-blocos.tex`,
 a partir do Teorema 3(i). Fica no corpo do artigo em `k = 4`.
 
-### E1.14 A taxa lenta em todo `s' > 0` (catalogada em 2026-10-03)
+### E1.14 A taxa lenta em todo `s' > 0` (fechada em 2026-10-04)
 
 A Proposição 4 de E1.6 e o Corolário 14 de E1.12 completados nos regimes
 que D49 excluiu (`s' ≤ 1/4` com `s > 1/2`, `s' ≤ s/2` com `s < 1/2`) e na
@@ -508,7 +508,7 @@ As edições acumuladas desde E5a, marcadas em `colR1` (D38 para a troca de
 33 páginas e `supp_2` em 30; as pendências estão na pergunta 32 do
 `ESTADO.md`.
 
-### E5d. Versão `k = 4` (catalogada em 2026-10-03)
+### E5d. Versão `k = 4` (fechada em 2026-10-04)
 
 O estimador e a teoria de D44 a D51 no manuscrito: o posicionamento de D50,
 a penalidade em blocos na §2.3, a teoria em blocos na §3 e no supp (o

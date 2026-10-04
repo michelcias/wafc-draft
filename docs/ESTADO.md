@@ -34,12 +34,14 @@ a taxa lenta em blocos (Corolário 14, que em `π ≥ 2` e `s < 1/2` dá
 a documentação; pendências decididas em D49. E6.1b está pronta e espera a
 ordem do autor para rodar (§5). A decidir: a saída da aplicação (pergunta 2). O
 teto de páginas fica para o fim (D21).
-**Versão viva do manuscrito:** `k = 3` (`manuscript/ms_3.tex`,
-`supp_3.tex`, `references_3.bib`), aberta em 2026-10-01 por decisão do
-autor para a notação da seleção (D40); a `k = 2` fica intacta. Os dois
-compilam limpos em **34 e 30 páginas** (34 desde a pergunta 40).
+**Versão viva do manuscrito:** `k = 4` (`manuscript/ms_4.tex`,
+`supp_4.tex`, `references_4.bib`), aberta pela E5d em 2026-10-04 com a
+teoria em blocos (D44 a D51); as versões `k = 1` a `k = 3` ficam intactas.
+Os dois compilam limpos em **50 e 60 páginas** com a marcação, **43 e 59**
+sem o texto removido; com as Seções 5 a 7 o corpo projeta ~54 páginas,
+contra o teto de 40 (D21, pergunta 47(e)).
 **Cor da rodada corrente:** `colR1`, em uso desde `k = 2` (a rodada não foi
-aceita, então a marcação de E5c segue em `colR1` na `k = 3`).
+aceita, então a marcação de E5c segue em `colR1` na `k = 3` e na `k = 4`).
 
 Este documento é o ponto de partida de cada sessão. Ele diz onde o trabalho
 parou, o que já foi decidido (para não reabrir) e o que vem a seguir.
@@ -2100,6 +2102,96 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-04: E1.14 fechada, a taxa lenta em todo `s' > 0`
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina, em cópias
+congeladas: o `check/05-taxas.R` (Parte VI nova) e o `check/08-blocos.R`
+(Parte VIII nova) imprimem **`OK`** (o `08` em 421 s, com a E6.1b rodando
+ao lado); o `05-taxas.tex` compila em **12 páginas** e o `08-blocos.tex` em
+**20**, sem referência indefinida nem aviso. Nenhum número global novo; as
+Observações 1 e 2 antigas do `05` passam a 2 e 3, sem referência por número
+em lugar nenhum.
+
+**Os enunciados.** Acima do teto de concentração as normas das colunas
+crescem, e a calibração passa a `λ_n^+ = μ_{J_n}^{1/2} λ_n`, com
+`μ_J = 1 + c_ψ 2^J log d/n` (no `08`, `λ_n^{𝒢,+}` com `μ^𝒢_J`, que também
+cobre `λ_max(Σ̂)`); abaixo do teto `μ → 1`.
+
+- **Proposição 4 (LASSO):** (iii)(a) `s > 1/2`, `s' ≤ 1/4`:
+  `(log n/n)^{4s'/(1+4s')}`; (iii)(b) `s < 1/2`, `s' ≤ s/2`:
+  `(log n/n)^{2s'/(1−s+2s')}`; (iv) `s = 1/2`: `n^{−1/2}(log n)^{3/2}` com
+  `s' ≥ 1/4`, e `(log²n/n)^{4s'/(1+4s')}` com `s' < 1/4`.
+- **Corolário 14 (blocos):** (iii)(a) a mesma taxa; (iii)(b) com
+  `(log n)^{(1−1/π)2s'/(1−s+2s')}` a menos que o LASSO; (iv) `s = 1/2` com
+  `n^{−1/2}(log n)^{3/2−ϑ_π}` (meio logaritmo a menos em `π ≥ 2`) e o caso
+  `s' < 1/4`. As taxas de (iii) emendam com as de (i) e (ii) na fronteira.
+
+**A leitura do chat principal era válida e não a melhor.** Parar `J_n` no
+teto dá `(log n/n)^{2s'}` (e o `ω_n` não é necessário: basta
+`2^{J_n} = n/(K log n)` com `K` fixo acima de `4‖ψ‖²_∞/(3C_U)`). Mas acima do
+teto, com o `λ` inflado, o termo de estimação cresce mais devagar do que o
+viés cai, e os expoentes `4s'/(1+4s')` e `2s'/(1−s+2s')` passam de `2s'`
+fora da fronteira; o minimizador da cota em `J` é o `J_n` do enunciado a
+menos de constante, de modo que é a melhor cota que o argumento dá.
+
+**A conferência:** os expoentes de `n` e do logaritmo em 17 pares (a 0,01 e
+a 0,1), o minimizador da cota seguindo o `J_n` do enunciado e passando do
+teto exatamente nos pares novos, a cobertura de `s' > 0` numa grade de 183
+pares, os eventos de `σ̂_max` e de `λ_max(Σ̂)` acima do teto (o `λ_n` da
+Hipótese 1 deixa de ser admissível com `2^J > 4n`, e o fator `μ` é
+necessário), e ajustes com `J` acima do teto (`d` até 2044) sem violação,
+folga mínima de 61 a 78.
+
+- **Sinal no Lema 6 de E1.5 (constante, não ordem):** nos níveis 0 e 1 da
+  base periodizada o sup normalizado `‖ψ_jk‖_∞2^{−j/2}` é 1,48 e 1,45,
+  contra `‖ψ‖_∞ = 1,359`, por causa da dobra da periodização; o alcance
+  `R'_J` do lema falha só em `J ≤ 2`. As conferências novas usam o alcance
+  medido.
+- **Lições:** o `2^J` das formas fechadas estoura o `double` em `J > 1023`
+  (trabalhar em log); `grep -c` sem casamento sai com código 1 e corta uma
+  cadeia `&&`; `pkill -f <script>` casa com o próprio shell, como o `pgrep`.
+
+### 2026-10-04: E5d fechada, o manuscrito em `k = 4`
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: `ms_4` e `supp_4`
+compilam sem referência indefinida nem rótulo duplicado, em **50 e 60
+páginas** (os dois avisos do `ms` são os de `\underbar` e `\underline` do
+`ulem`, que a `k = 3` já tinha); a `k = 3` está intacta (`git diff` vazio);
+`references_4.bib` com **40 entradas, todas citadas** (as 37 da `k = 3` mais
+Hsu, Kakade & Zhang 2012, Cai 1999 e Mallat 2009).
+
+- **O que entrou:** o posicionamento de D50 no §1; a penalidade em blocos na
+  §2.3 (a Proposição 7 em prosa, a prova na Proposition S5.1); a §3 com a
+  teoria em blocos (o Corolário 11 como Theorem 1, o Teorema 3 como Theorem
+  2, o Teorema 4 como Theorem 3, o Corolário 10 como Corollary 1, o Lema 15
+  como Lemma 3, o Corolário 12 como Corollary 2, o Corolário 13 como
+  Corollary 3, novo, e o Corolário 14 como Proposition 3, **sem os itens de
+  E1.14**); a §4 com o `grpreg`, a variante branca, a escala de `λ`, o
+  `cv.wafc(x, u, y)` e uma §4.4 nova sobre a regra `cv1se`; no supp, S5 a S7
+  em blocos e a **S8 nova** com a teoria do lasso coordenado (D51), com a
+  Proposição 4 emendada por D49. O resumo também foi trocado, fora do
+  catálogo (pergunta 47(b)). O mapa novo da numeração está no cabeçalho do
+  `ms_4.tex`.
+- **As páginas:** sem o texto removido, **43 e 59**; o corpo cresceu 9
+  páginas, quase todas na §3 (19 páginas). Com as Seções 5 a 7 (~11 páginas)
+  a projeção é de **~54, contra o teto de 40** (D21).
+- **Onde o manuscrito se afasta da derivação na forma:** a Hipótese B não é
+  uma Assumption (as peças estão na §2.3, nos enunciados e em (3.1)); a
+  Proposition 3 está sob as Assumptions 1, 4 e 5 mais as cotas superiores
+  das 2 e 3 (a leitura de D49(b)); o Theorem 2 traz `λ_{0,G}` e `λ_w` no
+  enunciado e pede pesos que não dependam da resposta; o Corollary 1 perdeu
+  a cláusula da taxa do Theorem 1 (o Corolário 11 só dá a soma dos erros das
+  componentes); a terceira leitura do Theorem 1 cita Donoho & Johnstone
+  (1998), a cota inferior de K&P com erro gaussiano (Remark S6.1) e o resto
+  logarítmico de K&P e de Cai (1999); os números de E2.3 na §4.3 passam a
+  dizer que são do lasso; o Corolário 9 e a Observação `rem:inferior`
+  entraram no supp (Corollary S5.1, Remark S6.1), porque o corpo se apoia
+  neles.
+- **Lições** (no `instrucoes.md` §3): `\textcolor{colR1}{ texto}` perde o
+  espaço inicial (três casos herdados da `k = 2` corrigidos sem marca, por
+  ser tipografia); o PDF com a marcação superestima o artigo (50 contra
+  43), e o teto se conta numa cópia sem o removido.
+
 ### 2026-10-03: E1.13 fechada, a taxa lenta em blocos ganha um logaritmo
 
 Chat de tarefa, integrado aqui. Conferido nesta máquina: o
@@ -2302,12 +2394,18 @@ com `ρ_n^𝒢`; a §3.6 ganha o Corolário 13; o §1 e o "Why not block LASSO?"
 são reescritos; no supp, S5 (Teorema 3, Lema 14, variante branca), S6
 (Lema 15, Teorema 4, Corolários 10 e 11) e S7 (mais Lema 16, Corolários 12
 e 13). As Proposições 1 e 2 e os Lemas 1 e 2 do manuscrito não mudam. A
-Proposition 3 (taxa lenta) passa ao Corolário 14 (E1.13), no corpo, com as
-condições `s' > 1/4` em (i) e `s' > s/2` em (ii) e a frase de que em
-`s < 1/2` e `π ≥ 2` a taxa é `n^{−2s/(2s+1)}`, sem logaritmo e sem condição
-de desenho, dita também no §3 depois do Theorem `thm:main` (D49(c)); a
-contagem de `‖θ*‖_{𝒢,1}` e a prova vão ao supp, em S6. O texto diz que a
-única propriedade de `Σ̂` usada é a cota superior (D49(b)).
+Proposition 3 (taxa lenta) passa ao Corolário 14 (E1.13 e E1.14), no corpo,
+**em todo `s' > 0`**: os itens (i) e (ii) com as condições `s' > 1/4` e
+`s' > s/2` e a frase de que em `s < 1/2` e `π ≥ 2` a taxa é
+`n^{−2s/(2s+1)}`, sem logaritmo e sem condição de desenho, dita também no
+§3 depois do Theorem `thm:main` (D49(c)); uma frase que manda ao supp os
+pares restantes (só `π < 2`) e a fronteira `s = 1/2`, os itens (iii) e (iv),
+com o nível acima do teto e `λ` inflado por `(μ^𝒢_J)^{1/2}`; a contagem de
+`‖θ*‖_{𝒢,1}`, os itens (iii) e (iv) e a prova vão ao supp, em S6, e pela
+D51 a Proposição 4 vai à S8 com os seus (iii) e (iv). A frase de D49(b)
+passa a: a única propriedade de `Σ̂` usada é uma cota superior de
+`λ_max(Σ̂)` (`Λ`, ou `Λμ^𝒢_J` acima do teto), sem `c_U` nem `κ_1`. **A E5d
+entrou sem os itens de E1.14** (pergunta 47(a)).
 
 ### Decisões tomadas
 
@@ -3109,7 +3207,9 @@ Ordenadas pelo que bloqueia mais.
      que escolha os blocos desenhados, para `p × q` grande: ficam para E3.3
      e E6.2.
 
-45. **Completar a Proposição 4 de E1.6 e o Corolário 14 de E1.12 nos
+45. **~~Completar a Proposição 4 de E1.6 e o Corolário 14 de E1.12 nos
+   regimes que D49 excluiu~~ feito por E1.14 (2026-10-04, §2).** Texto
+   original: Completar a Proposição 4 de E1.6 e o Corolário 14 de E1.12 nos
    regimes que D49 excluiu** (2026-10-03, pedido do autor: os resultados
    servem no futuro). Os regimes `s' ≤ 1/4` em (i) e `s' ≤ s/2` em (ii)
    (só `π < 2`) ficaram fora porque a escolha de `J_n` passa de `n`, e a
@@ -3123,11 +3223,66 @@ Ordenadas pelo que bloqueia mais.
    regimes em vez de dois. **Catalogada como E1.14 em 2026-10-03**, com a
    fronteira `s = 1/2`, que nenhum dos dois regimes atuais cobre.
 
+46. **Pendências de E1.14** (2026-10-04). Recomendação do chat principal:
+   - (a) **O comparador truncado na taxa lenta do LASSO.** O Lema 8(i) com
+     `θ*·1{|θ*| > λ}` troca `λ‖θ*‖_1` por `Σ_a min(λ|θ*_a|, θ*_a²)`, e em
+     `π < 2` a taxa lenta passaria a `(log n/n)^{2s/(2s+1)}` com
+     `s' > s/(2s+1)`, a taxa do Corolário 5(iii) sem condição de desenho; nos
+     blocos pede uma contagem nova de `Σ_G min(λ‖θ*_G‖, ‖θ*_G‖²)` sob Besov.
+     Só a aritmética foi conferida (cinco pares). Recomendação: catalogar,
+     porque o autor quer os resultados completos e é o que faria a taxa lenta
+     igualar a rápida também em `π < 2`; não bloqueia nada.
+   - (b) Uma cota de `σ̂_max` e `λ_max(Σ̂)` pela contagem de pontos nos
+     suportes, muito acima do teto: tiraria parte de um logaritmo em regimes
+     que o artigo não usa. Recomendação: não abrir.
+   - (c) Os itens (iii) e (iv) no supp, com uma frase no corpo: sim (já está
+     na tabela da `k = 4`).
+   - (d) **Símbolos locais novos** para o `notacao.md` §10: `μ_J`, `λ_n^+`,
+     `c_ψ` (no `05`), `μ^𝒢_J`, `λ_n^{𝒢,+}`, `c_μ`, `Δ = Λ − κ_2C_U` (no `08`).
+     Recomendação: aceitar, trocando `Δ` por outra letra, porque `Δ` e `Δ̄_n`
+     já são o erro por bloco e a sua cota (D40).
+
+47. **Pendências de E5d** (2026-10-04). Recomendação do chat principal:
+   - (a) **Os itens de E1.14 na `k = 4`:** a Proposition 3 e a Proposition
+     S8.1 entraram sem o regime (iii) e sem `s = 1/2`; levá-los (a frase no
+     corpo, os itens e a prova em S6 e S8, `μ^𝒢_J` e `λ_n^{𝒢,+}`, e a frase de
+     D49(b) revista). Recomendação: catalogar uma tarefa curta na `k = 4`.
+   - (b) **O resumo** foi trocado pela tarefa, fora do catálogo, para não
+     contradizer o corpo (block lasso com pedaços, pesos de razão limitada,
+     sem logaritmo em `π ≥ 2`, uma frase sobre o limiar, "group lasso" nas
+     palavras-chave). O texto não foi aprovado. Recomendação: o chat
+     principal o traz ao autor no formato do §3 do `instrucoes.md`.
+   - (c) **"programme"** (grafia britânica, desde a `k = 1`) no texto de
+     D50: trocar por "program". Recomendação: sim.
+   - (d) **A citação do `grpreg`:** o §4.1 diz "[VERIFICAR: Breheny and
+     Huang (2015) and the grpreg manual]", e o §2.3 nomeia o group lasso sem
+     citar. Recomendação: catalogar uma frente curta de bibliografia (L10)
+     com o `citation("grpreg")`, Breheny & Huang (2015, *Statist. Comput.*) e
+     Yuan & Lin (2006, *JRSS-B*), verificados como em L1.
+   - (e) **O teto de páginas** (D21): 43 páginas hoje sem o removido, ~54
+     projetadas com a E5b, contra 40. A §3 tem 19 páginas, e os candidatos
+     são o Theorem 3 e o Corollary 1 ao supp, ou a Proposition 3 e o
+     Corollary 3 só com o enunciado no corpo. Recomendação: manter D21
+     (decidir no fim), mas registrar que a decisão vai ter de mexer na §3, e
+     não só nas tabelas.
+   - (f) **Ratificar a leitura de D51 nos deslocamentos do supp:** o material
+     do lasso que foi de S5 a S7 para a S8 não foi repetido em cinza no
+     lugar antigo (uma linha cinza diz o que saiu e para onde), e a S8
+     inteira está em `colR1`; repetir dobraria ~14 páginas. Recomendação:
+     ratificar.
+   - (g) Símbolos do `ms` fora do `notacao.md` §10 (o comparador `β̄`, `b̄`,
+     `v̄`, `𝒢̄`, `𝒲̄`, `M_1`, `Σ̂_{GG}`): levá-los ao §10 junto com os da 46(d).
+
 ---
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-03).** **E2 fechada.** O autor aceitou as
+**Onde parou (2026-10-04).** **E1.14 e E5d fechadas e integradas**: a
+taxa lenta cobre todo `s' > 0`, e o manuscrito está em `k = 4` (43 páginas
+sem o removido, sem os itens de E1.14 na Proposition 3); pendências nas
+perguntas 46 e 47. **A E6.1b está rodando** (4 processos, 20 partições,
+desde 2026-10-03 à noite): 20 de 120 unidades em ~6 h, com o `beijing.heat`
+a ~2,5 h por partição, o que projeta ~29 h no total. **E2 fechada.** O autor aceitou as
 recomendações das perguntas 33, 38 e 41 (D44 a D46): o WAFC é o block
 LASSO balanceado seguido do limiar `cv1se`, o LASSO fica como opção, o
 alvo continua a *Statistica Sinica*, e o spline de E4 entra com `gam.reml`
@@ -3203,6 +3358,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-04 | E1.14 fechada e integrada (`OK` nas duas conferências; 12 e 20 páginas): a Proposição 4 e o Corolário 14 em todo `s' > 0` e em `s = 1/2`, com o `λ` inflado acima do teto, que faz melhor que parar `J_n` nele; pergunta 46. E5d fechada e integrada: `k = 4` viva, 50 e 60 páginas (43 e 59 sem o removido), 40 entradas no `.bib`; sem os itens de E1.14; pergunta 47. `manuscript/README.md` em `k = 4`; duas lições de marcação no `instrucoes.md` §3 |
 | 2026-10-03 | E5d (o manuscrito em `k = 4`) catalogada com D51 (a teoria do LASSO numa seção do supp; remoções inteiras em bloco cinza sem tachado, no `instrucoes.md` §3); mensagem para rodar a E6.1b com 4 processos e 20 partições passada ao autor |
 | 2026-10-03 | E1.14 catalogada: a taxa lenta (Proposição 4 e Corolário 14) em todo `s' > 0` e na fronteira `s = 1/2` |
 | 2026-10-03 | Posicionamento aprovado (D50) e gravado no `alvo-revista.md` §4, com frase-tese, contribuições e respostas ao referee revistas; pergunta 45 (completar a Proposição 4 e o Corolário 14 nos regimes excluídos por D49) |

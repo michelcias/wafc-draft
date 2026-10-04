@@ -155,6 +155,11 @@ Cuidados que já custaram compilações:
   `{\color{gray} ...}` aberto por uma linha "[removed in k = r]", sem
   tachado, e o novo vem logo depois em `{\color{colR1} ...}`; trocas
   pontuais seguem com `\sout` (D51, para a troca da teoria em `k = 4`).
+- `\textcolor{colR1}{ texto}` perde o espaço inicial (o `\color` termina em
+  `\ignorespaces`) e cola a palavra anterior: o espaço vai fora do
+  `\textcolor` (E5d).
+- O PDF com a marcação superestima o artigo: para o teto de páginas (D21),
+  contar numa cópia sem o texto removido (E5d).
 
 Exceção registrada: **uniformização de notação** aplicada por script sobre
 lista fechada de padrões pode entrar sem marcação, desde que o `ESTADO.md`

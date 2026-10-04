@@ -1,0 +1,2347 @@
+% WAFC -- suplemento, versao k = 4 (E5d; copia de k = 3, alteracoes marcadas em colR1; a
+% rodada nao foi aceita). Template da Statistica Sinica
+% (manuscript/ss-template/supp-temp_20240820.tex). Traz as provas dos
+% resultados de ms_4.tex e os lemas auxiliares. As fontes sao
+% derivations/01 a 08; o comentario acima de cada secao diz qual.
+% Em k = 4 (D44 a D51): S5 a S7 passam ao block lasso balanceado (E1.12, E1.13),
+% e o material do lasso coordenado que estava em S5 a S7 vai, com os enunciados
+% que estavam no corpo, para a Secao S8 nova (D51(a)). O material deslocado nao
+% e repetido em cinza no lugar antigo: uma linha cinza no inicio de cada secao
+% diz o que saiu e para onde (ver docs/handoff-E5d.md).
+\documentclass[10pt]{book}
+\usepackage[sectionbib]{natbib}
+\usepackage{array,epsfig,fancyheadings,rotating}
+\usepackage{hyperref}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textwidth=31.9pc
+\textheight=46.5pc
+\oddsidemargin=1pc
+\evensidemargin=1pc
+\headsep=15pt
+\topmargin=.6cm
+\parindent=1.7pc
+\parskip=0pt
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\definecolor{colR1}{RGB}{0,90,200}
+
+\setcounter{page}{1}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{proposition}{Proposition}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{remark}{Remark}[section]
+\pagestyle{fancy}
+
+% --- macros: as mesmas de ms_3.tex (docs/notacao.md) ---------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Prob}{\mathrm{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\T}{^{\top}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\normn}[1]{\left\lVert #1 \right\rVert_{n}}
+\newcommand{\inner}[2]{\langle #1, #2 \rangle}
+\newcommand{\cv}{\ell}
+\newcommand{\md}{m}
+\newcommand{\lev}{j}
+\newcommand{\tsl}{k}
+\newcommand{\jzero}{j_{0}}
+\newcommand{\NJ}{N_{J}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\fcoef}[1]{\beta_{#1}}
+\newcommand{\lvl}[1]{c_{#1}}
+\newcommand{\gcomp}[2]{g_{#1#2}}
+\newcommand{\wav}[2]{\psi_{#1#2}}
+\newcommand{\VJ}{V_{J}}
+\newcommand{\WJ}{W_{J}}
+\newcommand{\PiJ}{\Pi_{J}}
+\newcommand{\coef}[4]{\theta_{#1#2,#3#4}}
+\newcommand{\coefs}[4]{\theta^{*}_{#1#2,#3#4}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\thetastar}{\btheta^{*}}
+\newcommand{\thetahat}{\widehat{\btheta}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\betahat}{\widehat{\bbeta}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\chat}{\widehat{\mathbf{c}}}
+\newcommand{\Gram}{\Sigma}
+\newcommand{\Gramhat}{\widehat{\Sigma}}
+\newcommand{\pen}{\lambda}
+\newcommand{\penn}{\lambda_{n}}
+\newcommand{\Szero}{S_{0}}
+\newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
+\newcommand{\seff}{s'}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\MA}{M_{\Amat}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\Mstar}{M^{\star}}
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+\newcommand{\compat}{\phi_{0}}
+\newcommand{\GBA}{\Gramhat_{\Bmat\mid\Amat}}
+\newcommand{\thbar}{\bar{\btheta}}
+\newcommand{\bbar}{\bar{\bb}}
+\newcommand{\thstarM}[1]{\btheta^{*,(#1)}}
+\DeclareMathOperator{\vecop}{vec}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\supp}{supp}
+% --- a penalidade em blocos (docs/notacao.md, S10), as mesmas de ms_4.tex -----
+\newcommand{\vbar}{\bar{v}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Gzero}{\mathcal{G}_{0}}
+\newcommand{\Gbar}{\bar{\mathcal{G}}}
+\newcommand{\Hcal}{\mathcal{H}}
+\newcommand{\Wcal}{\mathcal{W}}
+\newcommand{\bn}{b_{n}}
+\newcommand{\jst}{j^{*}}
+\newcommand{\nGw}[1]{\lVert #1\rVert_{\mathcal{G},w}}
+\newcommand{\nGone}[1]{\lVert #1\rVert_{\mathcal{G},1}}
+\newcommand{\Psitil}{\widetilde{\Psi}}
+\newcommand{\Rid}{R_{\mathcal{G}}}
+\newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
+\newcommand{\lamGone}{\lambda^{\mathcal{G}}_{n,1}}
+\newcommand{\lamz}[1]{\lambda_{0,#1}}
+\newcommand{\lamzbar}[1]{\bar{\lambda}_{0,#1}}
+\newcommand{\rhoG}{\rho^{\mathcal{G}}_{n}}
+\newcommand{\rhoGt}{\tilde{\rho}^{\mathcal{G}}_{n}}
+\newcommand{\Tw}{\mathcal{T}_{\mathcal{G},w}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\ESig}{\mathcal{E}_{\Sigma}}
+\newcommand{\Acal}{\mathcal{A}_{n}}
+\newcommand{\AG}{A^{\mathcal{G}}_{s,\pi}}
+\newcommand{\Dbl}{\Delta_{\cv\md}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\def\n{\noindent}
+\lhead[\fancyplain{} \leftmark]{}
+\chead[]{}
+\rhead[]{\fancyplain{}\rightmark}
+\cfoot{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\renewcommand{\baselinestretch}{2}
+
+\markright{ \hbox{\footnotesize\rm Statistica Sinica: Supplement
+}\hfill\\[-13pt]
+\hbox{\footnotesize\rm
+}\hfill }
+
+\markboth{\hfill{\footnotesize\rm AUTHOR(S)} \hfill}
+{\hfill {\footnotesize\rm WAVELET ADDITIVE FUNCTIONAL COEFFICIENTS} \hfill}
+
+\renewcommand{\thefootnote}{}
+$\ $\par \fontsize{12}{14pt plus.8pt minus .6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\centerline{\large\bf SPARSE WAVELET ESTIMATION OF}
+\vspace{2pt}
+\centerline{\large\bf ADDITIVE FUNCTIONAL COEFFICIENTS}
+\vspace{.25cm}
+\centerline{Author(s)}
+\vspace{.4cm}
+\centerline{\it Affiliation(s)}
+\vspace{.55cm}
+\centerline{\bf Supplementary Material}
+\vspace{.55cm}
+\fontsize{9}{11.5pt plus.8pt minus .6pt}\selectfont
+\noindent
+This supplement contains the proofs of the results stated in the paper and
+the auxiliary lemmas they use. Section S1 fixes the notation and the objects.
+Section S2 proves the identification results of Section 2 of the paper,
+Section S3 the approximation lemma, Section S4 the bounds for the Gram matrix
+of the product design, Section S5 the oracle inequality, \textcolor{gray}{\sout{and}} Section S6 the
+rates\textcolor{colR1}{, \textcolor{gray}{\sout{and}} Section S7 the recovery of the block structure by
+thresholding} \textcolor{colR1}{and the risk of the thresholded estimator, and
+Section S8 gives the theory of the coordinatewise lasso, the option of the
+software that replaces the penalty of equation (2.5) by the $\ell_1$ norm}. References to numbered results without a section prefix are to the
+paper; results numbered with the prefix S are stated and proved here.
+\par
+
+\setcounter{section}{0}
+\setcounter{equation}{0}
+\def\theequation{S\arabic{section}.\arabic{equation}}
+\def\thesection{S\arabic{section}}
+
+\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Notation and objects}
+
+The model, the basis and the estimator are those of Sections 2.1 to 2.3 of the
+paper. We write $\bZ = [\Amat\;\Bmat]$ for the design matrix of equation
+(2.4), with $\Amat \in \R^{n\times p}$ the unpenalized block and
+$\Bmat \in \R^{n\times d}$, $d = pq\NJ$, the block of products; $\bY$, $f$ and
+$\bveps$ for the vectors with entries $Y_i$, $f(\bX_i,\bU_i)$ and
+$\varepsilon_i$; $\Gramhat = \bZ\T\bZ/n$ and $\Gram = \E(\bZ\bZ\T)$; and, for
+$a, h \in \R^n$, $\normn{a}^2 = n^{-1}\sum_i a_i^2$ and
+$\inner{a}{h}_n = n^{-1}\sum_i a_ih_i$.
+
+The \textcolor{colR1}{oracle of the approximation space} is $\betastar = (\bc,\thetastar)$, with
+$\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$
+for $\lev < J$, so that $f_J = \bZ\betastar$ is the best approximation of $f$
+in the \textcolor{colR1}{approximation space} in the sense of Lemma 2; the deterministic residual is
+$\bb = f - f_J$, the oracle support is $\Szero = \supp(\thetastar)$ and
+$s_0 = |\Szero|$, and $v = \thetahat - \thetastar$. When $\Amat$ has rank $p$
+we write $\PA = \Amat(\Amat\T\Amat)^{-1}\Amat\T$, $\MA = I_n - \PA$,
+$\Btil = \MA\Bmat$, $\GBA = \Btil\T\Btil/n$ and $\gtil = \lmin(\GBA)$, and
+finally $\smax^2 = \max_a(\Gramhat)_{aa}$, the maximum being over the $d$
+penalized columns.
+
+{\color{colR1}
+For the penalty of equation (2.5), $\Gcal$ is the partition of the $d$
+penalized coordinates into the chunks of Section 2.3 of the paper, $|\Gcal|$
+the number of chunks, $\btheta_{G}$ and $|G|$ the subvector and the size of a
+chunk $G$, $w_{G} > 0$ its weight and $\varrho = \max_{G}w_{G}/\min_{G}w_{G}$
+the ratio of the weights; $\nGw{\btheta} = \sum_{G}w_{G}\norm{\btheta_{G}}_{2}$,
+$\nGone{\btheta}$ is the same norm with unit weights, and, for
+$\Hcal \subseteq \Gcal$, $\nGw{\btheta_{\Hcal}} =
+\sum_{G\in\Hcal}w_{G}\norm{\btheta_{G}}_{2}$ and
+$\Wcal(\Hcal) = \sum_{G\in\Hcal}w_{G}^{2}$; $\Gzero(\btheta) =
+\{G : \btheta_{G} \ne 0\}$ are the active chunks of $\btheta$. With unit
+weights $\Wcal(\Gzero(\btheta))$ is the number of active chunks, and with
+$w_{G} = |G|^{1/2}$ it is the number of coordinates in them. A comparator is
+any $\bar\bbeta = (\bar\bc,\thbar) \in \R^{p}\times\R^{d}$, with
+deterministic residual $\bbar = f - \bZ\bar\bbeta$, active chunks
+$\Gbar = \Gzero(\thbar)$, $\bar\Wcal = \Wcal(\Gbar)$ and
+$\vbar = \thetahat - \thbar$. For a chunk, $\Bmat_{G}$ and $\Btil_{G}$ are the
+columns of $\Bmat$ and $\Btil$ in $G$, $\Psitil_{G} = \Btil_{G}\T\Btil_{G}/n$
+and $\Gramhat_{GG} = \Bmat_{G}\T\Bmat_{G}/n$. The ideal risk over chunks is
+$\Rid(\btheta;\eta) = \sum_{G}\min(\norm{\btheta_{G}}_{2}^{2},\eta)$, for
+$\eta > 0$; it is nondecreasing in $\eta$, and, since
+$\min(u,\kappa\eta) \le \kappa\min(u,\eta)$ for $\kappa \ge 1$,
+$\Rid(\btheta;\kappa\eta) \le \kappa\Rid(\btheta;\eta)$. Finally
+$\gamma = \kappa_{1}c_{U}$, $\Lambda = \kappa_{2}C_{U} + \gamma/2$ is the
+constant of equation (3.1), and
+\[
+  \ESig \;=\; \bigl\{\opnorm{\Gramhat - \Gram} < \gamma/2\bigr\};
+\]
+on $\ESig$, Weyl's inequality and Proposition 2(i) give
+$\lmin(\Gramhat) > \gamma/2$ and $\lmaxx(\Gramhat) < \Lambda$, and the matrix
+Bernstein bound in the proof of Proposition 2(ii), Section S4, gives
+$\Prob(\ESig) \to 1$ whenever $pq2^{J}\log(pq2^{J})/n \to 0$.
+}
+
+For a support $S$ and a symmetric matrix $A$, the compatibility constant is
+\[
+  \compat^2(S;A) = \min\bigl\{|S|\,\delta\T A \delta :\;
+  \norm{\delta_S}_1 = 1,\; \norm{\delta_{S^c}}_1 \le 3 \bigr\},
+\]
+and the elementary bound
+$\delta\T A\delta \ge \lmin(A)\norm{\delta}_2^2 \ge
+\lmin(A)\norm{\delta_S}_1^2/|S|$ gives
+\begin{equation}
+  \label{eq:compat-lmin}
+  \compat^2(S;A) \;\ge\; \lmin(A) \qquad \text{for every } S,
+\end{equation}
+so that a lower bound on the smallest eigenvalue is a compatibility bound on
+every support, with the same constant and no cone restriction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/01-identificabilidade.md
+\section{Identification and the periodized basis}
+\setcounter{equation}{0}
+
+\subsection*{Proof of Proposition 1}
+
+\emph{Levels and components are determined by the coefficients.} Let $\beta$
+and $\tilde\beta$ be measurable maps from $[0,1]^q$ to $\R^p$ with
+$\sum_{\cv}\fcoef{\cv}(\bU)X_{\cv} = \sum_{\cv}\tilde\beta_{\cv}(\bU)X_{\cv}$
+almost surely, and put $\delta(u) = \beta(u)-\tilde\beta(u)$. Then
+$\{\delta(\bU)\T\bX\}^2 = 0$ almost surely, and since $\delta(\bU)$ is
+measurable with respect to $\bU$ and $\E\norm{\bX}_2^2 < \infty$,
+\[
+  0 \;=\; \E\bigl[\{\delta(\bU)\T\bX\}^2 \mid \bU\bigr]
+  \;=\; \delta(\bU)\T\,\E(\bX\bX\T\mid\bU)\,\delta(\bU)
+  \qquad \text{almost surely.}
+\]
+The conditional second moment matrix is positive definite almost surely, and a
+positive definite quadratic form vanishes only at the origin, so
+$\delta(\bU) = 0$ almost surely.
+
+\emph{Levels and components are determined within a coefficient.} Because the
+density of $\bU$ is positive Lebesgue almost everywhere, a set is null for the
+law of $\bU$ if and only if it is Lebesgue null, so the identity
+$\lvl{\cv} + \sum_{\md}\gcomp{\cv}{\md}(u_{\md}) =
+\tilde{c}_{\cv} + \sum_{\md}\tilde{g}_{\cv\md}(u_{\md})$ holds Lebesgue almost
+everywhere on $[0,1]^q$. Write $\Delta = \lvl{\cv}-\tilde{c}_{\cv}$ and
+$\delta_{\md} = \gcomp{\cv}{\md}-\tilde{g}_{\cv\md} \in L_2[0,1] \subset
+L_1[0,1]$, so that $\Delta + \sum_{\md}\delta_{\md}(u_{\md}) = 0$ almost
+everywhere. Each summand is integrable on the cube by Tonelli's theorem.
+Integrating in all coordinates and using $\int_0^1\delta_{\md} = 0$, which
+holds because both parametrizations satisfy (2.2), gives $\Delta = 0$; fixing
+$\md$ and integrating in the remaining coordinates gives
+$\delta_{\md}(u_{\md}) = 0$ for almost every $u_{\md}$. \qed
+
+\begin{remark}
+\label{rem:centering}
+If the centering $\int_0^1 \gcomp{\cv}{\md} = 0$ is replaced by
+$\E\{\gcomp{\cv}{\md}(U_{\md})\} = 0$, the same proof applies under the
+two sided density bound of Assumption 3, since then $L_2[0,1]$ and
+$L_2(P_{U_{\md}})$ coincide as sets: the step that uses Fubini's theorem
+yields $\delta_{\md}$ constant almost everywhere, and the constant is its
+mean, which is zero. The two parametrizations are related by
+$\lvl{\cv} \mapsto \lvl{\cv} + \sum_{\md}\E\{\gcomp{\cv}{\md}(U_{\md})\}$, as
+stated in Section 2.1 of the paper. The difference is not cosmetic for the
+estimator: the design of Section 2.3, which omits the constant scaling
+function, estimates the version centered with respect to Lebesgue measure.
+\end{remark}
+
+\subsection*{Proof of Lemma 1}
+
+\emph{The basis.} The periodization of the scaling function is
+$\phi^{\rm per}_{00}(u) = \sum_{\iota}\phi(u+\iota)$, a finite sum at each $u$
+because the support is compact, and it equals the constant function one, since
+the integer translates of an orthonormal scaling function with
+$\int\phi = 1$ form a partition of unity \textcolor{colR1}{\citep[Section~7.5.1]{Mallat-2009}}. For a wavelet, exchanging the finite
+sum with the integral,
+$\int_0^1\wav{\lev}{\tsl} = \int_{\R}2^{\lev/2}\psi(2^{\lev}y-\tsl)\,dy =
+2^{-\lev/2}\int_{\R}\psi = 0$ by the vanishing moment of order zero. That
+$\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$ is an orthonormal basis of $L_2[0,1]$
+is the standard construction of the periodized multiresolution analysis
+\citep[Section 9.3]{Daubechies-1992}. Since $\dim\VJ = 2^J$ and the $2^J-1$
+wavelets of level below $J$ are orthogonal to the constant, $\WJ$ is exactly
+the set of elements of $\VJ$ with zero integral.
+
+\emph{Injectivity.} Suppose two parameter vectors give the same regression
+function almost surely. The functions
+$\beta^J_{\cv}(u) = \lvl{\cv}+\sum_{\md}g^J_{\cv\md}(u_{\md})$, with
+$g^J_{\cv\md} = \sum_{\lev\tsl}\coef{\cv}{\md}{\lev}{\tsl}\wav{\lev}{\tsl}$,
+are measurable and bounded, so the first part of Proposition 1 gives
+$\beta^J_{\cv} = \tilde\beta^J_{\cv}$ almost surely; each $g^J_{\cv\md}$ has
+zero integral by the previous paragraph, so the second part gives
+$\lvl{\cv} = \tilde{c}_{\cv}$ and
+$\sum_{\lev\tsl}(\btheta-\tilde\btheta)_{\cv\md,\lev\tsl}\wav{\lev}{\tsl} = 0$
+almost everywhere, whence $\btheta = \tilde\btheta$ by orthonormality. For the
+Gram matrix, $\E\norm{\bZ}_2^2 < \infty$ because $\E\norm{\bX}_2^2 < \infty$
+and each wavelet is bounded, and for $a \ne 0$,
+$a\T\Gram a = \E\{(a\T\bZ)^2\} = \norm{f_a}^2_{L_2(P)} > 0$ by injectivity,
+where $f_a$ is the regression function with parameter $a$.
+
+\emph{Nullity when the scaling column is kept.} With $\phi_{00}\equiv 1$ the
+column $X_{\cv}\phi_{00}(U_{\md})$ coincides with the unpenalized column
+$X_{\cv}$, for each of the $pq$ pairs, so the $pq$ vectors that oppose one to
+the other lie in the kernel and are linearly independent. There are no others:
+a kernel vector defines
+$\sum_{\cv}X_{\cv}\{a_{\cv} + \sum_{\md}(\alpha_{\cv\md} +
+\sum_{\lev\tsl}a_{\cv\md,\lev\tsl}\wav{\lev}{\tsl}(U_{\md}))\} = 0$ almost
+surely; by Proposition 1 applied to the part with zero integral,
+$a_{\cv\md,\lev\tsl} = 0$ and $a_{\cv}+\sum_{\md}\alpha_{\cv\md} = 0$, which
+is the space of dimension $pq$ spanned by those vectors. \qed
+
+\begin{remark}[The interval basis]
+\label{rem:cdv}
+With the basis of \citet*{cohen1993wavelets} the wavelets of level
+$\lev \ge \jzero$ are orthogonal to $V_{\jzero}$, which contains the
+constants, so they still have zero integral and the penalized part of each
+block satisfies (2.2) with no restriction. The $2^{\jzero}$ scaling functions
+do not: the constant is the combination $1 = \sum_{\tsl}\mu_{\tsl}
+\phi^{\rm int}_{\jzero\tsl}$ with
+$\mu_{\tsl} = \int_0^1\phi^{\rm int}_{\jzero\tsl}$, and the subspace with zero
+integral is $\{\mu\T\alpha = 0\}$. Keeping the $2^{\jzero}$ scaling columns of
+each block unrestricted repeats the constant and makes $\Gram$ singular with
+nullity $pq$, as in the last part of Lemma 1; reparametrizing
+$\alpha_{\cv\md} = Q\gamma_{\cv\md}$ with $Q$ an orthonormal basis of
+$\{\mu\T\alpha = 0\}$ restores injectivity, at the price of
+$pq(2^{\jzero}-1)$ unpenalized parameters.
+\end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/02-aproximacao-besov.tex
+\section[\texorpdfstring{Approximation by the wavelet spaces $\WJ$}{Approximation by the wavelet spaces W\_J}]{Approximation by the wavelet \texorpdfstring{\textcolor{colR1}{spaces $\WJ$}}{spaces W\_J}}
+\setcounter{equation}{0}
+
+\subsection*{Proof of Lemma 2}
+
+Fix a pair $(\cv,\md)$ and write $g = \gcomp{\cv}{\md}$ and
+$\theta_{\lev\tsl} = \coefs{\cv}{\md}{\lev}{\tsl}$.
+
+\emph{Tail sum.} By Step 2 below the coefficients are square summable, so
+$g \in L_2[0,1]$ and, the system being complete and $g$ orthogonal to the
+constant, $g = \sum_{\lev\ge0}\sum_{\tsl}\theta_{\lev\tsl}\wav{\lev}{\tsl}$ in
+$L_2$. The orthogonal projection onto $\WJ$ retains the levels below $J$, and
+Parseval's identity gives
+$\norm{g-\PiJ g}^2_{L_2[0,1]} = \sum_{\lev\ge J}
+\norm{\theta_{\lev\cdot}}_2^2$.
+
+\emph{From $\ell_\pi$ to $\ell_2$ inside a level.} In $\R^{2^{\lev}}$ one has
+$\norm{a}_2 \le \norm{a}_{\pi}$ when $\pi \le 2$, and
+$\norm{a}_2 \le (2^{\lev})^{1/2-1/\pi}\norm{a}_{\pi}$ by Hölder's inequality
+when $\pi > 2$. In both cases $\norm{\theta_{\lev\cdot}}_2 \le
+2^{\lev(1/2-1/\pi)_{+}}\norm{\theta_{\lev\cdot}}_{\pi}$, and
+Assumption 5 gives
+\[
+  \norm{\theta_{\lev\cdot}}_2 \;\le\;
+  C_g\,2^{-\lev\{s+1/2-1/\pi-(1/2-1/\pi)_{+}\}}
+  \;=\; C_g\,2^{-\lev\seff},
+\]
+since the exponent equals $s$ when $\pi \ge 2$ and $s-(1/\pi-1/2)$ when
+$\pi < 2$. This is where the loss $(1/\pi-1/2)_{+}$ appears.
+
+\emph{Geometric sum and density.}
+$\sum_{\lev\ge J}C_g^2 2^{-2\lev\seff} = C_g^2 2^{-2J\seff}/(1-2^{-2\seff})$,
+finite because $\seff > 0$, which is the first display of Lemma 2. For the
+second, write $f-f_J = \sum_{\cv,\md}X_{\cv}h_{\cv\md}(U_{\md})$ with
+$h_{\cv\md} = \gcomp{\cv}{\md}-\PiJ\gcomp{\cv}{\md}$, the levels cancelling.
+By the Cauchy-Schwarz inequality over the $pq$ terms and
+$|X_{\cv}| \le B_X$,
+\[
+  \E\{(f-f_J)^2\} \;\le\; pq\sum_{\cv,\md}
+  \E\{X_{\cv}^2h_{\cv\md}^2(U_{\md})\}
+  \;\le\; pq\,B_X^2\sum_{\cv,\md}\E\{h_{\cv\md}^2(U_{\md})\},
+\]
+and $\E\{h^2(U_{\md})\} = \int_0^1 h^2 p_{U_{\md}} \le C_U\norm{h}^2_{L_2[0,1]}$,
+the marginal density being bounded by $C_U$ because integrating the joint
+density over the other $q-1$ coordinates of $[0,1]^{q-1}$ does not increase
+the bound. One factor $pq$ comes from the Cauchy-Schwarz inequality and the
+other from the sum. \qed
+
+The uniform version is used in Section S5 to bound the empirical norm of the
+bias without an appeal to Markov's inequality.
+
+\begin{lemma}[Uniform approximation error]
+\label{lem:sup}
+Under Assumptions 4 and 5 with $s > 1/\pi$, each component has a continuous
+version and, for every $J \ge 0$,
+\[
+  \norm{\gcomp{\cv}{\md}-\PiJ\gcomp{\cv}{\md}}_{\infty}
+  \;\le\; \frac{(L-1)\norm{\psi}_{\infty}C_g}{1-2^{-(s-1/\pi)}}\,
+  2^{-J(s-1/\pi)} ,
+\]
+and therefore
+$\normn{\bb} \le \norm{f-f_J}_{\infty} \le pq B_X(L-1)\norm{\psi}_{\infty}
+C_g\,2^{-J(s-1/\pi)}/\{1-2^{-(s-1/\pi)}\}$ for every sample.
+\end{lemma}
+
+\begin{proof}
+At a point $u$ and a level $\lev$ at most $L-1$ periodized translates are
+nonzero, because $\psi(2^{\lev}u-\tsl)\ne0$ requires
+$2^{\lev}u-\tsl \in (0,L-1)$, so
+$\sum_{\tsl}|\wav{\lev}{\tsl}(u)| \le (L-1)2^{\lev/2}\norm{\psi}_{\infty}$.
+With $\max_{\tsl}|\theta_{\lev\tsl}| \le \norm{\theta_{\lev\cdot}}_{\pi} \le
+C_g2^{-\lev(s+1/2-1/\pi)}$ the level contributes at most
+$(L-1)\norm{\psi}_{\infty}C_g2^{-\lev(s-1/\pi)}$ in the supremum norm. Since
+$s > 1/\pi$ the series converges absolutely and uniformly, so its sum is
+continuous and agrees almost everywhere with $g$; the tail from level $J$ on
+is the geometric sum of the displayed bounds, and the statement for $f-f_J$ is
+the triangle inequality over the $pq$ terms.
+\end{proof}
+
+The next proposition is the one referred to in Section 2.2 of the paper: it
+quantifies what the periodized basis charges for a component that does not
+match at the two ends of the interval.
+
+\begin{proposition}[Cost of periodization]
+\label{prop:periodization}
+Let the basis be as in Assumption 4 and let
+$g \in \Besov{s}{\pi}{r}[0,1]$, the Besov space of the interval and not of the
+circle, with $s > 1/\pi$, $N > s$ and $\int_0^1 g = 0$. Then there is a
+constant $C$ depending on $g$, on $\psi$ and on $(s,\pi)$ such that, for every
+$J$ with $2^J \ge L-1$,
+\[
+  \norm{g-\PiJ g}^2_{L_2[0,1]} \;\le\; C\,2^{-2J\seff}
+  \;+\; 2(L-1)\norm{\psi}_1^2\norm{g}^2_{\infty}\,2^{-J},
+\]
+so that the $L_2$ rate is $2^{-J\min(\seff,1/2)}$. If $g$ is continuous with
+$g(0) \ne g(1)$, the second term is of the exact order $2^{-J}$ and
+$\norm{g-\PiJ g}_{\infty}$ does not converge to zero.
+\end{proposition}
+
+\begin{proof}
+Let $\tilde g$ be the one periodic extension of $g$, so that
+$\theta_{\lev\tsl} = \int_{\R}\tilde g(y)2^{\lev/2}\psi(2^{\lev}y-\tsl)\,dy$.
+At a level with $2^{\lev} \ge L-1$, separate the interior translates, whose
+support lies inside $[0,1]$, from the at most $L-1$ boundary translates that
+cross the identification of $0$ with $1$. For an interior translate,
+$\theta_{\lev\tsl} = \inner{Eg}{\psi_{\lev\tsl}}_{\R}$ for any extension $Eg$
+of $g$ to the line; taking $E$ a bounded extension operator from
+$\Besov{s}{\pi}{r}[0,1]$ to $\Besov{s}{\pi}{r}(\R)$
+\citep[Chapter 3]{Triebel-1983} and using the wavelet characterization of the
+latter, which for the implication from the function to the sequence requires
+only $N > s$ vanishing moments, gives
+$\norm{(\theta_{\lev\tsl})_{\rm int}}_{\pi} \le C_12^{-\lev(s+1/2-1/\pi)}$,
+whose tail sum is bounded as in Lemma 2. For a boundary translate,
+$s > 1/\pi$ makes $g$ bounded and
+$|\theta_{\lev\tsl}| \le \norm{g}_{\infty}\norm{\psi_{\lev\tsl}}_1 =
+\norm{g}_{\infty}\norm{\psi}_12^{-\lev/2}$, and there are at most $L-1$ of
+them per level, so their tail sum is at most
+$2(L-1)\norm{\psi}_1^2\norm{g}_{\infty}^22^{-J}$. For the exact order, if $g$
+is continuous with $g(0) \ne g(1)$ then on the support of a boundary translate
+$\tilde g$ equals $g(1)+o(1)$ to the left of the identification point and
+$g(0)+o(1)$ to the right, so
+$\theta_{\lev\tsl} = 2^{-\lev/2}\{g(0)-g(1)\}\int_{y>a_{\tsl}}\psi(y)\,dy +
+o(2^{-\lev/2})$; since $\int\psi = 0$ and $\psi$ vanishes on no subinterval of
+its support, that partial integral is nonzero for some translate, and the
+boundary contribution of the level is of order $2^{-\lev}$. The failure of
+uniform convergence is that of any wavelet series at a jump.
+\end{proof}
+
+Under Assumption 5 nothing changes, since that assumption is already a
+periodic one; what Proposition S3.1 gives is the price of its failure. With
+the basis of \citet*{cohen1993wavelets} the space $\VJ$ reproduces polynomials
+of degree below $N$ and its basis characterizes $\Besov{s}{\pi}{r}[0,1]$
+without periodicity \citep[Section 3.9]{Cohen-2003}, so Lemma 2 holds with
+that space and the same proof.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/03-desenho-produtos.tex
+\section{The Gram matrix of the product design}
+\setcounter{equation}{0}
+
+Recall $\bPsi(u) \in \R^{K}$, $K = 1+q\NJ$, the vector that collects the
+constant and the wavelets of the $q$ modulators, and the identity
+$\bZ = \Pi\{\bX \otimes \bPsi(\bU)\}$, where $\Pi$ is the fixed permutation
+that moves the $p$ entries $X_{\cv}\cdot 1$ to the front. Since $\Pi$ is
+orthogonal, every statement about eigenvalues is invariant to the column
+order. Assumption 4 also gives a constant $C_\psi$, depending only on the
+family, with
+\begin{equation}
+  \label{eq:pointwise}
+  \sup_{u\in[0,1]}\sum_{\lev<J}\sum_{\tsl}\wav{\lev}{\tsl}(u)^2
+  \;\le\; C_\psi\,2^{J} \qquad \text{for every } J \ge 1 :
+\end{equation}
+at each level at most $L$ periodized wavelets are nonzero at a given $u$ and
+$\norm{\wav{\lev}{\tsl}}_{\infty} = 2^{\lev/2}\norm{\psi}_{\infty}$, so the
+left side is at most
+$L\norm{\psi}^2_{\infty}\sum_{\lev<J}2^{\lev} \le L\norm{\psi}^2_{\infty}2^J$.
+
+\subsection*{Proof of Proposition 2}
+
+\emph{Part (i), the modulators.} For $a \in \R^{K}$ write
+$h_a(u) = a\T\bPsi(u) = a_0 + \sum_{\md}h_{a,\md}(u_{\md})$ with
+$h_{a,\md} = \sum_{\lev\tsl}a_{\md,\lev\tsl}\wav{\lev}{\tsl}$. The functions
+$1$ and $\wav{\lev}{\tsl}(u_{\md})$, $\md = 1,\dots,q$, are orthonormal in
+$L_2([0,1]^q,du)$: within one coordinate this is the orthonormality of the
+periodized system, and across coordinates
+$\int\wav{\lev}{\tsl}(u_{\md})\wav{\lev'}{\tsl'}(u_{\md'})\,du =
+\int_0^1\wav{\lev}{\tsl}\int_0^1\wav{\lev'}{\tsl'} = 0$ for
+$\md \ne \md'$, because every wavelet integrates to zero. Hence
+$\int_{[0,1]^q}h_a^2 = \norm{a}_2^2$ and, by Assumption 3,
+$c_U\norm{a}_2^2 \le \E\{h_a(\bU)^2\} \le C_U\norm{a}_2^2$, which is the claim
+since $a\T\Gram_{\bPsi}a = \E\{h_a(\bU)^2\}$.
+
+\emph{Part (i), the full matrix.} Let $\delta \in \R^{pK}$ and reshape it as
+$\Delta \in \R^{p\times K}$, row $\cv$ holding the coefficients attached to
+$X_{\cv}$, so that $\{\bX\otimes\bPsi(\bU)\}\T\delta = \bX\T\Delta\bPsi(\bU)$.
+By the tower property,
+\[
+  \delta\T\Pi\T\Gram\Pi\delta
+  = \E\bigl[\{\bX\T\Delta\bPsi(\bU)\}^2\bigr]
+  = \E\bigl[\bPsi(\bU)\T\Delta\T\,\E(\bX\bX\T\mid\bU)\,\Delta\bPsi(\bU)\bigr].
+\]
+Assumption 2 bounds the inner quadratic form between
+$\kappa_1\norm{\Delta\bPsi(\bU)}_2^2$ and $\kappa_2\norm{\Delta\bPsi(\bU)}_2^2$
+almost surely, and
+$\E\norm{\Delta\bPsi(\bU)}_2^2 = \delta\T(I_p\otimes\Gram_{\bPsi})\delta$ lies
+between $\lmin(\Gram_{\bPsi})\norm{\delta}_2^2$ and
+$\lmaxx(\Gram_{\bPsi})\norm{\delta}_2^2$. Combining the two and using the
+first part gives $\gamma = \kappa_1c_U \le \lmin(\Gram)$ and
+$\lmaxx(\Gram) \le \kappa_2C_U$. If $\bX$ and $\bU$ are independent, the
+conditional second moment matrix is constant, the same computation gives
+$\delta\T\Pi\T\Gram\Pi\delta = \delta\T\{\E(\bX\bX\T)\otimes\Gram_{\bPsi}\}
+\delta$ for every $\delta$, and two symmetric matrices with the same quadratic
+form are equal; the eigenvalues of a Kronecker product of symmetric matrices
+are the products of the eigenvalues, and
+$\lmin\{\E(\bX\bX\T)\} \ge \kappa_1$ by Jensen's inequality, since $\lmin$ is
+concave and $\E(\bX\bX\T) = \E\{\E(\bX\bX\T\mid\bU)\}$.
+
+\emph{Part (ii), the empirical matrix.} First the range:
+$\norm{\bZ_i}_2^2 = \norm{\bX_i}_2^2\norm{\bPsi(\bU_i)}_2^2 \le
+pB_X^2(1+qC_\psi2^J) = R_J$ by \eqref{eq:pointwise} applied to each of the $q$
+coordinates. Set $A_i = (\bZ_i\bZ_i\T-\Gram)/n$, independent, centered and
+symmetric, with $\Gramhat - \Gram = \sum_i A_i$. Then
+$\opnorm{\bZ_i\bZ_i\T} = \norm{\bZ_i}_2^2 \le R_J$ and
+$\opnorm{\Gram} \le R_J$, so $\opnorm{A_i} \le 2R_J/n$; and
+$\E\{(\bZ\bZ\T-\Gram)^2\} = \E(\norm{\bZ}_2^2\bZ\bZ\T) - \Gram^2 \preceq
+R_J\Gram$, so that
+$\opnorm{\sum_i\E A_i^2} \le R_J\lmaxx(\Gram)/n \le R_J\kappa_2C_U/n$. The
+matrix Bernstein inequality \citep[Theorem 1.4]{tropp2012user} applied to
+$\pm\sum_iA_i$ gives, for every $t>0$,
+\[
+  \Prob\bigl(\opnorm{\Gramhat-\Gram} \ge t\bigr)
+  \;\le\; 2D\exp\Bigl\{-\frac{nt^2}{2R_J(\kappa_2C_U+2t/3)}\Bigr\},
+\]
+and $t = \gamma/2$ with Weyl's inequality gives
+$\lmin(\Gramhat) \ge \lmin(\Gram)-\gamma/2 \ge \gamma/2$ on the complementary
+event, which is the display of part (ii). The exponent is $-cn/R_J$ with $c$
+fixed and $R_J \asymp pq2^J$, while $\log(2D) \asymp \log(pq2^J)$, so the
+bound tends to zero exactly when $n/(pq2^J) - \log(pq2^J) \to \infty$, which
+is implied by $pq2^J\log(pq2^J)/n \to 0$. On that event
+$\compat^2(S;\Gramhat) \ge \gamma/2$ for every support, by
+\eqref{eq:compat-lmin}. \qed
+
+\begin{remark}[What the two assumptions exclude]
+\label{rem:excl}
+Assumption 2 fails exactly when a nontrivial linear combination of the linear
+covariates is almost surely a function of the modulators on a set of positive
+probability; in the canonical case $X_1\equiv1$ and $X_2 = h(U_1)$ the
+conditional second moment matrix has rank one and the population Gram matrix
+degenerates as $J$ grows, because $h(u_1)\wav{\lev}{\tsl}(u_1)$ is approached
+by the span of the basis. In Assumption 3 it is the joint density that is
+bounded below: if $U_2 = U_1$ almost surely, both marginals are uniform but
+$\wav{\lev}{\tsl}(U_1)-\wav{\lev}{\tsl}(U_2) \equiv 0$ and
+$\Gram_{\bPsi}$ is singular. Independence between $\bX$ and $\bU$ buys the
+exact factorization of part (i) and nothing else.
+\end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/04-oraculo.tex
+\section{The oracle inequality}
+\setcounter{equation}{0}
+
+{\color{gray}\noindent[k = 4: the calibration lemma of the lasso, the proof of
+Theorem~2 for the lasso, the remark on the cone and the corollary that
+instantiates the design condition, which stood in this section, are moved to
+Section~S8, unchanged except for the numbering of the results they cite;
+Lemmas~S5.1, S5.3 and S5.4 stay, the first extended to the penalty of
+equation~(2.5).]\par}
+
+\textcolor{gray}{\sout{Four lemmas precede the proof of Theorem 2.}}
+\textcolor{colR1}{A proposition on the partition into chunks and four lemmas
+precede the proof of Theorem~2.}
+
+% derivations/08-blocos.tex, Proposicao 7 (numeracao global).
+{\color{colR1}
+\begin{proposition}[The partition into chunks]
+\label{prop:balanced}
+Let $\Gcal$ be the partition of Section~2.3 of the paper with $b \ge 2$ and
+$J \ge 1$, and let $\jst = \max\{\lev \ge 0 : 2^{\lev} < b\}$.
+\begin{enumerate}
+\item[(i)] Every chunk of a fine level, $\lev > \jst$, is contained in that
+level and has between $b$ and $2b-1$ coefficients. If $J > \jst+1$, the coarse
+chunk has $2^{\jst+1}-1$ coefficients, and $b-1 \le 2^{\jst+1}-1 \le 2b-3$;
+if $J \le \jst+1$, each block is a single chunk of $2^{J}-1$ coefficients.
+\item[(ii)] $|\Gcal| \le pq(1 + 2^{J}/b)$.
+\item[(iii)] With $w_{G} = |G|^{1/2}$,
+$\varrho^{2} = \max_{G}|G|/\min_{G}|G| \le (2b-1)/(b-1) \le 3$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+All blocks have the same structure, so it suffices to look at one. The coarse
+chunk has $\sum_{\lev=0}^{\min(\jst,J-1)}2^{\lev} = 2^{\min(\jst,J-1)+1}-1$
+coefficients. If $J \le \jst+1$, this is $2^{J}-1$ and there is no fine level.
+Otherwise $2^{\jst} < b \le 2^{\jst+1}$ and, $b$ being an integer,
+$2^{\jst} \le b-1$, so that $b-1 \le 2^{\jst+1}-1 \le 2b-3$. A fine level
+$\lev$ has $k_{\lev} = \lfloor 2^{\lev}/b\rfloor \ge 1$ chunks, $k_{\lev}-1$ of
+them with $b$ coefficients and the last with $b + r_{\lev}$, where
+$r_{\lev} = 2^{\lev} - k_{\lev}b \in \{0,\dots,b-1\}$; all lie between $b$ and
+$2b-1$, which is (i). For (ii), a block has
+$1 + \sum_{\lev=\jst+1}^{J-1}\lfloor 2^{\lev}/b\rfloor \le
+1 + (2^{J}-2^{\jst+1})/b \le 1 + 2^{J}/b$ chunks. For (iii), with
+$w_{G} = |G|^{1/2}$, $\varrho^{2} = \max|G|/\min|G|$; with no fine level every
+chunk has $2^{J}-1$ coefficients and $\varrho = 1$, and otherwise (i) gives
+$\min|G| \ge b-1$ and $\max|G| \le 2b-1$, and
+$(2b-1)/(b-1) = 2 + 1/(b-1) \le 3$.
+\end{proof}
+}
+
+
+\begin{lemma}[Profiling and the Schur complement]
+\label{lem:profile}
+Suppose $\Amat$ has rank $p$. Then $\thetahat$ minimizes
+\textcolor{gray}{\sout{$\normn{\MA\bY-\Btil\btheta}^2+2\pen\norm{\btheta}_1$}}\textcolor{colR1}{$\normn{\MA\bY-\Btil\btheta}^2+2\pen\nGw{\btheta}$,
+or the same with $\norm{\btheta}_1$ for the lasso,} and
+$\chat = (\Amat\T\Amat)^{-1}\Amat\T(\bY-\Bmat\thetahat)$; with
+$v = \thetahat-\thetastar$,
+\begin{equation}
+  \label{eq:decomp}
+  \widehat{f}-f_J \;=\; \Btil v + \PA(\bb+\bveps)\textcolor{colR1}{,}
+\end{equation}
+\textcolor{colR1}{and the same identity holds with any comparator
+$\bar\bbeta$, $\bbar$ and $\vbar = \thetahat-\thbar$ in place of $\betastar$,
+$\bb$ and $v$;}
+$\GBA$ is the Schur complement of the block $\Amat$ in $\Gramhat$ and
+\begin{equation}
+  \label{eq:schur}
+  \gtil \;=\; \lmin(\GBA) \;\ge\; \lmin(\Gramhat);
+\end{equation}
+and if $\lmin(\Gramhat)>0$ the minimizer in (2.5) is unique.
+\end{lemma}
+
+\begin{proof}
+\textcolor{colR1}{The argument uses only that the penalty does not depend on
+$\bc$ and is convex, so it holds for both penalties.} The objective is convex and, for fixed $\btheta$, quadratic and coercive in
+$\bc$, with minimum at the stated value and minimized value
+$\normn{\MA(\bY-\Bmat\btheta)}^2 = \normn{\MA\bY-\Btil\btheta}^2$, since $\MA$
+is a symmetric idempotent; minimizing first in $\bc$ and then in $\btheta$
+gives the same set of minimizers as minimizing jointly. For
+\eqref{eq:decomp}, $\Amat\chat = \PA(\bY-\Bmat\thetahat)$ and
+$\Amat\bc = \PA\Amat\bc$, and $\bY = \Amat\bc+\Bmat\thetastar+\bb+\bveps$, so
+$\Amat(\chat-\bc) = \PA(\bb+\bveps)-\PA\Bmat v$ and
+$\widehat{f}-f_J = \MA\Bmat v + \PA(\bb+\bveps)$\textcolor{colR1}{; the same
+computation with $\bY = \Amat\bar\bc + \Bmat\thbar + \bbar + \bveps$ gives the
+identity for a comparator}. For \eqref{eq:schur}, the
+variational characterization of the Schur complement gives, for every
+$v \in \R^d$,
+\[
+  v\T\GBA v \;=\; \min_{u\in\R^p}(u\T,v\T)\,\Gramhat\,(u\T,v\T)\T
+  \;\ge\; \min_{u}\lmin(\Gramhat)(\norm{u}_2^2+\norm{v}_2^2)
+  \;=\; \lmin(\Gramhat)\norm{v}_2^2 .
+\]
+Finally $\lmin(\Gramhat)>0$ makes the quadratic term strictly convex, and
+adding a convex function preserves strict convexity.
+\end{proof}
+
+% derivations/08-blocos.tex, Lema 14 (numeracao global).
+{\color{colR1}
+\begin{lemma}[Calibration of the penalty over chunks]
+\label{lem:calib-blocks}
+Under Assumption~1, let $\Gcal$ be any partition of the penalized coordinates
+and $\alpha \in (0,1)$.
+\begin{enumerate}
+\item[(i)] With $\lamz{G}$ as in Theorem~2, the event
+$\Ecal = \{\norm{(\Btil\T\bveps/n)_{G}}_{2} \le \lamz{G} \text{ for every } G\}$
+has $\Prob(\Ecal\mid\bX,\bU) \ge 1-\alpha$. Consequently, for any weights $w$
+and every $\pen \ge \pen_{w}$, $\Ecal \subseteq \Tw$ and
+$\Prob(\Tw) \ge 1-\alpha$.
+\item[(ii)] (Closed form.) $\mathrm{tr}(\Psitil_{G}) \le |G|\smax^{2}$ and
+$\opnorm{\Psitil_{G}} \le \lmaxx(\Gramhat)$; hence, on the event
+$\{\smax^{2} \le 2B_X^{2}C_U\}\cap\{\lmaxx(\Gramhat) \le \Lambda\}$,
+$\lamz{G} \le \lamzbar{G}$ for every $G$, with
+\[
+  \lamzbar{G} \;=\; \frac{\sigma}{\sqrt{n}}\Bigl\{B_X\sqrt{2C_U|G|}
+  + \sqrt{2\Lambda\log(|\Gcal|/\alpha)}\Bigr\},
+\]
+which is deterministic and is the quantity of equation (3.1) of the paper.
+\item[(iii)] (The price of the weights.) With
+$\lamG = 2\max_{G}\lamzbar{G}/w_{G}$ and $\lamGone = 2\max_{G}\lamzbar{G}$,
+$\lamG w_{G} \le \varrho\lamGone$ for every $G$, and therefore
+$(\lamG)^{2}\Wcal(\Hcal) \le \varrho^{2}(\lamGone)^{2}|\Hcal|$ for every
+$\Hcal \subseteq \Gcal$. The same holds with $\pen_{w}$ and
+$2\max_{G}\lamz{G}$ in place of $\lamG$ and $\lamGone$.
+\end{enumerate}
+\end{lemma}
+
+The event $\Ecal$ does not depend on the weights: they only choose the chunk
+that dictates the penalty, the one with the largest $\lamz{G}/w_{G}$, and the
+price of unequal weights is the factor $\varrho$ of (iii), paid in the
+estimation term. With unit weights and chunks of at most $b_{\max}$
+coefficients, $\lamGone \asymp \sigma\{(b_{\max} + \log|\Gcal|)/n\}^{1/2}$,
+which is the penalty level of \citet[eq.~3.14]{Klopp-Pensky-2015} up to
+constants and the sub-Gaussian version of the level of
+\citet[Lemma~3.1]{Lounici-Pontil-vandeGeer-Tsybakov-2011}.
+
+\begin{proof}
+\emph{(i).} Condition on $(\bX,\bU)$. Then $\Btil$ is fixed and, by
+Assumption~1, the errors are independent with
+$\E\{\exp(a_{i}\varepsilon_{i})\mid\bX,\bU\} \le \exp(\sigma^{2}a_{i}^{2}/2)$,
+so that $\E\{\exp(a\T\bveps)\mid\bX,\bU\} \le \exp(\sigma^{2}\norm{a}_{2}^{2}/2)$
+for every $a \in \R^{n}$, which is the condition of
+\citet[Theorem~2.1]{Hsu-Kakade-Zhang-2012} with mean zero. Fix $G$ and write
+$M_{G} = \Btil_{G}\T/n$, so that $(\Btil\T\bveps/n)_{G} = M_{G}\bveps$, and
+$\Sigma_{G} = M_{G}\T M_{G} \in \R^{n\times n}$. The theorem is stated for a
+square matrix $A$ with $\Sigma = A\T A$; take $A = \Sigma_{G}^{1/2}$, which has
+the same $\Sigma_{G}$, and note that
+$\norm{\Sigma_{G}^{1/2}\bveps}_{2}^{2} = \bveps\T\Sigma_{G}\bveps =
+\norm{M_{G}\bveps}_{2}^{2}$. Since $\mathrm{tr}(\Sigma_{G}) =
+\mathrm{tr}(\Psitil_{G})/n$, $\opnorm{\Sigma_{G}} = \opnorm{\Psitil_{G}}/n$
+and $\mathrm{tr}(\Sigma_{G}^{2}) \le \opnorm{\Sigma_{G}}\mathrm{tr}(\Sigma_{G})$,
+the theorem gives, for every $t > 0$, with conditional probability at least
+$1 - e^{-t}$,
+\[
+  \norm{(\Btil\T\bveps/n)_{G}}_{2}^{2}
+  \;\le\; \sigma^{2}\bigl[\mathrm{tr}(\Sigma_{G})
+  + 2\{\mathrm{tr}(\Sigma_{G}^{2})t\}^{1/2} + 2\opnorm{\Sigma_{G}}t\bigr]
+  \;\le\; \frac{\sigma^{2}}{n}\Bigl[\{\mathrm{tr}(\Psitil_{G})\}^{1/2}
+  + \{2\opnorm{\Psitil_{G}}t\}^{1/2}\Bigr]^{2}.
+\]
+With $t = \log(|\Gcal|/\alpha)$ each chunk fails with conditional probability
+at most $\alpha/|\Gcal|$, and a union bound over the chunks and the tower
+property give $\Prob(\Ecal) \ge 1-\alpha$. On $\Ecal$,
+$\norm{(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \lamz{G}/w_{G} \le \pen_{w}/2 \le
+\pen/2$ for every $G$, so $\Ecal \subseteq \Tw$.
+
+\emph{(ii).} Since $\MA \preceq I_{n}$,
+$\Psitil_{G} = \Bmat_{G}\T\MA\Bmat_{G}/n \preceq \Gramhat_{GG}$, the principal
+submatrix of $\Gramhat$ on $G$. Hence $\mathrm{tr}(\Psitil_{G}) \le
+\sum_{a\in G}(\Gramhat)_{aa} \le |G|\smax^{2}$, and
+$\opnorm{\Psitil_{G}} \le \lmaxx(\Gramhat_{GG}) \le \lmaxx(\Gramhat)$ by Cauchy
+interlacing. On the event of the statement,
+$\smax \le B_X(2C_U)^{1/2}$ and $\lmaxx(\Gramhat) \le \Lambda$.
+
+\emph{(iii).} For every $G$,
+$\lamG w_{G} = 2\max_{G'}(\lamzbar{G'}w_{G}/w_{G'}) \le
+2\max_{G'}\lamzbar{G'}\cdot\max_{G'}(w_{G}/w_{G'}) \le \varrho\lamGone$, and
+$(\lamG)^{2}\Wcal(\Hcal) = \sum_{G\in\Hcal}(\lamG w_{G})^{2} \le
+\varrho^{2}(\lamGone)^{2}|\Hcal|$. The same computation holds with the
+$\lamz{G}$.
+\end{proof}
+}
+
+\begin{lemma}[Empirical column norms]
+\label{lem:columns}
+Under Assumptions 2 to 4, every penalized column has
+$\E\{(\Gramhat)_{aa}\} \le B_X^2C_U$ and, for every $t>0$, with
+$R'_J = B_X^2\norm{\psi}^2_{\infty}2^{J-1}$,
+\[
+  \Prob(\smax^2 > B_X^2C_U+t) \;\le\;
+  d\exp\Bigl\{-\frac{nt^2}{2(R'_JB_X^2C_U+R'_Jt/3)}\Bigr\} .
+\]
+In particular $\Prob(\smax^2 \le 2B_X^2C_U) \to 1$ whenever
+$2^J\log d/n \to 0$.
+\end{lemma}
+
+\begin{proof}
+For the column $a = (\cv\md,\lev\tsl)$ the summand is
+$W_i = X_{i\cv}^2\wav{\lev}{\tsl}(U_{i\md})^2 \ge 0$, with
+$\E(W) \le B_X^2\int_0^1\wav{\lev}{\tsl}^2p_{U_{\md}} \le B_X^2C_U$ by
+orthonormality and the bounded marginal density, and
+$0 \le W_i \le B_X^2\norm{\psi}_{\infty}^22^{J-1} = R'_J$ because
+$\lev \le J-1$. Then $\Var(W) \le \E(W^2) \le R'_J\E(W) \le R'_JB_X^2C_U$, and
+the one sided Bernstein inequality with a union bound over the $d$ columns
+gives the display. With $t = B_X^2C_U$ the exponent is
+$-3nB_X^2C_U/(8R'_J)$ and $R'_J \asymp 2^J$.
+\end{proof}
+
+\begin{lemma}[The $\ell_1$ norm of the \textcolor{colR1}{oracle}]
+\label{lem:l1}
+Under Assumption 5, for every pair $(\cv,\md)$ and every level,
+$\sum_{\tsl}|\coefs{\cv}{\md}{\lev}{\tsl}| \le
+2^{\lev(1-1/\pi)}\norm{\theta^{*}_{\cv\md,\lev\cdot}}_{\pi} \le
+C_g2^{\lev(1/2-s)}$, with no dependence on $\pi$, and therefore
+$\norm{\thetastar}_1 \le pqC_g\sum_{\lev<J}2^{\lev(1/2-s)}$, which is
+$O(1)$ if $s>1/2$, of order $J$ if $s = 1/2$ and of order
+$2^{J(1/2-s)}$ if $s<1/2$.
+\end{lemma}
+
+\begin{proof}
+Hölder's inequality in $\R^{2^{\lev}}$ gives
+$\norm{a}_1 \le (2^{\lev})^{1-1/\pi}\norm{a}_{\pi}$, and Assumption 5 bounds
+the $\ell_\pi$ norm of the level by $C_g2^{-\lev(s+1/2-1/\pi)}$; the resulting
+exponent is $\lev(1-1/\pi)-\lev(s+1/2-1/\pi) = \lev(1/2-s)$, in which $\pi$
+has disappeared. Summing over the levels below $J$ and over the $pq$ blocks
+gives the three regimes of the geometric sum.
+\end{proof}
+
+% derivations/08-blocos.tex, prova do Teorema 3 (numeracao global).
+{\color{colR1}
+\subsection*{Proof of Theorem 2}
+
+The event $\Tw$ has probability at least $1-\alpha$ whenever
+$\pen \ge \pen_{w}$, by Lemma~\ref{lem:calib-blocks}(i). Fix a comparator
+$\bar\bbeta = (\bar\bc,\thbar)$ and write $\norm{\cdot}$ for $\nGw{\cdot}$ in
+this proof.
+
+\emph{Step 1, the basic inequality.} By Lemma~\ref{lem:profile}, $\thetahat$
+minimizes the residualized objective; comparing its value at $\thetahat$ with
+its value at $\thbar$, and using $\bY = \Amat\bar\bc + \Bmat\thbar + \bbar +
+\bveps$ and $\MA\Amat = 0$, so that $\MA\bY = \Btil\thbar + r$ with
+$r = \MA(\bbar + \bveps)$,
+\begin{equation}
+  \label{eq:basic-blocks}
+  \normn{\Btil\vbar}^{2} + 2\pen\norm{\thetahat}
+  \;\le\; 2\inner{r}{\Btil\vbar}_{n} + 2\pen\norm{\thbar} .
+\end{equation}
+
+\emph{Step 2, the two noises.} Since $\MA$ is symmetric and $\MA\Btil = \Btil$,
+$\inner{r}{\Btil\vbar}_{n} = \inner{\bbar+\bveps}{\Btil\vbar}_{n}$. The
+stochastic part is handled by the dual norm of $\norm{\cdot}$, which is
+$z \mapsto \max_{G}\norm{z_{G}}_{2}/w_{G}$: on $\Tw$,
+\[
+  2\bigl|\inner{\bveps}{\Btil\vbar}_{n}\bigr|
+  = 2\Bigl|\sum_{G}\inner{(\Btil\T\bveps/n)_{G}}{\vbar_{G}}\Bigr|
+  \le 2\max_{G}\frac{\norm{(\Btil\T\bveps/n)_{G}}_{2}}{w_{G}}
+  \sum_{G}w_{G}\norm{\vbar_{G}}_{2}
+  \le \pen\norm{\vbar} .
+\]
+The deterministic part is handled by the Cauchy-Schwarz and Young
+inequalities: $2|\inner{\bbar}{\Btil\vbar}_{n}| =
+2|\inner{\MA\bbar}{\Btil\vbar}_{n}| \le 2\normn{\bbar}\normn{\Btil\vbar} \le
+\normn{\Btil\vbar}^{2}/2 + 2\normn{\bbar}^{2}$. Substituting both in
+\eqref{eq:basic-blocks},
+\begin{equation}
+  \label{eq:basic2-blocks}
+  \tfrac12\normn{\Btil\vbar}^{2} + 2\pen\norm{\thetahat}
+  \;\le\; \pen\norm{\vbar} + 2\pen\norm{\thbar} + 2\normn{\bbar}^{2} .
+\end{equation}
+
+\emph{Step 3, the slow rate.} Bounding $\norm{\vbar} \le \norm{\thetahat} +
+\norm{\thbar}$ in \eqref{eq:basic2-blocks} gives part (i). No property of
+$\Gramhat$ was used.
+
+\emph{Step 4, decomposability.} For $G \notin \Gbar$, $\thbar_{G} = 0$ and
+$\thetahat_{G} = \vbar_{G}$; for $G \in \Gbar$,
+$\norm{\thetahat_{G}}_{2} \ge \norm{\thbar_{G}}_{2} - \norm{\vbar_{G}}_{2}$.
+Hence $\norm{\thetahat} \ge \norm{\thbar} - \norm{\vbar_{\Gbar}} +
+\norm{\vbar_{\Gbar^{c}}}$, while $\norm{\vbar} = \norm{\vbar_{\Gbar}} +
+\norm{\vbar_{\Gbar^{c}}}$; substituting in \eqref{eq:basic2-blocks} and
+cancelling $2\pen\norm{\thbar}$,
+\begin{equation}
+  \label{eq:cone-blocks}
+  \tfrac12\normn{\Btil\vbar}^{2} + \pen\norm{\vbar_{\Gbar^{c}}}
+  \;\le\; 3\pen\norm{\vbar_{\Gbar}} + 2\normn{\bbar}^{2} .
+\end{equation}
+
+\emph{Step 5, two cases, with no cone.} By the Cauchy-Schwarz inequality and
+the definition of $\gtil$,
+\begin{equation}
+  \label{eq:cs-blocks}
+  \norm{\vbar_{\Gbar}} = \sum_{G\in\Gbar}w_{G}\norm{\vbar_{G}}_{2}
+  \le \bar\Wcal^{1/2}\norm{\vbar}_{2}
+  \le (\bar\Wcal/\gtil)^{1/2}\normn{\Btil\vbar},
+\end{equation}
+because $\normn{\Btil\vbar}^{2} = \vbar\T\GBA\vbar \ge \gtil\norm{\vbar}_{2}^{2}$.
+If $2\normn{\bbar}^{2} \le \pen\norm{\vbar_{\Gbar}}$, then
+\eqref{eq:cone-blocks} gives $\tfrac12\normn{\Btil\vbar}^{2} +
+\pen\norm{\vbar_{\Gbar^{c}}} \le 4\pen\norm{\vbar_{\Gbar}}$, and with
+\eqref{eq:cs-blocks}, $\tfrac12\normn{\Btil\vbar}^{2} \le
+4\pen(\bar\Wcal/\gtil)^{1/2}\normn{\Btil\vbar}$, that is
+$\normn{\Btil\vbar}^{2} \le 64\pen^{2}\bar\Wcal/\gtil$ and
+$\norm{\vbar}_{2}^{2} \le \normn{\Btil\vbar}^{2}/\gtil \le
+64\pen^{2}\bar\Wcal/\gtil^{2}$. If instead
+$2\normn{\bbar}^{2} > \pen\norm{\vbar_{\Gbar}}$, then \eqref{eq:cone-blocks}
+gives $\tfrac12\normn{\Btil\vbar}^{2} < 8\normn{\bbar}^{2}$, that is
+$\normn{\Btil\vbar}^{2} < 16\normn{\bbar}^{2}$, and
+$\norm{\vbar}_{2}^{2} < 16\normn{\bbar}^{2}/\gtil$. Each quantity is bounded by
+the maximum of the two cases, hence by their sum, which is part (ii).
+
+\emph{Step 6, prediction.} By Lemma~\ref{lem:profile} with the comparator,
+$\widehat{f}-f = \Btil\vbar + \PA(\bbar+\bveps) - \bbar$, and
+$\normn{\PA\bbar} \le \normn{\bbar}$, which gives the triangle inequality of
+part (iii). Conditionally on the covariates the errors are independent,
+centered and of variance at most $\sigma^{2}$, so
+$\E(\normn{\PA\bveps}^{2}\mid\bX,\bU) \le \sigma^{2}\mathrm{tr}(\PA)/n \le
+\sigma^{2}p/n$. Since $\Tw$, $\gtil$ and $\pen$ do not depend on the
+comparator, the bounds hold simultaneously for all comparators, and with
+$(x+y+z)^{2} \le 3(x^{2}+y^{2}+z^{2})$ and part (ii) they give, on
+$\Tw\cap\{\gtil > 0\}$,
+\begin{equation}
+  \label{eq:oracle-min-blocks}
+  \normn{\widehat{f}-f}^{2} \;\le\;
+  3\min_{\bar\bbeta}\Bigl\{\frac{64\pen^{2}\bar\Wcal}{\gtil}
+  + 20\normn{\bbar}^{2}\Bigr\} + 3\normn{\PA\bveps}^{2} . \qquad\qed
+\end{equation}
+
+\begin{remark}[Why there is no cone condition, also over chunks]
+\label{rem:nocone-blocks}
+The step that dispenses with the cone is the one of the lasso
+(Remark~\ref{rem:nocone}): profiling removes the levels from the problem, and
+the full smallest eigenvalue of Proposition 2 controls
+$\norm{\vbar_{\Gbar}} \le (\bar\Wcal/\gtil)^{1/2}\normn{\Btil\vbar}$ over the
+whole space, by \eqref{eq:cs-blocks}.
+\citet{Lounici-Pontil-vandeGeer-Tsybakov-2011} need a restricted eigenvalue
+condition for groups on a weighted cone (their Assumption~3.1); here it is
+dominated by the full smallest eigenvalue, and the constant is the same for
+every $\Gbar$.
+\end{remark}
+
+% derivations/08-blocos.tex, Observacao 2 (a variante branca); D47(d).
+\begin{remark}[The estimator that the software computes]
+\label{rem:white}
+The software standardizes the columns, orthonormalizes each chunk and
+penalizes the orthonormalized coordinates with the weights $|G|^{1/2}$. On the
+original scale its penalty is $\sum_{G}w_{G}\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$,
+with $Q_{G} = \Bmat_{G}\T M_{1}\Bmat_{G}/n$ the centered Gram matrix of the
+chunk, $M_{1} = I_{n} - n^{-1}\mathbf{1}\mathbf{1}\T$. Theorem~2 holds with any
+$Q_{G}$ positive definite and measurable with respect to the covariates, with
+three changes: the event becomes
+$\{\max_{G}\norm{Q_{G}^{-1/2}(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \pen/2\}$, by
+the dual norm; $\bar\Wcal$ becomes $q_{\max}\bar\Wcal$ in parts (ii) and
+(iii), with $q_{\max} = \max_{G}\lmaxx(Q_{G})$, because Step 5 reads
+$\sum_{G\in\Gbar}w_{G}\norm{Q_{G}^{1/2}\vbar_{G}}_{2} \le
+(q_{\max}\bar\Wcal)^{1/2}\norm{\vbar}_{2}$; and Lemma~\ref{lem:calib-blocks}(i)
+holds with $Q_{G}^{-1/2}\Psitil_{G}Q_{G}^{-1/2}$ in place of $\Psitil_{G}$, by
+the same proof with $Q_{G}^{-1/2}\Btil_{G}\T/n$ in place of $\Btil_{G}\T/n$.
+When the constant covariate $X_{1}\equiv 1$ is among the columns of $\Amat$,
+$\PA \succeq I_{n} - M_{1}$, so that $\MA \preceq M_{1}$ and
+$\Psitil_{G} \preceq Q_{G}$: the trace of $Q_{G}^{-1/2}\Psitil_{G}Q_{G}^{-1/2}$
+is at most $|G|$ and its norm at most one, and
+\[
+  \lamz{G} \;\le\; \frac{\sigma}{\sqrt{n}}\Bigl\{|G|^{1/2}
+  + \sqrt{2\log(|\Gcal|/\alpha)}\Bigr\},
+\]
+which is pivotal, with neither $\smax$ nor $\Lambda$; and
+$q_{\max} \le \lmaxx(\Gramhat) \le \Lambda$ on $\ESig$, since
+$Q_{G} \preceq \Gramhat_{GG}$. The rates of Section~S6 hold for this estimator
+with the constant multiplied by $\Lambda$.
+\end{remark}
+
+% derivations/08-blocos.tex, Corolario 9 (numeracao global).
+\begin{corollary}[The ideal risk form]
+\label{cor:ideal}
+In the conditions of Theorem~2, on the event $\Tw\cap\{\gtil > 0\}$, let
+$\Lambda' \ge \lmaxx(\Gramhat)$, for instance $\Lambda' = \Lambda$ on $\ESig$,
+and
+\[
+  \eta \;=\; \frac{1.6\max_{G}(\pen w_{G})^{2}}{\Lambda'\gtil}.
+\]
+Then
+\[
+  \normn{\widehat{f}-f}^{2} \;\le\; 120\Lambda'\Rid(\thetastar;\eta)
+  + 120\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2},
+  \qquad
+  \norm{\thetahat-\thetastar}_{2}^{2} \;\le\;
+  \frac{82\Lambda'\Rid(\thetastar;\eta) + 64\normn{\bb}^{2}}{\gtil}.
+\]
+With $\pen = \lamG$, or $\pen = \pen_{w}$, Lemma~\ref{lem:calib-blocks}(iii)
+gives $\eta \le \varrho^{2}\eta_{1}$, with
+$\eta_{1} = 1.6(\lamGone)^{2}/(\Lambda'\gtil)$ the level of unit weights, and
+$\Rid(\thetastar;\eta) \le \varrho^{2}\Rid(\thetastar;\eta_{1})$.
+\end{corollary}
+
+\begin{proof}
+Let $T = \{G : \norm{\thetastar_{G}}_{2}^{2} > \eta\}$ and take the comparator
+$\bar\bbeta = (\bc,\thbar)$ with $\thbar_{G} = \thetastar_{G}\mathbf{1}\{G\in T\}$.
+Then $\Gbar \subseteq T$ and, by the definition of $\eta$,
+$\pen^{2}\bar\Wcal \le \sum_{G\in T}(\pen w_{G})^{2} \le
+|T|\max_{G}(\pen w_{G})^{2} = |T|\eta\Lambda'\gtil/1.6$. The residual is
+$\bbar = \bb + \Bmat(\thetastar-\thbar)$, and since $\Bmat\T\Bmat/n$ is a
+principal submatrix of $\Gramhat$,
+\[
+  \normn{\bbar}^{2} \;\le\; 2\normn{\bb}^{2}
+  + 2\lmaxx(\Gramhat)\norm{\thetastar-\thbar}_{2}^{2}
+  \;\le\; 2\normn{\bb}^{2} + 2\Lambda'\sum_{G\notin T}\norm{\thetastar_{G}}_{2}^{2}.
+\]
+By \eqref{eq:oracle-min-blocks},
+$\normn{\widehat{f}-f}^{2} \le 192\pen^{2}\bar\Wcal/\gtil + 60\normn{\bbar}^{2}
++ 3\normn{\PA\bveps}^{2} \le 120\Lambda'\{\eta|T| +
+\sum_{G\notin T}\norm{\thetastar_{G}}_{2}^{2}\} + 120\normn{\bb}^{2} +
+3\normn{\PA\bveps}^{2}$, and the term in braces is exactly
+$\Rid(\thetastar;\eta)$. For the coefficients, Theorem~2(ii) gives
+$\norm{\vbar}_{2}^{2} \le 64\pen^{2}\bar\Wcal/\gtil^{2} +
+16\normn{\bbar}^{2}/\gtil \le (40\Lambda'\eta|T| + 32\normn{\bb}^{2} +
+32\Lambda'\sum_{G\notin T}\norm{\thetastar_{G}}_{2}^{2})/\gtil \le
+(40\Lambda'\Rid + 32\normn{\bb}^{2})/\gtil$, and
+$\norm{\thetahat-\thetastar}_{2}^{2} \le 2\norm{\vbar}_{2}^{2} +
+2\norm{\thbar-\thetastar}_{2}^{2} \le (80\Lambda'\Rid +
+64\normn{\bb}^{2})/\gtil + 2\Rid$; since $\gtil \le \lmin(\Bmat\T\Bmat/n) \le
+\lmaxx(\Gramhat) \le \Lambda'$, the Schur complement being dominated by the
+block, $2\Rid \le 2\Lambda'\Rid/\gtil$, which gives the second bound. The last
+statement is Lemma~\ref{lem:calib-blocks}(iii) and the two properties of
+$\Rid$ in Section~S1.
+\end{proof}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/05-taxas.tex
+\section{Rates}
+\setcounter{equation}{0}
+
+{\color{gray}\noindent[k = 4: the lemma that read Theorem~2 at an arbitrary
+comparator for the lasso, and the proofs of Lemma~3, Proposition~3,
+Theorem~3, Corollary~1, Theorem~1 and the remark on compressibility for the
+lasso, which stood in this section, are moved to Section~S8, unchanged except
+for the numbering of the results they cite.]\par}
+
+Throughout this section $p$, $q$, $\sigma$, $B_X$, $c_U$, $C_U$, $\kappa_1$,
+$\kappa_2$, $C_g$, $s$, $\pi$, $r$ and $\alpha$ are fixed as $n$ grows,
+$J = J_n \to \infty$, $d_n = pq(2^{J_n}-1)$,
+\textcolor{gray}{\sout{$L_n = \log(2d_n/\alpha) \asymp J_n$, and $\penn$ is as in (3.1)}}\textcolor{colR1}{$2^{J_n} \le 2n$,
+$\bn = \lceil\log n\rceil$ with $n \ge 3$, so that $\bn \ge 2$, $\Gcal_{n}$ is
+the partition of Section~2.3 of the paper with $b = \bn$, the weights have
+ratio $\varrho \le \bar\varrho$ for a fixed $\bar\varrho$, and $\pen = \lamG$
+is as in (3.1)}. \textcolor{gray}{\sout{Since the
+constants of Theorem 2 depend on the confidence levels only through
+$1/\alpha'$ and $1/\alpha''$, taking $\alpha' = \alpha'' = \epsilon/3$ gives,
+for each $\epsilon>0$, a constant $M_\epsilon$ with
+$\Prob(\normn{\widehat{f}-f}^2 > M_\epsilon r_n) < \epsilon$, which is the
+meaning of the statements in $O_p$ below. We also write
+$\Lambda = \kappa_2C_U+\gamma/2$.}} \textcolor{colR1}{The statements in $O_p$
+are proved by exhibiting, for each $\epsilon > 0$, an event of probability at
+least $1-\epsilon$ for $n$ large, built with the confidence levels
+$\alpha = \alpha' = \alpha'' = \epsilon/4$ for the noise, the bias and the
+levels, on which the error is at most a constant $M_\epsilon$ times the rate.
+The constant $\Lambda = \kappa_2C_U + \gamma/2$ and the event $\ESig$ are those
+of Section~S1.}
+
+% derivations/08-blocos.tex, as duas consequencias da Hipotese B.
+{\color{colR1}
+\begin{lemma}[The penalty level and the regime]
+\label{lem:regime}
+In the setting above,
+\begin{equation}
+  \label{eq:order-lambda}
+  (\lamGone)^{2} \;\le\; C_{\pen}\,\frac{\sigma^{2}\bn}{n},
+  \qquad
+  C_{\pen} = 16\bigl\{2B_X^{2}C_U + \Lambda\bigl(1 + \tfrac12\log(2pq/\alpha)\bigr)\bigr\},
+\end{equation}
+and, on the event $\Acal = \{\smax^{2} \le 2B_X^{2}C_U\}\cap\ESig$,
+$\lamG \ge \pen_{w}$, so that $\Ecal \subseteq \Tw$ for the event $\Ecal$ of
+Lemma~\ref{lem:calib-blocks}(i), $\gtil > \gamma/2$, $\Amat$ has rank $p$ and
+$\lmaxx(\Gramhat) < \Lambda$. Moreover $\Prob(\Acal) \to 1$ whenever
+$pq2^{J_n}\log(pq2^{J_n})/n \to 0$.
+\end{lemma}
+
+\begin{proof}
+By $(x+y)^{2} \le 2x^{2}+2y^{2}$, $(\lamGone)^{2} = 4\max_{G}\lamzbar{G}^{2} \le
+(8\sigma^{2}/n)\{2B_X^{2}C_U b_{\max} + 2\Lambda\log(|\Gcal_{n}|/\alpha)\}$, with
+$b_{\max} = \max_{G}|G|$. By Proposition~\ref{prop:balanced},
+$b_{\max} \le 2\bn - 1 < 2\bn$ and $|\Gcal_{n}| \le pq(1 + 2^{J_n}/\bn) \le
+pq(1+n) \le 2pqn$, because $2^{J_n} \le 2n$ and $\bn \ge 2$; hence
+$\log(|\Gcal_{n}|/\alpha) \le \log(2pq/\alpha) + \log n \le \log(2pq/\alpha) +
+\bn$, and $(\lamGone)^{2} \le (16\sigma^{2}/n)\{(2B_X^{2}C_U + \Lambda)\bn +
+\Lambda\log(2pq/\alpha)\} \le C_{\pen}\sigma^{2}\bn/n$, using $\bn \ge 2$. On
+$\Acal$, Lemma~\ref{lem:calib-blocks}(ii) gives $\lamz{G} \le \lamzbar{G}$ for
+every $G$, so that $\lamG \ge \pen_{w}$ and, by the same lemma,
+$\Ecal \subseteq \Tw$. On $\ESig$, $\lmin(\Gramhat) > \gamma/2$ and
+$\lmaxx(\Gramhat) < \Lambda$; \eqref{eq:schur} gives $\gtil > \gamma/2$, and
+$\lmin(\Amat\T\Amat/n) \ge \lmin(\Gramhat) > 0$ gives the rank. Finally
+$\Prob(\smax^{2} \le 2B_X^{2}C_U) \to 1$ by Lemma~\ref{lem:columns}, which asks
+$2^{J}\log d/n \to 0$, and $\Prob(\ESig) \to 1$ when
+$pq2^{J_n}\log(pq2^{J_n})/n \to 0$ (Section~S1); the second condition implies
+the first.
+\end{proof}
+}
+
+
+% derivations/08-blocos.tex, prova do Lema 15 (numeracao global).
+{\color{colR1}
+\subsection*{Proof of Lemma 3}
+
+Fix a block and write $\theta_{\lev} = \theta^{*}_{\cv\md,\lev\cdot} \in
+\R^{2^{\lev}}$, set to zero for $\lev \ge J$, which only decreases the risk;
+write $\Gcal_{\lev}$ for the chunks of a fine level $\lev$, those with
+$2^{\lev} \ge b$, and $r_{\lev} = \sum_{G\in\Gcal_{\lev}}
+\min(\norm{\theta_{G}}_{2}^{2},\eta)$. The coarse chunk, if there is one,
+contributes at most $\eta$, so the block contributes at most
+$\eta + \sum_{\lev}r_{\lev}$, the sum running over the fine levels. The first
+bound on $r_{\lev}$ is the count: each chunk of $\Gcal_{\lev}$ has at least $b$
+of the $2^{\lev}$ coefficients of the level, so that
+$r_{\lev} \le |\Gcal_{\lev}|\eta \le 2^{\lev}\eta/b$.
+
+\emph{The case $\pi \le 2$.} Write $a = \pi(s+1/2) > 1$. For $u \ge 0$,
+$\min(u,\eta) \le \eta^{1-\pi/2}u^{\pi/2}$, and $\norm{x}_{2} \le \norm{x}_{\pi}$
+for $\pi \le 2$; hence the second bound,
+\[
+  r_{\lev} \;\le\; \eta^{1-\pi/2}\sum_{G\in\Gcal_{\lev}}\norm{\theta_{G}}_{\pi}^{\pi}
+  \;\le\; \eta^{1-\pi/2}\norm{\theta_{\lev}}_{\pi}^{\pi}
+  \;\le\; \eta^{1-\pi/2}C_g^{\pi}2^{-\lev(a-1)},
+\]
+by Assumption~5, because the chunks of $\Gcal_{\lev}$ are disjoint and
+contained in the level. Define $x \in \R$ by
+$2^{xa} = bC_g^{\pi}\eta^{-\pi/2}$, so that the two bounds agree at
+$\lev = x$, with common value
+$h = 2^{x}\eta/b = \eta^{1-\pi/2}C_g^{\pi}2^{-x(a-1)}$. Summing the first bound
+over the levels $\lev \le x$ gives at most $2^{\lfloor x\rfloor+1}\eta/b \le 2h$
+(an empty sum if $x < 0$), and summing the second over the levels $\lev > x$
+gives at most $h\sum_{i\ge0}2^{-i(a-1)} = h/(1-2^{1-a})$, since the first
+integer $\lev > x$ has $2^{-\lev(a-1)} \le 2^{-x(a-1)}$. The block therefore
+contributes at most $\eta + \{2 + (1-2^{1-a})^{-1}\}h$. Since $1/a = \tau/\pi$,
+$2^{x} = b^{\tau/\pi}C_g^{\tau}\eta^{-\tau/2}$ and
+$h = b^{\tau/\pi-1}C_g^{\tau}\eta^{1-\tau/2}$, and, with
+$1-\tau/2 = 2s/(2s+1)$,
+\[
+  h \;=\; C_g^{\tau}\Bigl(\frac{\eta}{b}\Bigr)^{2s/(2s+1)}
+  b^{\tau/\pi - 1 + 2s/(2s+1)}
+  \;=\; C_g^{\tau}\Bigl(\frac{\eta}{b}\Bigr)^{2s/(2s+1)}
+  b^{\tau(1/\pi-1/2)},
+  \qquad
+  \tau\Bigl(\frac{1}{\pi}-\frac12\Bigr) = \frac{2/\pi-1}{2s+1}.
+\]
+
+\emph{The case $\pi \ge 2$.} Hölder's inequality in $\R^{2^{\lev}}$ gives
+$\norm{\theta_{\lev}}_{2} \le 2^{\lev(1/2-1/\pi)}\norm{\theta_{\lev}}_{\pi} \le
+C_g2^{-\lev s}$, with $1/\pi = 0$ if $\pi = \infty$, and the second bound is
+$r_{\lev} \le \norm{\theta_{\lev}}_{2}^{2} \le C_g^{2}2^{-2\lev s}$. With
+$2^{x(2s+1)} = C_g^{2}b/\eta$ and $h = 2^{x}\eta/b = C_g^{2}2^{-2xs}$, the same
+computation gives the contribution $\eta + \{2 + (1-2^{-2s})^{-1}\}h$, and
+$h = (C_g^{2}b/\eta)^{1/(2s+1)}\eta/b = C_g^{\tau}(\eta/b)^{2s/(2s+1)}$, because
+$2/(2s+1) = \tau$.
+
+Summing over the $pq$ blocks gives the statement; at $\pi = 2$,
+$1-2^{1-a} = 1-2^{-2s}$ and the two constants agree. \qed
+}
+
+We also record that, on the event of Proposition 2(ii) with $t = \gamma/2$,
+\begin{equation}
+  \label{eq:lmax}
+  \normn{\Bmat\delta}^2 \le \lmaxx(\Gramhat)\norm{\delta}_2^2
+  \quad\text{and}\quad \lmaxx(\Gramhat) \le \Lambda,
+\end{equation}
+the first because $\Bmat\T\Bmat/n$ is a principal submatrix of $\Gramhat$ and
+the second by Weyl's inequality and Proposition 2(i).
+
+% derivations/08-blocos.tex, a contagem (eq. contagem-lenta) e a prova do
+% Corolario 14 (numeracao global); D47(c), D49(b).
+{\color{colR1}
+\begin{lemma}[The norm of the oracle over chunks]
+\label{lem:count}
+Under Assumptions~4 and 5, let $\Gcal$ be the partition of Section~2.3 of the
+paper with $b \ge 2$, and let $\vartheta_{\pi} = \min(1-1/\pi,\,1/2)$, with
+$\vartheta_{\infty} = 1/2$. Then, for every $J$,
+\begin{equation}
+  \label{eq:count}
+  \nGone{\thetastar} \;\le\; pqC_g\Bigl\{\frac{1}{1-2^{-\seff}}
+  + b^{-\vartheta_{\pi}}\sum_{\lev=\jst+1}^{J-1}2^{\lev(1/2-s)}\Bigr\}.
+\end{equation}
+The bound for each fine level is attained, by a level whose energy is spread
+evenly when $\pi \ge 2$, and by a level with one large coefficient in each
+chunk when $\pi \le 2$.
+\end{lemma}
+
+\begin{proof}
+Fix a block and write $\theta_{\lev}$ for its coefficients of level $\lev$.
+By Assumption~5, $\norm{\theta_{\lev}}_{2} \le
+2^{\lev(1/2-1/\pi)_{+}}\norm{\theta_{\lev}}_{\pi} \le C_g2^{-\lev\seff}$, by
+Hölder's inequality in $\R^{2^{\lev}}$ if $\pi \ge 2$ and by
+$\norm{\cdot}_{2} \le \norm{\cdot}_{\pi}$ if $\pi \le 2$. The coarse chunk
+contributes at most $\sum_{\lev\le\jst}\norm{\theta_{\lev}}_{2} \le
+C_g(1-2^{-\seff})^{-1}$. At a fine level $\lev$ the $k_{\lev} \le 2^{\lev}/b$
+chunks $G \in \Gcal_{\lev}$ partition the level. If $\pi \ge 2$, by the
+Cauchy-Schwarz inequality,
+\[
+  \sum_{G\in\Gcal_{\lev}}\norm{\theta_{G}}_{2}
+  \;\le\; k_{\lev}^{1/2}\norm{\theta_{\lev}}_{2}
+  \;\le\; \Bigl(\frac{2^{\lev}}{b}\Bigr)^{1/2}C_g2^{-\lev s}
+  \;=\; C_g\,b^{-1/2}\,2^{\lev(1/2-s)} ;
+\]
+if $\pi \le 2$, by $\norm{\theta_{G}}_{2} \le \norm{\theta_{G}}_{\pi}$ and
+Hölder's inequality over the chunks,
+\[
+  \sum_{G\in\Gcal_{\lev}}\norm{\theta_{G}}_{2}
+  \;\le\; k_{\lev}^{1-1/\pi}\Bigl(\sum_{G\in\Gcal_{\lev}}
+  \norm{\theta_{G}}_{\pi}^{\pi}\Bigr)^{1/\pi}
+  = k_{\lev}^{1-1/\pi}\norm{\theta_{\lev}}_{\pi}
+  \;\le\; \Bigl(\frac{2^{\lev}}{b}\Bigr)^{1-1/\pi}C_g2^{-\lev(s+1/2-1/\pi)}
+  = C_g\,b^{-(1-1/\pi)}\,2^{\lev(1/2-s)} .
+\]
+Both are $C_gb^{-\vartheta_{\pi}}2^{\lev(1/2-s)}$, and the equality cases of
+the two inequalities are the configurations of the statement. Summing over the
+fine levels $\jst < \lev < J$ and over the $pq$ blocks gives \eqref{eq:count}.
+\end{proof}
+
+\subsection*{Proof of Proposition 3}
+
+\emph{The nonasymptotic bound.} On $\Tw$, Theorem~2(i) with the comparator
+$\bar\bbeta = \betastar$, so that $\bbar = \bb$ and
+$\vbar = v = \thetahat-\thetastar$, gives
+$\normn{\Btil v}^{2} \le 6\pen\nGw{\thetastar} + 4\normn{\bb}^{2}$, and the
+first part of Theorem~2(iii), with $(x+y+z)^{2} \le 3(x^{2}+y^{2}+z^{2})$, gives
+\begin{equation}
+  \label{eq:slow-nonasymptotic}
+  \normn{\widehat{f}-f}^{2} \;\le\; 18\pen\nGw{\thetastar}
+  + 24\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}
+  \qquad\text{on } \Tw .
+\end{equation}
+Steps 1 to 3 and 6 of the proof of Theorem~2, the only ones used, do not
+involve $\Gramhat$. With $\pen \ge \pen_{w}$, calibrated on the covariates by
+Lemma~\ref{lem:calib-blocks}(i), the bound holds with probability at least
+$1-\alpha$ in any design in which $\Amat$ has rank $p$, including designs with
+$d > n$, where $\gtil = 0$.
+
+\emph{The penalty level of the theory.} Let
+$\Acal^{+} = \{\smax^{2} \le 2B_X^{2}C_U\}\cap\{\lmaxx(\Gramhat) \le \Lambda\}$.
+On it Lemma~\ref{lem:calib-blocks}(ii) gives $\lamz{G} \le \lamzbar{G}$ for
+every $G$, hence $\lamG \ge \pen_{w}$ and $\Ecal \subseteq \Tw$. The first
+event has probability tending to one by Lemma~\ref{lem:columns}, whose proof
+uses only $|X_{\cv}| \le B_X$ and $p_{\bU} \le C_U$. For the second,
+$\Prob\{\lmaxx(\Gramhat) \le \Lambda\} \ge
+\Prob\{\opnorm{\Gramhat-\Gram} < \Lambda - \kappa_2C_U\}$ by Weyl's inequality,
+since $\lmaxx(\Gram) \le \kappa_2C_U$, and the matrix Bernstein bound in the
+proof of Proposition~2(ii), with $t = \Lambda - \kappa_2C_U$, sends it to one;
+that bound uses only $\norm{\bZ_{i}}_{2}^{2} \le R_J$ and
+$\lmaxx(\Gram) \le \kappa_2C_U$, the upper half of Proposition~2(i), and
+neither $c_U$ nor $\kappa_1$, so that any $\Lambda > \kappa_2C_U$ serves. Both
+probabilities tend to one when $pq2^{J_n}\log(pq2^{J_n})/n \to 0$. Fix
+$\epsilon > 0$, take $\alpha = \alpha' = \alpha'' = \epsilon/4$ and intersect
+$\Acal^{+}$, $\Ecal$, $\{\normn{\bb}^{2} \le \mathcal{B}_{J_n}^{2}/\alpha'\}$
+and $\{\normn{\PA\bveps}^{2} \le \sigma^{2}p/(n\alpha'')\}$, the last two by
+Markov's inequality, Lemma~2 and Theorem~2(iii); for $n$ large the
+intersection has probability at least $1-\epsilon$, and on it
+$\normn{\widehat{f}-f}^{2} \le 18\lamG\nGw{\thetastar} +
+24\mathcal{B}_{J_n}^{2}/\alpha' + 3\sigma^{2}p/(n\alpha'')$, which is the first
+display of Proposition~3. For the chain, Lemma~\ref{lem:calib-blocks}(iii)
+gives $\lamG w_{G} \le \varrho\lamGone$ for every $G$, and summing with the
+weights $\norm{\thetastar_{G}}_{2}$ gives
+$\lamG\nGw{\thetastar} \le \varrho\lamGone\nGone{\thetastar}$, with
+$\varrho \le \bar\varrho$; and $\norm{x}_{2} \le \norm{x}_{1}$ in each chunk
+gives $\nGone{\thetastar} \le \norm{\thetastar}_{1}$. The order of $\lamGone$
+is \eqref{eq:order-lambda}.
+
+\emph{Part (i).} With $s > 1/2$ and $2^{\jst+1} \ge b$,
+$\sum_{\lev>\jst}2^{\lev(1/2-s)} \le 2^{(\jst+1)(1/2-s)}/(1-2^{1/2-s}) \le
+\bn^{1/2-s}/(1-2^{1/2-s})$, and Lemma~\ref{lem:count} gives
+$\nGone{\thetastar} \le pqC_g\{(1-2^{-\seff})^{-1} +
+\bn^{1/2-s-\vartheta_{\pi}}(1-2^{1/2-s})^{-1}\} = O(1)$; hence
+$\lamG\nGw{\thetastar} = O\{(\bn/n)^{1/2}\} = O\{(\log n/n)^{1/2}\}$. With
+$J_n \ge \log_2 n/(4\seff)$, $\mathcal{B}_{J_n}^{2} \asymp 2^{-2J_n\seff} \le
+n^{-1/2}$, and $p/n$ is of smaller order. With $\seff > 1/4$ the choice
+$J_n = \lceil\log_2 n/(4\seff)\rceil$ has $2^{J_n} < 2n^{1/(4\seff)}$ and
+satisfies the conditions of the statement.
+
+\emph{Part (ii).} With $s < 1/2$,
+$\sum_{\jst<\lev<J_n}2^{\lev(1/2-s)} \le 2^{J_n(1/2-s)}/(2^{1/2-s}-1)$, so that
+$\nGone{\thetastar} = O\{1 + \bn^{-\vartheta_{\pi}}2^{J_n(1/2-s)}\}$ and, since
+$1/2 - \vartheta_{\pi} = (1/\pi-1/2)_{+}$,
+\[
+  \lamG\nGw{\thetastar} \;\lesssim\; \Bigl(\frac{\bn}{n}\Bigr)^{1/2}
+  + n^{-1/2}\,\bn^{(1/\pi-1/2)_{+}}\,2^{J_n(1/2-s)} .
+\]
+Equating the second term with the bias $2^{-2J_n\seff}$ gives
+$2^{J_n(1/2-s+2\seff)} \asymp n^{1/2}\bn^{-(1/\pi-1/2)_{+}}$, which is the
+choice of the statement, with common value $2^{-2J_n\seff} \asymp
+\{\bn^{(2/\pi-1)_{+}}/n\}^{2\seff/(1-2s+4\seff)}$. The term $(\bn/n)^{1/2}$ and
+$p/n$ are of smaller order, because $2\seff/(1-2s+4\seff) < 1/2$ is equivalent
+to $s < 1/2$. The conditions of the statement hold because $\seff > s/2$ gives
+$1/(1-2s+4\seff) < 1$, and $2^{J_n} \ge \bn$ for $n$ large. When $\pi \ge 2$,
+$\seff = s$, $(2/\pi-1)_{+} = 0$ and $1-2s+4s = 2s+1$. \qed
+
+% derivations/08-blocos.tex, prova do Teorema 4 (numeracao global).
+\subsection*{Proof of Theorem 3}
+
+By the definition of $J_n$, $n^{1/(2\seff+1)} \le 2^{J_n} <
+2n^{1/(2\seff+1)} \le 2n$, so the setting of this section holds, and
+$pq2^{J_n}\log(pq2^{J_n})/n \asymp n^{1/(2\seff+1)-1}\log n =
+n^{-2\seff/(2\seff+1)}\log n \to 0$, which is the requirement of
+Proposition~2(ii); by Lemma~\ref{lem:regime}, $\Prob(\Acal) \to 1$. Fix
+$\epsilon > 0$, take $\alpha = \alpha' = \alpha'' = \epsilon/4$, and intersect
+$\Acal$, the event $\Ecal$ of Lemma~\ref{lem:calib-blocks}(i),
+$\{\normn{\bb}^{2} \le \mathcal{B}_{J_n}^{2}/\alpha'\}$ (Markov's inequality,
+since $\E\normn{\bb}^{2} = \norm{f-f_{J_n}}_{L_2(P)}^{2} \le
+\mathcal{B}_{J_n}^{2}$ by Lemma~2) and
+$\{\normn{\PA\bveps}^{2} \le \sigma^{2}p/(n\alpha'')\}$ (Markov's inequality and
+Theorem~2(iii)); for $n$ large the intersection has probability at least
+$1-\epsilon$. On it $\Tw$ holds, and \eqref{eq:oracle-min-blocks} with
+$\bar\bbeta = \betastar$ gives
+\[
+  \normn{\widehat{f}-f}^{2} \;\le\;
+  \frac{192(\lamG)^{2}\Wcal(\Gzero(\thetastar))}{\gtil}
+  + 60\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}.
+\]
+By Lemma~\ref{lem:calib-blocks}(iii), Lemma~\ref{lem:regime} and
+Proposition~\ref{prop:balanced}(ii), with $\gtil > \gamma/2$,
+\[
+  \frac{192(\lamG)^{2}\Wcal(\Gcal_{n})}{\gtil}
+  \;\le\; \frac{384\bar\varrho^{2}(\lamGone)^{2}|\Gcal_{n}|}{\gamma}
+  \;\le\; \frac{384\bar\varrho^{2}C_{\pen}\sigma^{2}pq(\bn + 2^{J_n})}{\gamma n},
+\]
+which is of order $n^{-2\seff/(2\seff+1)}$, because
+$2^{J_n} \asymp n^{1/(2\seff+1)}$ dominates $\bn \asymp \log n$. The bias term
+is $60\mathcal{B}_{J_n}^{2}/\alpha' \asymp 2^{-2J_n\seff} \le
+n^{-2\seff/(2\seff+1)}$, by the lower bound on $2^{J_n}$, and the last term is
+$O(1/n)$, of strictly smaller order. Hence
+$\Prob\{\normn{\widehat{f}-f}^{2} > M_\epsilon n^{-2\seff/(2\seff+1)}\} <
+\epsilon$ for a constant $M_\epsilon$. \qed
+
+% derivations/08-blocos.tex, prova do Corolario 10 (numeracao global).
+\subsection*{Proof of Corollary 1}
+
+By the orthonormality of the wavelets of level below $J_n$ in $L_2[0,1]$ and
+Lemma~2,
+$\sum_{\cv,\md}\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}\rVert^{2}_{L_2[0,1]}
+\le 2\norm{\thetahat-\thetastar}_{2}^{2} +
+2pqC_g^{2}(1-2^{-2\seff})^{-1}2^{-2J_n\seff}$. On the event of the proof of
+Theorem~3, Theorem~2(ii) with $\bar\bbeta = \betastar$ gives
+$\norm{\thetahat-\thetastar}_{2}^{2} \le
+64(\lamG)^{2}\Wcal(\Gcal_{n})/\gtil^{2} + 16\normn{\bb}^{2}/\gtil$, with
+$\gtil > \gamma/2$: the two terms have the order of those of Theorem~3, with
+$\gamma^{-2}$ in place of $\gamma^{-1}$. For the levels,
+Lemma~\ref{lem:profile} with $\bar\bbeta = \betastar$ gives
+$\Amat(\chat-\bc) = \PA(\bb+\bveps) - \PA\Bmat v$, so that
+$\normn{\Amat(\chat-\bc)} \le \normn{\bb} + \normn{\PA\bveps} +
+\Lambda^{1/2}\norm{v}_{2}$, and $\lmin(\Amat\T\Amat/n) > \gamma/2$ gives
+$\norm{\chat-\bc}_{2}^{2} \le 2\normn{\Amat(\chat-\bc)}^{2}/\gamma$. Finally the
+components of a functional coefficient depend on distinct coordinates of $u$
+and the basis is orthonormal, so that
+$\lVert\widehat{\fcoef{\cv}}-\fcoef{\cv}\rVert_{L_2([0,1]^q)} \le
+|\widehat{c}_{\cv}-\lvl{\cv}| + \sum_{\md}\lVert\widehat{g}_{\cv\md}-
+\gcomp{\cv}{\md}\rVert_{L_2[0,1]}$, with $q$ fixed. \qed
+
+% derivations/08-blocos.tex, prova do Corolario 11 (numeracao global); D47(a).
+\subsection*{Proof of Theorem 1}
+
+\emph{The window.} Since $\seff \le s$,
+$s/\{(2s+1)\seff\} \ge 1/(2s+1)$, and the window is nonempty if and only if
+$s/\{(2s+1)\seff\} < 1$, that is $\seff > s/(2s+1)$. With $c < 1$,
+$2^{J_n} \le 2n^{c} \le 2n$, so the setting of this section holds; the
+requirement of Proposition~2(ii) is $pq2^{J_n}\log(pq2^{J_n})/n \asymp
+n^{c-1}\log n \to 0$, and $\Prob(\Acal) \to 1$ by Lemma~\ref{lem:regime}.
+
+\emph{The rate.} Fix $\epsilon > 0$ and the event of the proof of Theorem~3.
+On it, Corollary~\ref{cor:ideal} with $\Lambda' = \Lambda$ gives
+$\normn{\widehat{f}-f}^{2} \le 120\Lambda\Rid(\thetastar;\eta) +
+120\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}$, and, by
+Lemma~\ref{lem:calib-blocks}(iii), \eqref{eq:order-lambda} and
+$\gtil > \gamma/2$,
+\[
+  \eta \;=\; \frac{1.6\max_{G}(\lamG w_{G})^{2}}{\Lambda\gtil}
+  \;\le\; \frac{3.2\bar\varrho^{2}(\lamGone)^{2}}{\Lambda\gamma}
+  \;\le\; \bar\eta_{n} := \kappa\,\frac{\bn}{n},
+  \qquad
+  \kappa = \frac{3.2\bar\varrho^{2}C_{\pen}\sigma^{2}}{\Lambda\gamma}.
+\]
+Since $\Rid$ is nondecreasing in $\eta$, Lemma~3 with $b = \bn$ gives
+\[
+  \Rid(\thetastar;\eta) \;\le\; \Rid(\thetastar;\bar\eta_{n})
+  \;\le\; pq\Bigl\{\AG C_g^{\tau}\kappa^{2s/(2s+1)}\,n^{-2s/(2s+1)}
+  \bn^{(2/\pi-1)_{+}/(2s+1)} + \kappa\frac{\bn}{n}\Bigr\},
+\]
+with $\bn \asymp \log n$; the second term is of smaller order because
+$2s/(2s+1) < 1$. The bias is $O(2^{-2J_n\seff}) = O(n^{-2c\seff})$, and
+$2c\seff \ge 2s/(2s+1)$ by the window; the term $\sigma^{2}p/n$ is of smaller
+order. For the components, the second bound of Corollary~\ref{cor:ideal} and
+Lemma~2 give the same rate, as in the proof of Corollary~1.
+
+\emph{Two readings.} The constant grows with the weights at most as
+$\bar\varrho^{\,4s/(2s+1)}$ in the leading term, through
+$\kappa^{2s/(2s+1)}$. The gain over the rate $(\log n/n)^{2s/(2s+1)}$ of the
+lasso (Theorem~\ref{thm:lasso-main}) is the factor $(\log n)^{2\seff/(2s+1)}$,
+because $2s/(2s+1) - (2/\pi-1)_{+}/(2s+1) = 2\seff/(2s+1)$: when $\pi < 2$,
+$2s - 2/\pi + 1 = 2(s - 1/\pi + 1/2) = 2\seff$, and when $\pi \ge 2$,
+$\seff = s$. The logarithm of the union bound over the columns is absorbed by
+the size of the chunks, which is why they must have at least of the order of
+$\log|\Gcal_{n}|$ coefficients. \qed
+
+% derivations/08-blocos.tex, Observacao rem:inferior.
+\begin{remark}[The lower bound of Klopp and Pensky with one modulator]
+\label{rem:lower}
+For $q = 1$, $\bX$ independent of $U_1$ and Gaussian errors,
+\citet[Theorem~1, eqs.~3.6 and 3.7]{Klopp-Pensky-2015}, with the number of
+covariates fixed, give the minimax lower bound $n^{-2r/(2r+1)}$ over their
+class (A3) with the periodized wavelet basis, which their condition (A1)(b)
+admits. That class, a weighted $\ell_\nu$ ball
+$\sum_{k}|a_{k}|^{\nu}(k+1)^{\nu(r+1/2-1/\nu)} \le C_a^{\nu}$ over all the
+coefficients, implies Assumption~5 with $(s,\pi) = (r,\nu)$ and $C_g = C_a$,
+level by level, since $k+1 \ge 2^{\lev}$ at level $\lev$; so the lower bound
+holds over the class of Assumption~5, and when $\pi \ge 2$ Theorem~1 is minimax
+optimal up to a constant in that case. When $\pi < 2$ the factor
+$(\log n)^{(2/\pi-1)/(2s+1)}$ remains, the same as in eqs.~(3.19) and (3.20)
+of Klopp and Pensky with the number of covariates fixed, and the same as in
+the rate of block thresholding in the sequence model
+\citep[Theorem~4, eq.~5.4]{Cai-1999}, which holds for $s \ge 1/\pi$; the
+condition $\seff > s/(2s+1)$ of Theorem~1 is implied by $s \ge 1/\pi$, since
+then $\seff \ge 1/2 > s/(2s+1)$, and is strictly weaker. That this factor is
+necessary for the estimator is proved neither here nor by Klopp and Pensky,
+and for $q \ge 2$ no lower bound is available.
+\end{remark}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/06-selecao-limiar.tex (Lema 13 e Corolario 8 na numeracao
+% global; a Hipotese S e a Assumption 6 do artigo). Entrou em k = 2 (E5c).
+{\color{colR1}
+\section{Recovery of the block structure by thresholding}
+\setcounter{equation}{0}
+
+Throughout this section $\nu_{\cv\md}$, $\widehat{\nu}_{\cv\md}$, $\mathcal{S}$,
+$\widehat{\mathcal{S}}(t)$, \textcolor{gray}{\sout{$\rho_n$}} $\rhoG$ and $\nu_{\min,n}$ are as in Section 3.6 of the paper,
+$\nu_{\min} = \min_{(\cv,\md)\in \mathcal{S}}\nu_{\cv\md}$ for a fixed sample size, and
+\[
+  \Delta \;=\; \max_{\cv,\md}\,
+  \bigl\lVert \widehat{g}_{\cv\md} - \gcomp{\cv}{\md} \bigr\rVert_{L_2[0,1]}
+\]
+is the largest error over the blocks. The first statement is deterministic
+and knows nothing about the \textcolor{gray}{\sout{lasso}} estimator.
+
+\begin{lemma}[Thresholding under a uniform block error]
+\label{lem:sandwich}
+Let $\{\gcomp{\cv}{\md}\}$ and $\{\widehat{g}_{\cv\md}\}$ be any two families
+of functions in $L_2[0,1]$ indexed by the blocks, with $\nu_{\cv\md}$,
+$\widehat{\nu}_{\cv\md}$, $\mathcal{S}$, $\widehat{\mathcal{S}}(t)$, $\Delta$ and $\nu_{\min}$ defined
+from them as above, and let $\bar{\Delta} \ge \Delta$. Then, for every $t \ge 0$,
+\begin{equation}
+  \label{eq:sandwich}
+  \bigl\{(\cv,\md) :\; \nu_{\cv\md} > t + \bar{\Delta}\bigr\}
+  \;\subseteq\; \widehat{\mathcal{S}}(t) \;\subseteq\;
+  \bigl\{(\cv,\md) :\; \nu_{\cv\md} > t - \bar{\Delta}\bigr\} .
+\end{equation}
+In particular: (i) if $t \ge \bar{\Delta}$, then $\widehat{\mathcal{S}}(t) \subseteq \mathcal{S}$, with no
+use of $\nu_{\min}$; (ii) if $t < \nu_{\min} - \bar{\Delta}$, then $\mathcal{S} \subseteq \widehat{\mathcal{S}}(t)$;
+and (iii) if $\bar{\Delta} \le t < \nu_{\min} - \bar{\Delta}$, then $\widehat{\mathcal{S}}(t) = \mathcal{S}$, and such a $t$
+exists if and only if $\nu_{\min} > 2\bar{\Delta}$.
+\end{lemma}
+
+\begin{proof}
+By the triangle inequality in $L_2[0,1]$, for every block,
+$|\widehat{\nu}_{\cv\md} - \nu_{\cv\md}| \le
+\lVert\widehat{g}_{\cv\md} - \gcomp{\cv}{\md}\rVert_{L_2[0,1]} \le \Delta \le \bar{\Delta}$.
+If $\nu_{\cv\md} > t + \bar{\Delta}$, then
+$\widehat{\nu}_{\cv\md} \ge \nu_{\cv\md} - \bar{\Delta} > t$, which is the left inclusion of
+\eqref{eq:sandwich}; if $\widehat{\nu}_{\cv\md} > t$, then
+$\nu_{\cv\md} \ge \widehat{\nu}_{\cv\md} - \bar{\Delta} > t - \bar{\Delta}$, which is the right one. For
+(i), $t - \bar{\Delta} \ge 0$ and the right inclusion give $\widehat{\mathcal{S}}(t) \subseteq
+\{\nu_{\cv\md} > 0\} = \mathcal{S}$. For (ii), every block of $\mathcal{S}$ has
+$\nu_{\cv\md} \ge \nu_{\min} > t + \bar{\Delta}$, and the left inclusion applies. Part (iii) is
+the conjunction of the two, and $[\bar{\Delta}, \nu_{\min} - \bar{\Delta})$ is nonempty exactly when
+$\bar{\Delta} < \nu_{\min} - \bar{\Delta}$.
+\end{proof}
+
+\begin{remark}[The window is exact]
+\label{rem:window}
+The condition $\nu_{\min} > 2\bar{\Delta}$ is not an artifact of the proof. Take two blocks,
+one active with $\nu_{11} = 2\bar{\Delta}$ and one null with $\nu_{21} = 0$, and fitted
+norms $\widehat{\nu}_{11} = \widehat{\nu}_{21} = \bar{\Delta}$, which is compatible with
+$\Delta \le \bar{\Delta}$: the two statistics tie and no threshold separates them. This
+says that the argument does not extend below $\nu_{\min} = 2\bar{\Delta}$, not that no
+procedure does, which would be a lower bound and is not proved here.
+\end{remark}
+
+% derivations/06-selecao-limiar.tex, Lema 16 (numeracao global; adendo de
+% E1.12); D45.
+\begin{lemma}[The risk of the thresholded estimator]
+\label{lem:thrisk}
+Let $\{\gcomp{\cv}{\md}\}$ and $\{\widehat{g}_{\cv\md}\}$ be any two families of
+functions in $L_2[0,1]$ indexed by the blocks and $t \ge 0$, with
+$\nu_{\cv\md}$, $\widehat{\nu}_{\cv\md}$, $\mathcal{S}$ and
+$\widehat{\mathcal{S}}(t)$ as above, $\Dbl = \lVert\widehat{g}_{\cv\md} -
+\gcomp{\cv}{\md}\rVert_{L_2[0,1]}$, and
+$\widehat{g}^{(t)}_{\cv\md} = \widehat{g}_{\cv\md}
+\mathbf{1}\{(\cv,\md)\in\widehat{\mathcal{S}}(t)\}$.
+\begin{enumerate}
+\item[(i)] With no assumption,
+\[
+  \sum_{\cv,\md}\bigl\lVert\widehat{g}^{(t)}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2}
+  = \sum_{(\cv,\md)\in\widehat{\mathcal{S}}(t)}\Dbl^{2}
+  + \sum_{(\cv,\md)\in\mathcal{S}\setminus\widehat{\mathcal{S}}(t)}\nu_{\cv\md}^{2},
+\]
+and every $(\cv,\md) \in \mathcal{S}\setminus\widehat{\mathcal{S}}(t)$ has
+$\nu_{\cv\md} \le t + \Dbl$; hence the left side is at most
+$2\sum_{\cv,\md}\Dbl^{2} + 2t^{2}|\mathcal{S}\setminus\widehat{\mathcal{S}}(t)|
+\le 2\sum_{\cv,\md}\Dbl^{2} + 2t^{2}|\mathcal{S}|$.
+\item[(ii)] If $\mathcal{S} \subseteq \widehat{\mathcal{S}}(t)$, the left side
+of (i) is $\sum_{\widehat{\mathcal{S}}(t)}\Dbl^{2} \le \sum_{\cv,\md}\Dbl^{2}$;
+if $\widehat{\mathcal{S}}(t) = \mathcal{S}$, it is $\sum_{\mathcal{S}}\Dbl^{2}$,
+and the null blocks no longer contribute.
+\item[(iii)] Let $\lmin(\Gramhat) > 0$, $\betastar = (\bc,\thetastar)$,
+$f_J = \bZ\betastar$, $\betahat = (\chat,\thetahat)$ any fit,
+$\widehat{\mathcal{S}}(t) = \{(\cv,\md) : \norm{\thetahat_{\cv\md,\cdot}}_{2} > t\}$,
+$\mathcal{S}_J = \{(\cv,\md) : \thetastar_{\cv\md,\cdot} \ne 0\}$,
+$\thetahat^{(t)}$ the vector $\thetahat$ with the blocks outside
+$\widehat{\mathcal{S}}(t)$ set to zero, and
+$\widehat{f}^{(t)} = \Amat\chat + \Bmat\thetahat^{(t)}$. Then
+\[
+  \normn{\widehat{f}^{(t)}-f_J}^{2} \;\le\;
+  \frac{2\lmaxx(\Gramhat)}{\lmin(\Gramhat)}\normn{\widehat{f}-f_J}^{2}
+  + 2\lmaxx(\Gramhat)\,t^{2}\,|\mathcal{S}_J\setminus\widehat{\mathcal{S}}(t)|,
+\]
+and, if $\mathcal{S}_J \subseteq \widehat{\mathcal{S}}(t)$,
+$\normn{\widehat{f}^{(t)}-f_J}^{2} \le
+\{\lmaxx(\Gramhat)/\lmin(\Gramhat)\}\normn{\widehat{f}-f_J}^{2}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\emph{(i).} If $(\cv,\md) \in \widehat{\mathcal{S}}(t)$, then
+$\widehat{g}^{(t)}_{\cv\md} = \widehat{g}_{\cv\md}$ and the error of the block
+is $\Dbl^{2}$; otherwise $\widehat{g}^{(t)}_{\cv\md} = 0$ and the error is
+$\nu_{\cv\md}^{2}$, which vanishes outside $\mathcal{S}$. Summing gives the
+identity. For $(\cv,\md) \notin \widehat{\mathcal{S}}(t)$,
+$\widehat{\nu}_{\cv\md} \le t$, and the triangle inequality gives
+$\nu_{\cv\md} \le \widehat{\nu}_{\cv\md} + \Dbl \le t + \Dbl$, hence
+$\nu_{\cv\md}^{2} \le 2t^{2} + 2\Dbl^{2}$; summing over
+$\mathcal{S}\setminus\widehat{\mathcal{S}}(t)$ and adding the sum over
+$\widehat{\mathcal{S}}(t)$, a disjoint set, gives the bound.
+\emph{(ii).} If $\mathcal{S} \subseteq \widehat{\mathcal{S}}(t)$, the second sum
+of (i) is empty.
+\emph{(iii).} The proof of (i) and (ii) uses only the triangle inequality in a
+norm; applied to the vectors $\thetahat_{\cv\md,\cdot}$ and
+$\thetastar_{\cv\md,\cdot}$ of $\R^{\NJ}$, with $\mathcal{S}_J$ in place of
+$\mathcal{S}$, it gives $\norm{\thetahat^{(t)}-\thetastar}_{2}^{2} \le
+2\norm{\thetahat-\thetastar}_{2}^{2} +
+2t^{2}|\mathcal{S}_J\setminus\widehat{\mathcal{S}}(t)|$, and
+$\norm{\thetahat^{(t)}-\thetastar}_{2}^{2} \le \norm{\thetahat-\thetastar}_{2}^{2}$
+when $\mathcal{S}_J \subseteq \widehat{\mathcal{S}}(t)$. Since $\chat$ does not
+change, the same bounds hold for $\betahat^{(t)} = (\chat,\thetahat^{(t)})$
+against $\betastar$. Finally
+$\normn{\widehat{f}^{(t)}-f_J}^{2} = (\betahat^{(t)}-\betastar)\T\Gramhat
+(\betahat^{(t)}-\betastar) \le
+\lmaxx(\Gramhat)\norm{\betahat^{(t)}-\betastar}_{2}^{2}$ and
+$\norm{\betahat-\betastar}_{2}^{2} \le
+\normn{\bZ(\betahat-\betastar)}^{2}/\lmin(\Gramhat) =
+\normn{\widehat{f}-f_J}^{2}/\lmin(\Gramhat)$. By the orthonormality of the
+basis, $\norm{\thetahat_{\cv\md,\cdot}}_{2} = \widehat{\nu}_{\cv\md}$, so that the
+$\widehat{\mathcal{S}}(t)$ of (iii) is that of (i).
+\end{proof}
+
+The factor $2$ in (i) is attained: an active block with
+$\widehat{g}_{\cv\md} = t\,\gcomp{\cv}{\md}/\nu_{\cv\md}$ and
+$\nu_{\cv\md} = 2t$ has $\widehat{\nu}_{\cv\md} = t$, is set to zero, and pays
+$\nu_{\cv\md}^{2} = 4t^{2} = 2\Dbl^{2} + 2t^{2}$. In (iii), the passage between
+the norm of the coefficients and the prediction norm uses the smallest
+eigenvalue of $\Gramhat$ to go from prediction to coefficients and the largest
+to come back, and the factor is the condition number of $\Gramhat$, which on
+$\ESig$ is smaller than $2\Lambda/\gamma$.
+
+
+{\color{gray}\noindent[k = 4: the proof of Corollary~2 for the lasso, which stood
+here, is moved to Section~S8, unchanged except for the numbering of the results
+it cites.]\par}
+
+% derivations/06-selecao-limiar.tex, provas do Corolario 12, da Observacao
+% rem:adaptativa-blocos e do Corolario 13 (adendo de E1.12).
+\subsection*{Proof of Corollary 2}
+
+\emph{A nonasymptotic bound on $\Delta$.} Work at $J = J_n$ and
+$\pen = \lamG$, and intersect $\Acal$, the event $\Ecal$ of
+Lemma~\ref{lem:calib-blocks}(i) and
+$\{\normn{\bb}^{2} \le \mathcal{B}_{J_n}^{2}/\alpha'\}$; the intersection has
+probability at least $1 - \alpha - \alpha' - \Prob(\Acal^{c})$, by
+Lemma~\ref{lem:calib-blocks}, Markov's inequality and Lemma~2. On $\Acal$,
+$\Ecal \subseteq \Tw$ and $\gtil > \gamma/2$ (Lemma~\ref{lem:regime}), and
+Theorem~2(ii) with the comparator $\betastar$ and
+$\Wcal(\Gzero(\thetastar)) \le \Wcal(\Gcal_{n})$ gives, with
+$v = \thetahat - \thetastar$,
+\[
+  \norm{v}_{2}^{2} \;\le\; \frac{64(\lamG)^{2}\Wcal(\Gcal_{n})}{\gtil^{2}}
+  + \frac{16\normn{\bb}^{2}}{\gtil}
+  \;\le\; \frac{256(\lamG)^{2}\Wcal(\Gcal_{n})}{\gamma^{2}}
+  + \frac{32\mathcal{B}^{2}_{J_n}}{\alpha'\gamma} .
+\]
+For a fixed block, the orthonormality of the wavelets of level below $J_n$
+gives $\lVert\widehat{g}_{\cv\md} - \PiJ\gcomp{\cv}{\md}\rVert_{L_2[0,1]} =
+\norm{v_{\cv\md,\cdot}}_2 \le \norm{v}_2$, and the first display of Lemma~2
+bounds $\lVert\PiJ\gcomp{\cv}{\md} - \gcomp{\cv}{\md}\rVert^2_{L_2[0,1]}$ by
+$C_g^2(1-2^{-2\seff})^{-1}2^{-2J_n\seff}$. By $(x+y)^2 \le 2x^2 + 2y^2$,
+\begin{equation}
+  \label{eq:Dn-blocks}
+  \Delta^{2} \;\le\; (\bar{\Delta}^{\Gcal}_n)^{2} \;=\;
+  \frac{512(\lamG)^{2}\Wcal(\Gcal_{n})}{\gamma^{2}}
+  + \frac{64\,\mathcal{B}^2_{J_n}}{\alpha'\gamma}
+  + \frac{2C_g^2}{1-2^{-2\seff}}\,2^{-2J_n\seff},
+\end{equation}
+with $(\lamG)^{2}\Wcal(\Gcal_{n}) \le \varrho^{2}(\lamGone)^{2}|\Gcal_{n}|$ by
+Lemma~\ref{lem:calib-blocks}(iii). The residual probability
+$\Prob(\Acal^{c})$ tends to zero by Lemma~\ref{lem:regime} and does not depend
+on the components; it is the $\omega_n$ of Corollary~2(iii), and by
+Lemma~S7.1(iii) this paragraph is the proof of that part. The bound
+$\bar{\Delta}^{\Gcal}_n$ depends on the components only through the constants
+of Assumption~5, so everything above holds uniformly over the class, which is
+what allows the target to vary with $n$ in Assumption~6.
+
+\emph{The order of $\bar{\Delta}^{\Gcal}_n$.} By the proof of Theorem~3,
+$(\lamG)^{2}\Wcal(\Gcal_{n}) \le \bar\varrho^{2}C_{\pen}\sigma^{2}pq(\bn +
+2^{J_n})/n \asymp n^{-2\seff/(2\seff+1)}$, and $2^{-2J_n\seff} \le
+n^{-2\seff/(2\seff+1)}$ by the definition of $J_n$. Hence
+$\bar{\Delta}^{\Gcal}_n \le c(\alpha,\alpha')\rhoG$ with
+$c(\alpha,\alpha') < \infty$. Given $\epsilon > 0$, take
+$\alpha = \alpha' = \epsilon/4$ and $n$ large enough that
+$\Prob(\Acal^{c}) < \epsilon/2$; then
+$\Prob\{\Delta > c(\epsilon/4,\epsilon/4)\rhoG\} < \epsilon$, that is
+$\Delta = O_p(\rhoG)$, uniformly over the class.
+
+\emph{Part (i).} If $t_n/\rhoG \to \infty$, then $\Prob(\Delta \le t_n) \to 1$,
+and on that event Lemma~S7.1(i) with $\bar{\Delta} = \Delta$ gives
+$\widehat{\mathcal{S}}(t_n) \subseteq \mathcal{S}$. No property of
+$\nu_{\min,n}$ has been used.
+
+\emph{Part (ii).} If $\mathcal{S}$ is empty, part (ii) is part (i). Otherwise,
+the condition $\limsup_n t_n/\nu_{\min,n} < 1$ gives $\eta > 0$ and $n_0$ with
+$\nu_{\min,n} - t_n \ge \eta\,\nu_{\min,n}$ for $n \ge n_0$, and Assumption~6
+gives $(\nu_{\min,n} - t_n)/\rhoG \ge \eta\,\nu_{\min,n}/\rhoG \to \infty$.
+Hence $\Prob(\Delta \le t_n) \to 1$ and
+$\Prob(\Delta < \nu_{\min,n} - t_n) \to 1$, and on the intersection of the two
+events Lemma~S7.1(iii) with $\bar{\Delta} = \Delta$ gives
+$\widehat{\mathcal{S}}(t_n) = \mathcal{S}$. For the existence,
+$t_n = (\rhoG\nu_{\min,n})^{1/2}$ has
+$t_n/\rhoG = (\nu_{\min,n}/\rhoG)^{1/2} \to \infty$ and
+$t_n/\nu_{\min,n} = (\rhoG/\nu_{\min,n})^{1/2} \to 0$. \qed
+
+\emph{At the resolution of Theorem~1.} Theorem~1 gives
+$\sum_{\cv,\md}\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}\rVert^2_{L_2[0,1]}
+= O_p\{(\rhoGt)^{2}\}$, with $\rhoGt$ as in Section~3.6 of the paper, hence
+$\Delta = O_p(\rhoGt)$, and the bound in its proof depends on the components
+only through the constants of Assumption~5 and of the design, so that this
+holds uniformly over the class. The proofs of parts (i) and (ii) above use
+nothing about $\Delta$ beyond $\Delta = O_p(\rhoG)$ uniformly over the class,
+together with Lemma~S7.1 and Assumption~6, and they go through verbatim with
+$\rhoGt$ in place of $\rhoG$.
+
+\subsection*{Proof of Corollary 3}
+
+Write $r_n$ for the rate of the statement and $\Dbl$ as in
+Lemma~\ref{lem:thrisk}. For the fit of Theorem~3,
+$\normn{\widehat{f}-f}^{2} = O_p(r_n^{2})$ and
+$\sum_{\cv,\md}\Dbl^{2} = O_p(r_n^{2})$ by Theorem~3 and Corollary~1; for the
+lasso, by Theorem~\ref{thm:lasso-linear} and
+Corollary~\ref{cor:lasso-components}. In both cases
+$\Prob(\ESig) \to 1$, by the proofs of Theorems~3 and \ref{thm:lasso-linear},
+and $\normn{\bb}^{2} = O_p(\mathcal{B}_{J_n}^{2}) = O_p(r_n^{2})$, by the choice
+of $J_n$.
+
+\emph{Part (i).} The bound for the components is Lemma~\ref{lem:thrisk}(i)
+with $|\mathcal{S}| \le pq$. For prediction,
+$\normn{\widehat{f}^{(t)}-f}^{2} \le 2\normn{\widehat{f}^{(t)}-f_{J_n}}^{2} +
+2\normn{\bb}^{2}$, and on $\ESig$, $\lmaxx(\Gramhat) < \Lambda$ and
+$\lmin(\Gramhat) > \gamma/2$, so that Lemma~\ref{lem:thrisk}(iii) gives, for
+every $t$,
+\[
+  \normn{\widehat{f}^{(t)}-f}^{2} \;\le\;
+  \frac{8\Lambda}{\gamma}\normn{\widehat{f}-f_{J_n}}^{2}
+  + 4\Lambda t^{2}|\mathcal{S}_{J_n}\setminus\widehat{\mathcal{S}}(t)|
+  + 2\normn{\bb}^{2},
+\]
+with $\normn{\widehat{f}-f_{J_n}}^{2} \le 2\normn{\widehat{f}-f}^{2} +
+2\normn{\bb}^{2} = O_p(r_n^{2})$.
+
+\emph{Part (ii).} By Lemma~S7.1(ii), $\mathcal{S} \subseteq
+\widehat{\mathcal{S}}(t_n)$ whenever $t_n < \nu_{\min,n} - \Delta$. With
+$\limsup_n t_n/\nu_{\min,n} < 1$ there are $\eta > 0$ and $n_0$ with
+$\nu_{\min,n} - t_n \ge \eta\nu_{\min,n}$ for $n \ge n_0$, and since
+$\Delta^{2} \le \sum_{\cv,\md}\Dbl^{2} = O_p(r_n^{2})$ and
+$\nu_{\min,n}/r_n \to \infty$, $\Prob(\Delta < \nu_{\min,n} - t_n) \to 1$. On
+that event Lemma~\ref{lem:thrisk}(ii) holds and, since
+$\mathcal{S}_{J_n} \subseteq \mathcal{S}$, so does the second case of
+Lemma~\ref{lem:thrisk}(iii), which on $\ESig$ gives
+$\normn{\widehat{f}^{(t_n)}-f}^{2} \le
+(4\Lambda/\gamma)\normn{\widehat{f}-f_{J_n}}^{2} + 2\normn{\bb}^{2}$. If
+moreover $t_n/r_n \to \infty$, part (ii) of Corollary~2, or of
+Corollary~\ref{cor:lasso-threshold} for the lasso, gives
+$\Prob\{\widehat{\mathcal{S}}(t_n) = \mathcal{S}\} \to 1$, and
+Lemma~\ref{lem:thrisk}(ii) concludes. \qed
+
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/04-oraculo.tex, 05-taxas.tex e 06-selecao-limiar.tex (o lasso
+% coordenado). Secao nova em k = 4 (D51(a)): os enunciados estavam nas Secoes
+% 3.2 a 3.6 do ms_3 e as provas nas Secoes S5 a S7 do supp_3; a Proposicao 4
+% entra emendada por D49(a) (as condicoes s' > 1/4 em (i) e s' > s/2 em (ii)).
+{\color{colR1}
+\section{The coordinatewise lasso}
+\setcounter{equation}{0}
+
+\noindent[k = 4: the statements of this section stood in Sections 3.2 to 3.6 of
+the paper, and their proofs in Sections S5 to S7 of this supplement.]
+
+This section gives the theory of the estimator obtained by replacing
+$\nGw{\btheta}$ by $\norm{\btheta}_{1}$ in equation (2.5) of the paper, the
+lasso of \citet{tibshirani1996regression} with the levels left unpenalized,
+which the software offers as an option. Assumptions 1 to 5, Lemmas 1 and 2,
+Proposition 2 and Lemmas~\ref{lem:profile}, \ref{lem:columns} and \ref{lem:l1}
+are used as they stand, with the notation $\Szero$, $s_0$ and $v$ of
+Section~S1. The penalty level is
+\begin{equation}
+  \label{eq:lasso-lambda}
+  \penn \;=\; 2\sigma B_X\sqrt{2C_U}\,
+  \sqrt{\frac{2\log(2d_n/\alpha)}{n}} \;\asymp\;
+  \sigma B_X \sqrt{C_U}\,\sqrt{\frac{J_n}{n}} ,
+\end{equation}
+with $d_n$ the number of penalized columns at resolution $J_n$.
+
+\subsection*{Statements}
+
+\begin{theorem}[Oracle inequality for the lasso]
+\label{thm:lasso-oracle}
+Let Assumption 1 hold, suppose $\Amat$ has rank $p$, and take
+$\pen \ge 2\pen_0$ with
+$\pen_0 = \sigma\smax\{2\log(2d/\alpha)/n\}^{1/2}$. On the event
+$\mathcal{T} = \{\norm{\Btil\T\bveps/n}_{\infty} \le \pen/2\}$, which has
+probability at least $1 - \alpha$:
+\begin{enumerate}
+\item[(i)] with no condition on the design,
+$\normn{\Btil v}^{2} \le 6\pen\norm{\thetastar}_{1} + 4\normn{\bb}^{2}$;
+\item[(ii)] if $\gtil > 0$,
+\[
+  \normn{\Btil v}^{2} \le \frac{64\pen^{2}s_0}{\gtil} + 16\normn{\bb}^{2},
+  \qquad
+  \norm{v}_{2}^{2} \le \frac{64\pen^{2}s_0}{\gtil^{2}}
+  + \frac{16\normn{\bb}^{2}}{\gtil} ;
+\]
+\item[(iii)] in either regime,
+$\normn{\widehat{f}-f} \le \normn{\Btil v} + 2\normn{\bb}
++ \normn{\PA\bveps}$, and
+$\E(\normn{\PA\bveps}^{2}\mid\bX,\bU) \le \sigma^{2}p/n$.
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Rate of linear approximation for the lasso]
+\label{thm:lasso-linear}
+Let Assumptions 1 to 5 hold with $p$, $q$ and the constants fixed, and take
+\begin{equation}
+  \label{eq:lasso-Jn}
+  J_n = \min\bigl\{J \in \mathbb{N} :\;
+  2^{J} \ge (n/\log n)^{1/(2\seff+1)}\bigr\},
+\end{equation}
+so that $J_n = \log_2 n/(2\seff+1) + O(\log\log n)$. Then the requirement of
+Proposition 2(ii) holds along $J_n$, being itself of the exact order
+$(\log n/n)^{2\seff/(2\seff+1)}$, and, with $\penn$ as in
+\eqref{eq:lasso-lambda},
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2\seff/(2\seff+1)}\Bigr\} .
+\]
+At this resolution the estimation term and the bias term are of the same
+order, and the term $\sigma^{2}p/n$ of Theorem~\ref{thm:lasso-oracle}(iii) is
+of strictly smaller order.
+\end{theorem}
+
+\begin{corollary}[Components and coefficients for the lasso]
+\label{cor:lasso-components}
+In the setting of Theorem~\ref{thm:lasso-linear}, and with $r_n$ denoting the
+rate of that theorem,
+\[
+  \sum_{\cv,\md}\bigl\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2} = O_p(r_n),
+  \qquad
+  \bigl\lVert\widehat{\fcoef{\cv}}-\fcoef{\cv}
+  \bigr\rVert_{L_2([0,1]^{q})} = O_p(r_n^{1/2})
+\]
+for $\cv = 1,\dots,p$, and the same statements hold with the rate of
+Theorem~\ref{thm:lasso-main} in place of $r_n$ under the conditions of that
+theorem.
+\end{corollary}
+
+% derivations/05-taxas.tex, Proposicao 4, emendada por D49(a).
+\begin{proposition}[Slow rate for the lasso, no design condition]
+\label{prop:lasso-slow}
+Let Assumptions 1, 4 and 5 hold, with $\Amat$ of rank $p$ and $\penn$ as in
+\eqref{eq:lasso-lambda}. Then
+$\normn{\widehat{f}-f}^{2} = O_p\{\penn\norm{\thetastar}_{1} +
+\mathcal{B}_{J_n}^{2} + p/n\}$, where
+$\norm{\thetastar}_{1} \le pqC_g\sum_{\lev<J_n}2^{\lev(1/2-s)}$ does not
+depend on $\pi$. In particular, if $s > 1/2$ and $\seff > 1/4$ then
+$\normn{\widehat{f}-f}^{2} = O_p\{(J_n/n)^{1/2}\}$ for every
+$J_n \ge \log_2 n/(4\seff)$; and if $s < 1/2$ and $\seff > s/2$, the choice
+$2^{J_n} \asymp (n/J_n)^{1/(1-2s+4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} = O_p\{(J_n/n)^{2\seff/(1-2s+4\seff)}\}$, an
+exponent that equals $2s/(2s+1)$ when $\pi \ge 2$.
+\end{proposition}
+
+For a vector $\btheta$ let $\theta_{(1)} \ge \theta_{(2)} \ge \cdots$ be the
+nonincreasing rearrangement of the absolute values of its entries and let
+$\btheta^{(M)}$ retain the $M$ largest of them.
+
+\begin{lemma}[Besov regularity implies compressibility]
+\label{lem:lasso-weak}
+Under Assumptions 4 and 5 with $\pi(s+1/2) > 1$, the oracle satisfies, for
+every $J$ and every $k \ge 1$,
+\[
+  \theta^{*}_{(k)} \;\le\; C_\tau\,k^{-1/\tau},
+  \qquad \tau = \frac{1}{s+1/2},
+  \qquad C_\tau = C_g(pq\,A_{s,\pi})^{s+1/2},
+  \qquad A_{s,\pi} = 1 + \frac{1}{1-2^{1-\pi(s+1/2)}},
+\]
+with constants that do not depend on $J$ and with $\tau \in (0,2)$ for every
+$s > 0$. Consequently
+$\sum_{k>M}\theta^{*2}_{(k)} \le \tau(2-\tau)^{-1}C_\tau^{2}M^{1-2/\tau}$ for
+every $M \ge 1$.
+\end{lemma}
+
+The inclusion of Besov balls in weak $\ell_\tau$ balls is classical
+\citep[Proposition~9.15]{johnstone2019gaussian}; what the lemma adds is the
+constant $C_\tau$, uniform in $J$, for the oracle of the product design, which
+is the form in which the proof of Theorem~\ref{thm:lasso-main} uses it.
+
+\begin{theorem}[Rate of nonlinear approximation for the lasso]
+\label{thm:lasso-main}
+Let Assumptions 1 to 5 hold with $p$, $q$ and all the constants fixed as $n$
+grows, and set $\tau = (s+1/2)^{-1}$. Suppose $\seff > s/(2s+1)$ and take
+$J_n = \lceil c \log_2 n\rceil$ with
+\begin{equation}
+  \label{eq:lasso-window}
+  \max\Bigl\{\frac{\tau}{2},\; \frac{2-\tau}{4\seff}\Bigr\}
+  \;\le\; c \;<\; 1 ,
+\end{equation}
+a window that is nonempty precisely under that condition. Then, with $\penn$
+as in \eqref{eq:lasso-lambda},
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\Bigr\},
+  \qquad
+  \sum_{\cv,\md}\bigl\lVert \widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\Bigr\} .
+\]
+\end{theorem}
+
+The logarithmic factor is the price of the single penalty level
+\eqref{eq:lasso-lambda}, which takes a union bound over the $d_n$ columns;
+Theorem~1 of the paper removes the factor $(\log n)^{2\seff/(2s+1)}$ of it.
+Write $\rho_n = (\log n/n)^{\seff/(2\seff+1)}$ for the square root of the rate
+of Theorem~\ref{thm:lasso-linear}.
+
+\begin{corollary}[Block structure by thresholding the lasso]
+\label{cor:lasso-threshold}
+Let the assumptions of Theorem~\ref{thm:lasso-linear} hold, with $J_n$ and
+$\penn$ as there.
+\begin{enumerate}
+\item[(i)] (Screening.) If the thresholds satisfy $t_n/\rho_n \to \infty$,
+then $\Prob\{\widehat{\mathcal{S}}(t_n) \subseteq \mathcal{S}\} \to 1$.
+\item[(ii)] (Recovery.) If, in addition, Assumption 6 holds with $\rho_n$ in
+place of $\rhoG$ and $\limsup_n t_n/\nu_{\min,n} < 1$, then
+$\Prob\{\widehat{\mathcal{S}}(t_n) = \mathcal{S}\} \to 1$. Such thresholds
+always exist; one is $t_n = (\rho_n\nu_{\min,n})^{1/2}$.
+\item[(iii)] (A window at fixed $n$.) With $\alpha$ the level in
+\eqref{eq:lasso-lambda}, for every $n$ and every $\alpha' \in (0,1)$ there is
+an event, of probability at least $1 - \alpha - \alpha' - \omega_n$ with
+$\omega_n \to 0$ not depending on the components, on which
+$\widehat{\mathcal{S}}(t) = \mathcal{S}$ for every $t$ with
+$\bar{\Delta}_n \le t < \nu_{\min,n} - \bar{\Delta}_n$; here
+$\bar{\Delta}_n \le c(\alpha,\alpha')\rho_n$ is the explicit bound
+\eqref{eq:Dn} on $\max_{(\cv,\md)}\lVert \widehat{g}_{\cv\md} -
+\gcomp{\cv}{\md}\rVert_{L_2[0,1]}$.
+\end{enumerate}
+\end{corollary}
+
+Parts (i) and (ii) hold also at the resolution of
+Theorem~\ref{thm:lasso-main}, with $\rho_n$ replaced by
+$\tilde\rho_n = (\log n/n)^{s/(2s+1)}$, the square root of the rate of that
+theorem, both in the condition on $t_n$ and in Assumption~6. Since
+$\tilde\rho_n \le \rho_n$, with a gap in the exponent when $\pi < 2$, the
+separation required is weaker exactly where the components are spatially
+inhomogeneous.
+
+\subsection*{Proofs}
+
+\begin{lemma}[Calibration of the penalty]
+\label{lem:calib}
+Under Assumption 1, for every $\alpha \in (0,1)$,
+$\Prob(\norm{\Btil\T\bveps/n}_{\infty} > \pen_0) \le \alpha$ with
+$\pen_0 = \sigma\smax\{2\log(2d/\alpha)/n\}^{1/2}$.
+\end{lemma}
+
+\begin{proof}
+Condition on the covariates, so that $\Btil$ and $\smax$ are fixed and the
+errors are independent and sub-Gaussian with parameter $\sigma$. For a column
+$a$, $(\Btil\T\bveps)_a/n$ is sub-Gaussian with parameter
+$\sigma\lVert\Btil^{(a)}\rVert_2/n$, and, $\MA$ being an orthogonal
+projection, $\lVert\Btil^{(a)}\rVert_2 \le \lVert\Bmat^{(a)}\rVert_2 =
+\sqrt{n}\,(\Gramhat)_{aa}^{1/2} \le \sqrt{n}\,\smax$. With
+$t = \pen_0$ the sub-Gaussian tail bound is at most $\alpha/d$ per column; a
+union bound over the $d$ columns and the tower property finish the proof.
+\end{proof}
+
+\subsection*{Proof of Theorem~\ref{thm:lasso-oracle}}
+
+\emph{Step 1, the basic inequality.} By Lemma S5.1, $\thetahat$ minimizes the
+residualized objective; comparing its value at $\thetahat$ with its value at
+$\thetastar$, and using $\MA\Amat = 0$, so that
+$\MA\bY = \Btil\thetastar + \MA(\bb+\bveps)$, gives, with
+$r = \MA(\bb+\bveps)$,
+\begin{equation}
+  \label{eq:basic}
+  \normn{\Btil v}^2 + 2\pen\norm{\thetahat}_1
+  \;\le\; 2\inner{r}{\Btil v}_n + 2\pen\norm{\thetastar}_1 .
+\end{equation}
+
+\emph{Step 2, the two noises.} Since $\MA\Btil = \Btil$ and $\MA$ is
+symmetric, $\inner{r}{\Btil v}_n = \inner{\bb+\bveps}{\Btil v}_n$. The
+stochastic part is handled by duality: on $\mathcal{T}$,
+$2|\inner{\bveps}{\Btil v}_n| \le
+2\norm{\Btil\T\bveps/n}_{\infty}\norm{v}_1 \le \pen\norm{v}_1$. The
+deterministic part is handled by the Cauchy-Schwarz and Young inequalities,
+and not by duality, because $\bb$ is not small coordinatewise:
+$2|\inner{\bb}{\Btil v}_n| \le 2\normn{\bb}\normn{\Btil v} \le
+\normn{\Btil v}^2/2 + 2\normn{\bb}^2$. Substituting both in
+\eqref{eq:basic},
+\begin{equation}
+  \label{eq:basic2}
+  \tfrac12\normn{\Btil v}^2 + 2\pen\norm{\thetahat}_1
+  \;\le\; \pen\norm{v}_1 + 2\pen\norm{\thetastar}_1 + 2\normn{\bb}^2 .
+\end{equation}
+
+\emph{Step 3, the slow rate.} Bounding
+$\norm{v}_1 \le \norm{\thetahat}_1+\norm{\thetastar}_1$ in
+\eqref{eq:basic2} gives
+$\tfrac12\normn{\Btil v}^2 + \pen\norm{\thetahat}_1 \le
+3\pen\norm{\thetastar}_1 + 2\normn{\bb}^2$, which is part (i). No property of
+$\Gramhat$ was used.
+
+\emph{Step 4, the cone.} Since $\thetastar$ vanishes off $\Szero$,
+$\norm{\thetahat}_1 \ge \norm{\thetastar}_1 - \norm{v_{\Szero}}_1 +
+\norm{v_{\Szero^c}}_1$ and
+$\norm{v}_1 = \norm{v_{\Szero}}_1+\norm{v_{\Szero^c}}_1$; substituting in
+\eqref{eq:basic2} and cancelling $2\pen\norm{\thetastar}_1$,
+\begin{equation}
+  \label{eq:cone}
+  \tfrac12\normn{\Btil v}^2 + \pen\norm{v_{\Szero^c}}_1
+  \;\le\; 3\pen\norm{v_{\Szero}}_1 + 2\normn{\bb}^2 .
+\end{equation}
+
+\emph{Step 5, two cases.} If $2\normn{\bb}^2 \le \pen\norm{v_{\Szero}}_1$,
+then \eqref{eq:cone} gives
+$\tfrac12\normn{\Btil v}^2 + \pen\norm{v_{\Szero^c}}_1 \le
+4\pen\norm{v_{\Szero}}_1$; by the Cauchy-Schwarz inequality and
+\eqref{eq:schur}, $\norm{v_{\Szero}}_1 \le \sqrt{s_0}\norm{v}_2 \le
+\sqrt{s_0}\normn{\Btil v}/\sqrt{\gtil}$, so
+$\normn{\Btil v} \le 8\pen\sqrt{s_0/\gtil}$ and
+$\norm{v}_2^2 \le \normn{\Btil v}^2/\gtil \le 64\pen^2s_0/\gtil^2$; the same
+display gives $\norm{v_{\Szero^c}}_1 \le 4\norm{v_{\Szero}}_1$ and hence
+$\norm{v}_1 \le 5\norm{v_{\Szero}}_1 \le 40\pen s_0/\gtil$. If instead
+$2\normn{\bb}^2 > \pen\norm{v_{\Szero}}_1$, then \eqref{eq:cone} gives
+$\tfrac12\normn{\Btil v}^2 < 8\normn{\bb}^2$, that is
+$\normn{\Btil v}^2 < 16\normn{\bb}^2$, together with
+$\pen\norm{v}_1 < 10\normn{\bb}^2$ and
+$\norm{v}_2^2 < 16\normn{\bb}^2/\gtil$. Each quantity is bounded by the
+maximum of the two cases, hence by their sum, which is part (ii).
+
+\emph{Step 6, prediction.} By \eqref{eq:decomp},
+$\widehat{f}-f = \Btil v + \PA(\bb+\bveps) - \bb$, and $\PA$ being a
+projection, $\normn{\PA\bb} \le \normn{\bb}$, which gives the triangle
+inequality of part (iii). Conditionally on the covariates the errors are
+independent, centered and of variance at most $\sigma^2$, so
+\[
+  \E(\normn{\PA\bveps}^2\mid\bX,\bU)
+  = \frac1n\tr\{\PA\,\mathrm{Cov}(\bveps\mid\bX,\bU)\}
+  \le \frac{\sigma^2}{n}\tr(\PA) \le \frac{\sigma^2p}{n},
+\]
+since the diagonal entries of $\PA$ are nonnegative and its trace is the rank
+of $\Amat$. \qed
+
+\begin{remark}[Why there is no cone condition]
+\label{rem:nocone}
+The usual treatment of unpenalized coordinates \citep[Section
+6.9]{buhlmann2011statistics} places them inside the support and requires
+compatibility on the cone $\norm{\delta_{S^c}}_1 \le 3\norm{\delta_S}_1$.
+Profiling removes them from the problem, and \eqref{eq:schur} transfers the
+full smallest eigenvalue of $\Gramhat$ to the residualized block, so that
+Proposition 2(ii) is used as it stands and the constant does not depend on
+$\Szero$. If only the restricted version of the design condition were
+available, the cone would return, and with the constant $4$ rather than $3$,
+since Step 5 produces $\norm{v_{\Szero^c}}_1 \le 4\norm{v_{\Szero}}_1$: the
+bias consumes part of the slack.
+\end{remark}
+
+\begin{corollary}[The two rates with the design condition instantiated]
+\label{cor:instant}
+Add Assumptions 2 to 5 and suppose $2^J\log d/n \to 0$, which is implied by
+the requirement of Proposition 2(ii). Take
+$\pen = 2\sigma B_X\sqrt{2C_U}\{2\log(2d/\alpha)/n\}^{1/2}$. Then, with
+probability at least $1-\alpha-\alpha'-\alpha''$ up to terms that tend to
+zero,
+\[
+  \normn{\widehat{f}-f}^2 \;\lesssim\;
+  \frac{\sigma^2B_X^2C_U}{\kappa_1c_U}\,\frac{s_0\log(pq\NJ)}{n}
+  \;+\; \frac{\mathcal{B}^2_J}{\alpha'} \;+\; \frac{\sigma^2p}{n\alpha''},
+\]
+and, with no condition on the design, the same bound with
+$\pen\norm{\thetastar}_1$ of Lemma S5.4 in place of the first term.
+\end{corollary}
+
+\begin{proof}
+Intersect four events: $\mathcal{T}$, of probability at least $1-\alpha$, by
+Lemma~\ref{lem:calib}; $\{\smax^2 \le 2B_X^2C_U\}$, by Lemma S5.3, which makes the stated
+$\pen$ admissible, that is $\pen \ge 2\pen_0$;
+$\{\lmin(\Gramhat)\ge\gamma/2\}$, by Proposition 2(ii), which with
+\eqref{eq:schur} gives $\gtil \ge \gamma/2$; and
+$\{\normn{\bb}^2 \le \mathcal{B}_J^2/\alpha'\}$, which is Markov's inequality
+applied to $\E\normn{\bb}^2 = \norm{f-f_J}^2_{L_2(P)} \le \mathcal{B}_J^2$,
+the identity holding because the observations are identically distributed.
+Substituting in parts (ii) and (iii) of Theorem~\ref{thm:lasso-oracle} gives the statement, and
+part (i) with Lemma S5.4 gives the unconditional version.
+\end{proof}
+
+The first lemma is Theorem~\ref{thm:lasso-oracle} read at an arbitrary comparator. It consumes no
+new step: the proof of that theorem uses the oracle only through the
+decomposition of $\bY$ and through the size of its support.
+
+\begin{lemma}[Theorem~\ref{thm:lasso-oracle} with an arbitrary comparator]
+\label{lem:comparator}
+Under Assumption 1, with $\Amat$ of rank $p$ and $\pen \ge 2\pen_0$, on the
+event $\mathcal{T}$ the following hold simultaneously for every
+$\bar\bbeta = (\bar\bc,\thbar)$, with $\bbar = f - \bZ\bar\bbeta$,
+$\bar M = |\supp(\thbar)|$ and $\bar v = \thetahat-\thbar$:
+$\tfrac12\normn{\Btil\bar v}^2 + \pen\norm{\thetahat}_1 \le
+3\pen\norm{\thbar}_1 + 2\normn{\bbar}^2$; if $\gtil>0$,
+$\normn{\Btil\bar v}^2 \le 64\pen^2\bar M/\gtil + 16\normn{\bbar}^2$ and
+$\norm{\bar v}_2^2 \le 64\pen^2\bar M/\gtil^2 +
+16\normn{\bbar}^2/\gtil$; and
+\begin{equation}
+  \label{eq:oracle-min}
+  \normn{\widehat{f}-f}^2 \;\le\;
+  3\min_{\bar\bbeta}\Bigl\{\frac{64\pen^2\bar M}{\gtil}
+  + 20\normn{\bbar}^2\Bigr\} + 3\normn{\PA\bveps}^2 .
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Follow the proof of Theorem~\ref{thm:lasso-oracle} with
+$(\bar\bc,\thbar,\bbar,\supp(\thbar),\bar M,\bar v)$ in place of
+$(\bc,\thetastar,\bb,\Szero,s_0,v)$. Step 1 uses only
+$\bY = \Amat\bar\bc+\Bmat\thbar+\bbar+\bveps$, which is the definition of
+$\bbar$, and $\MA\Amat = 0$. Step 2 uses $\mathcal{T}$, which does not depend
+on the comparator, and $\normn{\MA\bbar} \le \normn{\bbar}$. Steps 3 to 5 are
+algebra with $\supp(\thbar)$ in place of $\Szero$, using
+$\thbar_{\supp(\thbar)^c} = 0$, the Cauchy-Schwarz inequality and
+\eqref{eq:schur}. Step 6 gives
+$\widehat{f}-\bZ\bar\bbeta = \Btil\bar v + \PA(\bbar+\bveps)$ and hence
+$\widehat{f}-f = \Btil\bar v+\PA(\bbar+\bveps)-\bbar$. Since $\mathcal{T}$,
+$\gtil$ and the condition on $\pen$ do not involve $\bar\bbeta$, the
+inequalities hold simultaneously on the same event and the minimum may be
+taken; \eqref{eq:oracle-min} follows from
+$(x+y+z)^2 \le 3(x^2+y^2+z^2)$.
+\end{proof}
+
+\subsection*{Proof of Lemma~\ref{lem:lasso-weak}}
+
+\emph{The envelope.} Fix $\epsilon>0$ and count
+$N(\epsilon) = \#\{a : |\theta^{*}_a| > \epsilon\}$. Inside a block and a
+level, Markov's inequality in the $\ell_\pi$ norm gives
+$\#\{\tsl : |\coefs{\cv}{\md}{\lev}{\tsl}|>\epsilon\} \le
+\epsilon^{-\pi}\norm{\theta^{*}_{\cv\md,\lev\cdot}}^{\pi}_{\pi}$, and
+Assumption 5 gives
+$\norm{\theta^{*}_{\cv\md,\lev\cdot}}^{\pi}_{\pi} \le
+C_g^{\pi}2^{-\lev\pi(s+1/2-1/\pi)} = C_g^{\pi}2^{\lev(1-a)}$ with
+$a = \pi(s+1/2)>1$. Since a level has $2^{\lev}$ coordinates,
+\[
+  N_{\cv\md}(\epsilon) \;\le\; \sum_{\lev\ge0}
+  \min\{2^{\lev},\, C_g^{\pi}\epsilon^{-\pi}2^{\lev(1-a)}\} .
+\]
+The two arguments agree at $2^{\lev_\epsilon a} = (C_g/\epsilon)^{\pi}$, that
+is at $2^{\lev_\epsilon} = (C_g/\epsilon)^{\tau}$, since
+$\pi/a = (s+1/2)^{-1} = \tau$. Below that level the minimum is $2^{\lev}$ and
+the sum is at most $2^{\lev_\epsilon}$; above it the minimum is the second
+term, which decreases geometrically with ratio $2^{1-a}<1$, and the sum is
+$2^{\lev_\epsilon}/(1-2^{1-a})$. Adding the two parts and the $pq$ blocks
+gives $N(\epsilon) \le pqA_{s,\pi}(C_g/\epsilon)^{\tau}$; truncating at
+$\lev<J$ only decreases the count, so the bound holds for every $J$. Finally,
+$\epsilon < \theta^{*}_{(k)}$ implies $N(\epsilon) \ge k$, hence
+$\epsilon \le C_g(pqA_{s,\pi}/k)^{1/\tau}$, and letting $\epsilon$ increase to
+$\theta^{*}_{(k)}$ gives the envelope; and $\tau = (s+1/2)^{-1} < 2$ for every
+$s>0$.
+
+\emph{The tail.} With $2/\tau>1$,
+$\sum_{k>M}\theta^2_{(k)} \le C_\tau^2\sum_{k>M}k^{-2/\tau} \le
+C_\tau^2\int_M^{\infty}x^{-2/\tau}dx = C_\tau^2M^{1-2/\tau}\tau/(2-\tau)$.
+\qed
+
+\subsection*{Proof of Proposition~\ref{prop:lasso-slow}}
+
+By parts (i) and (iii) of Theorem~\ref{thm:lasso-oracle}, on $\mathcal{T}$,
+$\normn{\Btil v}^2 \le 6\pen\norm{\thetastar}_1+4\normn{\bb}^2$ and
+$\normn{\widehat{f}-f}^2 \le 3(\normn{\Btil v}^2+4\normn{\bb}^2+
+\normn{\PA\bveps}^2)$, and no property of $\Gramhat$ enters. Lemma S5.3 makes
+$\penn$ admissible with probability tending to one, since
+$2^{J_n}\log d_n/n \to 0$ in both regimes, and it is for this that the conditions
+$\seff > 1/4$ in (i) and $\seff > s/2$ in (ii) are needed: without them the choice
+in (i) gives $2^{J_n} \ge n^{1/(4\seff)} \ge n$, and the balance in (ii) gives
+$2^{J_n} \gtrsim n/\log n$; Markov's inequality
+applied to $\E\normn{\bb}^2 \le \mathcal{B}^2_{J_n}$, from Lemma 2, and to
+$\E(\normn{\PA\bveps}^2\mid\bX,\bU) \le \sigma^2p/n$ gives the general
+statement. If $s>1/2$, Lemma S5.4 gives $\norm{\thetastar}_1 = O(1)$ and
+$\penn\norm{\thetastar}_1 \asymp (J_n/n)^{1/2}$, and it suffices that the bias
+not dominate, that is $2^{-2J_n\seff} \le (J_n/n)^{1/2}$, which holds for
+$J_n \ge \log_2(n/J_n)/(4\seff)$. If $s<1/2$, then
+$\norm{\thetastar}_1 \asymp 2^{J_n(1/2-s)}$, the two terms are
+$(J_n/n)^{1/2}2^{J_n(1/2-s)}$ and $2^{-2J_n\seff}$, and equating them gives
+$2^{J_n} \asymp (n/J_n)^{1/(1-2s+4\seff)}$ with common value
+$(J_n/n)^{2\seff/(1-2s+4\seff)}$; when $\seff = s$ the denominator is
+$1+2s$. \qed
+
+\subsection*{Proof of Theorem~\ref{thm:lasso-linear}}
+
+By the definition of $J_n$,
+$(n/\log n)^{1/(2\seff+1)} \le 2^{J_n} < 2(n/\log n)^{1/(2\seff+1)}$ and
+$J_n \asymp \log n$, so
+\[
+  \frac{pq2^{J_n}\log(pq2^{J_n})}{n}
+  \;\asymp\; \frac{(n/\log n)^{1/(2\seff+1)}\log n}{n}
+  \;=\; \Bigl(\frac{\log n}{n}\Bigr)^{2\seff/(2\seff+1)}
+  \;\longrightarrow\; 0,
+\]
+which is the requirement of Proposition 2(ii); \eqref{eq:schur} then gives
+$\gtil \ge \gamma/2$ with probability tending to one. On that event
+Corollary~\ref{cor:instant} with $s_0 \le d_n$ gives
+\[
+  \normn{\widehat{f}-f}^2 \;\lesssim\;
+  \frac{\sigma^2B_X^2C_U}{\kappa_1c_U}\frac{d_nL_n}{n}
+  + \frac{\mathcal{B}^2_{J_n}}{\alpha'} + \frac{\sigma^2p}{n\alpha''} .
+\]
+With $d_n \asymp pq2^{J_n}$ and $L_n \asymp \log n$ the first term is the
+display above; the second is
+$\mathcal{B}^2_{J_n} \asymp 2^{-2J_n\seff} \le
+(\log n/n)^{2\seff/(2\seff+1)}$ by the lower bound on $2^{J_n}$; and the third
+is $O(1/n)$, of strictly smaller order because $2\seff/(2\seff+1)<1$. \qed
+
+\subsection*{Proof of Corollary~\ref{cor:lasso-components}}
+
+Inside a block the wavelets of level below $J$ are orthonormal in $L_2[0,1]$,
+so
+$\lVert\widehat{g}_{\cv\md}-\PiJ\gcomp{\cv}{\md}\rVert^2_{L_2[0,1]} =
+\sum_{\lev\tsl}v^2_{\cv\md,\lev\tsl}$, and summing over the $pq$ blocks gives
+$\norm{v}_2^2$; adding the bias of Lemma 2 in each block,
+\[
+  \sum_{\cv,\md}\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}
+  \rVert^2_{L_2[0,1]} \;\le\; 2\norm{v}_2^2
+  + \frac{2pqC_g^2}{1-2^{-2\seff}}2^{-2J\seff} .
+\]
+Theorem~\ref{thm:lasso-oracle}(ii) bounds $\norm{v}_2^2$ by
+$64\pen^2s_0/\gtil^2+16\normn{\bb}^2/\gtil$, and on the event of Theorem~\ref{thm:lasso-linear} the
+quantity $\gtil$ is bounded below by the constant $\gamma/2$, so the two terms
+are of the same order as those of Theorem~\ref{thm:lasso-linear}, the only difference being a
+constant with $\gamma^{-2}$ in place of $\gamma^{-1}$. This is where the
+design condition is used a second time. For the levels, Lemma S5.1 gives
+$\Amat(\chat-\bc) = \PA(\bb+\bveps)-\PA\Bmat v$, so that
+$\normn{\Amat(\chat-\bc)} \le \normn{\bb}+\normn{\PA\bveps}+
+\lmaxx(\Gramhat)^{1/2}\norm{v}_2$, while $\Amat\T\Amat/n$ is a principal
+submatrix of $\Gramhat$, whence
+$\norm{\chat-\bc}_2^2 \le \normn{\Amat(\chat-\bc)}^2/(\gamma/2)$. Finally the
+components of a functional coefficient depend on distinct coordinates of $u$
+and the basis is orthonormal, so
+$\lVert\widehat{\fcoef{\cv}}-\fcoef{\cv}\rVert_{L_2([0,1]^q)} \le
+|\widehat{c}_{\cv}-\lvl{\cv}| + \sum_{\md}\lVert\widehat{g}_{\cv\md}-
+\gcomp{\cv}{\md}\rVert_{L_2[0,1]}$, with $q$ fixed. The same argument applies
+verbatim under the conditions of Theorem~\ref{thm:lasso-main}. \qed
+
+\subsection*{Proof of Theorem~\ref{thm:lasso-main}}
+
+\emph{A nonasymptotic bound.} Apply Lemma~\ref{lem:comparator} with
+$\bar\bbeta = (\bc,\thstarM{M})$, the best $M$ term approximation of the
+oracle. Then $\bar M \le M$ and
+$\bbar = \bb + \Bmat(\thetastar-\thstarM{M})$, so that, by the
+Cauchy-Schwarz inequality, Lemma~\ref{lem:lasso-weak} and \eqref{eq:lmax},
+\[
+  \normn{\bbar}^2 \;\le\; 2\normn{\bb}^2
+  + 2\lmaxx(\Gramhat)\norm{\thetastar-\thstarM{M}}_2^2
+  \;\le\; 2\normn{\bb}^2 + \frac{2\Lambda C_\tau^2\tau}{2-\tau}M^{1-2/\tau} .
+\]
+Substituting in \eqref{eq:oracle-min}, on the intersection of $\mathcal{T}$
+with $\{\lmin(\Gramhat)\ge\gamma/2\}$,
+\[
+  \normn{\widehat{f}-f}^2 \;\le\; 3\min_{1\le M\le d}h(M)
+  + 120\normn{\bb}^2 + 3\normn{\PA\bveps}^2,
+  \qquad
+  h(M) = \frac{64\pen^2}{\gtil}M
+  + \frac{40\Lambda C_\tau^2\tau}{2-\tau}M^{1-2/\tau} .
+\]
+The function $h$ is strictly convex on the positive half line, since
+$1-2/\tau<0$, and $h'$ vanishes at
+$\Mstar = \{5\Lambda C_\tau^2\gtil/(8\pen^2)\}^{\tau/2}$, where
+$h(\Mstar) = 2(2-\tau)^{-1}(64\pen^2/\gtil)\Mstar$; moreover
+$h(\lceil\Mstar\rceil) \le h(\Mstar)+64\pen^2/\gtil \le 2h(\Mstar)$ whenever
+$\Mstar \ge 1$, because $(2-\tau)/2<1$.
+
+\emph{The resolution.} With $\penn^2 \asymp \sigma^2B_X^2C_UJ_n/n$,
+$\gtil \in [\gamma/2,\Lambda]$ and the other constants fixed,
+$\Mstar_n \asymp \penn^{-\tau} \asymp (n/J_n)^{\tau/2}$ and
+$h(\Mstar_n) \asymp \penn^2\Mstar_n \asymp (J_n/n)^{(2-\tau)/2}$. Writing
+$J_n = \lceil c\log_2 n\rceil$, so that $2^{J_n} \asymp n^{c}$, the three
+inequalities of the window \eqref{eq:lasso-window} are, in order: $\Mstar_n \le d_n$, which asks
+$(n/J_n)^{\tau/2} \lesssim pq\,n^{c}$, that is $c \ge \tau/2$ up to
+logarithms; that the bias not dominate, $n^{-2c\seff} \lesssim
+(J_n/n)^{(2-\tau)/2}$, that is $c \ge (2-\tau)/(4\seff)$; and the requirement
+of Proposition 2(ii), $n^{c-1}\log n \to 0$, that is $c<1$. The term
+$\sigma^2p/n$ is of smaller order because $(2-\tau)/2<1$. The window is
+nonempty if and only if $\tau/2<1$, which always holds, and
+$(2-\tau)/(4\seff)<1$, that is $\seff>(2-\tau)/4$.
+
+\emph{Under Assumption 5 the hypothesis is automatic.} By Lemma~\ref{lem:lasso-weak} the
+envelope holds with $\tau = (s+1/2)^{-1}$, whence $2-\tau = 4s/(2s+1)$,
+$(2-\tau)/2 = 2s/(2s+1)$ and $(2-\tau)/4 = s/(2s+1)$, which is the condition
+$\seff>s/(2s+1)$ of the statement; for $\pi \ge 2$ it holds for every $s>0$,
+and for $\pi<2$ it reads $2s^2/(2s+1)>1/\pi-1/2$. The rate for the components
+is the argument of Corollary~\ref{cor:lasso-components} with
+$\norm{\thetahat-\thetastar}_2 \le \norm{\bar v}_2 +
+\norm{\thetastar-\thstarM{M}}_2$ and Lemma~\ref{lem:comparator}, the only difference being an
+extra factor $\gtil^{-1}$ in the first term, which does not change the order.
+Finally $2s/(2s+1) \ge 2\seff/(2\seff+1)$, with equality only when
+$\seff = s$, by monotonicity of $x \mapsto 2x/(2x+1)$ and $\seff \le s$, so
+the rate is never worse than that of Theorem~\ref{thm:lasso-linear} and is strictly better when
+$\pi<2$. \qed
+
+\begin{remark}[What compressibility buys]
+\label{rem:s0}
+Read at the oracle, Theorem~\ref{thm:lasso-oracle}(ii) has $s_0 = d$ and delivers the rate of
+\textcolor{colR1}{linear approximation}; read at a sparse comparator, through Lemma~\ref{lem:comparator}, it delivers the rate
+of Theorem~\ref{thm:lasso-main}. It is the same inequality in both cases, and neither says
+anything about $\supp(\thetahat)$: no minimal signal and no
+irrepresentability condition is used, and what is gained is a rate governed by
+the effective dimension $\Mstar_n$ rather than by $d_n$.
+\end{remark}
+
+\subsection*{Proof of Corollary~\ref{cor:lasso-threshold}}
+
+\emph{A nonasymptotic bound on $\Delta$.} Work at $J = J_n$ and $\pen = \penn$,
+and intersect the four events of the proof of Corollary~\ref{cor:instant}: $\mathcal{T}$,
+of probability at least $1-\alpha$, by Lemma~\ref{lem:calib};
+$\{\smax^2 \le 2B_X^2C_U\}$, by Lemma S5.3, which makes $\penn$ admissible;
+$\{\lmin(\Gramhat) \ge \gamma/2\}$, by Proposition 2(ii), which with
+\eqref{eq:schur} gives $\gtil \ge \gamma/2$; and
+$\{\normn{\bb}^2 \le \mathcal{B}^2_{J_n}/\alpha'\}$, by Markov's inequality and
+Lemma 2. On this event Theorem~\ref{thm:lasso-oracle}(ii) with $s_0 \le d_n$ gives
+\[
+  \norm{v}_2^2 \;\le\; \frac{64\penn^2d_n}{\gtil^2}
+  + \frac{16\normn{\bb}^2}{\gtil}
+  \;\le\; \frac{256\penn^2d_n}{\gamma^2}
+  + \frac{32\mathcal{B}^2_{J_n}}{\alpha'\gamma} .
+\]
+For a fixed block, the orthonormality of the wavelets of level below $J_n$
+gives $\lVert\widehat{g}_{\cv\md} - \PiJ\gcomp{\cv}{\md}\rVert_{L_2[0,1]} =
+\norm{v_{\cv\md,\cdot}}_2 \le \norm{v}_2$, and the first display of Lemma 2
+bounds $\lVert\PiJ\gcomp{\cv}{\md} - \gcomp{\cv}{\md}\rVert^2_{L_2[0,1]}$ by
+$C_g^2(1-2^{-2\seff})^{-1}2^{-2J_n\seff}$. By $(x+y)^2 \le 2x^2 + 2y^2$,
+\begin{equation}
+  \label{eq:Dn}
+  \Delta^2 \;\le\; \bar{\Delta}_n^2 \;=\; \frac{512\,\penn^2d_n}{\gamma^2}
+  + \frac{64\,\mathcal{B}^2_{J_n}}{\alpha'\gamma}
+  + \frac{2C_g^2}{1-2^{-2\seff}}\,2^{-2J_n\seff}
+\end{equation}
+with probability at least
+$1 - \alpha - \alpha' - \Prob\{\lmin(\Gramhat) < \gamma/2\} -
+\Prob\{\smax^2 > 2B_X^2C_U\}$, the last two terms tending to zero by
+Proposition 2(ii) and Lemma S5.3\textcolor{colR1}{; their sum is the
+$\omega_n$ of Corollary~\ref{cor:lasso-threshold}(iii), and this paragraph is the proof of that
+part}. By Lemma S7.1(iii), on that event
+$\widehat{\mathcal{S}}(t) = \mathcal{S}$ for every $t$ with $\bar{\Delta}_n \le t < \nu_{\min} - \bar{\Delta}_n$, a window
+that is nonempty whenever $\nu_{\min} > 2\bar{\Delta}_n$. The bound $\bar{\Delta}_n$ depends on the
+components only through the constants of Assumption 5, and the two residual
+probabilities do not depend on them at all, so everything above holds
+uniformly over the class, which is what allows the target to vary with $n$ in
+Assumption 6.
+
+\emph{The order of $\bar{\Delta}_n$.} At the resolution of Theorem~\ref{thm:lasso-linear} the three terms of
+\eqref{eq:Dn} are at most of order $\rho_n^2$: the first because
+$\penn^2d_n \asymp pq2^{J_n}J_n/n$, which is the quantity shown to be of order
+$(\log n/n)^{2\seff/(2\seff+1)}$ in the proof of Theorem~\ref{thm:lasso-linear}, and the other two
+because $\mathcal{B}^2_{J_n} \asymp 2^{-2J_n\seff} \le
+(\log n/n)^{2\seff/(2\seff+1)}$ by the definition of $J_n$. Hence
+$\bar{\Delta}_n \le c(\alpha,\alpha')\rho_n$ with $c(\alpha,\alpha') < \infty$. Given $\epsilon > 0$,
+take $\alpha = \alpha' = \epsilon/4$ and $n$ large enough that the two
+residual probabilities add up to less than $\epsilon/2$; then
+$\Prob\{\Delta > c(\epsilon/4,\epsilon/4)\rho_n\} < \epsilon$, that is
+$\Delta = O_p(\rho_n)$.
+
+\emph{Part (i).} If $t_n/\rho_n \to \infty$, then
+$\Prob(\Delta \le t_n) \to 1$, and on that event Lemma S7.1(i) with
+$\bar{\Delta} = \Delta$ gives $\widehat{\mathcal{S}}(t_n) \subseteq \mathcal{S}$. No property of $\nu_{\min,n}$
+has been used.
+
+\emph{Part (ii).} If $\mathcal{S}$ is empty, part (ii) is part (i). Otherwise, the
+condition $\limsup_n t_n/\nu_{\min,n} < 1$ gives $\eta > 0$ and $n_0$ with
+$\nu_{\min,n} - t_n \ge \eta\,\nu_{\min,n}$ for $n \ge n_0$, and Assumption 6 with $\rho_n$ in place of $\rhoG$ gives
+$(\nu_{\min,n} - t_n)/\rho_n \ge \eta\,\nu_{\min,n}/\rho_n \to \infty$. Hence
+$\Prob(\Delta \le t_n) \to 1$ and $\Prob(\Delta < \nu_{\min,n} - t_n) \to 1$, and
+on the intersection of the two events Lemma S7.1(iii) with $\bar{\Delta} = \Delta$ gives
+$\widehat{\mathcal{S}}(t_n) = \mathcal{S}$. For the existence, $t_n = (\rho_n\nu_{\min,n})^{1/2}$ has
+$t_n/\rho_n = (\nu_{\min,n}/\rho_n)^{1/2} \to \infty$ and
+$t_n/\nu_{\min,n} = (\rho_n/\nu_{\min,n})^{1/2} \to 0$. \qed
+
+\textcolor{colR1}{\emph{At the resolution of Theorem~\ref{thm:lasso-main}.} Theorem~\ref{thm:lasso-main} gives
+$\sum_{\cv,\md}\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}\rVert^2_{L_2[0,1]}
+= O_p(\tilde\rho_n^{\,2})$ with $\tilde\rho_n = (\log n/n)^{s/(2s+1)}$, hence
+$\Delta = O_p(\tilde\rho_n)$, and the bound in its proof depends on the
+components only through the constants of Assumption 5, through $C_\tau$ of
+Lemma~\ref{lem:lasso-weak} and the design constants, so that this holds uniformly over the
+class. The proofs of parts (i) and (ii) above use nothing about $\Delta$
+beyond $\Delta = O_p(\rho_n)$ uniformly over the class, together with
+Lemma S7.1 and Assumption 6, and they go through verbatim with
+$\tilde\rho_n$ in place of $\rho_n$.}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibhang=1.7pc
+\bibsep=2pt
+\fontsize{9}{14pt plus.8pt minus .6pt}\selectfont
+\renewcommand\bibname{\large \bf References}
+\bibliographystyle{chicago}
+\bibliography{references_4}
+
+\end{document}

@@ -21,9 +21,12 @@
 % Teorema 2 e Corolário 8, e imprime o número global via \setcounter, como
 % 04, 05, 06 e 07. E1.13 acrescentou o Corolário 14 (a taxa lenta em blocos,
 % D47(c)), na §5, com o contador posto em 13 antes dele: os Corolários 12 e 13
-% estão no adendo de E1.12 de 06-selecao-limiar.tex.
+% estão no adendo de E1.12 de 06-selecao-limiar.tex. E1.14 acrescentou ao
+% Corolário 14 os itens (iii) e (iv) (todo s' > 0 e a fronteira s = 1/2, com o
+% nível acima do teto e lambda_n^G inflado por (mu^G_J)^{1/2}), sem número novo,
+% e a Parte VIII da conferência.
 %
-% Conferência numérica: check/08-blocos.R (imprime OK; ~5 min).
+% Conferência numérica: check/08-blocos.R (imprime OK; ~6,5 min).
 % Notação: docs/notacao.md (congelada em E1.1). Os símbolos da teoria em
 % blocos (os de E1.11) são macros locais deste arquivo, como em 07, até
 % entrarem no notacao.md (§10) pelo chat principal.
@@ -71,6 +74,7 @@
 \newcommand{\Rid}{R_{\mathcal{G}}}
 \newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
 \newcommand{\lamGone}{\lambda^{\mathcal{G}}_{n,1}}
+\newcommand{\lamGp}{\lambda^{\mathcal{G},+}_{n}}   % E1.14: \lamG inflado acima do teto
 \newcommand{\lamz}[1]{\lambda_{0,#1}}
 \newcommand{\lamzbar}[1]{\bar{\lambda}_{0,#1}}
 \newcommand{\rhoG}{\rho^{\mathcal{G}}_{n}}
@@ -663,6 +667,24 @@ na norma de grupos com pesos~$1$,
 A contagem é a peça nova: o pedaço cobra $\sqrt{\bn}$ em $\lamGone$ e devolve
 até $\bn^{\vartheta_{\pi}}$ em $\nGone{\thetastar}$.
 
+Os itens (iii) e (iv) abaixo (E1.14) pedem $2^{J_{n}}$ acima de $n/\log n$,
+onde nem $\smax^{2} \le 2B_{X}^{2}C_{U}$ nem $\lmaxx(\Gramhat) \le \Lambda$
+valem, e o $\lamG$ determinístico deixa de ser admissível. Com $D = p + d$,
+$\Delta = \Lambda - \kappa_{2}C_{U} > 0$ e o $c_{\psi} =
+7\norm{\psi}_{\infty}^{2}/(12C_{U})$ da Proposição~4(iii) de E1.6, escrevemos
+\begin{equation}
+  \label{eq:mu-blocos}
+  \mu^{\Gcal}_{J} = 1 + c_{\mu}\frac{2^{J}\log(2D)}{n},
+  \quad
+  c_{\mu} = \max\Bigl\{c_{\psi},\
+  \frac{2pB_{X}^{2}(1+qC_{\psi})}{\Lambda}
+  \Bigl(\frac{\kappa_{2}C_{U}}{2\Delta} + \frac43\Bigr)\Bigr\},
+  \quad
+  \lamGp = (\mu^{\Gcal}_{J_{n}})^{1/2}\lamG,
+\end{equation}
+com $C_{\psi}$ o da Proposição~3(iv) de E1.4; quando
+$pq2^{J_{n}}\log(pq2^{J_{n}})/n \to 0$, $\lamGp = \lamG\{1 + o(1)\}$.
+
 \setcounter{corollary}{13}
 \begin{corollary}[taxa lenta em blocos; nenhuma condição de desenho]\label{cor:lenta-blocos}
 Sob as Hipóteses~1 e~2 de E1.5, as hipóteses de E1.3, a
@@ -704,7 +726,40 @@ Em particular:
     quando $\pi \ge 2$ (isto é, $\seff = s$) a taxa é $n^{-2s/(2s+1)}$,
     \emph{sem logaritmo}: a do Teorema~\ref{thm:taxa-blocos} e do
     Corolário~\ref{cor:adaptativa-blocos}(i), obtida sem nenhuma condição de
-    desenho.
+    desenho;
+  \item \textup{(os pares que (i) e (ii) excluem, todos com $\pi < 2$; E1.14)}
+    sem a condição de dimensão acima, com $2^{J_{n}} \le n^{2}$ no lugar de
+    $2^{J_{n}} \le 2n$ na Hipótese~\ref{ass:regime-blocos} e $\lamGp$ de
+    \eqref{eq:mu-blocos} no lugar de $\lamG$ (no estimador e em
+    \eqref{eq:lenta-blocos}), vale \eqref{eq:lenta-blocos} com
+    $(\lamGone)^{2} \le (C_{\pen} + 16\Lambda)\sigma^{2}\bn/n$, e:
+    \begin{enumerate}[label=\textup{(\alph*)}, leftmargin=*, nosep]
+      \item se $s > 1/2$ e $\seff \le 1/4$, a escolha
+        $2^{J_{n}} \asymp (n/\log n)^{2/(1+4\seff)}$ dá
+        \[
+          \normn{\widehat f - f}^{2} =
+          O_{p}\bigl((\log n/n)^{4\seff/(1+4\seff)}\bigr),
+        \]
+        a taxa da Proposição~4(iii)(a) de E1.6;
+      \item se $s < 1/2$ e $\seff \le s/2$, a escolha
+        $2^{J_{n}} \asymp (n/\bn^{1/\pi})^{1/(1-s+2\seff)}$ dá
+        \[
+          \normn{\widehat f - f}^{2}
+          = O_{p}\Bigl(n^{-2\seff/(1-s+2\seff)}
+          (\log n)^{(1/\pi)\,2\seff/(1-s+2\seff)}\Bigr),
+        \]
+        com $(\log n)^{(1-1/\pi)2\seff/(1-s+2\seff)}$ a menos que a
+        Proposição~4(iii)(b) de E1.6;
+    \end{enumerate}
+  \item \textup{(a fronteira $s = 1/2$, com $\pi > 1$; E1.14)} nas trocas de
+    (iii), $\nGone{\thetastar} \le pqC_{g}\{(1-2^{-\seff})^{-1} +
+    \bn^{-\vartheta_{\pi}}J_{n}\}$ e: se $\seff \ge 1/4$ ($\pi \ge 4/3$), a
+    escolha $2^{J_{n}} \asymp (n/\bn)^{1/(4\seff)}$ dá
+    $\normn{\widehat f - f}^{2} = O_{p}\bigl(n^{-1/2}(\log
+    n)^{3/2-\vartheta_{\pi}}\bigr)$, isto é, $n^{-1/2}\log n$ em $\pi \ge 2$; se
+    $\seff < 1/4$ ($1 < \pi < 4/3$), a escolha $2^{J_{n}} \asymp
+    (n/\bn^{1+1/\pi})^{2/(1+4\seff)}$ dá $\normn{\widehat f - f}^{2} =
+    O_{p}\bigl(((\log n)^{1+1/\pi}/n)^{4\seff/(1+4\seff)}\bigr)$.
 \end{enumerate}
 \end{corollary}
 
@@ -745,6 +800,16 @@ $2^{J_{n}}\log d_{n}/n \to 0$, o que aquela prova afirma em todos os regimes:
 com $\seff \le 1/4$ em~(i), ou $\seff \le s/2$ em~(ii), o $J_{n}$ de lá tem
 $2^{J_{n}} \gtrsim n/\log n$ e o Lema~6 de E1.5 não se aplica (por exemplo,
 $(s,\pi) = (0{,}6;\,1)$ e $(0{,}3;\,1{,}5)$).
+
+Os itens (iii) e (iv) (E1.14) cobrem esses pares e a fronteira $s = 1/2$ como
+a Proposição~4(iii) e (iv) de E1.6: parar $J_{n}$ no teto daria
+$O_{p}((\log n/n)^{2\seff})$, e passar dele com $\lamGp$ dá os expoentes
+de (iii), estritamente maiores (Observação~1 de E1.6, que responde por que
+nenhuma escolha abaixo do teto faz melhor). O ganho em logaritmo sobre o
+LASSO segue o mecanismo de~(ii): nada em (iii)(a), onde o pedaço grosso
+domina as duas normas; $(\log n)^{(1-1/\pi)2\seff/(1-s+2\seff)}$ em (iii)(b);
+e, em (iv), $(\log n)^{\vartheta_{\pi}}$ se $\seff \ge 1/4$ (meio logaritmo
+em $\pi \ge 2$) e $(\log n)^{(1-1/\pi)4\seff/(1+4\seff)}$ se $\seff < 1/4$.
 \end{remark}
 
 \begin{remark}[onde o desenho entra, e onde não entra]\label{rem:lenta-desenho}
@@ -770,7 +835,9 @@ metade superior da Proposição~3(iii)), e não $c_{U}$ nem $\kappa_{1}$;
 qualquer $\Lambda > \kappa_{2}C_{U}$ serve. Essa é a diferença para o LASSO:
 lá a calibração só pede as normas das colunas ($\smax$); aqui a cauda de Hsu,
 Kakade e Zhang tem $\opnorm{\Psitil_{G}}$, e trocá-la pelo traço custaria um
-$\sqrt{\log n}$ a mais em $\lamGone$.
+$\sqrt{\log n}$ a mais em $\lamGone$. Em (iii) e (iv), acima do teto, a cota
+superior passa a $\lmaxx(\Gramhat) \le \Lambda\mu^{\Gcal}_{J}$, da mesma cauda
+com $t$ crescente; continua sem $c_{U}$ nem $\kappa_{1}$.
 \end{remark}
 
 \section{Diante do Teorema~2 de Klopp e Pensky (2015)}\label{sec:kp}
@@ -1313,7 +1380,81 @@ do enunciado, com valor comum $2^{-2J_{n}\seff} \asymp
 $p/n$ são de ordem menor, porque $2\seff/(1-2s+4\seff) < 1/2$ equivale a
 $s < 1/2$. A condição de dimensão vale porque $\seff > s/2$ dá
 $1/(1-2s+4\seff) < 1$; e $2^{J_{n}} \ge \bn$ para $n$ grande. Em $\pi \ge 2$,
-$\seff = s$, $(2/\pi-1)_{+} = 0$ e $1 - 2s + 4s = 2s + 1$. \qed
+$\seff = s$, $(2/\pi-1)_{+} = 0$ e $1 - 2s + 4s = 2s + 1$.
+
+\emph{Os dois eventos acima do teto (para (iii) e (iv)).} Seja $\Acal^{++} =
+\{\smax^{2} \le 2B_{X}^{2}C_{U}\mu^{\Gcal}_{J}\} \cap \{\lmaxx(\Gramhat) \le
+\Lambda\mu^{\Gcal}_{J}\}$. A conta da prova da Proposição~4(iii) de E1.6 dá
+$\Prob(\smax^{2} > 2B_{X}^{2}C_{U}(1 + c_{\psi}2^{J}\log d/n)) \le 1/d$, e
+$c_{\psi}2^{J}\log d \le c_{\mu}2^{J}\log(2D)$. Para a segunda, a cauda da
+Proposição~3(iv) de E1.4, $\Prob(\opnorm{\Gramhat - \Gram} \ge t) \le
+2D\exp\{-nt^{2}/(2R_{J}(\kappa_{2}C_{U} + 2t/3))\}$, vale para todo $J$ e
+todo $t > 0$; com $x = 2\log(2D)$ e $t = (2xR_{J}\kappa_{2}C_{U}/n)^{1/2} +
+(4/3)xR_{J}/n$, vale $nt^{2} \ge 2xR_{J}\kappa_{2}C_{U} + (4/3)xR_{J}t$, e a
+probabilidade é no máximo $2De^{-x} = 1/(2D)$; e $(2ab)^{1/2} \le \Delta +
+ab/(2\Delta)$ com $a = \kappa_{2}C_{U}$ e $b = xR_{J}/n$ dá $t \le \Delta +
+(\kappa_{2}C_{U}/(2\Delta) + 4/3)xR_{J}/n$. Por Weyl e
+$\lmaxx(\Gram) \le \kappa_{2}C_{U}$, fora desse evento
+$\lmaxx(\Gramhat) < \Lambda + (\kappa_{2}C_{U}/(2\Delta) + 4/3)
+2\log(2D)R_{J}/n \le \Lambda\mu^{\Gcal}_{J}$, porque $R_{J} =
+pB_{X}^{2}(1 + qC_{\psi}2^{J}) \le pB_{X}^{2}(1+qC_{\psi})2^{J}$. Logo
+$\Prob(\Acal^{++}) \ge 1 - 1/d - 1/(2D) \to 1$, sem condição sobre $J_{n}$.
+No evento $\Acal^{++}$, o Lema~\ref{lem:calib-blocos}(ii) dá $\lamz{G} \le
+(\mu^{\Gcal}_{J})^{1/2}\lamzbar{G}$ para todo $G$, logo $\lamGp \ge
+\pen_{w}$ e $\Ecal \subseteq \Tw$, e o passo da forma $O_{p}$ acima segue com
+$\lamGp$ no lugar de $\lamG$ e $\Acal^{++}$ no lugar de $\Acal^{+}$; a cadeia
+dá $\lamGp\nGw{\thetastar} \le \bar\varrho(\mu^{\Gcal}_{J_{n}})^{1/2}
+\lamGone\nGone{\thetastar}$. Com $2^{J_{n}} \le n^{2}$, $|\Gcal_{n}| \le pq(1 +
+n^{2}/\bn) \le pqn^{2}$ e $\log(|\Gcal_{n}|/\alpha) \le \log(2pq/\alpha) +
+2\bn$, e a conta de \eqref{eq:ordem-lambda} dá $(\lamGone)^{2} \le
+(16\sigma^{2}/n)\{(2B_{X}^{2}C_{U} + 2\Lambda)\bn + \Lambda\log(2pq/\alpha)\}
+\le (C_{\pen} + 16\Lambda)\sigma^{2}\bn/n$. Como $\log(2D_{n}) \asymp \log n
+\asymp \bn$,
+\begin{equation}
+  \label{eq:lam-plus-blocos}
+  (\mu^{\Gcal}_{J_{n}})^{1/2}\lamGone \;\asymp\;
+  \Bigl(\frac{\log n}{n}\Bigr)^{1/2}\Bigl(1 + \frac{2^{J_{n}}\log n}{n}\Bigr)^{1/2},
+  \qquad\text{e}\qquad
+  \asymp 2^{J_{n}/2}\,\frac{\log n}{n}\quad\text{se } 2^{J_{n}} \gtrsim n/\log n .
+\end{equation}
+
+\emph{(iii)(a).} Com $s > 1/2$, $\nGone{\thetastar} = O(1)$ como em (i), e a
+conta é a da Proposição~4(iii)(a) de E1.6 com
+\eqref{eq:lam-plus-blocos} no lugar da ordem de $\pen_{n}^{+}$ de lá: com
+$2^{J_{n}} \asymp (n/\log n)^{2/(1+4\seff)} \gtrsim n/\log n$, o termo de
+estimação é $(\log n/n)(n/\log n)^{1/(1+4\seff)} =
+(\log n/n)^{4\seff/(1+4\seff)}$, a ordem do viés.
+
+\emph{(iii)(b).} Com $s < 1/2$ e $\pi < 2$, $\vartheta_{\pi} = 1 - 1/\pi$ e
+$\nGone{\thetastar} = O(1 + \bn^{-\vartheta_{\pi}}2^{J_{n}(1/2-s)})$ como em
+(ii). Com $2^{J_{n}} \asymp (n/\bn^{1/\pi})^{1/(1-s+2\seff)}$, que passa de
+$n/\bn$ para $n$ grande (o expoente é pelo menos $1$ e $1/\pi \le 1$),
+\eqref{eq:lam-plus-blocos} dá o termo de estimação
+\[
+  2^{J_{n}/2}\frac{\log n}{n}\bigl(1 + \bn^{-(1-1/\pi)}2^{J_{n}(1/2-s)}\bigr)
+  \;\asymp\; 2^{J_{n}/2}\frac{\log n}{n} +
+  2^{J_{n}(1-s)}\frac{(\log n)^{1/\pi}}{n},
+\]
+cuja segunda parcela domina e, na escolha do enunciado, é
+\[
+  (\bn^{1/\pi}/n)^{1 - (1-s)/(1-s+2\seff)} =
+  (\bn^{1/\pi}/n)^{2\seff/(1-s+2\seff)},
+\]
+a ordem do viés $2^{-2J_{n}\seff}$.
+
+\emph{(iv).} Com $s = 1/2$, \eqref{eq:contagem-lenta} tem
+$\sum_{\jst<\lev<J_{n}}2^{0} \le J_{n}$, o que dá a cota de
+$\nGone{\thetastar}$ do enunciado, e $J_{n} \asymp \log n \asymp \bn$ nas
+duas escolhas, de modo que $\nGone{\thetastar} \asymp 1 +
+(\log n)^{1-\vartheta_{\pi}} \asymp (\log n)^{1-\vartheta_{\pi}}$
+($\vartheta_{\pi} \le 1/2$). Se $\seff \ge 1/4$, $2^{J_{n}} \asymp
+(n/\bn)^{1/(4\seff)} \lesssim n/\log n$, $\mu^{\Gcal}_{J_{n}}$ é limitado, o
+termo de estimação é $(\log n/n)^{1/2}(\log n)^{1-\vartheta_{\pi}}$ e o viés,
+$(\bn/n)^{1/2}$, é de ordem menor. Se $\seff < 1/4$, $\pi < 4/3$ e
+$\vartheta_{\pi} = 1 - 1/\pi$; com $2^{J_{n}} \asymp
+(n/\bn^{1+1/\pi})^{2/(1+4\seff)}$, que passa de $n/\log n$, o termo de
+estimação é $2^{J_{n}/2}(\log n)^{1+1/\pi}/n \asymp
+((\log n)^{1+1/\pi}/n)^{4\seff/(1+4\seff)}$, a ordem do viés. \qed
 
 \section{O que foi transposto e o que é novo}
 
@@ -1348,6 +1489,12 @@ $\seff = s$, $(2/\pi-1)_{+} = 0$ e $1 - 2s + 4s = 2s + 1$. \qed
     logaritmo em $s < 1/2$ e $\pi \ge 2$ (Corolário~\ref{cor:lenta-blocos});
     a leitura da Proposição~4 de E1.6 pelo Teorema~\ref{thm:oraculo-blocos}(i)
     é transposta.
+  \item \textbf{Novo em E1.14:} os itens (iii) e (iv) do
+    Corolário~\ref{cor:lenta-blocos}, em todo $\seff > 0$ e na fronteira
+    $s = 1/2$, com o nível acima do teto e $\lamG$ inflado por
+    $(\mu^{\Gcal}_{J})^{1/2}$, que cobre ao mesmo tempo $\smax$ e
+    $\lmaxx(\Gramhat)$ acima do teto \eqref{eq:mu-blocos}; o ganho em logaritmo
+    sobre o LASSO em (iii)(b) e em (iv).
 \end{itemize}
 
 \section{O que isto não cobre}
@@ -1387,15 +1534,23 @@ $\seff = s$, $(2/\pi-1)_{+} = 0$ e $1 - 2s + 4s = 2s + 1$. \qed
     colunas dos níveis $\lev \le \jst$ e o termo $\sigma^{2}p_{0}/n$,
     $p_{0} = p + pq(2^{\jst+1}-1)$, que é $O(\log n/n)$; não enunciado aqui,
     porque D44 não adotou essa forma.
-  \item \textbf{A taxa lenta além de $\thetastar$, em $s = 1/2$ e nos pares
-    fora de (i) e (ii).} O Corolário~\ref{cor:lenta-blocos} lê o
+  \item \textbf{A taxa lenta além de $\thetastar$.} O
+    Corolário~\ref{cor:lenta-blocos} lê o
     Teorema~\ref{thm:oraculo-blocos}(i) só no comparador $\betastar$, como a
-    Proposição~4; um comparador truncado trocaria parte de
-    $\pen\nGw{\thetastar}$ por viés e não foi estudado. $s = 1/2$ fica de
-    fora, como lá. Nos pares com $\seff \le 1/4$ (em $s > 1/2$) ou
-    $\seff \le s/2$ (em $s < 1/2$), todos com $\pi < 2$, o balanço pede
-    $2^{J_{n}} \gtrsim n/\log n$; a cota \eqref{eq:lenta-nao-assint} continua
-    valendo, mas a taxa com o $J_{n}$ admissível não foi escrita.
+    Proposição~4; um comparador truncado por pedaço trocaria parte de
+    $\pen\nGw{\thetastar}$ por viés. No LASSO, E1.14 esboçou que o truncado
+    melhora (ii) e (iii) em $s < 1/2$ e $\pi < 2$ (o que isto não cobre do
+    \texttt{05}); em blocos, pediria uma contagem nova de
+    $\sum_{G}\min(\pen\norm{\theta^{*}_{G}}_{2}, \norm{\theta^{*}_{G}}_{2}^{2})$
+    sob Besov. Não foi feito. (Em $s = 1/2$ e nos pares fora de (i) e (ii),
+    os itens (iii) e (iv), de E1.14, substituem o que aqui estava em
+    aberto.)
+  \item \textbf{$\smax$ e $\lmaxx(\Gramhat)$ muito acima do teto.} As cotas de
+    \eqref{eq:mu-blocos} têm $2^{J}\log(2D)/n$, de Bernstein; quando $2^{J}/n$
+    cresce como potência de $n$, as duas são da ordem de $2^{J}/n$, o que
+    tiraria parte do logaritmo de (iii)(a) e de (iv) com $\seff < 1/4$. A
+    constante $c_{\mu}$ (perto de $150$ no desenho da conferência) vem do
+    $\Delta$ pequeno de E1.6 e não foi otimizada.
   \item \textbf{A calibração sem $\lmaxx(\Gramhat)$.} Nos pedaços finos, as
     wavelets de um mesmo nível só se sobrepõem em translações vizinhas, e
     $\opnorm{\Psitil_{G}}$ fica sob uma constante da família vezes
@@ -1406,7 +1561,7 @@ $\seff = s$, $(2/\pi-1)_{+} = 0$ e $1 - 2s + 4s = 2s + 1$. \qed
 
 \section{Conferência numérica}
 
-\texttt{check/08-blocos.R} (imprime \texttt{OK}; cerca de $5$~min nesta máquina;
+\texttt{check/08-blocos.R} (imprime \texttt{OK}; cerca de $6{,}5$~min nesta máquina;
 dependências \texttt{WaveBased} e \texttt{glmnet}; não chama
 \texttt{wafc/R/}). Desenho de E1.4 a E1.6: Daublets com filtro $8$, $p = 2$
 com $X_{1}\equiv 1$ e $X_{2} = 1/2 + \mathrm{Unif}(-1,1)$, $q = 2$, $\bU$
@@ -1507,6 +1662,29 @@ Lema~\ref{lem:calib-blocos}(ii). O que saiu em 2026-10-03:
     menos de $10^{-14}$) nos dois últimos desenhos. No $\thetastar$ do
     desenho, $\norm{\thetastar}_{1}/\nGone{\thetastar}$ vai de $1{,}5$ a $1{,}9$
     em~(i) e de $2{,}6$ a $2{,}7$ em~(ii).
+  \item \textbf{Corolário~\ref{cor:lenta-blocos}(iii) e (iv)} (Parte~VIII,
+    E1.14). A cota com $\lamGp$, minimizada em $J$ com $2^{J} \le n^{2}$
+    ($n$ de $10^{15}$ a $10^{140}$), em $17$ pares (quatro de (iii)(a), quatro
+    de (iii)(b), cinco de (iv), quatro de (i) e (ii)): o expoente de $n$ é o do
+    item a $0{,}01$ nos pesos~$1$ e $\sqrt{|G|}$; o do logaritmo, a $0{,}1$
+    (por exemplo $0{,}21$ contra $0{,}20$ em $(s,\pi) = (0{,}4;1{,}25)$ e
+    $0{,}95$ contra $1$ em $(0{,}5;2)$); o ganho sobre o LASSO no logaritmo é o
+    da teoria em todo par; o minimizador cresce como o $J_{n}$ do enunciado
+    (a $0{,}03$) e passa do teto exatamente nos pares de (iii) e de (iv) com
+    $\seff < 1/4$; a cota no $J_{n}$ do enunciado tem o expoente da teoria; e
+    com $J$ parado no teto e $\lamG$ o expoente é $-2\seff$, pior pela diferença
+    da teoria. Numa grade de $183$ pares com $\seff > 0$, o expoente de $n$ é o
+    do item do par, com desvio máximo de $0{,}002$. Acima do teto ($n = 250$,
+    $J = 5$ a $9$, $10$ réplicas): $\smax^{2} \le 2B_{X}^{2}C_{U}\mu^{\Gcal}_{J}$
+    e $\lmaxx(\Gramhat) \le \Lambda\mu^{\Gcal}_{J}$ em toda réplica (razões
+    máximas $0{,}23$ e $0{,}035$; $c_{\mu} = 153$), $\pen_{w} \le \lamGp$ e
+    cobertura de $\Tw$ igual a $1{,}000$ nos dois pesos; $\lmaxx(\Gramhat)$
+    mediano vai de $2{,}4\Lambda$ a $14{,}7\Lambda$. Em ajustes ($n = 250$,
+    $\pen = \pen_{w}$ exato, $4$ réplicas, os dois pesos) com $(s,\pi) =
+    (0{,}6;1)$ em $J = 8$, $(0{,}4;1{,}25)$ e $(0{,}5;1{,}2)$ em $J = 7$, todos
+    com $d > n$ e $\gtil = 0$: cobertura $1{,}000$, nenhuma violação do
+    Teorema~\ref{thm:oraculo-blocos}(i) nem de \eqref{eq:lenta-nao-assint},
+    folga mínima de $61$ vezes.
 \end{itemize}
 
 \section*{Referências}

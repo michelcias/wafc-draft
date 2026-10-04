@@ -2,7 +2,8 @@
 # blocos do estimador de D44: block LASSO na forma balanceada, níveis c_l
 # livres, pesos de razão limitada) e da cota do estimador limiarizado
 # acrescentada a derivations/06-selecao-limiar.tex (D45); a Parte VII (E1.13)
-# confere o Corolário 14, a taxa lenta em blocos. Roda ANTES da prova;
+# confere o Corolário 14, a taxa lenta em blocos, e a Parte VIII (E1.14), os
+# itens (iii) e (iv) dele, em todo s' > 0. Roda ANTES da prova;
 # imprime OK ou falha com stop(). Notação: docs/notacao.md (congelada em
 # E1.1); os símbolos da teoria em blocos são os de E1.11 (08a, §1.4).
 #
@@ -39,6 +40,12 @@
 #        expoentes de n e do logaritmo da cota nos dois regimes (s > 1/2 e
 #        s < 1/2), nos pesos 1 e sqrt(|G|), ao lado da cota do LASSO
 #        (Proposição 4 de E1.6); e a cota em ajustes, também com gamma_til = 0.
+#   VIII. a taxa lenta em blocos em todo s' > 0 (Corolário 14(iii) e (iv),
+#        E1.14): os expoentes da cota minimizada em J (2^J <= n^2, lambda_n^G
+#        inflado por sqrt(mu^G_J)) nos pares excluídos e em s = 1/2, nos pesos
+#        1 e sqrt(|G|), ao lado do LASSO; os eventos sigma_max^2 <= 2 B_X^2 C_U
+#        mu^G_J e lambda_max(Sigma_hat) <= Lambda mu^G_J acima do teto; e a cota
+#        em ajustes com s' pequeno e d > n.
 #
 # Nos scripts de conferência, elemento de lista se acessa com [[ ]] e nome
 # completo (instrucoes.md, §5).
@@ -1230,5 +1237,260 @@ cat(sprintf("  ||theta*||_1 / ||theta*||_{G,1} no theta* do desenho: %s (regime 
             paste(sprintf("%.2f", tabVII[tabVII[["regime"]] == "i" & tabVII[["pesos"]] == "1", "ganho_l1"]), collapse = " "),
             paste(sprintf("%.2f", tabVII[tabVII[["regime"]] == "ii" & tabVII[["pesos"]] == "1", "ganho_l1"]), collapse = " ")))
 
+## ===========================================================================
+cat("\nPARTE VIII. A taxa lenta em blocos em todo s' > 0: Corolário 14(iii) e (iv) (E1.14)\n")
+## ===========================================================================
+
+# Os pares que (i) e (ii) do Corolário 14 excluem (s > 1/2 com s' <= 1/4; s < 1/2
+# com s' <= s/2) e a fronteira s = 1/2 com s' < 1/4 pedem 2^J acima do teto
+# n/log n, onde nem sigma_max^2 <= 2 B_X^2 C_U nem lambda_max(Sigma_hat) <= Lambda
+# valem. Os itens (iii) e (iv) trocam lambda_n^G por lambda_n^{G,+} =
+# sqrt(mu^G_J) lambda_n^G, com mu^G_J = 1 + c_mu 2^J log(2D)/n, que cobre as duas
+# cotas acima do teto (Bernstein do Lema 6 de E1.5 com x = 2 log d e a cauda da
+# Proposição 3(iv) de E1.4 com x = 2 log(2D)), e 2^J <= n^2 no lugar de 2^J <= 2n
+# na Hipótese B. VIII.1 lê os expoentes da cota minimizada em J, nos pesos 1 e
+# sqrt(|G|), ao lado da do LASSO (Proposição 4(iii) e (iv)); VIII.2 confere os dois
+# eventos e a cobertura de T_{G,w} acima do teto; VIII.3, a cota em ajustes num s'
+# pequeno.
+
+ug <- (seq_len(2^14) - 0.5) / 2^14
+Wg <- psi_block(ug, 10L)
+lvg <- lev_of(10L)
+sup_lev <- tapply(apply(abs(Wg), 2, max), lvg, max)
+psi_inf <- max(sup_lev[as.character(4:9)] / 2^((4:9) / 2))
+Cpsi <- max(vapply(2:10, function(Jl) max(rowSums(Wg[, lvg < Jl, drop = FALSE]^2)) / 2^Jl, 1))
+Dlt <- Lam - kap2 * C_U                             # Lambda - kappa_2 C_U > 0
+c_psi <- 7 * psi_inf^2 / (12 * C_U)
+c_Lam <- 2 * p * B_X^2 * (1 + q * Cpsi) * (kap2 * C_U / (2 * Dlt) + 4 / 3) / Lam
+c_mu <- max(c_psi, c_Lam)
+cat(sprintf("  ||psi||_inf = %.4f, C_psi = %.4f; c_psi = %.3f, c_Lambda = %.1f, c_mu = %.1f\n",
+            psi_inf, Cpsi, c_psi, c_Lam, c_mu))
+# As duas cotas da prova, com os alcances exatos (R'_J = B_X^2 max_a sup psi_a^2,
+# R_J = p B_X^2 (1 + q C_psi 2^J)); mu^G_sim é o maior dos dois fatores.
+mu_sim <- function(n, Jl) {
+  d <- p * q * (2^Jl - 1)
+  D <- p + d
+  Rp <- B_X^2 * max(sup_lev[seq_len(Jl)]^2)
+  RJ <- p * B_X^2 * (1 + q * Cpsi * 2^Jl)
+  c(sm = 2 * B_X^2 * C_U + (7 / 3) * Rp * log(d) / n,
+    lmax = Lam + (kap2 * C_U / (2 * Dlt) + 4 / 3) * 2 * log(2 * D) * RJ / n)
+}
+
+## ---- VIII.1 a aritmética dos expoentes ---------------------------------------
+# A cota 18 lambda sup ||theta*||_{G,w} + 24 B^2 + 3 sigma^2 p/n, com lambda =
+# sqrt(mu^G_J) lambda_n^G (mu = TRUE) ou lambda_n^G (mu = FALSE), o supremo exato da
+# classe (sup_Gw_path, Parte VII) e, ao lado, a do LASSO com sqrt(mu_J) lambda_n e
+# mu_J = 1 + c_psi 2^J log d/n.
+paths_VIII <- function(n, s, pii, Cg, Jl, mu = TRUE) {
+  b <- as.integer(ceiling(log(n)))
+  lt <- lev_tab(Jl, b)
+  top <- pmin(jstar_of(b), lt[["j"]])
+  szc <- 2^(top + 1) - 1
+  M <- p * q * (1 + cumsum(ifelse(lt[["fine"]], lt[["k"]], 0)))
+  mxf <- cummax(ifelse(lt[["fine"]], b + lt[["r"]], 0))
+  mnf <- cummin(ifelse(lt[["fine"]], ifelse(lt[["k"]] >= 2, b, b + lt[["r"]]), Inf))
+  lbar <- function(m) sig / sqrt(n) * (B_X * sqrt(2 * C_U * m) + sqrt(2 * Lam * log(M / alpha)))
+  Jv <- seq_len(Jl)
+  dJ <- p * q * (2^Jv - 1)
+  muG <- if (mu) 1 + c_mu * 2^Jv * log(2 * (p + dJ)) / n else 1
+  mu5 <- if (mu) 1 + c_psi * 2^Jv * log(dJ) / n else 1
+  lam1 <- 2 * pmax(lbar(szc), ifelse(mxf > 0, lbar(mxf), 0)) * sqrt(muG)
+  lamS <- 2 * pmax(lbar(szc) / sqrt(szc), ifelse(is.finite(mnf), lbar(pmin(mnf, 1e300)) / sqrt(pmin(mnf, 1e300)), 0)) * sqrt(muG)
+  sp <- sp_of(s, pii)
+  B2 <- (p * q)^2 * B_X^2 * C_U * Cg^2 / (1 - 2^(-2 * sp)) * 2^(-2 * Jv * sp)
+  tail3 <- 3 * sig^2 * p / n
+  lamL <- 2 * sig * B_X * sqrt(2 * C_U) * sqrt(2 * log(2 * dJ / alpha) / n) * sqrt(mu5)
+  list(blk1 = 18 * lam1 * p * q * sup_Gw_path(s, pii, Cg, Jl, b, w_one) + 24 * B2 + tail3,
+       blkS = 18 * lamS * p * q * sup_Gw_path(s, pii, Cg, Jl, b, w_sqrt) + 24 * B2 + tail3,
+       las = 18 * lamL * p * q * l1_path(s, Cg, Jl) + 24 * B2 + tail3)
+}
+# O regime do Corolário 14 e os expoentes: taxa n^a (log n)^k nos blocos, k_las a do
+# LASSO no mesmo regime, e a escolha do enunciado 2^{J_n} ~ n^{eJ} (log n)^{kJ}.
+reg14 <- function(s, pii) {
+  sp <- sp_of(s, pii)
+  ip <- ipi_of(pii)
+  if (abs(s - 0.5) < 1e-12) {
+    if (sp >= 0.25 - 1e-12) c(reg = 4.1, a = -0.5, k = 1.5 - vth_of(pii), k_las = 1.5, eJ = 1 / (4 * sp), kJ = -1 / (4 * sp))
+    else {
+      e <- 4 * sp / (1 + 4 * sp)
+      c(reg = 4.2, a = -e, k = (1 + ip) * e, k_las = 2 * e, eJ = 2 / (1 + 4 * sp), kJ = -2 * (1 + ip) / (1 + 4 * sp))
+    }
+  } else if (s > 0.5) {
+    if (sp > 0.25) c(reg = 1, a = -0.5, k = 0.5, k_las = 0.5, eJ = 1 / (4 * sp), kJ = 0)
+    else {
+      e <- 4 * sp / (1 + 4 * sp)
+      c(reg = 3.1, a = -e, k = e, k_las = e, eJ = 2 / (1 + 4 * sp), kJ = -2 / (1 + 4 * sp))
+    }
+  } else {
+    if (sp > s / 2) {
+      e <- 2 * sp / (1 - 2 * s + 4 * sp)
+      x <- max(0, 2 * ip - 1)
+      c(reg = 2, a = -e, k = x * e, k_las = e, eJ = 1 / (1 - 2 * s + 4 * sp), kJ = -x / (1 - 2 * s + 4 * sp))
+    } else {
+      e <- 2 * sp / (1 - s + 2 * sp)
+      c(reg = 3.2, a = -e, k = ip * e, k_las = e, eJ = 1 / (1 - s + 2 * sp), kJ = -ip / (1 - s + 2 * sp))
+    }
+  }
+}
+K_cap <- 2 * 4 * psi_inf^2 / (3 * C_U)
+lnn_g8 <- log(10^seq(15, 140, length.out = 120))
+scan14 <- function(s, pii, lnns = lnn_g8, cap = TRUE) {
+  th <- reg14(s, pii)
+  t(vapply(lnns, function(lnn) {
+    n <- exp(lnn)
+    Jl <- floor(2 * lnn / log(2))
+    pa <- paths_VIII(n, s, pii, 1, Jl)
+    Jst <- min(Jl, max(1, round((th[["eJ"]] * lnn + th[["kJ"]] * log(lnn)) / log(2))))
+    Jc <- floor((lnn - log(K_cap * lnn)) / log(2))
+    pc <- if (cap) paths_VIII(n, s, pii, 1, Jc, mu = FALSE) else NULL
+    c(blk1 = log(min(pa[["blk1"]])), blkS = log(min(pa[["blkS"]])), las = log(min(pa[["las"]])),
+      Jopt = which.min(pa[["blk1"]]), Fst = log(pa[["blk1"]][Jst]) - log(min(pa[["blk1"]])),
+      cap = if (cap) log(min(pc[["blk1"]])) else NA, teto = (lnn - log(lnn)) / log(2))
+  }, numeric(7)))
+}
+fit2 <- function(lnns, y) unname(coef(lm(y ~ lnns + log(lnns)))[2:3])
+fitk <- function(lnns, y, a) unname(coef(lm(y - a * lnns ~ log(lnns)))[2])
+pairs08 <- list(c(0.55, 1), c(0.6, 1), c(0.7, 1), c(0.6, 1.15),          # (iii)(a)
+                c(0.4, 1.25), c(0.3, 1.5), c(0.2, 1.6), c(0.45, 1.25),     # (iii)(b)
+                c(0.5, 1.1), c(0.5, 1.2), c(0.5, 1.5), c(0.5, 2), c(0.5, Inf),  # (iv)
+                c(1, 2), c(1.2, 1), c(0.3, 2), c(0.45, 1.6))               # (i) e (ii)
+tabVIII <- do.call(rbind, lapply(pairs08, function(sp_) {
+  s <- sp_[1]
+  pii <- sp_[2]
+  th <- reg14(s, pii)
+  sc <- scan14(s, pii)
+  c(s = s, pi = pii, sprime = sp_of(s, pii), reg = th[["reg"]], a = th[["a"]],
+    a_blk1 = fit2(lnn_g8, sc[, "blk1"])[1], a_blkS = fit2(lnn_g8, sc[, "blkS"])[1],
+    k = th[["k"]], k_blk1 = fitk(lnn_g8, sc[, "blk1"], th[["a"]]), k_blkS = fitk(lnn_g8, sc[, "blkS"], th[["a"]]),
+    k_las = th[["k_las"]], kh_las = fitk(lnn_g8, sc[, "las"], th[["a"]]),
+    eJ = th[["eJ"]], eJ_hat = fit2(lnn_g8, sc[, "Jopt"] * log(2))[1],
+    acima = mean((sc[, "Jopt"] > sc[, "teto"])[lnn_g8 >= median(lnn_g8)]),
+    a_st = fit2(lnn_g8, sc[, "blk1"] + sc[, "Fst"])[1], Jst = max(sc[, "Fst"]),
+    a_cap = fit2(lnn_g8, sc[, "cap"])[1], a_teto = -2 * sp_of(s, pii))
+}))
+print(round(tabVIII, 3))
+nv8 <- tabVIII[, "reg"] %in% c(3.1, 3.2, 4.2)
+chk(all(abs(tabVIII[, c("a_blk1", "a_blkS")] - tabVIII[, "a"]) < 0.01),
+    "blocos: o expoente de n da cota minimizada em J é o dos quatro itens (i) a (iv), nos pesos 1 e sqrt(|G|) (a 0,01; n de 1e15 a 1e140, 2^J <= n^2)")
+chk(all(abs(tabVIII[, c("k_blk1", "k_blkS")] - tabVIII[, "k"]) < 0.1),
+    "o do logaritmo também, a 0,1: (log n)^{1/pi} em (iii)(b), 3/2 - vartheta_pi e (1 + 1/pi) 4s'/(1 + 4s') em (iv)")
+chk(all(abs(tabVIII[, "kh_las"] - tabVIII[, "k_las"]) < 0.1) &&
+      all(abs((tabVIII[, "kh_las"] - tabVIII[, "k_blk1"]) - (tabVIII[, "k_las"] - tabVIII[, "k"])) < 0.1),
+    "ao lado do LASSO (Proposição 4(iii) e (iv)), o ganho dos blocos no logaritmo é o da teoria em todo par (nada em (iii)(a))")
+chk(all(abs(tabVIII[, "eJ_hat"] - tabVIII[, "eJ"]) < 0.03),
+    "o minimizador em J cresce como o J_n do enunciado (a 0,03)")
+chk(all(tabVIII[nv8, "acima"] == 1) && all(tabVIII[!nv8, "acima"] == 0),
+    "o minimizador passa do teto (em n >= 1e78) exatamente nos pares de (iii) e de (iv) com s' < 1/4")
+chk(all(abs(tabVIII[, "a_st"] - tabVIII[, "a"]) < 0.01),
+    "a cota no J_n do enunciado tem o expoente de n da teoria (a 0,01): a escolha atinge a taxa")
+chk(all(abs(tabVIII[nv8, "a_cap"] - tabVIII[nv8, "a_teto"]) < 0.01) &&
+      all(abs((tabVIII[nv8, "a_cap"] - tabVIII[nv8, "a_blk1"]) - (tabVIII[nv8, "a_teto"] - tabVIII[nv8, "a"])) < 0.01),
+    "com J parado no teto e lambda_n^G a cota em blocos é n^{-2s'}, e a de (iii) e (iv) é melhor pelo expoente da teoria")
+gr8 <- expand.grid(s = seq(0.05, 1.5, by = 0.05), pi = c(1, 1.1, 1.25, 1.5, 2, 4, Inf))
+gr8[["sp"]] <- mapply(sp_of, gr8[["s"]], gr8[["pi"]])
+gr8 <- gr8[gr8[["sp"]] > 1e-9, ]
+lnn_c8 <- log(10^seq(60, 140, length.out = 20))
+ah8 <- vapply(seq_len(nrow(gr8)), function(i) {
+  fit2(lnn_c8, scan14(gr8[["s"]][i], gr8[["pi"]][i], lnns = lnn_c8, cap = FALSE)[, "blk1"])[1]
+}, 1)
+at8 <- vapply(seq_len(nrow(gr8)), function(i) reg14(gr8[["s"]][i], gr8[["pi"]][i])[["a"]], 1)
+cat(sprintf("  grade de %d pares com s' > 0: desvio máximo do expoente de n = %.4f\n", nrow(gr8), max(abs(ah8 - at8))))
+chk(max(abs(ah8 - at8)) < 0.02, "em todos os pares da grade, o expoente de n da cota em blocos é o do item do par: os quatro itens cobrem todo s' > 0")
+
+## ---- VIII.2 os dois eventos e a calibração acima do teto ----------------------
+n8 <- 250L
+tabVIII2 <- do.call(rbind, lapply(5:9, function(Jl) {
+  b <- as.integer(ceiling(log(n8)))
+  grp <- kp_groups_bal(Jl, b)
+  M <- max(grp)
+  gsize <- as.numeric(table(grp))
+  ms <- mu_sim(n8, Jl)
+  mu <- max(ms[["sm"]] / (2 * B_X^2 * C_U), ms[["lmax"]] / Lam)
+  r <- t(vapply(seq_len(10L), function(i) {
+    U <- matrix(runif(n8 * q), n8, q)
+    X <- draw_X(n8)
+    Wl <- lapply(seq_len(q), function(m) psi_block(U[, m], Jl))
+    Z <- design_from(X, Wl, Jl)
+    rp <- resid_pen(Z)
+    sm <- max(colSums(rp[["B"]]^2) / n8)
+    lmx <- max(eigen(tcrossprod(Z) / n8, symmetric = TRUE, only.values = TRUE)[["values"]])
+    gs <- group_stats(rp[["Bt"]], grp)
+    l0 <- lam0_exact(n8, M, gs[["tr"]], gs[["op"]])
+    l0p <- sqrt(mu) * lam0_det(n8, M, gsize)            # lambda_bar_{0,G} com mu (forma fechada)
+    eps <- rnorm(n8, sd = sig)
+    z <- sqrt(as.numeric(rowsum((as.numeric(crossprod(rp[["Bt"]], eps)) / n8)^2, grp)))
+    out <- c(sm = sm, lmax = lmx)
+    for (wf in list(w_one, w_sqrt)) {
+      ws <- wf(gsize)
+      lp <- lam_w(l0p, ws)
+      out <- c(out, lam_w(l0, ws) <= lp, max(z / ws) <= lp / 2)
+    }
+    out
+  }, numeric(6)))
+  data.frame(J = Jl, dois_J = 2^Jl, teto = round(n8 / log(n8)), mu = mu,
+             sm_razao = max(r[, 1] / ms[["sm"]]), lmax_razao = max(r[, 2] / ms[["lmax"]]),
+             lmax_Lam = median(r[, 2] / Lam), sm_inadm = mean(r[, 1] > 2 * B_X^2 * C_U),
+             cobre1 = all(r[, 3] == 1), Tw1 = mean(r[, 4]), cobreS = all(r[, 5] == 1), TwS = mean(r[, 6]))
+}))
+print(tabVIII2, digits = 3, row.names = FALSE)
+chk(all(tabVIII2[["sm_razao"]] <= 1) && all(tabVIII2[["lmax_razao"]] <= 1),
+    "sigma_max^2 <= 2 B_X^2 C_U mu^G_J e lambda_max(Sigma_hat) <= Lambda mu^G_J em todas as réplicas, também com 2^J > n")
+chk(all(tabVIII2[["cobre1"]]) && all(tabVIII2[["cobreS"]]) && all(tabVIII2[, c("Tw1", "TwS")] >= 1 - alpha),
+    "lambda_w <= lambda_n^{G,+} e T_{G,w} com a probabilidade nominal acima do teto, nos pesos 1 e sqrt(|G|)")
+chk(all(diff(tabVIII2[["lmax_Lam"]]) > 0) && tail(tabVIII2[["lmax_Lam"]], 1) > 4,
+    "acima do teto lambda_max(Sigma_hat) cresce com 2^J (a forma fechada do Lema 14 com Lambda deixa de valer)")
+
+## ---- VIII.3 a cota em ajustes num s' pequeno ---------------------------------
+regsVIII <- list(iiia = list(s = 0.6, pi = 1, Cg = 0.5, forma = "random", J = 8L),
+                 iiib = list(s = 0.4, pi = 1.25, Cg = 0.4, forma = "random", J = 7L),
+                 iv = list(s = 0.5, pi = 1.2, Cg = 0.4, forma = "random", J = 7L))
+one_VIII <- function(rg, thf) {
+  Jl <- rg[["J"]]
+  b <- as.integer(ceiling(log(n8)))
+  grp <- kp_groups_bal(Jl, b)
+  M <- max(grp)
+  gsize <- as.numeric(table(grp))
+  dat <- sim_VII(n8, thf, FALSE)
+  pj <- prep_J(dat, Jl, thf)
+  Bt <- pj[["rp"]][["Bt"]]
+  gs <- group_stats(Bt, grp)
+  l0 <- lam0_exact(n8, M, gs[["tr"]], gs[["op"]])
+  z <- sqrt(as.numeric(rowsum((as.numeric(crossprod(Bt, dat[["eps"]])) / n8)^2, grp)))
+  tho <- pj[["th_or"]]
+  nG <- function(th) sqrt(as.numeric(rowsum(th^2, grp)))
+  t(vapply(list(w_one, w_sqrt), function(wf) {
+    ws <- wf(gsize)
+    lam <- lam_w(l0, ws)
+    th <- gl_fit(pj[["G"]], pj[["h"]], grp, ws, lam, pj[["Lmax"]], tol = 1e-8, maxit = 200000L)
+    ch <- coef_c(pj[["rp"]], dat[["y"]], th)
+    pred <- mean((as.numeric(pj[["Z"]] %*% c(ch, th)) - dat[["f"]])^2)
+    pen_or <- sum(ws * nG(tho))
+    lhs <- 0.5 * mean((Bt %*% (th - tho))^2) + lam * sum(ws * nG(th))
+    b14 <- 18 * lam * pen_or + 24 * pj[["bias"]] + 3 * pj[["Peps"]]
+    c(Tw = max(z / ws) <= lam / 2, thm3i = lhs <= 3 * lam * pen_or + 2 * pj[["bias"]] + 1e-12,
+      c14 = pred <= b14, folga = b14 / pred, gtil = pj[["gtil"]], Lmax = pj[["Lmax"]],
+      kkt = max(kkt_gl(pj[["G"]], pj[["h"]], grp, ws, lam, th)))
+  }, numeric(7)))
+}
+tabVIII3 <- do.call(rbind, lapply(names(regsVIII), function(nm) {
+  rg <- regsVIII[[nm]]
+  thf <- theta_besov(rg[["s"]], rg[["pi"]], rg[["Cg"]], rg[["forma"]], 90L)
+  rr <- lapply(seq_len(4L), function(i) one_VIII(rg, thf))
+  do.call(rbind, lapply(1:2, function(iw) {
+    m <- do.call(rbind, lapply(rr, function(x) x[iw, ]))
+    data.frame(regime = nm, s = rg[["s"]], pi = rg[["pi"]], sprime = sp_of(rg[["s"]], rg[["pi"]]),
+               J = rg[["J"]], d = p * q * (2^rg[["J"]] - 1), pesos = c("1", "sqrt")[iw],
+               Tw = mean(m[, "Tw"]), viola = sum(m[, "Tw"] == 1 & (m[, "thm3i"] == 0 | m[, "c14"] == 0)),
+               folga_min = min(m[, "folga"]), gtil = median(m[, "gtil"]),
+               Lmax_Lam = median(m[, "Lmax"]) / Lam, kkt = max(m[, "kkt"]))
+  }))
+}))
+print(tabVIII3, digits = 3, row.names = FALSE)
+chk(all(2^tabVIII3[["J"]] > n8 / log(n8)), "os ajustes de VIII.3 estão acima do teto (2^J > n/log n), todos com d > n")
+chk(all(tabVIII3[["Tw"]] >= 1 - alpha) && max(tabVIII3[["kkt"]]) < 1e-6,
+    "T_{G,w} com a probabilidade nominal; o FISTA chega ao minimizador (KKT a 1e-6)")
+chk(all(tabVIII3[["viola"]] == 0),
+    "Corolário 14(iii) e (iv): no evento T_{G,w}, o Teorema 3(i) e a cota não assintótica valem em todos os ajustes, nos dois pesos")
+
 cat(sprintf("\n  tempo: %.0f s\n", proc.time()[["elapsed"]] - t_start))
-if (ok) cat("OK\n") else stop("E1.12 e E1.13: conferência numérica FALHOU (ver linhas acima)")
+if (ok) cat("OK\n") else stop("E1.12, E1.13 e E1.14: conferência numérica FALHOU (ver linhas acima)")

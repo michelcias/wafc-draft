@@ -8,7 +8,11 @@
 % a perda quadrática tem curvatura constante e dispensa a localização, o que
 % remove as duas restrições (tau < 2/3 e o piso de regularidade do estimador
 % não modificado) que o WALL precisa impor.
-% Conferência numérica: check/05-taxas.R (imprime OK; ~7 min).
+% Conferência numérica: check/05-taxas.R (imprime OK; ~8 min).
+% E1.14 (2026-10-03) acrescentou à Proposição 4 os itens (iii) e (iv): a taxa
+% lenta em todo s' > 0 e na fronteira s = 1/2, com o nível acima do teto do
+% Lema 6 de E1.5 e o lambda inflado por mu_J^{1/2}; a prova vai ao lado da
+% existente, e a conferência é a Parte VI do check. Nenhum número mudou.
 % Notação: docs/notacao.md (congelada em E1.1). Macros: derivations/macros.tex.
 \documentclass[11pt,a4paper]{article}
 \usepackage[T1]{fontenc}
@@ -71,7 +75,9 @@ de hipótese:
 \begin{enumerate}[label=(\alph*), leftmargin=*, nosep]
   \item \textbf{Sem nenhuma condição de desenho} (Proposição~\ref{prop:lenta}):
     a taxa lenta $\pen_{n}\norm{\thetastar}_{1} + \mathcal{B}_{J_{n}}^{2}$, com
-    $\norm{\thetastar}_{1}$ vindo do Lema~7 de E1.5, que não depende de $\pi$.
+    $\norm{\thetastar}_{1}$ vindo do Lema~7 de E1.5, que não depende de $\pi$,
+    em todo $\seff > 0$ (os itens (iii) e (iv), de E1.14, cobrem os pares em
+    que o balanço pede $2^{J_{n}}$ acima de $n/\log n$, e a fronteira $s = 1/2$).
   \item \textbf{Com a condição de desenho de E1.4} (Teorema~\ref{thm:taxa}):
     com $J_{n} \asymp \log_{2}n/(2\seff+1)$, a taxa de predição
     $(\log n/n)^{2\seff/(2\seff+1)}$, e, pelo Corolário~3 de E1.5, a mesma
@@ -269,6 +275,24 @@ quantifica a cauda da melhor aproximação com $M$ termos.
 
 \subsection*{Sem condição de desenho}
 
+O $\pen_{n}$ de \eqref{eq:lambda-n} só é admissível enquanto
+$2^{J_{n}}\log d_{n}/n \to 0$, que é o que o Lema~6 de E1.5 pede para
+$\smax^{2} \le 2B_{X}^{2}C_{U}$; acima desse teto, $\smax^{2}$ cresce com
+$2^{J}/n$, porque as wavelets do nível mais fino valem até
+$2^{(J-1)/2}\norm{\psi}_{\infty}$ e passam a ter um ou dois pontos no suporte
+(Parte~VI da conferência). Para os itens (iii) e (iv) abaixo, que pedem $2^{J_{n}}$ acima de
+$n/\log n$, escrevemos (E1.14)
+\begin{equation}
+  \label{eq:mu}
+  \mu_{J} \;=\; 1 + c_{\psi}\,\frac{2^{J}\log d}{n},
+  \qquad
+  c_{\psi} \;=\; \frac{7\norm{\psi}_{\infty}^{2}}{12\,C_{U}},
+  \qquad
+  \pen_{n}^{+} \;=\; \mu_{J_{n}}^{1/2}\,\pen_{n},
+\end{equation}
+com $\norm{\psi}_{\infty}$ e $C_{U}$ do Lema~6 de E1.5; quando
+$2^{J_{n}}\log d_{n}/n \to 0$, $\pen_{n}^{+} = \pen_{n}\{1 + o(1)\}$.
+
 \begin{proposition}[taxa lenta incondicional]\label{prop:lenta}
 Sob as Hipóteses~1 e~2 de E1.5, as Hipóteses de E1.3, a
 Hipótese~\ref{ass:regime} e $\Amat$ de posto $p$, com $\pen_{n}$ de
@@ -279,7 +303,9 @@ Hipótese~\ref{ass:regime} e $\Amat$ de posto $p$, com $\pen_{n}$ de
   + \tfrac{p}{n}\Bigr),
 \]
 com $\norm{\thetastar}_{1}$ dado pelo Lema~7 de E1.5, sem dependência de
-$\pi$. Em particular:
+$\pi$, sempre que $2^{J_{n}}\log d_{n}/n \to 0$; com $\pen_{n}^{+}$ de
+\eqref{eq:mu} no lugar de $\pen_{n}$ (no estimador e na cota), a mesma forma
+vale para toda sequência $J_{n}$. Em particular:
 \begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
   \item se $s > 1/2$ e $\seff > 1/4$, então $\norm{\thetastar}_{1} = O(1)$ e, para qualquer
     $J_{n} \ge \log_{2}n/(4\seff)$,
@@ -289,9 +315,64 @@ $\pi$. Em particular:
     $\normn{\widehat f - f}^{2} =
     O_{p}\bigl((J_{n}/n)^{2\seff/(1-2s+4\seff)}\bigr)$; quando $\pi \ge 2$
     (isto é $\seff = s$) esse expoente é $2s/(2s+1)$, \emph{a mesma taxa do
-    Teorema~\ref{thm:taxa}, obtida sem nenhuma condição de desenho}.
+    Teorema~\ref{thm:taxa}, obtida sem nenhuma condição de desenho};
+  \item \textup{(os pares que (i) e (ii) excluem, todos com $\pi < 2$; E1.14)}
+    com $\pen_{n}^{+}$:
+    \begin{enumerate}[label=\textup{(\alph*)}, leftmargin=*, nosep]
+      \item se $s > 1/2$ e $\seff \le 1/4$, a escolha
+        $2^{J_{n}} \asymp (n/\log n)^{2/(1+4\seff)}$ dá
+        \[
+          \normn{\widehat f - f}^{2} =
+          O_{p}\bigl((\log n/n)^{4\seff/(1+4\seff)}\bigr);
+        \]
+      \item se $s < 1/2$ e $\seff \le s/2$, a escolha
+        $2^{J_{n}} \asymp (n/\log n)^{1/(1-s+2\seff)}$ dá
+        \[
+          \normn{\widehat f - f}^{2} =
+          O_{p}\bigl((\log n/n)^{2\seff/(1-s+2\seff)}\bigr);
+        \]
+    \end{enumerate}
+    nos dois, $2^{J_{n}} \gtrsim n/\log n$, acima do teto do Lema~6 de E1.5, e
+    as taxas se ligam às de (i) e (ii) em $\seff = 1/4$ e $\seff = s/2$;
+  \item \textup{(a fronteira $s = 1/2$, com $\pi > 1$; E1.14)}
+    $\norm{\thetastar}_{1} \le pqC_{g}J_{n}$ e, com $\pen_{n}^{+}$: se
+    $\seff \ge 1/4$ (isto é, $\pi \ge 4/3$), a escolha
+    $2^{J_{n}} \asymp (n/\log n)^{1/(4\seff)}$ dá
+    $\normn{\widehat f - f}^{2} = O_{p}\bigl(n^{-1/2}(\log n)^{3/2}\bigr)$; se
+    $\seff < 1/4$ ($1 < \pi < 4/3$), a escolha
+    $2^{J_{n}} \asymp (n/(\log n)^{2})^{2/(1+4\seff)}$ dá
+    $\normn{\widehat f - f}^{2} =
+    O_{p}\bigl(((\log n)^{2}/n)^{4\seff/(1+4\seff)}\bigr)$.
 \end{enumerate}
 \end{proposition}
+
+\begin{remark}[o teto de $J_{n}$, e por que passar dele]\label{rem:teto}
+Nos pares de (iii) a cota $\pen_{n}\norm{\thetastar}_{1} +
+\mathcal{B}_{J}^{2}$ é dominada pelo viés em todo $J$ admissível: o primeiro
+termo é $O((\log n/n)^{1/2})$ em (a) e
+$O((\log n/n)^{1/2}2^{J(1/2-s)})$ em (b), e o balanço com
+$2^{-2J\seff}$ só acontece em $2^{J} \asymp (n/\log n)^{1/(4\seff)}$ ou
+$(n/\log n)^{1/(1-2s+4\seff)}$, que passam de $n/\log n$. Abaixo do teto a
+cota é, portanto, decrescente em $J$ (a menos de constante), e o melhor que
+se faz é parar nele: $2^{J_{n}} = n/(K\log n)$ com $K > K_{0} =
+4\norm{\psi}_{\infty}^{2}/(3C_{U})$ fixo, porque o expoente do Lema~6 de E1.5
+em $t = B_{X}^{2}C_{U}$ é $3nC_{U}/(4\norm{\psi}_{\infty}^{2}2^{J}) =
+(3C_{U}K/4\norm{\psi}_{\infty}^{2})\log n$ e $d_{n} \le pqn$; isso dá
+$O_{p}((\log n/n)^{2\seff})$, sem o $\omega_{n} \to \infty$ que uma
+escolha logo abaixo do teto sugeriria. Acima do teto, $\pen_{n}^{+}$ paga o
+crescimento de $\smax$, e o termo de estimação passa a
+$2^{J/2}(\log n/n)\norm{\thetastar}_{1}$, que cresce mais devagar do que o
+viés decresce até $2^{J}$ chegar ao $J_{n}$ de (iii). Os expoentes de (iii),
+$4\seff/(1+4\seff)$ e $2\seff/(1-s+2\seff)$, são estritamente maiores que
+$2\seff$ fora das fronteiras $\seff = 1/4$ e $\seff = s/2$ (perto de
+$\seff = 0$, por um fator $2$ e $(1-s)^{-1}$). O $J_{n}$ de (iii) minimiza
+a cota em $J$ a menos de constante, de modo que esta é a melhor cota que o
+argumento (o Teorema~1(i) de E1.5 no comparador $\thetastar$, com $\pen$
+calibrado pelas normas das colunas) dá. Em (iv) com $\seff \ge 1/4$, o
+$(\log n)^{3/2}$ vem de $\norm{\thetastar}_{1} \asymp J_{n} \asymp \log n$,
+que nenhuma escolha evita, porque o viés pede $J_{n} \ge
+\log_{2}(n/\log^{3}n)/(4\seff)$.
+\end{remark}
 
 \subsection*{Com a condição de desenho de E1.4}
 
@@ -541,7 +622,8 @@ $2^{J_{n}}\log d_{n}/n \to 0$ nos dois regimes, e é para isso que servem as
 condições $\seff > 1/4$ em (i) e $\seff > s/2$ em (ii): sem elas, a escolha de
 (i) dá $2^{J_{n}} \ge n^{1/(4\seff)} \ge n$, e o balanço de (ii) dá
 $2^{J_{n}} \gtrsim n/\log n$ (emenda de 2026-10-03, D49, achada pela E1.13;
-só afeta $\pi < 2$, porque com $\pi \ge 2$ vale $\seff = s$); Markov aplicado
+só afeta $\pi < 2$, porque com $\pi \ge 2$ vale $\seff = s$; os itens (iii) e
+(iv) cobrem esses pares com $\pen_{n}^{+}$); Markov aplicado
 a $\E\normn{\bb}^{2} \le \mathcal{B}_{J_{n}}^{2}$ (Corolário~1 de E1.3) e a
 $\E[\normn{\PA\bveps}^{2}\mid\bX,\bU] \le \sigma^{2}p/n$ fecha o enunciado
 geral, na forma $O_{p}$ da Hipótese~\ref{ass:regime}.
@@ -558,7 +640,63 @@ $(J_{n}/n)^{1/2}2^{J_{n}(1/2-s)}$ e $2^{-2J_{n}\seff}$. Igualá-los dá
 $2^{J_{n}(1/2-s+2\seff)} \asymp (n/J_{n})^{1/2}$, isto é
 $2^{J_{n}} \asymp (n/J_{n})^{1/(1-2s+4\seff)}$, e o valor comum é
 $2^{-2J_{n}\seff} \asymp (J_{n}/n)^{2\seff/(1-2s+4\seff)}$. Quando
-$\seff = s$, $1-2s+4s = 1+2s$. \qed
+$\seff = s$, $1-2s+4s = 1+2s$.
+
+\emph{O nível acima do teto (para (iii) e (iv)).} A prova do Lema~6 de E1.5
+dá, para todo $J$ e todo $t > 0$, $\Prob(\smax^{2} > B_{X}^{2}C_{U} + t) \le
+d\exp\{-nt^{2}/(2(R_{J}'B_{X}^{2}C_{U} + R_{J}'t/3))\}$, com $R_{J}' =
+B_{X}^{2}\norm{\psi}_{\infty}^{2}2^{J-1}$. Com $x = 2\log d$ e $t =
+(2xR_{J}'B_{X}^{2}C_{U}/n)^{1/2} + 2xR_{J}'/(3n)$, vale $nt^{2} \ge
+2xR_{J}'B_{X}^{2}C_{U} + (2/3)xR_{J}'t$, de modo que o expoente é no máximo
+$-x$; e $(2ab)^{1/2} \le a + b/2$ com $a = B_{X}^{2}C_{U}$ e $b =
+xR_{J}'/n$ dá $t \le B_{X}^{2}C_{U} + (7/6)xR_{J}'/n$. Logo
+\begin{equation}
+  \label{eq:smax-teto}
+  \Prob\bigl(\smax^{2} > 2B_{X}^{2}C_{U}\,\mu_{J}\bigr) \;\le\; \frac{1}{d},
+\end{equation}
+porque $2B_{X}^{2}C_{U} + (7/3)R_{J}'\log d/n = 2B_{X}^{2}C_{U}\mu_{J}$ com o
+$\mu_{J}$ de \eqref{eq:mu}. No evento complementar, $2\pen_{0} \le
+2\sigma(2B_{X}^{2}C_{U}\mu_{J})^{1/2}(2L_{n}/n)^{1/2} = \pen_{n}^{+}$, e o
+argumento da forma geral segue com $\pen_{n}^{+}$, sem condição sobre
+$J_{n}$: no evento $\mathcal{T}$, $\normn{\widehat f - f}^{2} \le
+18\pen_{n}^{+}\norm{\thetastar}_{1} + 24\normn{\bb}^{2} +
+3\normn{\PA\bveps}^{2}$, e Markov fecha. Em todas as escolhas de (iii) e
+(iv), $2^{J_{n}} \le n^{2}$, de modo que $L_{n} \asymp J_{n} \asymp \log n$,
+$\log d_{n} \asymp \log n$ e
+\begin{equation}
+  \label{eq:lam-plus}
+  \pen_{n}^{+} \;\asymp\; \Bigl(\frac{\log n}{n}\Bigr)^{1/2}
+  \Bigl(1 + \frac{2^{J_{n}}\log n}{n}\Bigr)^{1/2},
+\end{equation}
+em particular $\pen_{n}^{+} \asymp 2^{J_{n}/2}\log n/n$ se $2^{J_{n}} \gtrsim
+n/\log n$.
+
+\emph{(iii)(a).} Com $s > 1/2$, $\norm{\thetastar}_{1} = O(1)$ como em (i).
+Com $2^{J_{n}} \asymp (n/\log n)^{2/(1+4\seff)} \gtrsim n/\log n$ (porque
+$\seff \le 1/4$), \eqref{eq:lam-plus} dá $\pen_{n}^{+}\norm{\thetastar}_{1}
+\asymp (\log n/n)(n/\log n)^{1/(1+4\seff)} = (\log n/n)^{4\seff/(1+4\seff)}$,
+e o viés é $2^{-2J_{n}\seff} \asymp (\log n/n)^{4\seff/(1+4\seff)}$; $p/n$ é
+de ordem menor.
+
+\emph{(iii)(b).} Com $s < 1/2$, $\norm{\thetastar}_{1} \asymp
+2^{J_{n}(1/2-s)}$ como em (ii). Com $2^{J_{n}} \asymp
+(n/\log n)^{1/(1-s+2\seff)} \gtrsim n/\log n$ (porque $\seff \le s/2$),
+\eqref{eq:lam-plus} dá $\pen_{n}^{+}\norm{\thetastar}_{1} \asymp
+2^{J_{n}(1-s)}\log n/n \asymp (\log n/n)^{1 - (1-s)/(1-s+2\seff)} =
+(\log n/n)^{2\seff/(1-s+2\seff)}$, que é também a ordem do viés
+$2^{-2J_{n}\seff}$. Nas fronteiras, $\seff = 1/4$ em (a) e $\seff = s/2$ em
+(b), $2^{J_{n}} \asymp n/\log n$, $\mu_{J_{n}}$ é limitado, e as taxas são
+$(\log n/n)^{1/2}$ e $(\log n/n)^{s}$, as de (i) e (ii) nesses pontos.
+
+\emph{(iv).} Com $s = 1/2$ o Lema~7 de E1.5 dá $\norm{\thetastar}_{1} \le
+pqC_{g}J_{n}$, e $J_{n} \asymp \log n$ nas duas escolhas. Se $\seff \ge 1/4$,
+$2^{J_{n}} \asymp (n/\log n)^{1/(4\seff)} \lesssim n/\log n$, $\mu_{J_{n}}$ é
+limitado, $\pen_{n}^{+}\norm{\thetastar}_{1} \asymp (\log n/n)^{1/2}\log n$,
+e o viés, $2^{-2J_{n}\seff} \asymp (\log n/n)^{1/2}$, é de ordem menor. Se
+$\seff < 1/4$, $2^{J_{n}} \asymp (n/\log^{2}n)^{2/(1+4\seff)}$, que passa de
+$n/\log n$ para $n$ grande, e $\pen_{n}^{+}\norm{\thetastar}_{1} \asymp
+2^{J_{n}/2}\log^{2}n/n \asymp (\log^{2}n/n)^{4\seff/(1+4\seff)}$, a ordem do
+viés. \qed
 
 \subsection*{Teorema~\ref{thm:taxa}}
 
@@ -712,6 +850,12 @@ e de $\seff \le s$. \qed
     empírica de E1.4 é, na resolução \eqref{eq:Jn}, exatamente da ordem da
     própria taxa; e o Corolário~\ref{cor:componentes-taxa}, que fecha a cadeia
     até $\widehat{\fcoef{\cv}}$ usando o autovalor de E1.4 duas vezes.
+  \item \textbf{Novo em E1.14:} os itens (iii) e (iv) da
+    Proposição~\ref{prop:lenta}, que levam a taxa lenta a todo $\seff > 0$ e à
+    fronteira $s = 1/2$, com o nível acima do teto do Lema~6 de E1.5 e o
+    $\pen$ inflado por $\mu_{J}^{1/2}$ \eqref{eq:smax-teto}; acima do teto o
+    expoente é estritamente melhor que o de $J$ parado nele
+    (Observação~\ref{rem:teto}).
 \end{itemize}
 
 \section{O que isto não cobre}
@@ -746,6 +890,23 @@ e de $\seff \le s$. \qed
     2^{J})$ de E1.4 entram nas taxas, e a janela \eqref{eq:janela} estreita.
   \item \textbf{$\sigma$ desconhecido e $\pen$ aleatório}, e a base do
     intervalo, pelas mesmas razões de E1.5.
+  \item \textbf{A taxa lenta além do comparador $\thetastar$.} A
+    Proposição~\ref{prop:lenta} lê o Teorema~1(i) de E1.5 só em $\thetastar$.
+    O Lema~\ref{lem:comparador}(i) com o comparador determinístico
+    $\thetastar\mathbf{1}\{|\thetastar| > \pen\}$ troca
+    $\pen\norm{\thetastar}_{1}$ por uma quantidade da ordem de
+    $\sum_{a}\min(\pen|\theta^{*}_{a}|, \theta^{*2}_{a})$ (o resto vai ao
+    viés por $\E\normn{\Bmat\delta}^{2} \le \kappa_{2}C_{U}\norm{\delta}_{2}^{2}$,
+    sem condição de desenho), que sob o Lema~\ref{lem:weak}(i) e $s < 1/2$ é
+    da ordem de $\pen^{4s/(2s+1)}$; isso parece dar $(\log n/n)^{2s/(2s+1)}$ em
+    $\pi < 2$ e $\seff > s/(2s+1)$, melhor que (ii) e (iii)(b). Não foi
+    escrito nem conferido (E1.14 só o esboçou).
+  \item \textbf{$\smax$ muito acima do teto.} A cota \eqref{eq:smax-teto}
+    tem $2^{J}\log d/n$, de Bernstein; quando $2^{J}/n$ cresce como potência
+    de $n$ (as escolhas de (iii)(a) e (iv) com $\seff < 1/4$), o máximo das
+    contagens de pontos nos suportes das wavelets mais finas é limitado, e
+    $\smax^{2}$ é da ordem de $2^{J}/n$ (Parte~VI da conferência), o que
+    tiraria parte do logaritmo dessas taxas. Não foi escrito.
   \item \textbf{O regime pré-assintótico.} A conferência mostra que, na grade
     $n \le 12800$ com $\seff = 1/4$, a cadeia
     $\lmin(\Gramhat) \ge \kappa_{1}c_{U}/2$ da Proposição~3(iv) de E1.4 só é
@@ -756,7 +917,7 @@ e de $\seff \le s$. \qed
 
 \section{Conferência numérica}
 
-\texttt{check/05-taxas.R} (imprime \texttt{OK}; cerca de 7~min). Desenho de
+\texttt{check/05-taxas.R} (imprime \texttt{OK}; cerca de 8~min). Desenho de
 E1.4 e E1.5: Daublets com filtro 8, $p = 2$ com $X_{1}\equiv 1$ e
 $X_{2} = 1/2+\eta$, $q = 2$, $\bU$ uniforme em $[0,1]^{2}$ (logo
 $c_{U} = C_{U} = 1$ e $\gamma = \kappa_{1}c_{U} = 0.25$), erro gaussiano com
@@ -822,6 +983,34 @@ números que importam:
     réplicas. A resolução \eqref{eq:Jn} fica dois níveis acima do
     minimizador empírico do erro em todos os $n$ varridos, e custa entre $5\%$
     e $11\%$ de erro a mais que esse minimizador.
+  \item \textbf{Proposição~\ref{prop:lenta}(iii) e (iv)} (Parte~VI, E1.14).
+    A cota $18\pen_{n}^{+}\norm{\thetastar}_{1} + 24\mathcal{B}_{J}^{2} +
+    3\sigma^{2}p/n$, com o supremo exato de $\norm{\thetastar}_{1}$ na classe,
+    minimizada em $J$ com $2^{J} \le n^{2}$ ($n$ de $10^{15}$ a $10^{150}$), em
+    $17$ pares (quatro de (iii)(a), quatro de (iii)(b), cinco de (iv), quatro
+    de (i) e (ii)): o expoente de $n$ é o do item a $0{,}01$, o do logaritmo a
+    $0{,}1$ (por exemplo $0{,}25$ contra $0{,}25$ em $(s,\pi) = (0{,}4;1{,}25)$
+    e $1{,}44$ contra $3/2$ em $(0{,}5;2)$); o minimizador cresce como o $J_{n}$
+    do enunciado (a $0{,}03$), passa do teto $n/\log n$ exatamente nos pares
+    de (iii) e de (iv) com $\seff < 1/4$, e a cota no $J_{n}$ do enunciado
+    fica a menos de um fator $1{,}7$ do mínimo; com $J$ parado no teto e
+    $\pen_{n}$, o expoente é $-2\seff$ (por exemplo $-0{,}10$ contra
+    $-0{,}17$ de (iii)(a) em $(0{,}55;1)$, e $-0{,}20$ contra $-0{,}25$ de
+    (iii)(b) em $(0{,}4;1{,}25)$). Numa grade de $183$ pares com
+    $\seff > 0$ ($132$ em (i), $30$ em (ii), $15$ em (iii), $6$ em (iv)), o
+    expoente de $n$ é o do item do par a $0{,}02$. O evento
+    \eqref{eq:smax-teto}, com $n = 250$ e $1000$ e $J = 5$ a $10$ ($20$
+    réplicas): razão máxima de $\smax^{2}$ à cota de $0{,}27$; abaixo do teto
+    $\smax^{2} \le 2B_{X}^{2}C_{U}$ sempre, e com $2^{J} > 4n$ nunca, de modo
+    que o fator $\mu_{J}$ é necessário; $n\smax^{2}/2^{J}$ desce de $11{,}7$ a
+    $2{,}3$ em $n = 250$. Em ajustes ($n = 250$ e
+    $500$, $6$ réplicas, $J$ acima do teto, $d$ até $2044$) com
+    $(s,\pi) = (0{,}6;1)$, $(0{,}4;1{,}25)$ e $(0{,}5;1{,}2)$: cobertura de
+    $\mathcal{T}$ igual a $1{,}000$ com $\pen_{n}^{+}$ e com $2\pen_{0}$,
+    nenhuma violação do Teorema~1(i) de E1.5 nem da cota, folga mínima de
+    $78$ vezes; com $\pen_{n}^{+}$, de $2{,}1$ a $3{,}1$ vezes $\pen_{n}$, o
+    ajuste é nulo nos três pares e a cota vale trivialmente, e com $2\pen_{0}$
+    não.
 \end{itemize}
 
 \section*{Referências}
