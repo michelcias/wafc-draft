@@ -3119,8 +3119,8 @@ Ordenadas pelo que bloqueia mais.
    quanto se queira; a cota fica `O_p((ω_n log n/n)^{2s'})`, mais lenta que
    a dos regimes de (i) e (ii), mas consistente para todo `s' > 0`. Com isso
    a proposição e o corolário passam a cobrir todo `s' > 0`, com três
-   regimes em vez de dois. Proposta: catalogar como E1.14 (as duas emendas,
-   com conferência numérica antes, como pede o §5 do `instrucoes.md`).
+   regimes em vez de dois. **Catalogada como E1.14 em 2026-10-03**, com a
+   fronteira `s = 1/2`, que nenhum dos dois regimes atuais cobre.
 
 ---
 
@@ -3202,6 +3202,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | E1.14 catalogada: a taxa lenta (Proposição 4 e Corolário 14) em todo `s' > 0` e na fronteira `s = 1/2` |
 | 2026-10-03 | Posicionamento aprovado (D50) e gravado no `alvo-revista.md` §4, com frase-tese, contribuições e respostas ao referee revistas; pergunta 45 (completar a Proposição 4 e o Corolário 14 nos regimes excluídos por D49) |
 | 2026-10-03 | Pergunta 44 decidida (D49): a Proposição 4 de E1.6 emendada com as duas condições implícitas; o Corolário 14 sobe ao §3 em `k = 4`; dois símbolos no `notacao.md`; as assinaturas de `plot` ratificadas; a rodada da E6.1b fica com 20 partições |
 | 2026-10-03 | E1.13 fechada e integrada (`OK` em 209 s, 18 páginas): Corolário 14, a taxa lenta em blocos, que pela norma de grupos ganha um logaritmo sobre a Proposição 4 e em `π ≥ 2` dá a taxa do Teorema 4 sem condição de desenho; achadas duas condições implícitas na Proposição 4 de E1.6. E3.2 fechada e integrada (1 202 testes em 48 s, 1 427 com os lentos): `plot.wafc`, `plot.cv.wafc`, roxygen auditado, o `coef` limiarizado corrigido, exemplo no README. Pergunta 44 |

@@ -261,6 +261,13 @@ O enunciado sem condição de desenho (a Proposição 4 de E1.6, Proposition 3
 do manuscrito) na versão em blocos, como Corolário 14 do `08-blocos.tex`,
 a partir do Teorema 3(i). Fica no corpo do artigo em `k = 4`.
 
+### E1.14 A taxa lenta em todo `s' > 0` (catalogada em 2026-10-03)
+
+A Proposição 4 de E1.6 e o Corolário 14 de E1.12 completados nos regimes
+que D49 excluiu (`s' ≤ 1/4` com `s > 1/2`, `s' ≤ s/2` com `s < 1/2`) e na
+fronteira `s = 1/2`, parando `J_n` no maior nível admissível (pergunta 45
+do `ESTADO.md`).
+
 ### E1.9 (não aberta) Cota inferior para `q ≥ 2`
 
 Klopp & Pensky (2015) têm a cota inferior minimax para `q = 1` com
