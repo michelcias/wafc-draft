@@ -2343,6 +2343,7 @@ contagem de `‖θ*‖_{𝒢,1}` e a prova vão ao supp, em S6. O texto diz que 
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
 | D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
+| D50 | 10-03 | **O parágrafo de posicionamento e as contribuições em blocos** (`alvo-revista.md` §4), que substituem o terceiro e o quarto parágrafos da Introduction na `k = 4`: a extensão de K&P com o block LASSO de níveis livres e pesos de razão limitada; a taxa deles, sem logaritmo em `π ≥ 2`, ótima com uma moduladora independente, sob condições mais fracas (`p` fixo, `s' > s/(2s+1)`); **a frase "A lower bound for several modulators remains open." fica na introdução**; **três contribuições** (teoria, estrutura, computação), com a antiga "compressibility costs no assumption" absorvida na primeira e a numérica para a E5b; "Section~5" e o rótulo do Corolário 13 resolvidos na `k = 4` e na E5b | rascunho do chat principal, aprovado pelo autor com as três recomendações; D18 continua, e o texto antigo fica no histórico do git |
 | D49 | 10-03 | **Pendências de E1.13 e E3.2 (pergunta 44):** (a) a Proposição 4 do `05-taxas.tex` ganhou as duas condições que a prova usa, `s' > 1/4` em (i) e `s' > s/2` em (ii), no enunciado e na prova (só afetam `π < 2`; o PDF segue em 10 páginas); (b) no manuscrito, o enunciado sem condição de desenho diz que nenhuma cota inferior de `Σ̂` é usada e que a única propriedade de `Σ̂` é `λ_max(Σ̂) ≤ Λ`, sem `c_U` nem `κ_1`, e a variante sem essa cota não é escrita; (c) o Corolário 14(ii) em `π ≥ 2` sobe ao §3 numa frase depois do Theorem `thm:main`; (d) `‖θ‖_{𝒢,1}` e `ϑ_π` no `notacao.md` §10; (e) as assinaturas de `plot.wafc()` e `plot.cv.wafc()` ratificadas; (f) as figuras ficam versionadas em `wafc/man-figures/`; (g) as funções sem roxygen fora de "Internals" vão a E3.3, e a escolha dos blocos desenhados a E6.2 | recomendações do chat principal, aceitas pelo autor |
 | D48 | 10-03 | **Interface de E3.1 ratificada (pergunta 43):** `wafc()` e `cv.wafc()` com `penalty = "block"` padrão (o block LASSO balanceado pelo `grpreg`, `block.size = ⌈log n⌉`), `cv.wafc(..., threshold = "cv1se")` padrão, `thresholded = NULL` nos métodos de `cv.wafc`, o `cvm` do bloco na convenção do `cv.grpreg`, `thresh = 1e-4` no bloco, e `wafc_tune()`, `wafc_sigma()` e `wafc_fit_oracle()` no LASSO; o `grpreg` passa a `wafc_depends` (`load.R`, `CONTINUAR.md`); o defeito do `wafc_thr_object()` vai a E3.2 | recomendações do chat principal, aceitas pelo autor: a interface é o estimador medido, reproduzido à última casa na oitava junção exata; `1e-8` não muda a escolha e custa 4,1 vezes |
 | D47 | 10-03 | **Pendências de E1.12 (pergunta 42):** (a) **o enunciado principal do artigo passa a ser o Corolário 11** (`08-blocos.tex`), no lugar do Corolário 5, o que emenda D16; (b) a razão dos pesos é **`ϱ`** e a soma dos pesos ao quadrado é **`𝒲(·)`**, trocados no `08` (19 `\rho`, 12 `\bar\rho`, 24 `\bar W`, 9 `W(`) e no `06` (3 `\rho` da razão, 9 `W(`) só no modo matemático e sem tocar a taxa `ρ_n` nem as macros `\rhoG`, `\rhoGt`; a lista de símbolos entrou no `notacao.md` §10, com as macros locais como no `07`; (c) **a taxa lenta (Proposition 3) fica no corpo, em versão de blocos**, como corolário do Teorema 3(i), a escrever no `08` (Corolário 14) e conferir; (d) a variante branca (Observação 2 do `08`) vai ao supp como o enunciado que cobre o estimador exato do código | recomendações do chat principal, aceitas pelo autor; a (c) foi revista antes da aceitação, porque a Proposition 3 é o único enunciado sem condição de desenho (D16) |
@@ -3107,6 +3108,20 @@ Ordenadas pelo que bloqueia mais.
      que escolha os blocos desenhados, para `p × q` grande: ficam para E3.3
      e E6.2.
 
+45. **Completar a Proposição 4 de E1.6 e o Corolário 14 de E1.12 nos
+   regimes que D49 excluiu** (2026-10-03, pedido do autor: os resultados
+   servem no futuro). Os regimes `s' ≤ 1/4` em (i) e `s' ≤ s/2` em (ii)
+   (só `π < 2`) ficaram fora porque a escolha de `J_n` passa de `n`, e a
+   concentração das normas das colunas (Lema 6 de E1.5, e o análogo em
+   blocos) pede `2^{J}log d/n → 0`. **Leitura do chat principal, a
+   conferir:** nesses regimes o viés domina, e basta parar `J_n` no maior
+   nível admissível, `2^{J_n} ≍ n/(ω_n log n)` com `ω_n → ∞` tão devagar
+   quanto se queira; a cota fica `O_p((ω_n log n/n)^{2s'})`, mais lenta que
+   a dos regimes de (i) e (ii), mas consistente para todo `s' > 0`. Com isso
+   a proposição e o corolário passam a cobrir todo `s' > 0`, com três
+   regimes em vez de dois. Proposta: catalogar como E1.14 (as duas emendas,
+   com conferência numérica antes, como pede o §5 do `instrucoes.md`).
+
 ---
 
 ## 5. Próximos passos
@@ -3150,7 +3165,9 @@ entradas).
   decididas em D49.
 - (b) **O parágrafo de posicionamento de D18** (`alvo-revista.md` §4),
   reescrito para a penalidade em blocos, com a frase-tese e as
-  contribuições; o texto vai ao autor antes de entrar.
+  contribuições. **Aprovado em 2026-10-03 (D50)** e gravado no
+  `alvo-revista.md` §4, com as respostas ao referee revistas; entra no
+  `ms` na `k = 4`.
 - (c) **E3, a consolidação do código:** o block LASSO balanceado sai de
   `wafc_fit_klopp()` (concorrente) para dentro de `wafc()` e `cv.wafc()`
   como penalidade padrão, com o limiar `cv1se` na interface; o LASSO como
@@ -3185,6 +3202,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-03 | Posicionamento aprovado (D50) e gravado no `alvo-revista.md` §4, com frase-tese, contribuições e respostas ao referee revistas; pergunta 45 (completar a Proposição 4 e o Corolário 14 nos regimes excluídos por D49) |
 | 2026-10-03 | Pergunta 44 decidida (D49): a Proposição 4 de E1.6 emendada com as duas condições implícitas; o Corolário 14 sobe ao §3 em `k = 4`; dois símbolos no `notacao.md`; as assinaturas de `plot` ratificadas; a rodada da E6.1b fica com 20 partições |
 | 2026-10-03 | E1.13 fechada e integrada (`OK` em 209 s, 18 páginas): Corolário 14, a taxa lenta em blocos, que pela norma de grupos ganha um logaritmo sobre a Proposição 4 e em `π ≥ 2` dá a taxa do Teorema 4 sem condição de desenho; achadas duas condições implícitas na Proposição 4 de E1.6. E3.2 fechada e integrada (1 202 testes em 48 s, 1 427 com os lentos): `plot.wafc`, `plot.cv.wafc`, roxygen auditado, o `coef` limiarizado corrigido, exemplo no README. Pergunta 44 |
 | 2026-10-03 | E1.13 (a taxa lenta em blocos, Corolário 14) e E3.2 (gráficos, documentação e o defeito de D48) catalogadas, em paralelo com a E6.1b; o parágrafo de posicionamento de D18 começa no chat principal |

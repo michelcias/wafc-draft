@@ -87,98 +87,127 @@ Template versionado em `manuscript/ejs-template/` (clonado em 2026-09-18,
 
 ## 4. Como o artigo se posiciona
 
-**A reescrever depois de D44 (2026-10-03):** o WAFC passou a ser o block
-LASSO na forma balanceada seguido do limiar `cv1se`, com o LASSO coordenado
-como opção. D18 continua (extensão de Klopp & Pensky), mas o parágrafo
-abaixo, a frase-tese, as contribuições e a resposta a "Why not block
-LASSO?" ainda descrevem a penalidade coordenada. O texto novo vai ao autor
-antes de entrar (`ESTADO.md` §5(b)).
+**Decidido em 2026-09-19 (D18) e reescrito em 2026-10-03 (D44, D50):** o
+artigo se apresenta como **extensão de Klopp & Pensky (2015)**. Com D44 o
+WAFC passou a ser o block LASSO na forma balanceada seguido do limiar
+`cv1se`, com o LASSO coordenado como opção, e o parágrafo de 2026-09-19
+("we penalize coefficient by coefficient rather than in blocks") deixou de
+valer; o texto antigo fica no histórico do git. O texto abaixo foi aprovado
+pelo autor em 2026-10-03 (D50) e substitui o terceiro e o quarto parágrafos
+da Introduction do `ms_3` quando a `k = 4` abrir, com a marcação do §3 do
+`instrucoes.md`. Dois rótulos ainda não existem no manuscrito: "Section~5"
+(E5b) e o do Corolário 13 de E1.12 (o risco do limiarizado, citado sem
+rótulo na segunda contribuição).
 
-**Decidido em 2026-09-19 (D18):** o artigo se apresenta como **extensão de
-Klopp & Pensky (2015)**, e não como modelo diferente com eles citados de
-passagem. O parágrafo de posicionamento foi escrito e aprovado; E5a o usa
-como está, ajustando só o nome do método (D8) e os números dos resultados:
-
-```
-Klopp and Pensky (2015) study the varying coefficient model in which a
+```latex
+\citet{Klopp-Pensky-2015} study the varying coefficient model in which a
 single index modulates every coefficient. They expand each coefficient
 function in an orthonormal basis, estimate the resulting array by a block
-LASSO, and obtain a nonasymptotic oracle inequality, a Besov rate that
-adapts to inhomogeneous smoothness, and a matching minimax lower bound,
-under the assumption that the covariates are independent of the index. The
-present paper carries that programme to the situation an applied problem
-usually presents, in which several variables modulate a coefficient at once.
-We let each coefficient be additive in the modulators, which keeps the
-estimator free of the curse of dimensionality in their number, we allow the
-covariates to depend on the modulators, and we penalize coefficient by
-coefficient rather than in blocks, leaving the levels of the coefficients
-unpenalized. Each of these costs something. Additivity produces cross terms
-between distinct modulators, so the population Gram matrix no longer
-factorizes as a Kronecker product and has to be bounded directly; dependence
-between the covariates and the modulators replaces a marginal second moment
-by a conditional one; and the unpenalized levels leave a term in the risk
-that block penalization does not incur. Our main result, Corollary 5, states
-that the estimator attains the rate of nonlinear wavelet approximation up to
-a logarithmic factor, under the same Besov assumption that governs the
-linear sieve, and it reduces to the rate of Klopp and Pensky when a single
-modulator is present.
+lasso, and obtain a nonasymptotic oracle inequality, a Besov rate that adapts
+to inhomogeneous smoothness, and a matching minimax lower bound, under the
+assumption that the covariates are independent of the index. The present paper
+carries that programme to the situation an applied problem usually presents,
+in which several variables modulate a coefficient at once. We let each
+coefficient be additive in the modulators, which keeps the estimator free of
+the curse of dimensionality in their number, we allow the covariates to depend
+on the modulators, and we keep the block lasso but leave the levels of the
+coefficients unpenalized and group the wavelet coefficients in chunks of order
+$\log n$ within a resolution level, with weights whose ratio stays bounded, so
+that the standardized weights of group lasso software are covered. Additivity
+produces cross terms between distinct modulators, so the population Gram
+matrix no longer factorizes as a Kronecker product and has to be bounded
+directly; dependence between the covariates and the modulators replaces a
+marginal second moment by a conditional one; and the unpenalized levels leave
+a term in the risk that full block penalization does not incur. Our main
+result, Theorem~\ref{thm:main}, states that the estimator attains the rate of
+Klopp and Pensky, with no logarithmic factor when the Besov integrability
+index is at least two, so that with a single modulator independent of the
+covariates it is minimax optimal there. It holds under weaker conditions than
+theirs: the number of covariates is fixed, a regime their high dimensional
+condition excludes, and the effective smoothness of the components need only
+exceed $s/(2s+1)$, which is below one half, where theirs must exceed one half.
+Components with effective smoothness one half, such as the inhomogeneous
+functions of Section~5, are covered here and not there. A lower bound for
+several modulators remains open.
+
+We call the resulting procedure WAFC, for wavelet additive functional
+coefficients. Its contributions are of three kinds. The first is the theory of
+the additive product design: a design condition for the Gram matrix of the
+products between a linear covariate and a wavelet of a modulator, which
+carries a cross term between distinct modulators and does not assume
+independence (Proposition~\ref{prop:gram}); an oracle inequality that needs no
+cone condition, because the unpenalized levels are profiled out, and that
+holds for any weights of bounded ratio, including those of the software that
+computes the estimator (Theorem~\ref{thm:oracle}); and rates that follow from
+the Besov assumption alone, through a bound on the ideal risk over chunks
+(Theorem~\ref{thm:main}). The second is the recovery of the structure of the
+model, which modulators act on which coefficients, by a threshold on the norms
+of the fitted components (Corollary~\ref{cor:threshold}): removing the null
+blocks needs no separation condition, and the thresholded estimator keeps the
+rate of the fit, so that one estimator serves both for structure and for
+prediction. The third is computational: the estimator is one convex program
+solved by standard group lasso software, the resolution level and the penalty
+are chosen jointly by cross-validation, and the threshold by the one standard
+error rule on the same folds.
 ```
 
-**Frase-tese:** estender o modelo de coeficientes variáveis esparso de Klopp
-& Pensky a coeficientes **aditivos em várias moduladoras** e a desenho
-**dependente** produz um estimador que (i) atinge a taxa de aproximação não
-linear em wavelets a menos de um fator logarítmico, sob a mesma hipótese de
-Besov que governa o sieve linear (Corolário 5, D16); (ii) é um único
-problema convexo resolvido pelo `glmnet` em segundos; e (iii) recupera,
-por limiarização das normas por bloco, quais moduladoras afetam quais
-coeficientes (Corolário 8, D32; Corollary 2 no `ms_2`).
+**Frase-tese:** estender o modelo de coeficientes variáveis de Klopp &
+Pensky a coeficientes **aditivos em várias moduladoras** e a desenho
+**dependente**, mantendo o block LASSO com os níveis livres, produz um
+estimador que (i) atinge a taxa deles, sem logaritmo em `π ≥ 2`, sob
+condições mais fracas (`p` fixo, regularidade efetiva acima de `s/(2s+1)`;
+Corolário 11 de E1.12, D47); (ii) é um único problema convexo resolvido por
+software de group LASSO; e (iii) recupera, por limiarização das normas por
+bloco, quais moduladoras afetam quais coeficientes, com o mesmo estimador
+servindo à predição (Corolários 12 e 13).
 
 **Contribuições a defender (em ordem de força):**
 
-1. A teoria no desenho aditivo de produtos `X_ℓ ψ_{jk}(U_m)`: a condição de
-   desenho com termo cruzado entre moduladoras e sem independência (E1.4), a
-   desigualdade oráculo sem condição de cone (E1.5) e a taxa por
-   compressibilidade (E1.6). O que Klopp & Pensky já têm para `q = 1` com
-   `X ⊥ U` é citado, não reprovado.
-2. O uso de que **a compressibilidade não custa hipótese**: a hipótese de
-   Besov já implica weak-`ℓ_τ` (Lema 9), e é isso que separa a taxa da do
-   sieve linear quando `π < 2`. O mergulho é clássico (Johnstone 2019,
-   Proposição 9.15, pergunta 40 do `ESTADO.md`); o que é do WAFC é a
-   versão com constantes uniformes em `J` para o oráculo do desenho de
-   produtos e o uso dela para dispensar a hipótese de compressibilidade
-   que o WALL precisava.
-3. Evidência numérica de que a adaptatividade se materializa: contra splines
-   (Xue & Yang; `mgcv`), contra o spline adaptativo de Wang, Jiang & Liu
-   (2024) e contra o block LASSO de K&P no mesmo desenho (E4).
-4. Software: o código de `wafc/`, com a mesma interface do `wall()`, na
-   forma de distribuição decidida em E3.3.
+1. A teoria no desenho aditivo de produtos com a penalidade em blocos: a
+   condição de desenho com termo cruzado e sem independência (E1.4), o
+   oráculo sem cone para pesos de razão limitada, que cobre o estimador
+   exato do `grpreg` pela variante branca (E1.12, Teorema 3), e as taxas
+   pela hipótese de Besov sozinha (Lema 15, Teorema 4, Corolários 10, 11 e
+   14), com o regime `s/(2s+1) < s' ≤ 1/2` fora do Teorema 2 de K&P.
+2. A recuperação da estrutura por limiarização (Corolário 12) e a cota de
+   risco do limiarizado (Corolário 13): triagem sem separação e um só
+   estimador para estrutura e predição.
+3. A computação: `cv.wafc(x, u, y)` (D48), `(J, λ)` por validação cruzada e o
+   limiar pela regra de um erro-padrão.
+4. Evidência numérica (E4, na E5b): a do piloto é vitória sobre o spline
+   sintonizado por REML no não homogêneo e na `mixed` em `n ≥ 500` (5% a
+   10% em `rmse_f`), empate com o sintonizado por GCV, derrota no suave
+   perto do fator 1,5 em ISE, e estrutura recuperada em 0,9 a 1 das réplicas
+   em `n ≥ 500` contra 0 a 0,4 do spline (`ESTADO.md` §2, E2.5h a E2.5j).
 
 **O que o referee vai perguntar:**
 
-- **"Why not block LASSO, as in Klopp and Pensky?"** É a pergunta que o
-  posicionamento escolhido convida. A resposta: a penalidade coordenada é um
-  único problema do `glmnet`, dá o corolário de compressibilidade sem
-  restringir `τ`, e a comparação numérica contra os blocos está em E4. A
-  estrutura sai da limiarização do LASSO (D32), e a variante em grupos
-  existe em `wafc()` como opção (E2.2).
-- **"Onde está a cota inferior para `q ≥ 2`?"** Não existe (pergunta 20 da
-  §4 do `ESTADO.md`), e sob este posicionamento ela fica mais visível: o
-  artigo cita a de K&P e afirma otimalidade só onde ela vale. É o risco
-  assumido da escolha.
-- "Por que wavelets e não splines?" O cenário não homogêneo em E4 mais a
-  taxa com `π < 2`. Se E4 não mostrar ganho, o artigo não tem razão de ser.
+- **"Isto não é Klopp e Pensky com mais moduladoras?"** Não só: o termo
+  cruzado entre moduladoras tira a fatoração de Kronecker da Gram; `X`
+  depende de `U`; os níveis são livres; os pesos de razão limitada cobrem o
+  software; e o enunciado vale com `p` fixo e com regularidade efetiva entre
+  `s/(2s+1)` e `1/2`, que o Teorema 2 deles exclui (`08-blocos.tex`, §7). A
+  seleção de estrutura e o software também não estão lá.
+- **"Por que blocos e não o LASSO coordenado?"** Mesmo com o limiar oráculo,
+  o LASSO não vence o spline no não homogêneo nem na `mixed`, e os blocos
+  vencem; a taxa em blocos não tem logaritmo em `π ≥ 2`. O LASSO coordenado
+  fica como opção (D43), com a teoria de E1.5 e E1.6.
+- **"Onde está a cota inferior para `q ≥ 2`?"** Não existe, e o artigo o diz
+  na introdução (D50). Com uma moduladora independente das covariáveis a
+  cota de K&P vale sobre a nossa classe, e o Corolário 11 é ótimo em
+  `π ≥ 2`.
+- **"Por que wavelets e não splines?"** O não homogêneo e a estrutura (item
+  4 acima), e a taxa com `π < 2`. O spline por GCV empata no não homogêneo;
+  a tabela mostra as duas sintonias do `gam` (D46).
 - "Isso não é Sardy & Ma com um `X_ℓ` multiplicando?" Não: a teoria deles é
-  de otimização (L2, `busca-novidade.md` §3). A resposta fica na Seção 2.
-- "Como escolhe `J`?" Validação cruzada conjunta com `λ` (E2.3), e a teoria
-  diz a ordem. A regra teórica erra `J` por até dois níveis, acima ou
-  abaixo conforme `s'` (E1.6, E2.3), e o que a torna cara é o `λ`, de 7 a
-  13 vezes o ótimo; é o que a §4.3 do `ms_2` diz.
-- "E a seleção de estrutura?" Estimação seguida de limiar: o Corolário 8
-  (D32) está na §3.6 do `ms_2` como Corollary 2, triagem sem hipótese e
-  recuperação sob separação por bloco, e vale para o LASSO puro. A variante
-  em grupos, lida em `lambda.min`, acerta a estrutura em 0 de 10 réplicas
-  onde o LASSO limiarizado acerta 10 (E1.7c).
-- "Aplicação real?" E6, com efeito que varia com covariáveis e interpretação.
+  de otimização (L2, `busca-novidade.md` §3).
+- "Como escolhe `J` e `t`?" Validação cruzada conjunta de `(J, λ)` e a regra
+  de um erro-padrão para `t` nas mesmas dobras (D45); a teoria diz a ordem
+  de `J_n` e de `t_n`, e a regra teórica de `λ` é cara (§4.3 do `ms`).
+- "E a irrepresentabilidade?" Não é pedida: estimação seguida de limiar, com
+  triagem sem hipótese e recuperação sob separação por bloco.
+- "Aplicação real?" E6 (E6.1b em curso, no critério de estrutura estável
+  com predição competitiva).
 
 ## 5. Estrutura-alvo do manuscrito (40 páginas, SS)
 
