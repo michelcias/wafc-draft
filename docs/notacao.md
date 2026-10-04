@@ -223,6 +223,10 @@ as copia em `k = 4`.
 | `Q_G`, `q_max` | Gram da variante branca (o `grpreg` ortonormaliza o pedaço); seu maior autovalor | Observação 2 do `08` |
 | `θ̂^{(t)}`, `ĝ^{(t)}`, `f̂^{(t)}`, `Δ_{ℓm}`, `𝒮_J`, `Δ̄_n^𝒢` | o ajuste limiarizado em `t`; erro por bloco; estrutura no nível `J`; cota do Corolário 12 | Lema 16, Corolários 12 e 13 |
 | `‖θ‖_{𝒢,1}` | norma de grupos com pesos 1, `Σ_G ‖θ_G‖_2` | Corolário 14 (E1.13; D49); macro local `\nGone` |
+| `μ_J`, `λ_n^+`, `c_ψ` | fator de inflação da calibração do LASSO acima do teto de concentração, `μ_J = 1 + c_ψ 2^J log d/n`; o `λ` inflado, `μ_{J_n}^{1/2}λ_n`; a constante, `7‖ψ‖²_∞/(12C_U)` | Proposição 4(iii) e (iv) do `05` (E1.14; D52) |
+| `μ^𝒢_J`, `λ_n^{𝒢,+}`, `c_μ`, `ξ` | o mesmo nos blocos, cobrindo também `λ_max(Σ̂)`; `ξ = Λ − κ_2C_U` | Corolário 14(iii) e (iv) do `08` (E1.14; D52); `ξ` no lugar do `Δ` da tarefa, que colidia com `Δ` e `Δ̄_n` (D40); macro local `\lamGp` |
+| `β̄ = (c̄, θ̄)`, `b̄`, `v̄`, `𝒢̄ = 𝒢_0(θ̄)`, `𝒲̄ = 𝒲(𝒢̄)` | o comparador do oráculo em blocos, o seu viés, o seu erro e os seus pedaços ativos | Teorema 3 do `08`, Theorem 2 do `ms_4` (D52) |
+| `M_1`, `Σ̂_{GG}` | o centrador da variante branca; a Gram empírica do pedaço | Observação 2 do `08`, Remark S5.2 (D52) |
 | `ϑ_π` | expoente da contagem, `min(1 − 1/π, 1/2)`: nos níveis finos, `‖θ*‖_{𝒢,1}` fica abaixo de `‖θ*‖_1` por `b_n^{−ϑ_π}` | Corolário 14 (E1.13; D49); `\vartheta_{\pi}`, sem uso no `ms_3` nem no `supp_3` |
 
 No LaTeX: `\mathcal{G}`, `b_{n}`, `w_{G}`, `\varrho`, `\bar\varrho`,

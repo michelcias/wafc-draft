@@ -106,7 +106,7 @@ function in an orthonormal basis, estimate the resulting array by a block
 lasso, and obtain a nonasymptotic oracle inequality, a Besov rate that adapts
 to inhomogeneous smoothness, and a matching minimax lower bound, under the
 assumption that the covariates are independent of the index. The present paper
-carries that programme to the situation an applied problem usually presents,
+carries that program to the situation an applied problem usually presents,
 in which several variables modulate a coefficient at once. We let each
 coefficient be additive in the modulators, which keeps the estimator free of
 the curse of dimensionality in their number, we allow the covariates to depend
