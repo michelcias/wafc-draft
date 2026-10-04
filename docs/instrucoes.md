@@ -150,6 +150,11 @@ Cuidados que já custaram compilações:
   `\section[...]{...}` e `\texorpdfstring` para os marcadores (E5c).
 - Cor dentro de `\citep{...}` não funciona; citação acrescentada ao lado de
   uma existente vai por `\citetext` com `\citealp` (E5c).
+- Remoção de um enunciado inteiro, de uma prova ou de matemática deslocada,
+  que o `\sout` não atravessa: o texto antigo fica no lugar num grupo
+  `{\color{gray} ...}` aberto por uma linha "[removed in k = r]", sem
+  tachado, e o novo vem logo depois em `{\color{colR1} ...}`; trocas
+  pontuais seguem com `\sout` (D51, para a troca da teoria em `k = 4`).
 
 Exceção registrada: **uniformização de notação** aplicada por script sobre
 lista fechada de padrões pode entrar sem marcação, desde que o `ESTADO.md`

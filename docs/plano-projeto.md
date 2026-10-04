@@ -508,6 +508,15 @@ As edições acumuladas desde E5a, marcadas em `colR1` (D38 para a troca de
 33 páginas e `supp_2` em 30; as pendências estão na pergunta 32 do
 `ESTADO.md`.
 
+### E5d. Versão `k = 4` (catalogada em 2026-10-03)
+
+O estimador e a teoria de D44 a D51 no manuscrito: o posicionamento de D50,
+a penalidade em blocos na §2.3, a teoria em blocos na §3 e no supp (o
+Corolário 11 como teorema principal), a taxa lenta em blocos no corpo, a
+interface de D48 na §4, e a teoria do LASSO numa seção do supp (D51). As
+remoções inteiras ficam em blocos cinza sem tachado (D51). Sem as Seções 5
+a 7, que são da E5b.
+
 ### E5b. Seções que dependem dos números (abre quando E4 e E6 fecharem)
 
 Simulation; Application; Discussion. Verificação de teto; cada número
