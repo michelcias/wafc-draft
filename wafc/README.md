@@ -76,7 +76,7 @@ predict(object, newx, newu, s = c("lambda.min", "lambda.1se"),
         thresholded = NULL, ...)
 print(x, digits = max(3L, getOption("digits") - 3L), ...)
 
-## os gráficos (E3.2, propostos; R/plot.R)
+## os gráficos (E3.2, ratificados em 2026-10-03, D49; R/plot.R)
 plot(x, which = "components", s = NULL, truth = NULL, grid = NULL,
      n_grid = 512L, ask = NULL, ...)                  # classe 'wafc'
 plot(x, which = NULL, s = "lambda.min", thresholded = NULL, truth = NULL,

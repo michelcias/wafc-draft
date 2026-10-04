@@ -281,10 +281,10 @@ Hipótese~\ref{ass:regime} e $\Amat$ de posto $p$, com $\pen_{n}$ de
 com $\norm{\thetastar}_{1}$ dado pelo Lema~7 de E1.5, sem dependência de
 $\pi$. Em particular:
 \begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*, nosep]
-  \item se $s > 1/2$, então $\norm{\thetastar}_{1} = O(1)$ e, para qualquer
+  \item se $s > 1/2$ e $\seff > 1/4$, então $\norm{\thetastar}_{1} = O(1)$ e, para qualquer
     $J_{n} \ge \log_{2}n/(4\seff)$,
     $\normn{\widehat f - f}^{2} = O_{p}\bigl((J_{n}/n)^{1/2}\bigr)$;
-  \item se $s < 1/2$, então $\norm{\thetastar}_{1} \asymp 2^{J_{n}(1/2-s)}$ e a
+  \item se $s < 1/2$ e $\seff > s/2$, então $\norm{\thetastar}_{1} \asymp 2^{J_{n}(1/2-s)}$ e a
     escolha $2^{J_{n}} \asymp (n/J_{n})^{1/(1-2s+4\seff)}$ dá
     $\normn{\widehat f - f}^{2} =
     O_{p}\bigl((J_{n}/n)^{2\seff/(1-2s+4\seff)}\bigr)$; quando $\pi \ge 2$
@@ -537,7 +537,11 @@ $\normn{\widehat f - f}^{2} \le 3(\normn{\Btil v}^{2} + 4\normn{\bb}^{2}
 + \normn{\PA\bveps}^{2})$. Nenhuma propriedade de $\Gramhat$ entra. O
 Lema~6 de E1.5 torna $\pen_{n}$ de \eqref{eq:lambda-n} admissível
 ($\pen_{n} \ge 2\pen_{0}$) com probabilidade que tende a $1$, porque
-$2^{J_{n}}\log d_{n}/n \to 0$ em todos os regimes considerados; Markov aplicado
+$2^{J_{n}}\log d_{n}/n \to 0$ nos dois regimes, e é para isso que servem as
+condições $\seff > 1/4$ em (i) e $\seff > s/2$ em (ii): sem elas, a escolha de
+(i) dá $2^{J_{n}} \ge n^{1/(4\seff)} \ge n$, e o balanço de (ii) dá
+$2^{J_{n}} \gtrsim n/\log n$ (emenda de 2026-10-03, D49, achada pela E1.13;
+só afeta $\pi < 2$, porque com $\pi \ge 2$ vale $\seff = s$); Markov aplicado
 a $\E\normn{\bb}^{2} \le \mathcal{B}_{J_{n}}^{2}$ (Corolário~1 de E1.3) e a
 $\E[\normn{\PA\bveps}^{2}\mid\bX,\bU] \le \sigma^{2}p/n$ fecha o enunciado
 geral, na forma $O_{p}$ da Hipótese~\ref{ass:regime}.

@@ -222,6 +222,8 @@ as copia em `k = 4`.
 | `ρ_n^𝒢`, `ρ̃_n^𝒢` | taxas por componente do Teorema 4 (`n^{−s'/(2s'+1)}`) e do Corolário 11 | par de `ρ_n` e `ρ̃_n` da §9 |
 | `Q_G`, `q_max` | Gram da variante branca (o `grpreg` ortonormaliza o pedaço); seu maior autovalor | Observação 2 do `08` |
 | `θ̂^{(t)}`, `ĝ^{(t)}`, `f̂^{(t)}`, `Δ_{ℓm}`, `𝒮_J`, `Δ̄_n^𝒢` | o ajuste limiarizado em `t`; erro por bloco; estrutura no nível `J`; cota do Corolário 12 | Lema 16, Corolários 12 e 13 |
+| `‖θ‖_{𝒢,1}` | norma de grupos com pesos 1, `Σ_G ‖θ_G‖_2` | Corolário 14 (E1.13; D49); macro local `\nGone` |
+| `ϑ_π` | expoente da contagem, `min(1 − 1/π, 1/2)`: nos níveis finos, `‖θ*‖_{𝒢,1}` fica abaixo de `‖θ*‖_1` por `b_n^{−ϑ_π}` | Corolário 14 (E1.13; D49); `\vartheta_{\pi}`, sem uso no `ms_3` nem no `supp_3` |
 
 No LaTeX: `\mathcal{G}`, `b_{n}`, `w_{G}`, `\varrho`, `\bar\varrho`,
 `\lVert\theta\rVert_{\mathcal{G},w}`, `\mathcal{G}_{0}`, `\mathcal{W}`,
