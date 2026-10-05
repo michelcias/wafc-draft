@@ -24,7 +24,9 @@
 %   Corolario 14            -> Proposition 3  (prop:slow; D47(c), D49(b)); os itens
 %                              (iii) e (iv) de E1.14 sao a Proposition S6.1 do supp
 %                              (prop:slow-ceiling; E5e, D52)
-%   Lema 15                 -> Lemma 3        (lem:weak; o rotulo ficou com o nome antigo)
+%   Corolario 15            -> Proposition S6.2 do supp (prop:truncated; E5f, D54),
+%                              citada numa frase depois da Proposition 3
+%   Lema 15                -> Lemma 3        (lem:weak; o rotulo ficou com o nome antigo)
 %   Corolario 12, Hipotese S com rho_n^G
 %                           -> Corollary 2 (cor:threshold), Assumption 6 (ass:sep);
 %                              o Lema 13 e o Lemma S7.1 do supp (lem:sandwich)
@@ -34,7 +36,8 @@
 %   Proposicao 4 emendada por D49 e com os itens (iii) e (iv) de E1.14 (E5e),
 %   Lema 9, Corolario 8): Secao S8 do supp,
 %   como Theorems S8.1 a S8.3, Corollaries S8.1 e S8.2, Proposition S8.1 e
-%   Lemma S8.1 (D51(a)).
+%   Lemma S8.1 (D51(a)). A Proposicao 8 (E1.15) e a Proposition S8.2
+%   (prop:lasso-truncated; E5f, D54).
 %   Os rotulos sec:sieve, thm:sieve e lem:weak ficaram com o nome antigo (D33 muda
 %   o texto, nao os rotulos; em k = 4 o conteudo de thm:sieve e lem:weak mudou).
 \documentclass[12pt]{article} %***
@@ -583,7 +586,8 @@ $\thetahat$ by
   \widehat{\fcoef{\cv}}(u) = \widehat{c}_{\cv}
   + \sum_{\md=1}^{q}\widehat{g}_{\cv\md}(u_{\md}).
 \]
-Problem \eqref{eq:estimator} is a \textcolor{gray}{\sout{lasso}} \textcolor{gray}{\sout{\mbox{\citep{tibshirani1996regression}}}}\textcolor{colR1}{group lasso} with some coordinates unpenalized, so
+% E5f (L10; D54): a citacao de Yuan & Lin dentro do grupo azul de k = 4.
+Problem \eqref{eq:estimator} is a \textcolor{gray}{\sout{lasso}} \textcolor{gray}{\sout{\mbox{\citep{tibshirani1996regression}}}}\textcolor{colR1}{group lasso \citep{Yuan-Lin-2006}} with some coordinates unpenalized, so
 it is convex, and it is strictly convex, hence uniquely solved, whenever the
 Gram matrix of $\bZ$ is nonsingular. \textcolor{gray}{\sout{Two structural variants are available at
 no conceptual cost and are discussed in Section~\mbox{\ref{sec:computation}}: a
@@ -1100,9 +1104,14 @@ for $\cv = 1,\dots,p$, and $\norm{\chat - \bc}_{2} = O_p(\rhoG)$.
 
 The passage from the prediction norm to the norm of a single component is
 where the design condition is used a second time, and the smallest eigenvalue
-appears squared in the constant. Two further statements complete the picture.
+appears squared in the constant. \textcolor{colR1}{In the arguments of this
+paper the design condition is needed for the components in every case, and
+for the prediction rate of Theorem~\ref{thm:main} only when $s \ge 1/2$.}
+% E5f (E1.15; D54): a frase acima qualifica a condicao de desenho; a
+% introducao (D50) nao muda.
+Two further statements complete the picture.
 The first dispenses with the design condition altogether, at the price of a
-slower rate, and is the unconditional statement of this paper.
+slower rate \textcolor{colR1}{when $s \ge 1/2$}, and is the unconditional statement of this paper.
 
 % derivations/05-taxas.tex, Proposicao 4 (numeracao global). Substituida em
 % k = 4 pelo Corolario 14 de derivations/08-blocos.tex (D47(c)); a do lasso,
@@ -1199,7 +1208,22 @@ in place of $\lamG$, holds for every $\seff > 0$. There, too, the only
 property of $\Gramhat$ that the proof uses is an upper bound,
 $\lmaxx(\Gramhat) \le \Lambda\mu^{\Gcal}_{J_n}$, which holds with probability
 tending to one with no condition on $J_n$ and, again, without $c_U$ or
-$\kappa_1$.}
+$\kappa_1$.
+% E5f (E1.15; D54): o Corolario 15 de derivations/08-blocos.tex, que e a
+% Proposition S6.2 do supp; a versao do lasso (Proposicao 8 do 05) e a
+% Proposition S8.2.
+When $s < 1/2$ the slow rate improves further. Read at the comparator that
+keeps the chunks with $\norm{\thetastar_{G}}_{2} > \pen w_{G}$ and sets the
+others to zero, Theorem~\ref{thm:oracle}(i) charges the penalty only for the
+chunks kept and leaves the energy of the others to the bias, where an upper
+bound on $\lmaxx(\Gram)$ controls it; with $\seff > s/(2s+1)$ and $J_n$ in the
+window \eqref{eq:window}, this gives the prediction rate of
+Theorem~\ref{thm:main} with no design condition (Proposition~S6.2 in the
+Supplementary Material). When $s \ge 1/2$ no comparator does better than the
+order $\lamGone \asymp (\log n/n)^{1/2}$ of part (i): a coarse coefficient of
+fixed size costs its product with $\lamGone$ in the penalty or its square in
+the bias. Neither reading reaches the components, which need the design
+condition (Corollary~\ref{cor:components}).}
 
 The second is the approximation lemma that produces Theorem~\ref{thm:main}.
 \textcolor{gray}{\sout{For a vector $\btheta$ let $\theta_{(1)} \ge \theta_{(2)} \ge \cdots$ be the
@@ -1474,10 +1498,10 @@ looking the values up removes the cascade from the inner loop of a
 simulation.
 
 Problem \eqref{eq:estimator} is then a \textcolor{gray}{\sout{lasso}}\textcolor{colR1}{group lasso} with $p$ unpenalized coordinates,
-which \textcolor{gray}{\sout{coordinate descent}}\textcolor{colR1}{group descent} solves along a path of penalty levels; we use the
-\textcolor{gray}{\sout{\texttt{glmnet}}}\textcolor{colR1}{\texttt{grpreg}} package\textcolor{gray}{\sout{ \mbox{\citep{friedman2010regularization}}}} \textcolor{colR1}{[VERIFICAR:
-Breheny and Huang (2015) and the \texttt{grpreg} manual, not yet in the verified
-bibliography]} \textcolor{colR1}{of R
+% E5f (L10; D54): as duas citacoes do grpreg dentro dos grupos azuis de k = 4;
+% a nota [VERIFICAR] de E5d saiu sem cinza, por ser nota de trabalho.
+which \textcolor{gray}{\sout{coordinate descent}}\textcolor{colR1}{group descent \citep{Breheny-Huang-2015}} solves along a path of penalty levels; we use the
+\textcolor{gray}{\sout{\texttt{glmnet}}}\textcolor{colR1}{\texttt{grpreg}} package\textcolor{gray}{\sout{ \mbox{\citep{friedman2010regularization}}}} \textcolor{colR1}{\citep{Breheny-Miller-grpreg-2026}} \textcolor{colR1}{of R
 \citep{RCoreTeam-2026}}. Two points of scale deserve care, because they are
 what ties the software to the theory. First, \textcolor{colR1}{the solver standardizes
 the columns and orthonormalizes each chunk before penalizing it, so that what

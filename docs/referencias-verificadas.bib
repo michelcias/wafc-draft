@@ -7,6 +7,13 @@
 % redigitar; nelas só se acrescentou a linha `doi`, conferida no Crossref.
 % Nada daqui leva mais a nota "[L1: confirmar]".
 %
+% Sétima rodada (L11, 2026-10-05): entrou Simon & Tibshirani (2012), o
+% group lasso padronizado, na seção do LASSO, logo depois de Yuan & Lin
+% (2006): é a referência da escala ‖Q_G^{1/2}θ_G‖_2 da Remark S5.2 do
+% supp_4. Lido no PDF da editora (refs/simon2012.pdf). A paginação de
+% Breheny & Huang (2015) no periódico foi conferida no PDF da Springer
+% (refs/breheny2015.pdf), em nota acrescentada acima da entrada.
+%
 % Sexta rodada (L10, 2026-10-04): entraram o group lasso (Yuan & Lin
 % 2006), na seção do LASSO, e o `grpreg`, motor do block lasso do WAFC
 % desde E2.5b, na seção de software: o pacote (versão 3.6.0, por D25) e o
@@ -668,6 +675,39 @@
   doi     = {10.1111/j.1467-9868.2005.00532.x}
 }
 
+% L11 (2026-10-05). O Crossref confere título (em caixa de título),
+% autores, veículo, volume 22, número 3, `published-print` 2012 e DOI, sem
+% páginas; as páginas vêm do cabeçalho do PDF da editora
+% (refs/simon2012.pdf, "Statistica Sinica 22 (2012), 983-1001"), e o
+% OpenAlex confirma 22(3), 983--1001. Nomes como impressos na folha de
+% rosto (D39); o título, impresso em versal, vai em caixa de sentença,
+% como em `Wei-Huang-Li-2011`. O que o projeto usa: o group lasso
+% padronizado, eq. (1.4), §1, p. 984, com penalidade
+% √p_l ‖X^{(l)}β^{(l)}‖_2 em vez de √p_l ‖β^{(l)}‖_2, e a equivalência,
+% afirmada na mesma página, entre ele e ortonormalizar cada grupo, rodar o
+% group lasso não padronizado e voltar à escala original, isto é,
+% penalizar o ajuste X^{(l)}β^{(l)} de cada grupo e não os coeficientes. A
+% prova é a do §2, eqs. (2.2)--(2.4), p. 986: X^{(l)} = U^{(l)}R^{(l)},
+% com ‖U^{(l)}θ^{(l)}‖_2 = ‖θ^{(l)}‖_2 e β^{(l)} = (R^{(l)})^{-1}θ^{(l)};
+% pede posto coluna cheio (p_l ≤ n). Com X^{(l)} = M_1 B_G, a penalidade
+% é √n vezes a ‖Q_G^{1/2}θ_G‖_2 da Remark S5.2, e o √n vai ao λ. O peso
+% √p_l vem do §3.2, p. 987 (sob a nula, E‖P_{col(X^{(m)})} r^{(-m)}‖² =
+% p_m σ²), a mesma conta de traço que torna o λ_{0G} da Remark S5.2
+% pivotal. Três notas: o artigo cita Yuan & Lin como "(2007)" (é 2006,
+% `Yuan-Lin-2006`); remete a uma "Section 4.3" que não existe (o caso de
+% posto deficiente é o §7, p. 997); e Breheny & Huang (2015, §2.1)
+% citam este artigo como "(2011)", ano da versão on-line.
+@article{Simon-Tibshirani-2012,
+  author  = {Simon, Noah and Tibshirani, Robert},
+  title   = {Standardization and the group lasso penalty},
+  journal = {Statistica Sinica},
+  year    = {2012},
+  volume  = {22},
+  number  = {3},
+  pages   = {983--1001},
+  doi     = {10.5705/ss.2011.075}
+}
+
 @article{Simon-Friedman-Hastie-Tibshirani-2013,
   author  = {Simon, Noah and Friedman, Jerome and Hastie, Trevor and Tibshirani, Robert},
   title   = {A sparse-group lasso},
@@ -1217,6 +1257,16 @@
 % depois de centrar, com a observação de que penalizar ‖β̃_j‖ é penalizar
 % (n^{-1} β_j'X_j'X_j β_j)^{1/2}, a escala do preditor linear, e não
 % ‖β_j‖. É isso que o §4.1 do ms_4 descreve como ‖Q_G^{1/2} θ_G‖_2.
+% L11 (2026-10-05): o PDF da Springer (refs/breheny2015.pdf) é a versão
+% on-line de 2013 ("Stat Comput", DOI, recebido em 13/03/2013, aceito em
+% 27/09/2013), com 15 páginas e sem número de página impresso; o fascículo
+% tem 173--187 (Crossref), 15 páginas, e a página k do PDF é a 172 + k
+% (inferido pela contagem, não impresso). Seções e equações iguais às do
+% arXiv: a ortonormalização é o §2.1, pp. 174--175 (a decomposição
+% n^{-1}X_j'X_j = Q_jΛ_jQ_j' e as eqs. (2.3)--(2.4) na p. 175, assim como a
+% observação de que ‖β̃_j‖ é a escala do preditor linear, atribuída a
+% Simon & Tibshirani e a Huang et al. 2012); o objetivo do group lasso é a
+% eq. (2.5), §2.2, p. 175.
 @article{Breheny-Huang-2015,
   author  = {Breheny, Patrick and Huang, Jian},
   title   = {Group descent algorithms for nonconvex penalized linear and logistic regression models with grouped predictors},

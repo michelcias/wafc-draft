@@ -37,8 +37,8 @@ teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 4` (`manuscript/ms_4.tex`,
 `supp_4.tex`, `references_4.bib`), aberta pela E5d em 2026-10-04 com a
 teoria em blocos (D44 a D51); as versões `k = 1` a `k = 3` ficam intactas.
-Os dois compilam limpos em **50 e 68 páginas** com a marcação, **43 e 67**
-sem o texto removido (depois da E5e); com as Seções 5 a 7 o corpo projeta ~54 páginas,
+Os dois compilam limpos em **52 e 80 páginas** com a marcação, **44 e 79**
+sem o texto removido (depois da E5f); com as Seções 5 a 7 o corpo projeta ~54 páginas,
 contra o teto de 40 (D21, pergunta 47(e)).
 **Cor da rodada corrente:** `colR1`, em uso desde `k = 2` (a rodada não foi
 aceita, então a marcação de E5c segue em `colR1` na `k = 3` e na `k = 4`).
@@ -2102,6 +2102,40 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-05: E5f e L11 fechadas, a E1.15 na `k = 4` e Simon & Tibshirani
+
+Dois chats de tarefa, integrados aqui. Conferido nesta máquina: `ms_4` e
+`supp_4` compilam sem referência indefinida, rótulo duplicado ou aviso do
+BibTeX, em **52 e 80 páginas** (44 e 79 sem o removido; o corpo ganhou uma
+página, o supp doze); `references_4.bib` com **43 entradas, todas
+citadas**; `referencias-verificadas.bib` com **87 entradas** e 0 avisos; a
+`k = 3` intacta; os diffs dos `.bib` só acrescentam.
+
+- **E5f:** no corpo, depois da Proposition 3, o comparador truncado com a
+  taxa de predição do Theorem 1 sem condição de desenho em `s < 1/2`
+  (**Proposition S6.2**) e o limite em `s ≥ 1/2`, com "Neither reading
+  reaches the components"; depois do Corollary 1, "the design condition is
+  needed for the components in every case, and for the prediction rate of
+  Theorem 1 only when `s ≥ 1/2`" ("needed in the arguments of this paper",
+  não "necessary", porque não há cota inferior); a introdução não mudou. No
+  supp, a Proposition S6.2 (Corolário 15) e a **Proposition S8.2**
+  (Proposição 8) com as provas; a Proposition S8.1 com as cotas superiores
+  das Assumptions 2 e 3; as citações de L10 no §2.3 e no §4.1, sem o
+  `[VERIFICAR]`. A linha sobre a variante branca truncada entrou no
+  parágrafo de leitura da S6.2, porque o supp não tem seção "what this does
+  not cover".
+- **L11:** `Simon-Tibshirani-2012` (*Statist. Sinica* 22(3), 983–1001) na
+  seção do LASSO do `.bib`. O group lasso padronizado é a eq. (1.4), p. 984,
+  e a equivalência com ortonormalizar por grupo é o §2, p. 986, o que a
+  Remark S5.2 usa (`‖M_1B_Gθ_G‖_2 = n^{1/2}‖Q_G^{1/2}θ_G‖_2`); o peso
+  `√p_l` vem do §3.2, p. 987. Em Breheny & Huang, o §2.1 está nas pp.
+  174–175 e a eq. (2.5) na p. 175, **paginação inferida** (a versão on-line
+  da Springer não imprime número de página).
+- **Lições:** com a S6 e a S8 em `colR1` desde a E5d, o que entra lá não se
+  distingue no PDF (o rastro é o comentário `% E5f`); a versão "Online First"
+  da Springer não traz página, e citar página pede contar a partir do
+  intervalo do Crossref e dizer que foi inferida.
+
 ### 2026-10-05: E1.15 fechada, o comparador truncado na taxa lenta
 
 Chat de tarefa, integrado aqui. Conferido nesta máquina, em cópias
@@ -3394,12 +3428,28 @@ Ordenadas pelo que bloqueia mais.
    $\lambda^{\mathcal{G}}_{n,1} \asymp (\log n/n)^{1/2}$, and the design
    condition is what the faster rate costs."
 
+49. **Pendências de E5f e L11** (2026-10-05), três edições pequenas na
+   `k = 4`, com o `.tex` proposto na resposta do chat principal de
+   2026-10-05: (a) a frase do §3.2 depois do Theorem 1 ("When `s < 1/2` and
+   `π ≥ 2`, the rate ... is attained with no design condition at all, at
+   another resolution") passa a dizer que, em `s < 1/2`, a taxa de predição
+   do Theorem 1 vale sem condição de desenho para todo `π` (Proposition
+   S6.2); (b) Simon & Tibshirani (2012) no §4.1, ao lado de Breheny & Huang,
+   e não no parágrafo do Theorem 2; (c) a frase de Simon & Tibshirani na
+   Remark S5.2 (eq. 1.4 e §2), sem citá-los no argumento pivotal (lá é uma
+   esperança sob a nula, aqui uma cota de cauda); a entrada no
+   `references_4.bib`. Breheny & Huang se citam por seção, não por página
+   inferida. O supp cresceu de 67 para 79 páginas, o que não conta no teto
+   (D21).
+
 ---
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-05).** **E1.15, E5e e L10 fechadas e integradas**;
-pendências na pergunta 48. A E6.1b vai em 107 de 120 unidades. **E1.14 e
+**Onde parou (2026-10-05).** **E5f e L11 fechadas e integradas**; três
+edições pequenas na pergunta 49. A E6.1b vai em 113 de 120 unidades.
+**E1.15, E5e e L10 fechadas e integradas**, com a pergunta 48 decidida
+(D54). **E1.14 e
 E5d fechadas e integradas**: a
 taxa lenta cobre todo `s' > 0`, e o manuscrito está em `k = 4` (43 páginas
 sem o removido, sem os itens de E1.14 na Proposition 3); pendências nas
@@ -3481,6 +3531,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-05 | E5f e L11 fechadas e integradas (52 e 80 páginas; 43 entradas no `references_4.bib`, 87 no verificado): a E1.15 na `k = 4` (Propositions S6.2 e S8.2) e as citações de L10; Simon & Tibshirani (2012) verificado; pergunta 49 |
 | 2026-10-05 | Pergunta 48 decidida (D54): E5f (a E1.15 e as citações de L10 na `k = 4`) e L11 (Simon & Tibshirani 2012) catalogadas; `ℛ_1`, `ℛ_{𝒢,w}`, `ℛ_{𝒢,1}` no `notacao.md` |
 | 2026-10-05 | E1.15 fechada e integrada (`OK` nas duas conferências; 15 e 23 páginas): Proposição 8 e Corolário 15, a taxa lenta pelo comparador truncado, que em `s < 1/2` alcança a do Theorem 1 sem condição de desenho e em `s ≥ 1/2` não melhora. E5e fechada e integrada (50 e 68 páginas): a E1.14 na `k = 4`, "program", "thresholding". L10 fechada e integrada (86 entradas). Pergunta 48 |
 | 2026-10-04 | Resumo da `k = 4` aprovado (D53), com "thresholding" no lugar de "effective dimension" nas palavras-chave, a cargo da E5e |

@@ -149,3 +149,14 @@ software do `.bib`, como o `glmnet`, e por D25 não têm linha aqui.
 | Referência | O que resolve | O que não cobre | Status |
 |---|---|---|---|
 | Yuan & Lin (2006), *JRSS B* 68(1) 49–67, "Model selection and estimation in regression with grouped variables" (DOI 10.1111/j.1467-9868.2005.00532.x) | o group lasso, eq. (2.1), p. 51, `½‖Y − Σ X_j β_j‖² + λ Σ ‖β_j‖_{K_j}`; o peso `K_j = p_j I`, p. 53, que é o `|G|^{1/2}` padrão do `grpreg`; os grupos ortonormalizados, §1, p. 50, que são a padronização do `grpreg`; o modelo aditivo como caso em que cada fator é um grupo de funções de base (§1, p. 49) | sem teoria de taxa ou de seleção em alta dimensão; grupos por fator, não pedaços dentro de um nível; ortonormalidade suposta, não discutida (Breheny & Huang 2015, §2.1) | `verificado` (`Yuan-Lin-2006`) |
+
+## Group lasso padronizado (L11, 2026-10-05)
+
+Linha nova de L11, conferida no Crossref, no OpenAlex e no PDF da editora
+(`refs/simon2012.pdf`); a entrada está em
+[`referencias-verificadas.bib`](referencias-verificadas.bib), onde também
+ficou a paginação de Breheny & Huang (2015) no periódico.
+
+| Referência | O que resolve | O que não cobre | Status |
+|---|---|---|---|
+| Simon & Tibshirani (2012), *Statistica Sinica* 22(3) 983–1001, "Standardization and the group lasso penalty" (DOI 10.5705/ss.2011.075) | o group lasso padronizado, eq. (1.4), §1, p. 984, com penalidade `√p_l ‖X^{(l)}β^{(l)}‖_2`; a equivalência com ortonormalizar cada grupo e voltar à escala original (p. 984; prova no §2, eqs. (2.2)–(2.4), p. 986), que é a escala `‖Q_G^{1/2}θ_G‖_2` da Remark S5.2 do `supp_4` com `X^{(l)} = M_1 B_G`; o peso `√p_l` pela esperança `p_m σ²` da projeção do resíduo sob a nula (§3.2, p. 987), a conta que torna o `λ_{0G}` da Remark S5.2 pivotal; é da revista-alvo | sem taxa nem desigualdade oráculo; pede posto coluna cheio em cada grupo (`p_l ≤ n`; o caso deficiente é o *ridged group lasso*, §7); sem centragem nem pesos diferentes de `√p_l` | `verificado` (`Simon-Tibshirani-2012`) |

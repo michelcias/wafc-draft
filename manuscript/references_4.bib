@@ -601,3 +601,80 @@
   isbn      = {978-0-12-374370-1},
   doi       = {10.1016/B978-0-12-374370-1.X0001-8}
 }
+
+% E5f (2026-10-05; D54): as tres entradas de L10, copiadas de
+% docs/referencias-verificadas.bib (no HEAD 786d250) com os comentarios de
+% conferencia, sem alteracao de campo. Yuan & Lin no paragrafo 2.3; Breheny &
+% Huang e o grpreg no 4.1, na secao de software (D25).
+
+% L10 (2026-10-04). O Crossref confere título, autores, veículo, 68(1),
+% 49--67, DOI e `published-print` 2006-02-01 (on-line em 2005-12-21; o ano
+% de citação é o do fascículo). Lido no PDF (refs/yuan2006.pdf, a versão
+% composta da editora, "J. R. Statist. Soc. B (2006) 68, Part 1, pp.
+% 49–67", da página do autor); nomes e título como impressos (D39), o
+% título em caixa de sentença como na folha de rosto. Veículo pelo nome da
+% época, como em `ravikumar2009sparse`. O que o projeto usa: o group lasso, eq.
+% (2.1), §2.1, p. 51, com objetivo (1/2)‖Y − Σ X_j β_j‖² + λ Σ ‖β_j‖_{K_j}
+% (sem o 1/n do `grpreg`); a escolha K_j = p_j I_{p_j}, p. 53, que dá o
+% peso √p_j, o `|G|^{1/2}` padrão do `grpreg`; e a hipótese de grupos
+% ortonormalizados, X_j'X_j = I_{p_j}, §1, p. 50, que é a padronização do
+% `grpreg` (cf. `Breheny-Huang-2015`).
+@article{Yuan-Lin-2006,
+  author  = {Yuan, Ming and Lin, Yi},
+  title   = {Model selection and estimation in regression with grouped variables},
+  journal = {Journal of the Royal Statistical Society: Series B (Statistical Methodology)},
+  year    = {2006},
+  volume  = {68},
+  number  = {1},
+  pages   = {49--67},
+  doi     = {10.1111/j.1467-9868.2005.00532.x}
+}
+
+% L10 (2026-10-04). A referência que o `citation("grpreg")` (3.6.0) pede
+% para as penalidades em norma L2 (`penalty = "grLasso"`, a do WAFC em
+% `fit.R`, `threshold.R` e `competitors.R`); o arquivo CITATION dá a
+% entrada inteira. O Crossref confere título, autores, veículo, 25(2),
+% 173--187, DOI e `published-print` 2015-03 (on-line em 2013-11-05; o ano
+% de citação é o do fascículo, como no CITATION). O PDF da Springer não
+% abriu; lido no arXiv:1209.2160v2 (refs/breheny2015-arxiv.pdf, 23 ago.
+% 2013), cujo `journal_ref` e DOI apontam para este artigo; nomes e título
+% como impressos ali e no CITATION (D39). As seções abaixo são as do
+% arXiv, sem a paginação do periódico. O que o projeto usa: o objetivo do
+% group lasso, eq. (2.5), §2.2, (2n)^{-1}‖y − Xβ‖² + λ Σ √K_j ‖β_j‖, o
+% mesmo do help de `grpreg::grpreg` ((1/n) vezes metade do desvio, com
+% `group.multiplier` padrão √K_j); e a ortonormalização de cada grupo,
+% §2.1, n^{-1} X_j'X_j = Q_j Λ_j Q_j' e X̃_j = X_j Q_j Λ_j^{-1/2}, aplicada
+% depois de centrar, com a observação de que penalizar ‖β̃_j‖ é penalizar
+% (n^{-1} β_j'X_j'X_j β_j)^{1/2}, a escala do preditor linear, e não
+% ‖β_j‖. É isso que o §4.1 do ms_4 descreve como ‖Q_G^{1/2} θ_G‖_2.
+@article{Breheny-Huang-2015,
+  author  = {Breheny, Patrick and Huang, Jian},
+  title   = {Group descent algorithms for nonconvex penalized linear and logistic regression models with grouped predictors},
+  journal = {Statistics and Computing},
+  year    = {2015},
+  volume  = {25},
+  number  = {2},
+  pages   = {173--187},
+  doi     = {10.1007/s11222-013-9424-2}
+}
+
+% L10 (2026-10-04). O pacote do block lasso do WAFC (E2.5b em diante; o
+% motor de `penalty = "block"` desde E3.1), versão instalada 3.6.0,
+% publicada no CRAN em 2026-03-26 (`DESCRIPTION` e página do CRAN). Autores
+% os dois `aut` do `DESCRIPTION` (Patrick Breheny e Ryan Miller; os `ctb`
+% ficam fora), como na citação automática `citation("grpreg", auto =
+% TRUE)` e no registro do DOI no Crossref. O DOI do CRAN não é de versão:
+% o Crossref o registra como `dataset`, com `published-print` 2008-11-24,
+% a primeira versão; o ano é o da versão usada, como em `Wood-mgcv-2025`.
+% Tipo `misc` pela razão da entrada do `WaveBased`. O `citation("grpreg")`
+% pede, para o `grLasso`, só `Breheny-Huang-2015`; as outras duas que ele
+% lista (Breheny 2015, Biometrics, o `gel`; Breheny & Huang 2009, Stat.
+% Interface, o `cMCP`) são de penalidades que o WAFC não usa e não entram.
+@misc{Breheny-Miller-grpreg-2026,
+  author       = {Breheny, Patrick and Miller, Ryan},
+  title        = {{grpreg}: {R}egularization {P}aths for {R}egression {M}odels with {G}rouped {C}ovariates},
+  year         = {2026},
+  howpublished = {R package version 3.6.0, \url{https://CRAN.R-project.org/package=grpreg}},
+  doi          = {10.32614/CRAN.package.grpreg},
+  url          = {https://CRAN.R-project.org/package=grpreg}
+}

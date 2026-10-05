@@ -8,6 +8,9 @@
 % que estavam no corpo, para a Secao S8 nova (D51(a)). O material deslocado nao
 % e repetido em cinza no lugar antigo: uma linha cinza no inicio de cada secao
 % diz o que saiu e para onde (ver docs/handoff-E5d.md).
+% E5f (E1.15, L10; D54): a Proposition S6.2 (Corolario 15 do 08) no fim de S6, a
+% Proposition S8.2 (Proposicao 8 do 05) em S8, com as provas; cada insercao em
+% grupo ja azul leva o comentario % E5f.
 \documentclass[10pt]{book}
 \usepackage[sectionbib]{natbib}
 \usepackage{array,epsfig,fancyheadings,rotating}
@@ -134,6 +137,11 @@
 \newcommand{\Acal}{\mathcal{A}_{n}}
 \newcommand{\AG}{A^{\mathcal{G}}_{s,\pi}}
 \newcommand{\Dbl}{\Delta_{\cv\md}}
+% E1.15 (E5f, D54): os pares em norma l1 e de grupos do risco ideal
+% (docs/notacao.md, S10); \mathcal{R}, sem uso anterior.
+\newcommand{\Rone}{\mathcal{R}_{1}}
+\newcommand{\RGw}{\mathcal{R}_{\mathcal{G},w}}
+\newcommand{\RGone}{\mathcal{R}_{\mathcal{G},1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagestyle{fancy}
@@ -1623,6 +1631,237 @@ then $\seff \ge 1/2 > s/(2s+1)$, and is strictly weaker. That this factor is
 necessary for the estimator is proved neither here nor by Klopp and Pensky,
 and for $q \ge 2$ no lower bound is available.
 \end{remark}
+
+% E5f (E1.15; D54): derivations/08-blocos.tex, Corolario 15 (numeracao global;
+% cor:truncada-blocos) e a sua prova, dentro do grupo azul de k = 4.
+\subsection*{The slow rate through a truncated comparator}
+
+Proposition~3 reads Theorem~2(i) at the comparator $\betastar$ only, and pays
+$\pen w_{G}\norm{\thetastar_{G}}_{2}$ for every chunk, including the chunks
+whose energy would cost less as bias. Theorem~2 holds for every comparator on
+the same event, and the comparator truncated chunk by chunk,
+\begin{equation}
+  \label{eq:truncated-blocks}
+  \thbar_{G} \;=\; \thetastar_{G}\,\mathbf{1}\bigl\{\norm{\thetastar_{G}}_{2}
+  > \pen w_{G}\bigr\},
+  \qquad G \in \Gcal,
+\end{equation}
+charges the penalty only for the chunks above their own level and sends the
+others to the bias. What remains is
+\begin{equation}
+  \label{eq:RG}
+  \RGw(\btheta;\pen) = \sum_{G\in\Gcal}
+  \min\bigl(\pen w_{G}\norm{\btheta_{G}}_{2},\,\norm{\btheta_{G}}_{2}^{2}\bigr),
+  \qquad
+  \RGone(\btheta;t) = \sum_{G\in\Gcal}
+  \min\bigl(t\norm{\btheta_{G}}_{2},\,\norm{\btheta_{G}}_{2}^{2}\bigr),
+\end{equation}
+the counterparts in the group norm of the ideal risk $\Rid$, with
+$\RGone(\btheta;t) \le t\nGone{\btheta}$.
+
+\begin{proposition}[Slow rate through the truncated comparator]
+\label{prop:truncated}
+Let the assumptions of Proposition~3 hold; in the statements with $\lamGp$
+in the estimator, the conditions on $J_n$ are replaced by $2^{J_n} \le n^{2}$,
+as in Proposition~\ref{prop:slow-ceiling}.
+\begin{enumerate}
+\item[(i)] On the event $\Tw$, with $\thbar$ of \eqref{eq:truncated-blocks},
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;\le\; 18\pen\nGw{\thbar} + 48\normn{\Bmat(\thetastar-\thbar)}^{2}
+  + 48\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2} .
+\]
+If $\pen$ and $w$ are deterministic,
+$\E\normn{\Bmat(\thetastar-\thbar)}^{2} \le
+\kappa_2C_U\norm{\thetastar-\thbar}_{2}^{2}$,
+\[
+  18\pen\nGw{\thbar} + 48\kappa_2C_U\norm{\thetastar-\thbar}_{2}^{2}
+  \;\le\; \max(18,48\kappa_2C_U)\,\RGw(\thetastar;\pen),
+\]
+and $\RGw(\thetastar;\lamG) \le \bar\varrho\,\RGone(\thetastar;\lamGone)$.
+Consequently, with deterministic weights,
+\[
+  \normn{\widehat{f}-f}^{2} \;=\; O_p\bigl\{\RGone(\thetastar;\lamGone)
+  + \mathcal{B}_{J_n}^{2} + p/n\bigr\},
+\]
+and, with $\lamGp$ in the estimator, the same holds with
+$(\mu^{\Gcal}_{J_n})^{1/2}\lamGone$ in place of $\lamGone$, for every sequence
+$J_n$.
+\item[(ii)] For every $J$, every $b \ge 2$ and every $t > 0$, with
+$\tau = (s+1/2)^{-1}$: if $s < 1/2$,
+\begin{equation}
+  \label{eq:count-truncated}
+  \RGone(\thetastar;t) \;\le\; pq\Bigl\{\frac{C_g\,t}{1-2^{-\seff}}
+  + C_g^{\tau}\,t^{4s/(2s+1)}\,b^{\{(2/\pi-1)_{+}-2s\}/(2s+1)}
+  \Bigl(\frac{1}{1-2^{s-1/2}} + \frac{1}{1-2^{-\min(\pi,2)\seff}}\Bigr)\Bigr\};
+\end{equation}
+if $s \ge 1/2$, nothing is gained in order: $\RGone(\thetastar;t) \le
+t\nGone{\thetastar}$, and for $t \le C_g$ the class of Assumption~5 contains a
+$\thetastar$ with $\RGone(\thetastar;t) \ge tC_g$ if $s > 1/2$, and, if
+$s = 1/2$, one in which every fine level $\lev < J$ with
+$2^{\lev} \le C_gb^{1-\vartheta_{\pi}}/t$ contributes at least
+$tC_gb^{-\vartheta_{\pi}}/2$ to $\RGone(\thetastar;t)$, the order of
+Lemma~\ref{lem:count}.
+\item[(iii)] If $s < 1/2$ and $\seff > s/(2s+1)$, then with
+$J_n = \lceil c\log_2 n\rceil$ and $c$ in the window (3.2) of Theorem~1,
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\bigl\{n^{-2s/(2s+1)}(\log n)^{(2/\pi-1)_{+}/(2s+1)}\bigr\},
+\]
+the prediction rate of Theorem~1.
+\item[(iv)] If $s < 1/2$ and $\seff \le s/(2s+1)$, which forces $\pi < 2$,
+then with $\lamGp$ in the estimator and the choice
+$2^{J_n} \asymp \{n^{2s}\bn^{-(2s+2/\pi-1)/2}\}^{1/\{s+\seff(2s+1)\}}$, which
+exceeds $n/\bn$,
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\bigl\{n^{-e}(\log n)^{e(2s+2/\pi-1)/(4s)}\bigr\},
+  \qquad e = \frac{4s\seff}{s+\seff(2s+1)} ;
+\]
+at $\seff = s/(2s+1)$ this is
+$n^{-2s/(2s+1)}(\log n)^{(2s+2/\pi-1)/\{2(2s+1)\}}$.
+\end{enumerate}
+\end{proposition}
+
+Proposition~\ref{prop:truncated} is a statement on prediction. Like
+Proposition~3, it uses no lower bound on $\Gramhat$: besides the upper bound
+on $\lmaxx(\Gramhat)$ that makes the level admissible, it uses only
+$\lmaxx(\Gram) \le \kappa_2C_U$, in the new bias, and the components still
+need the design condition (Corollary~1). When $s < 1/2$ and $\pi < 2$ it
+improves on Proposition~3(ii) and on Proposition~\ref{prop:slow-ceiling}(iii)(b)
+in every pair: (iii) gives the rate of Theorem~1 in the window of that
+theorem, and (iv) replaces Proposition~\ref{prop:slow-ceiling}(iii)(b) and the
+part of Proposition~3(ii) with $s/2 < \seff \le s/(2s+1)$. When $\pi \ge 2$
+the rate is that of Proposition~3(ii), $n^{-2s/(2s+1)}$, now for every
+$c \in [1/(2s+1),1)$. When $s \ge 1/2$ nothing changes: a coarse chunk of
+norm $C_g$, which the class allows, costs $\pen C_g$ in the penalty or $C_g^{2}$ in the bias, and
+the slow route does not go below $\lamGone \asymp (\log n/n)^{1/2}$;
+Proposition~3(i) and Proposition~\ref{prop:slow-ceiling}(iii)(a) and (iv)
+remain the statements with no design condition in those pairs. Against the
+lasso read at its own truncated comparator
+(Proposition~\ref{prop:lasso-truncated}), the chunks remove the factor
+$(\log n)^{2\seff/(2s+1)}$ in (iii), the gain of Theorem~1 over
+Theorem~\ref{thm:lasso-main}, and $(\log n)^{e\seff/(2s)}$ in (iv). The
+proposition is stated for the estimator (2.5) and not for the one that the
+software computes (Remark~\ref{rem:white}); for the latter the comparator
+would truncate at $\pen w_{G}\Lambda^{1/2}$ on the event $q_{\max} \le \Lambda$,
+and we do not pursue it.
+
+\subsection*{Proof of Proposition~\ref{prop:truncated}}
+
+\emph{Part (i).} Theorem~2(i) and (iii) with $\bar\bbeta = (\bc,\thbar)$ give,
+as in the proof of \eqref{eq:slow-nonasymptotic},
+$\normn{\widehat{f}-f}^{2} \le 18\pen\nGw{\thbar} + 24\normn{\bbar}^{2} +
+3\normn{\PA\bveps}^{2}$, and $\bbar = f - \Amat\bc - \Bmat\thbar = \bb +
+\Bmat(\thetastar-\thbar)$ gives $\normn{\bbar}^{2} \le 2\normn{\bb}^{2} +
+2\normn{\Bmat(\thetastar-\thbar)}^{2}$. If $\pen$ and $w$ are deterministic,
+so is $u = \thetastar-\thbar$, and $\E\normn{\Bmat u}^{2} =
+u\T\E(\Bmat\T\Bmat/n)u \le \lmaxx(\Gram)\norm{u}_{2}^{2} \le
+\kappa_2C_U\norm{u}_{2}^{2}$, because $\E(\Bmat\T\Bmat/n)$ is a principal
+submatrix of $\Gram$, by the upper half of Proposition~2(i). On the chunks with
+$\norm{\thetastar_{G}}_{2} > \pen w_{G}$ the minimum in \eqref{eq:RG} is
+$\pen w_{G}\norm{\thetastar_{G}}_{2}$, and on the others it is
+$\norm{\thetastar_{G}}_{2}^{2}$; summing gives the bound by
+$\max(18,48\kappa_2C_U)\RGw(\thetastar;\pen)$. By
+Lemma~\ref{lem:calib-blocks}(iii), $\lamG w_{G} \le \varrho\lamGone$, and
+$\min(\varrho x,y) \le \varrho\min(x,y)$ for $\varrho \ge 1$ gives
+$\RGw(\thetastar;\lamG) \le \varrho\,\RGone(\thetastar;\lamGone)$; with
+$\lamGp$, the same with $(\mu^{\Gcal}_{J})^{1/2}\lamGone$. The form in $O_p$
+is obtained as in the proof of Proposition~3, on the intersection of
+$\Acal^{+}$ below the ceiling, or of $\Acal^{++}$ of the proof of
+Proposition~\ref{prop:slow-ceiling} for every $J_n$, with $\Ecal$ and with
+the events given by Markov's inequality for $\normn{\bb}^{2}$,
+$\normn{\Bmat(\thetastar-\thbar)}^{2}$ and $\normn{\PA\bveps}^{2}$.
+
+\emph{Part (ii), $s < 1/2$.} Fix a block. The coarse chunk contributes at most
+$t\norm{\theta_{\mathrm{coarse}}}_{2} \le tC_g(1-2^{-\seff})^{-1}$, by the
+proof of Lemma~\ref{lem:count}. At a fine level $\lev$, with $\Gcal_{\lev}$
+its chunks and $v_{\lev} = \sum_{G\in\Gcal_{\lev}}\min(t\norm{\theta_{G}}_{2},
+\norm{\theta_{G}}_{2}^{2})$, there are two bounds. The first is in the group
+norm: $v_{\lev} \le t\sum_{G}\norm{\theta_{G}}_{2} \le
+tC_gb^{-\vartheta_{\pi}}2^{\lev(1/2-s)} =: A_{\lev}$, by the proof of
+Lemma~\ref{lem:count}. The second is the tail. If $\pi \le 2$,
+$\min(ty,y^{2}) \le t^{2-\pi}y^{\pi}$ for $y \ge 0$ (if $y \le t$,
+$y^{2} = y^{\pi}y^{2-\pi} \le y^{\pi}t^{2-\pi}$; if $y > t$,
+$ty = t^{2-\pi}t^{\pi-1}y \le t^{2-\pi}y^{\pi}$, because $\pi \ge 1$), and
+$\norm{\theta_{G}}_{2} \le \norm{\theta_{G}}_{\pi}$ gives
+$v_{\lev} \le t^{2-\pi}\sum_{G}\norm{\theta_{G}}_{\pi}^{\pi} =
+t^{2-\pi}\norm{\theta_{\lev}}_{\pi}^{\pi} \le
+t^{2-\pi}C_g^{\pi}2^{-\lev\pi\seff}$, since $\pi(s+1/2-1/\pi) = \pi\seff$; if
+$\pi \ge 2$, $v_{\lev} \le \norm{\theta_{\lev}}_{2}^{2} \le C_g^{2}2^{-2\lev s}$.
+Call this second bound $B_{\lev}$. With
+\[
+  2^{x} = \bigl\{(C_g/t)\,b^{1-\vartheta_{\pi}}\bigr\}^{\tau},
+  \qquad
+  h = C_g^{\tau}\,t^{2-\tau}\,b^{\tau(1-\vartheta_{\pi})-1},
+\]
+one has $A_{\lev} = h2^{(\lev-x)(1/2-s)}$ and
+$B_{\lev} = h2^{-(\lev-x)\min(\pi,2)\seff}$. Indeed, at $\lev = x$,
+$A_{x} = C_g^{\tau}t^{2-\tau}b^{-\vartheta_{\pi}+(1-\vartheta_{\pi})(\tau-1)}$,
+because $\tau(1/2-s) = \tau-1$, and the exponent of $b$ is
+$\tau(1-\vartheta_{\pi})-1$; if $\pi \le 2$, $1-\vartheta_{\pi} = 1/\pi$ and
+$B_{x} = t^{2-\pi}C_g^{\pi}\{(C_g/t)b^{1/\pi}\}^{-(\pi-\tau)} =
+C_g^{\tau}t^{2-\tau}b^{\tau/\pi-1}$, because $\tau\pi\seff = \pi-\tau$; if
+$\pi \ge 2$, $1-\vartheta_{\pi} = 1/2$ and
+$B_{x} = C_g^{2}\{(C_g/t)b^{1/2}\}^{-(2-\tau)} =
+C_g^{\tau}t^{2-\tau}b^{\tau/2-1}$, because $2s\tau = 2-\tau$. For every $\pi$,
+$\tau(1-\vartheta_{\pi})-1 = \{(2/\pi-1)_{+}-2s\}/(2s+1)$ and
+$2-\tau = 4s/(2s+1)$. Summing $A_{\lev}$ over the fine levels with
+$\lev \le x$ and $B_{\lev}$ over those with $\lev > x$, two geometric series
+of ratios $2^{-(1/2-s)}$ and $2^{-\min(\pi,2)\seff}$ that start from at most
+$h$, gives at most $h\{(1-2^{s-1/2})^{-1} + (1-2^{-\min(\pi,2)\seff})^{-1}\}$
+per block. Truncating at $\lev < J$ only removes terms, and summing over the
+$pq$ blocks gives \eqref{eq:count-truncated}.
+
+\emph{Part (ii), $s \ge 1/2$.} The first statement is
+$\min(ty,y^{2}) \le ty$. If $s > 1/2$, the block with
+$\theta^{*}_{\cv\md,00} = C_g$ and all its other coefficients zero satisfies
+Assumption~5, and its coarse chunk, of norm $C_g$, contributes
+$\min(tC_g,C_g^{2}) = tC_g$. If $s = 1/2$, take a fine level $\lev$ with
+$2^{\lev} \le C_gb^{1-\vartheta_{\pi}}/t$, and let $k_{\lev}$ be the number of
+its chunks, so that $2^{\lev}/(2b) \le k_{\lev} \le 2^{\lev}/b$. If
+$\pi \le 2$, put a spike of height
+$y_{\lev} = C_g2^{-\lev(1-1/\pi)}k_{\lev}^{-1/\pi}$ in each chunk, which
+saturates Assumption~5 at that level; since $k_{\lev} \le 2^{\lev}/b$,
+$y_{\lev} \ge C_g2^{-\lev}b^{1/\pi} \ge t$, and the level contributes
+$k_{\lev}ty_{\lev} = tC_g2^{-\lev(1-1/\pi)}k_{\lev}^{1-1/\pi} \ge
+tC_g(2b)^{-(1-1/\pi)}$. If $\pi \ge 2$, set all the coefficients of the level
+equal to $C_g2^{-\lev}$, which again saturates Assumption~5: each chunk has
+norm $|G|^{1/2}C_g2^{-\lev} \ge b^{1/2}C_g2^{-\lev} \ge t$, and the level
+contributes $tC_g2^{-\lev}\sum_{G}|G|^{1/2} \ge tC_g2^{-\lev}k_{\lev}b^{1/2}
+\ge tC_gb^{-1/2}/2$. In both cases the contribution is at least
+$tC_gb^{-\vartheta_{\pi}}/2$.
+
+\emph{Part (iii).} With $\pen = \lamG$ and
+$(\lamGone)^{2} \le C_{\pen}\sigma^{2}\bn/n$ by \eqref{eq:order-lambda},
+\eqref{eq:count-truncated} with $b = \bn$ gives
+$\RGone(\thetastar;\lamGone) \lesssim (\bn/n)^{1/2} +
+(\bn/n)^{2s/(2s+1)}\bn^{\{(2/\pi-1)_{+}-2s\}/(2s+1)} = (\bn/n)^{1/2} +
+n^{-2s/(2s+1)}\bn^{(2/\pi-1)_{+}/(2s+1)}$, and the first term is of smaller
+order because $2s/(2s+1) < 1/2$. The bias and the conditions on $J_n$ are
+those of the proof of Theorem~1: $c \ge s/\{(2s+1)\seff\}$ gives
+$\mathcal{B}_{J_n}^{2} \lesssim n^{-2s/(2s+1)}$, and $c < 1$ gives
+$2^{J_n} \le 2n$ and $pq2^{J_n}\log(pq2^{J_n})/n \to 0$.
+
+\emph{Part (iv).} Write $\eta = 2s/\{s+\seff(2s+1)\} \in [1,2)$ and
+$\beta = (2s+2/\pi-1)/(2s+1)$, which lies in $(0,\,4s/(2s+1))$ because
+$\pi < 2$ and $2\seff = 2s+1-2/\pi > 0$. The choice of the statement is
+$2^{J_n} \asymp n^{\eta}\bn^{-\eta\beta(2s+1)/(4s)}$, which exceeds $n/\bn$
+because $\beta(2s+1)/(4s) < 1$, and is at most $n^{2}$. By
+\eqref{eq:lam-plus-blocks}, $t = (\mu^{\Gcal}_{J_n})^{1/2}\lamGone \asymp
+2^{J_n/2}\bn/n$, and \eqref{eq:count-truncated} gives
+\[
+  t^{4s/(2s+1)}\bn^{\beta-4s/(2s+1)}
+  \;\asymp\; 2^{J_n\cdot 2s/(2s+1)}\,n^{-4s/(2s+1)}\,\bn^{\beta},
+\]
+which, equated with the bias $2^{-2J_n\seff}$, gives
+$2^{J_n\{2s/(2s+1)+2\seff\}} = n^{4s/(2s+1)}\bn^{-\beta}$; this is the choice
+of the statement, because $\{2s/(2s+1)+2\seff\}(2s+1) = 2\{s+\seff(2s+1)\}$.
+The common value is $2^{-2J_n\seff} =
+\{\bn^{\beta}/n^{4s/(2s+1)}\}^{2\seff/\{2s/(2s+1)+2\seff\}} =
+n^{-e}\bn^{e\beta(2s+1)/(4s)}$, and $\beta(2s+1)/(4s) = (2s+2/\pi-1)/(4s)$.
+The term of the coarse chunk, of order $t$, is polynomially smaller, because
+$t \to 0$ and $4s/(2s+1) < 1$. \qed
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -2008,7 +2247,9 @@ when $2^{J_n}\log d_n/n \to 0$, $\penn^{+} = \penn\{1 + o(1)\}$.
 % (iii) e (iv) de E1.14 (E5e).
 \begin{proposition}[Slow rate for the lasso, no design condition]
 \label{prop:lasso-slow}
-Let Assumptions 1, 4 and 5 hold, with $\Amat$ of rank $p$ and $\penn$ as in
+% E5f (D54): as cotas superiores das Assumptions 2 e 3, que o penn e a prova usam.
+Let Assumptions 1, 4 and 5 hold, \textcolor{colR1}{together with the upper
+bounds in Assumptions 2 and 3,} with $\Amat$ of rank $p$ and $\penn$ as in
 \eqref{eq:lasso-lambda}. Then
 $\normn{\widehat{f}-f}^{2} = O_p\{\penn\norm{\thetastar}_{1} +
 \mathcal{B}_{J_n}^{2} + p/n\}$, where
@@ -2041,6 +2282,93 @@ $2^{J_n} \asymp \{n/(\log n)^{2}\}^{2/(1+4\seff)}$ gives
 $\normn{\widehat{f}-f}^{2} = O_p[\{(\log n)^{2}/n\}^{4\seff/(1+4\seff)}]$.
 \end{enumerate}
 \end{proposition}
+
+% E5f (E1.15; D54): derivations/05-taxas.tex, Proposicao 8 (numeracao global;
+% prop:truncada); a prova vem depois da Remark S8.2.
+Proposition~\ref{prop:lasso-slow} reads Theorem~\ref{thm:lasso-oracle}(i) at
+$\thetastar$ and pays $\pen|\theta^{*}_{a}|$ also for the coefficients
+smaller than $\pen$, which would cost less as bias. Lemma~\ref{lem:comparator}
+below holds for every comparator on the same event, and the comparator
+truncated at $t > 0$,
+$\thbar_{a} = \theta^{*}_{a}\mathbf{1}\{|\theta^{*}_{a}| > t\}$ for
+$a = 1,\dots,d$, charges the penalty only for the coefficients above $t$. What
+remains is
+\begin{equation}
+  \label{eq:R1}
+  \Rone(\btheta;t) \;=\; \sum_{a=1}^{d}\min\bigl(t|\theta_{a}|,\,\theta_{a}^{2}\bigr)
+  \;\le\; t\norm{\btheta}_{1},
+\end{equation}
+the counterpart in the $\ell_1$ norm of the ideal risk
+$\sum_{a}\min(\theta_{a}^{2},t^{2})$.
+
+\begin{proposition}[Slow rate for the lasso through the truncated comparator]
+\label{prop:lasso-truncated}
+Let the assumptions of Proposition~\ref{prop:lasso-slow} hold.
+\begin{enumerate}
+\item[(i)] On the event $\mathcal{T}$, for every $\pen \ge 2\pen_0$ and
+every $t > 0$, with $\thbar$ truncated at $t$,
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;\le\; 18\pen\norm{\thbar}_{1} + 48\normn{\Bmat(\thetastar-\thbar)}^{2}
+  + 48\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2} .
+\]
+If $t$ is deterministic,
+$\E\normn{\Bmat(\thetastar-\thbar)}^{2} \le
+\kappa_2C_U\norm{\thetastar-\thbar}_{2}^{2}$. With $t = \pen$ deterministic,
+$18\pen\norm{\thbar}_{1} + 48\kappa_2C_U\norm{\thetastar-\thbar}_{2}^{2} \le
+\max(18,48\kappa_2C_U)\Rone(\thetastar;\pen)$, and
+\[
+  \normn{\widehat{f}-f}^{2} \;=\; O_p\bigl\{\Rone(\thetastar;\penn)
+  + \mathcal{B}_{J_n}^{2} + p/n\bigr\}
+\]
+whenever $2^{J_n}\log d_n/n \to 0$; with $\penn^{+}$ of
+\eqref{eq:lasso-lamplus} in place of $\penn$, in the estimator and in the
+bound, the same holds for every sequence $J_n$ with $2^{J_n} \le n^{2}$.
+\item[(ii)] For every $J$ and every $t > 0$, with $\tau = (s+1/2)^{-1}$: if
+$s < 1/2$,
+\begin{equation}
+  \label{eq:count-lasso-truncated}
+  \Rone(\thetastar;t) \;\le\; pq\,C_g^{\tau}\,t^{4s/(2s+1)}
+  \Bigl\{\frac{1}{1-2^{s-1/2}} + \frac{1}{1-2^{-\min(\pi,2)\seff}}\Bigr\};
+\end{equation}
+if $s \ge 1/2$, nothing is gained in order: $\Rone(\thetastar;t) \le
+t\norm{\thetastar}_{1}$, and for $t \le C_g$ the class of Assumption~5
+contains a $\thetastar$ with $\Rone(\thetastar;t) \ge tC_g$ if $s > 1/2$,
+and one with $\Rone(\thetastar;t) \ge
+tC_g\min\{J,\,\lfloor\log_2(C_g/t)\rfloor + 1\}$ if $s = 1/2$, the order of
+$t\norm{\thetastar}_{1}$ in Proposition~\ref{prop:lasso-slow}.
+\item[(iii)] If $s < 1/2$ and $\seff > s/(2s+1)$, then with
+$J_n = \lceil c\log_2 n\rceil$ and $c$ in the window \eqref{eq:lasso-window},
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\Bigr\},
+\]
+the prediction rate of Theorem~\ref{thm:lasso-main}.
+\item[(iv)] If $s < 1/2$ and $\seff \le s/(2s+1)$, which forces $\pi < 2$,
+then with $\penn^{+}$ and the choice
+$2^{J_n} \asymp (n/\log n)^{2s/\{s+\seff(2s+1)\}}$, which has
+$2^{J_n} \gtrsim n/\log n$,
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\Bigl\{\Bigl(\frac{\log n}{n}\Bigr)^{4s\seff/\{s+\seff(2s+1)\}}\Bigr\};
+\]
+at $\seff = s/(2s+1)$ the exponent is $2s/(2s+1)$, that of (iii).
+\end{enumerate}
+\end{proposition}
+
+Proposition~\ref{prop:lasso-truncated} is a statement on prediction: it uses
+the design as Proposition~\ref{prop:lasso-slow} does, and, in the new bias,
+the upper bound $\lmaxx(\Gram) \le \kappa_2C_U$; the components still need
+the design condition (Corollary~\ref{cor:lasso-components}). When $s < 1/2$
+and $\pi < 2$ it improves on Proposition~\ref{prop:lasso-slow} in every pair:
+(iii) gives the rate of Theorem~\ref{thm:lasso-main} in the window of that
+theorem, with a gain of $2(s-\seff)(1-2s)/\{(2s+1)(1-2s+4\seff)\}$ in the
+exponent over Proposition~\ref{prop:lasso-slow}(ii), and (iv) replaces
+Proposition~\ref{prop:lasso-slow}(iii)(b) and the part of
+Proposition~\ref{prop:lasso-slow}(ii) with $s/2 < \seff \le s/(2s+1)$. When
+$\pi \ge 2$ the rate is that of Proposition~\ref{prop:lasso-slow}(ii), now
+for every $c \in [1/(2s+1),1)$. When $s \ge 1/2$ nothing changes, for the
+reason given after Proposition~\ref{prop:truncated}.
 
 For a vector $\btheta$ let $\theta_{(1)} \ge \theta_{(2)} \ge \cdots$ be the
 nonincreasing rearrangement of the absolute values of its entries and let
@@ -2436,6 +2764,90 @@ that the argument gives. In (iv) with $\seff \ge 1/4$, the factor
 $(\log n)^{3/2}$ comes from $\norm{\thetastar}_{1} \asymp J_n \asymp \log n$,
 which no choice avoids.
 \end{remark}
+
+% E5f (E1.15; D54): a prova da Proposicao 8 de derivations/05-taxas.tex.
+\subsection*{Proof of Proposition~\ref{prop:lasso-truncated}}
+
+\emph{Part (i).} Lemma~\ref{lem:comparator} with $\bar\bbeta = (\bc,\thbar)$
+gives, discarding $\pen\norm{\thetahat}_{1} \ge 0$,
+$\normn{\Btil\bar v}^{2} \le 6\pen\norm{\thbar}_{1} + 4\normn{\bbar}^{2}$,
+and Step~6 in its proof gives $\normn{\widehat{f}-f} \le \normn{\Btil\bar v}
++ 2\normn{\bbar} + \normn{\PA\bveps}$; with
+$(x+y+z)^{2} \le 3(x^{2}+y^{2}+z^{2})$, $\normn{\widehat{f}-f}^{2} \le
+18\pen\norm{\thbar}_{1} + 24\normn{\bbar}^{2} + 3\normn{\PA\bveps}^{2}$.
+Since $\bbar = \bb + \Bmat(\thetastar-\thbar)$, $\normn{\bbar}^{2} \le
+2\normn{\bb}^{2} + 2\normn{\Bmat(\thetastar-\thbar)}^{2}$. If $t$ is
+deterministic, so is $u = \thetastar-\thbar$, and
+$\E\normn{\Bmat u}^{2} \le \lmaxx(\Gram)\norm{u}_{2}^{2} \le
+\kappa_2C_U\norm{u}_{2}^{2}$, as in the proof of
+Proposition~\ref{prop:truncated}. With $t = \pen$, on the coordinates with
+$|\theta^{*}_{a}| > \pen$ the minimum in \eqref{eq:R1} is
+$\pen|\theta^{*}_{a}|$, and on the others it is $\theta^{*2}_{a}$; summing
+gives the bound by $\max(18,48\kappa_2C_U)\Rone(\thetastar;\pen)$. The form
+in $O_p$ is that of the proof of Proposition~\ref{prop:lasso-slow}: the
+event $\mathcal{T}$ with $\penn \ge 2\pen_0$, by Lemma~\ref{lem:columns}
+below the ceiling, or with $\penn^{+} \ge 2\pen_0$, by
+\eqref{eq:smax-ceiling} for every $J$, and Markov's inequality for
+$\normn{\bb}^{2}$, $\normn{\Bmat(\thetastar-\thbar)}^{2}$ and
+$\normn{\PA\bveps}^{2}$.
+
+\emph{Part (ii), $s < 1/2$.} Fix a block and a level $\lev$, write
+$\theta_{\lev} \in \R^{2^{\lev}}$ for its coefficients, with
+$\norm{\theta_{\lev}}_{\pi} \le C_g2^{-\lev(s+1/2-1/\pi)}$ by Assumption~5,
+and let $v_{\lev} = \sum_{\tsl}\min(t|\theta_{\lev\tsl}|,\theta_{\lev\tsl}^{2})$.
+The first bound is in the $\ell_1$ norm: by H\"older's inequality in
+$\R^{2^{\lev}}$, $v_{\lev} \le t\norm{\theta_{\lev}}_{1} \le
+t2^{\lev(1-1/\pi)}\norm{\theta_{\lev}}_{\pi} \le tC_g2^{\lev(1/2-s)} =:
+A_{\lev}$. The second is the tail, as in the proof of
+Proposition~\ref{prop:truncated}(ii) with coordinates in place of chunks:
+$v_{\lev} \le t^{2-\pi}\norm{\theta_{\lev}}_{\pi}^{\pi} \le
+t^{2-\pi}C_g^{\pi}2^{-\lev\pi\seff}$ if $\pi \le 2$, and
+$v_{\lev} \le \norm{\theta_{\lev}}_{2}^{2} \le C_g^{2}2^{-2\lev s}$ if
+$\pi \ge 2$; call it $B_{\lev}$. With
+\[
+  2^{x} = (C_g/t)^{\tau},
+  \qquad
+  h = C_g^{\tau}t^{2-\tau} = C_g^{\tau}t^{4s/(2s+1)},
+\]
+one has $A_{\lev} = h2^{(\lev-x)(1/2-s)}$, because $1 + \tau(1/2-s) = \tau$,
+and $B_{\lev} = h2^{-(\lev-x)\min(\pi,2)\seff}$, because
+$\tau\pi\seff = \pi-\tau$ and $2s\tau = 2-\tau$. Summing $A_{\lev}$ over
+$\lev \le x$ and $B_{\lev}$ over $\lev > x$, two geometric series of ratios
+$2^{-(1/2-s)}$ and $2^{-\min(\pi,2)\seff}$ that start from at most $h$, gives
+at most $h\{(1-2^{s-1/2})^{-1} + (1-2^{-\min(\pi,2)\seff})^{-1}\}$ per block;
+truncating at $\lev < J$ only removes terms, and summing over the $pq$
+blocks gives \eqref{eq:count-lasso-truncated}. This is the computation of
+the proof of Lemma~3, with $\min(ty,y^{2})$ in place of $\min(y^{2},\eta)$.
+
+\emph{Part (ii), $s \ge 1/2$.} The first statement is
+$\min(t|y|,y^{2}) \le t|y|$. For the second, the block with
+$\theta^{*}_{\cv\md,00} = C_g$ and all its other coefficients zero satisfies
+Assumption~5, and gives $\Rone(\thetastar;t) \ge \min(tC_g,C_g^{2}) = tC_g$.
+If $s = 1/2$, set, at each level $\lev < J$ with $2^{\lev} \le C_g/t$, all
+the $2^{\lev}$ coefficients equal to $C_g2^{-\lev} \ge t$; then
+$\norm{\theta_{\lev}}_{\pi} = C_g2^{-\lev(1-1/\pi)}$, the bound of
+Assumption~5 at $s = 1/2$, and each such level contributes
+$2^{\lev}tC_g2^{-\lev} = tC_g$.
+
+\emph{Part (iii).} With $J_n = \lceil c\log_2 n\rceil$ and $c < 1$,
+$2^{J_n}\log d_n/n \asymp n^{c-1}\log n \to 0$, and (i) holds with
+$\penn \asymp (\log n/n)^{1/2}$. By \eqref{eq:count-lasso-truncated},
+$\Rone(\thetastar;\penn) \lesssim (\log n/n)^{2s/(2s+1)}$. The lower end of
+the window \eqref{eq:lasso-window} is $s/\{(2s+1)\seff\}$, because
+$(2-\tau)/(4\seff) = s/\{(2s+1)\seff\}$ and $\seff \le s$, so that the bias
+is $\mathcal{B}_{J_n}^{2} \lesssim 2^{-2J_n\seff} \le n^{-2c\seff} \le
+n^{-2s/(2s+1)}$; and $p/n$ is of smaller order.
+
+\emph{Part (iv).} Write $\eta = 2s/\{s+\seff(2s+1)\}$, which lies in $[1,2)$
+exactly when $\seff \le s/(2s+1)$; then $2^{J_n} \asymp (n/\log n)^{\eta}
+\gtrsim n/\log n$, $2^{J_n} \le n^{2}$ and, by \eqref{eq:lam-plus},
+$\penn^{+} \asymp 2^{J_n/2}\log n/n \asymp (\log n/n)^{1-\eta/2}$. By
+\eqref{eq:count-lasso-truncated}, $\Rone(\thetastar;\penn^{+}) \lesssim
+(\log n/n)^{(1-\eta/2)4s/(2s+1)}$, and $(1-\eta/2)4s/(2s+1) =
+4s\seff/\{s+\seff(2s+1)\}$; the bias is $2^{-2J_n\seff} \asymp
+(\log n/n)^{2\seff\eta}$, with the same exponent. At $\seff = s/(2s+1)$,
+$\eta = 1$ and the exponent is $2s/(2s+1)$. Outside the window of (iii),
+$\pi < 2$, because $\pi \ge 2$ gives $\seff = s > s/(2s+1)$. \qed
 
 \subsection*{Proof of Theorem~\ref{thm:lasso-linear}}
 
