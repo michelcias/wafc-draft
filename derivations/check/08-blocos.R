@@ -2,8 +2,9 @@
 # blocos do estimador de D44: block LASSO na forma balanceada, níveis c_l
 # livres, pesos de razão limitada) e da cota do estimador limiarizado
 # acrescentada a derivations/06-selecao-limiar.tex (D45); a Parte VII (E1.13)
-# confere o Corolário 14, a taxa lenta em blocos, e a Parte VIII (E1.14), os
-# itens (iii) e (iv) dele, em todo s' > 0. Roda ANTES da prova;
+# confere o Corolário 14, a taxa lenta em blocos, a Parte VIII (E1.14), os
+# itens (iii) e (iv) dele, em todo s' > 0, e a Parte IX (E1.15), o Corolário
+# 15, a taxa lenta pelo comparador truncado por pedaço. Roda ANTES da prova;
 # imprime OK ou falha com stop(). Notação: docs/notacao.md (congelada em
 # E1.1); os símbolos da teoria em blocos são os de E1.11 (08a, §1.4).
 #
@@ -46,6 +47,12 @@
 #        1 e sqrt(|G|), ao lado do LASSO; os eventos sigma_max^2 <= 2 B_X^2 C_U
 #        mu^G_J e lambda_max(Sigma_hat) <= Lambda mu^G_J acima do teto; e a cota
 #        em ajustes com s' pequeno e d > n.
+#   IX.  a taxa lenta pelo comparador truncado por pedaço (Corolário 15,
+#        E1.15): a contagem de R_{G,1}(theta*; t) = sum_G min(t ||theta*_G||,
+#        ||theta*_G||^2) na forma balanceada contra o supremo exato da classe,
+#        em t e em b; os expoentes de n e do logaritmo da cota minimizada em J,
+#        ao lado do Corolário 14 e do LASSO truncado (Proposição 8 de E1.6),
+#        numa grade de pares; e a cota em ajustes, nos pesos 1 e sqrt(|G|).
 #
 # Nos scripts de conferência, elemento de lista se acessa com [[ ]] e nome
 # completo (instrucoes.md, §5).
@@ -1492,5 +1499,299 @@ chk(all(tabVIII3[["Tw"]] >= 1 - alpha) && max(tabVIII3[["kkt"]]) < 1e-6,
 chk(all(tabVIII3[["viola"]] == 0),
     "Corolário 14(iii) e (iv): no evento T_{G,w}, o Teorema 3(i) e a cota não assintótica valem em todos os ajustes, nos dois pesos")
 
+## ===========================================================================
+cat("\nPARTE IX. A taxa lenta em blocos pelo comparador truncado: Corolário 15 (E1.15)\n")
+## ===========================================================================
+
+# O Corolário 15 é o Teorema 3(i) com o comparador truncado por pedaço,
+# theta_bar_G = theta*_G 1{||theta*_G||_2 > lambda w_G}: no evento T_{G,w},
+#   ||f_hat - f||_n^2 <= 18 lambda ||theta_bar||_{G,w} + 48 ||B delta||_n^2 + 48 ||b||_n^2 + 3 ||P_A eps||_n^2,
+# e, com lambda determinístico, os dois primeiros termos ficam (em esperança) sob
+# max(18, 48 kappa_2 C_U) R_{G,w}(theta*; lambda), R_{G,w}(theta; lambda) =
+# sum_G min(lambda w_G ||theta_G||, ||theta_G||^2) <= rho R_{G,1}(theta*; lambda_1). A
+# contagem nova, na forma balanceada com b e em s < 1/2:
+#   R_{G,1}(theta*; t) <= pq {C_g t/(1 - 2^{-s'})
+#                             + C_g^tau t^{4s/(2s+1)} b^{((2/pi - 1)_+ - 2s)/(2s+1)} K},
+#   K = (1 - 2^{s-1/2})^{-1} + (1 - 2^{-min(pi,2) s'})^{-1}.
+# IX.1 confere a contagem contra o supremo exato da classe; IX.2 lê os expoentes da
+# cota minimizada em J, ao lado do Corolário 14 e da Proposição 8 de E1.6 (o LASSO
+# truncado); IX.3 confere a cota em ajustes, nos pesos 1 e sqrt(|G|).
+
+Kcst <- max(18, 48 * kap2 * C_U)
+# Supremo de sum_{k <= N} min(t |x_k|, x_k^2) sobre {||x||_pi <= eps} (o mesmo de
+# check/05-taxas.R, Parte VII): lo, um elemento da bola; hi, a envoltória côncava.
+sup_lvl <- function(t, eps, N, pii) {
+  if (pii >= 2) {
+    a <- eps * N^(-ipi_of(pii))
+    v <- N * pmin(t * a, a^2)
+    return(cbind(lo = v, hi = v))
+  }
+  E <- eps^pii
+  Tp <- t^pii
+  spread <- E >= N * Tp
+  tl <- E < Tp
+  mid <- !spread & !tl
+  lo <- hi <- numeric(length(E))
+  vs <- N * t * eps * N^(-1 / pii)
+  lo[spread] <- hi[spread] <- vs[spread]
+  lo[tl] <- hi[tl] <- (eps^2)[tl]
+  rt <- E / Tp
+  m <- floor(rt)
+  lo[mid] <- (t^2 * (m + (rt - m)^(2 / pii)))[mid]
+  hi[mid] <- (E * t^(2 - pii))[mid]
+  cbind(lo = lo, hi = hi)
+}
+phi_t <- function(t, y) pmin(t * y, y^2)
+# Supremo na classe de sum_G min(t ||theta_G||_2, ||theta_G||_2^2) num bloco da forma
+# balanceada, para J = 1..Jl, nos níveis finos (por nível) e no pedaço grosso. Num
+# nível fino com pi <= 2, ||theta_G||_2 <= ||theta_G||_pi com igualdade numa espiga
+# por pedaço: é o problema coordenado com k_j coordenadas (exato). Com pi > 2, lo é o
+# espalhado (a = eps_j 2^{-j/pi} em cada coordenada) e hi vem de Jensen com
+# sum_G ||theta_G||^2 <= C_g^2 2^{-2js}. O grosso: phi_t do supremo da sua norma.
+# (lt: a tabela de níveis de lev_tab, com pelo menos Jl níveis; passada pronta nos laços.)
+supRG_lvl <- function(s, pii, Cg, Jl, b, t, lt = lev_tab(Jl, b)) {
+  ix <- seq_len(Jl)
+  lt <- lapply(lt, function(v) v[ix])
+  j <- lt[["j"]]
+  eps <- Cg * 2^(-j * (s + 0.5 - ipi_of(pii)))
+  fn <- lt[["fine"]]
+  lo <- hi <- numeric(Jl)
+  if (any(fn)) {
+    k <- lt[["k"]][fn]
+    if (pii <= 2) {
+      sl <- sup_lvl(t, eps[fn], k, pii)
+      lo[fn] <- sl[, "lo"]
+      hi[fn] <- sl[, "hi"]
+    } else {
+      a <- eps[fn] * 2^(-j[fn] * ipi_of(pii))
+      m2 <- b + lt[["r"]][fn]
+      lo[fn] <- (k - 1) * phi_t(t, sqrt(b) * a) + phi_t(t, sqrt(m2) * a)
+      hi[fn] <- k * phi_t(t, sqrt(Cg^2 * 2^(-2 * j[fn] * s) / k))
+    }
+  }
+  top <- pmin(jstar_of(b), j)
+  yc <- sqrt(cumsum((Cg * 2^(-j * sp_of(s, pii)))^2))[top + 1L]
+  list(fine_lo = lo, fine_hi = hi, coarse = phi_t(t, yc))
+}
+supRG_path <- function(s, pii, Cg, Jl, b, t, lt = lev_tab(Jl, b)) {
+  x <- supRG_lvl(s, pii, Cg, Jl, b, t, lt)
+  cbind(lo = cumsum(x[["fine_lo"]]) + x[["coarse"]], hi = cumsum(x[["fine_hi"]]) + x[["coarse"]])
+}
+Ktr <- function(s, pii) 1 / (1 - 2^(s - 0.5)) + 1 / (1 - 2^(-min(pii, 2) * sp_of(s, pii)))
+eb_of <- function(s, pii) (max(0, 2 * ipi_of(pii) - 1) - 2 * s) / (2 * s + 1)
+bnd_RG <- function(s, pii, Cg, b, t) {                              # por bloco
+  Cg * t / (1 - 2^(-sp_of(s, pii))) + Cg^tau_of(s) * t^(4 * s / (2 * s + 1)) * b^eb_of(s, pii) * Ktr(s, pii)
+}
+
+## ---- IX.1 a contagem por pedaços sob Besov ----------------------------------------
+tg9 <- 10^seq(-1, -40, by = -0.5)
+pairs9a <- list(c(0.2, 2), c(0.3, 1.5), c(0.4, 1.25), c(0.45, 1.6), c(0.3, 4), c(0.3, Inf),
+                c(0.4, 1.8), c(0.1, 3), c(0.35, 1.9))
+bs9 <- c(2, 3, 5, 8, 16, 32, 64)
+lt9 <- lapply(setNames(c(bs9, 2^(3:10)), c(bs9, 2^(3:10))), function(b) lev_tab(400L, b))
+tab9a <- do.call(rbind, lapply(pairs9a, function(sp_) {
+  s <- sp_[1]
+  pii <- sp_[2]
+  r <- do.call(rbind, lapply(bs9, function(b) t(vapply(tg9, function(t) {
+    sp <- supRG_path(s, pii, 1, 400L, b, t, lt9[[as.character(b)]])
+    c(viol = max(sp[, "hi"] / bnd_RG(s, pii, 1, b, t)), hilo = max(sp[, "hi"] / sp[, "lo"]))
+  }, numeric(2)))))
+  sm <- tg9 <= 1e-15
+  lo8 <- vapply(tg9, function(t) unname(supRG_path(s, pii, 1, 400L, 8, t, lt9[["8"]])[400, "lo"]), 1)
+  bsl <- 2^(3:10)
+  lob <- vapply(bsl, function(b) unname(supRG_path(s, pii, 1, 400L, b, 1e-30, lt9[[as.character(b)]])[400, "lo"]), 1)
+  c(s = s, pi = pii, max_hi_cota = max(r[, "viol"]), hi_lo = max(r[, "hilo"]),
+    expo_t = 4 * s / (2 * s + 1), expo_t_hat = unname(coef(lm(log(lo8[sm]) ~ log(tg9[sm])))[2]),
+    expo_b = eb_of(s, pii), expo_b_hat = unname(coef(lm(log(lob) ~ log(bsl)))[2]),
+    justa = min(lo8[sm] / vapply(tg9[sm], function(t) bnd_RG(s, pii, 1, 8, t), 1)))
+}))
+print(round(tab9a, 3))
+chk(all(tab9a[, "max_hi_cota"] <= 1 + 1e-12),
+    "contagem do Corolário 15: o supremo de R_{G,1}(theta*; t) na classe fica sob a cota fechada em s < 1/2 (9 pares, b = 2..64, t de 1e-1 a 1e-40, J = 1..400)")
+chk(all(tab9a[, "hi_lo"] <= 2 + 1e-9), "o supremo está entre lo (um elemento da classe) e hi, com hi <= 2 lo")
+chk(all(abs(tab9a[, "expo_t_hat"] - tab9a[, "expo_t"]) < 0.01) && all(abs(tab9a[, "expo_b_hat"] - tab9a[, "expo_b"]) < 0.03) &&
+      all(tab9a[, "justa"] > 0.05),
+    "o supremo cai como t^{4s/(2s+1)} (a 0,01) e como b^{((2/pi - 1)_+ - 2s)/(2s+1)} (a 0,03), a um fator fixo da cota: justa em t e em b")
+
+## ---- IX.2 os expoentes da cota minimizada em J ----------------------------------
+# Pesos 1: a cota Kcst pq sup R_{G,1}(theta*; t_J) + 48 B^2 + 3 sigma^2 p/n, com t_J =
+# sqrt(mu^G_J) lambda_{n,1}^G; ao lado, a do LASSO truncado (Proposição 8 de E1.6),
+# com sqrt(mu_J) lambda_n e o supremo de R_1 (o problema coordenado com 2^j coordenadas).
+paths_IX <- function(n, s, pii, Cg, Jl) {
+  b <- as.integer(ceiling(log(n)))
+  lt <- lev_tab(Jl, b)
+  top <- pmin(jstar_of(b), lt[["j"]])
+  szc <- 2^(top + 1) - 1
+  M <- p * q * (1 + cumsum(ifelse(lt[["fine"]], lt[["k"]], 0)))
+  mxf <- cummax(ifelse(lt[["fine"]], b + lt[["r"]], 0))
+  lbar <- function(m) sig / sqrt(n) * (B_X * sqrt(2 * C_U * m) + sqrt(2 * Lam * log(M / alpha)))
+  Jv <- seq_len(Jl)
+  dJ <- p * q * (2^Jv - 1)
+  lam1 <- 2 * pmax(lbar(szc), ifelse(mxf > 0, lbar(mxf), 0)) * sqrt(1 + c_mu * 2^Jv * log(2 * (p + dJ)) / n)
+  lamL <- 2 * sig * B_X * sqrt(2 * C_U) * sqrt(2 * log(2 * dJ / alpha) / n) * sqrt(1 + c_psi * 2^Jv * log(dJ) / n)
+  j <- lt[["j"]]
+  epsl <- Cg * 2^(-j * (s + 0.5 - ipi_of(pii)))
+  SG <- vapply(Jv, function(J) {
+    x <- supRG_lvl(s, pii, Cg, J, b, lam1[J], lt)
+    sum(x[["fine_lo"]]) + x[["coarse"]][J]
+  }, 1)
+  SL <- vapply(Jv, function(J) sum(sup_lvl(lamL[J], epsl[seq_len(J)], 2^j[seq_len(J)], pii)[, "lo"]), 1)
+  sp <- sp_of(s, pii)
+  B2 <- (p * q)^2 * B_X^2 * C_U * Cg^2 / (1 - 2^(-2 * sp)) * 2^(-2 * Jv * sp)
+  tail3 <- 3 * sig^2 * p / n
+  list(blk = log(Kcst * p * q * SG + 48 * B2 + tail3), las = log(Kcst * p * q * SL + 48 * B2 + tail3))
+}
+# O regime do Corolário 15 (s >= 1/2: o do Corolário 14, nada muda) e o do LASSO
+# truncado ao lado: taxa n^a (log n)^k, k_las a do LASSO; escolha 2^{J_n} ~ n^{eJ} (log n)^{kJ}.
+reg15b <- function(s, pii) {
+  sp <- sp_of(s, pii)
+  if (s >= 0.5 - 1e-12) return(reg14(s, pii))
+  x <- max(0, 2 * ipi_of(pii) - 1)
+  if (sp > s / (2 * s + 1)) c(reg = 5, a = -2 * s / (2 * s + 1), k = x / (2 * s + 1), k_las = 2 * s / (2 * s + 1),
+                              eJ = (s / ((2 * s + 1) * sp) + 1) / 2, kJ = 0)
+  else {
+    e <- 4 * s * sp / (s + sp * (2 * s + 1))
+    c(reg = 6, a = -e, k = sp * (2 * s + 2 * ipi_of(pii) - 1) / (s + sp * (2 * s + 1)), k_las = e,
+      eJ = 2 * s / (s + sp * (2 * s + 1)), kJ = -(2 * s + 2 * ipi_of(pii) - 1) / (2 * (s + sp * (2 * s + 1))))
+  }
+}
+lnn9 <- log(10^seq(15, 140, length.out = 60))
+up9 <- lnn9 >= log(1e60)
+scan15b <- function(s, pii, lnns = lnn9, st = TRUE) {
+  th <- reg15b(s, pii)
+  t(vapply(lnns, function(lnn) {
+    Jl <- floor(2 * lnn / log(2))
+    pa <- paths_IX(exp(lnn), s, pii, 1, Jl)
+    Jst <- if (st) min(Jl, max(1, round((th[["eJ"]] * lnn + th[["kJ"]] * log(lnn)) / log(2)))) else 1
+    c(blk = min(pa[["blk"]]), las = min(pa[["las"]]), Jopt = which.min(pa[["blk"]]),
+      Fst = pa[["blk"]][Jst] - min(pa[["blk"]]), teto = (lnn - log(lnn)) / log(2))
+  }, numeric(5)))
+}
+pairs9c <- list(c(0.3, 2), c(0.45, 1.6), c(0.4, 1.8), c(0.3, Inf), c(0.2, 4),
+                c(0.4, 1.25), c(0.3, 1.5), c(0.2, 1.6), c(0.45, 1.25), c(0.3, 1.6), c(0.25, 1.7),
+                c(0.6, 1), c(1, 2), c(1.2, 1), c(0.5, 1.5), c(0.5, 1.2))
+tab9c <- do.call(rbind, lapply(pairs9c, function(sp_) {
+  s <- sp_[1]
+  pii <- sp_[2]
+  th <- reg15b(s, pii)
+  sc <- scan15b(s, pii)
+  kfit <- function(y) unname(coef(lm((y - th[["a"]] * lnn9)[up9] ~ log(lnn9[up9])))[2])
+  c(s = s, pi = pii, sprime = sp_of(s, pii), reg = th[["reg"]], a = th[["a"]],
+    a_blk = fit2(lnn9, sc[, "blk"])[1], a_las = fit2(lnn9, sc[, "las"])[1], a_C14 = reg14(s, pii)[["a"]],
+    k = th[["k"]], k_blk = kfit(sc[, "blk"]), k_las = th[["k_las"]], kh_las = kfit(sc[, "las"]),
+    eJ = th[["eJ"]], eJ_hat = fit2(lnn9, sc[, "Jopt"] * log(2))[1],
+    acima = mean((sc[, "Jopt"] > sc[, "teto"])[lnn9 >= median(lnn9)]),
+    a_st = fit2(lnn9, sc[, "blk"] + sc[, "Fst"])[1], Jst = max(sc[, "Fst"]))
+}))
+print(round(tab9c, 3))
+r5b <- tab9c[, "reg"] == 5
+r6b <- tab9c[, "reg"] == 6
+gb <- tab9c[, "s"] < 0.5 & tab9c[, "pi"] < 2
+chk(all(abs(tab9c[, c("a_blk", "a_las")] - tab9c[, "a"]) < 0.01),
+    "o expoente de n da cota minimizada em J é o do Corolário 15, e o do LASSO truncado é o mesmo (a 0,01; n de 1e15 a 1e140)")
+chk(all(abs(tab9c[, "k_blk"] - tab9c[, "k"]) < 0.1) && all(abs(tab9c[, "kh_las"] - tab9c[, "k_las"]) < 0.1),
+    "o do logaritmo também, nos blocos e no LASSO truncado (a 0,1, lido em n de 1e60 a 1e140)")
+chk(all(abs((tab9c[, "kh_las"] - tab9c[, "k_blk"]) - (tab9c[, "k_las"] - tab9c[, "k"])) < 0.1),
+    "o ganho dos blocos no logaritmo sobre o LASSO truncado é o da teoria: (log n)^{2s'/(2s+1)} na janela, (log n)^{e s'/(2s)} acima do teto")
+chk(all(tab9c[gb, "a"] < tab9c[gb, "a_C14"] - 1e-6) && all(abs(tab9c[!gb, "a"] - tab9c[!gb, "a_C14"]) < 1e-12),
+    "a taxa é estritamente melhor que a do Corolário 14 exatamente em s < 1/2 e pi < 2; igual em pi >= 2 e em s >= 1/2")
+chk(all(abs(tab9c[r6b, "eJ_hat"] - tab9c[r6b, "eJ"]) < 0.03) && all(tab9c[r6b, "acima"] == 1),
+    "em s' < s/(2s+1) o minimizador passa do teto e cresce como o J_n do enunciado (a 0,03)")
+chk(all(abs(tab9c[r5b | r6b, "a_st"] - tab9c[r5b | r6b, "a"]) < 0.01) && all(tab9c[r5b | r6b, "Jst"] < log(10)),
+    "a cota no J_n do enunciado tem o expoente da teoria e fica a menos de um fator 10 do mínimo")
+gr9 <- expand.grid(s = seq(0.05, 1.5, by = 0.05), pi = c(1, 1.1, 1.25, 1.5, 1.75, 2, 4, Inf))
+gr9[["sp"]] <- mapply(sp_of, gr9[["s"]], gr9[["pi"]])
+gr9 <- gr9[gr9[["sp"]] > 1e-9, ]
+lnn_c9 <- log(10^seq(60, 140, length.out = 8))
+ah9 <- vapply(seq_len(nrow(gr9)), function(i) {
+  fit2(lnn_c9, scan15b(gr9[["s"]][i], gr9[["pi"]][i], lnns = lnn_c9, st = FALSE)[, "blk"])[1]
+}, 1)
+at9 <- vapply(seq_len(nrow(gr9)), function(i) reg15b(gr9[["s"]][i], gr9[["pi"]][i])[["a"]], 1)
+ao9 <- vapply(seq_len(nrow(gr9)), function(i) reg14(gr9[["s"]][i], gr9[["pi"]][i])[["a"]], 1)
+cat(sprintf("  grade de %d pares com s' > 0: desvio máximo do expoente de n = %.4f; %d pares com ganho sobre o Corolário 14\n",
+            nrow(gr9), max(abs(ah9 - at9)), sum(at9 < ao9 - 1e-9)))
+chk(max(abs(ah9 - at9)) < 0.02 && all(at9 <= ao9 + 1e-12),
+    "em todos os pares da grade o expoente de n da cota em blocos é o do Corolário 15, nunca pior que o do Corolário 14")
+
+## ---- IX.3 a cota em ajustes, com o comparador truncado por pedaço -------------------
+MXX <- matrix(c(1, 0.5, 0.5, 7 / 12), 2, 2)
+EBd_exact <- function(del, Jl) {
+  NJ <- 2L^Jl - 1L
+  D <- matrix(del, NJ, p * q)
+  sum(vapply(seq_len(q), function(m) {
+    Dm <- D[, (seq_len(p) - 1L) * q + m, drop = FALSE]
+    sum((Dm %*% MXX) * Dm)
+  }, 1))
+}
+regs9 <- list(a = list(s = 0.4, pi = 1.8, Cg = 1.5, J = 5L),     # s' > s/(2s+1), abaixo do teto
+              b = list(s = 0.4, pi = 1.25, Cg = 1.2, J = 7L),    # s' < s/(2s+1), acima do teto
+              c = list(s = 0.3, pi = 2, Cg = 1, J = 7L))
+n9 <- 250L
+one_IX <- function(rg, thf) {
+  Jl <- rg[["J"]]
+  b <- as.integer(ceiling(log(n9)))
+  grp <- kp_groups_bal(Jl, b)
+  M <- max(grp)
+  gsize <- as.numeric(table(grp))
+  dat <- sim_VII(n9, thf, FALSE)
+  pj <- prep_J(dat, Jl, thf)
+  Bt <- pj[["rp"]][["Bt"]]
+  gs <- group_stats(Bt, grp)
+  l0 <- lam0_exact(n9, M, gs[["tr"]], gs[["op"]])
+  z <- sqrt(as.numeric(rowsum((as.numeric(crossprod(Bt, dat[["eps"]])) / n9)^2, grp)))
+  tho <- pj[["th_or"]]
+  nG <- function(th) sqrt(as.numeric(rowsum(th^2, grp)))
+  t(vapply(list(w_one, w_sqrt), function(wf) {
+    ws <- wf(gsize)
+    lam <- lam_w(l0, ws)
+    lam1 <- 2 * max(l0)
+    rho <- max(ws) / min(ws)
+    th <- gl_fit(pj[["G"]], pj[["h"]], grp, ws, lam, pj[["Lmax"]], tol = 1e-8, maxit = 200000L)
+    ch <- coef_c(pj[["rp"]], dat[["y"]], th)
+    pred <- mean((as.numeric(pj[["Z"]] %*% c(ch, th)) - dat[["f"]])^2)
+    keep <- nG(tho) > lam * ws
+    thb <- tho * keep[grp]
+    del <- tho - thb
+    bb2 <- mean((dat[["f"]] - as.numeric(pj[["Z"]] %*% c(c_true, thb)))^2)
+    Bd2 <- mean((pj[["rp"]][["B"]] %*% del)^2)
+    lhs <- 0.5 * mean((Bt %*% (th - thb))^2) + lam * sum(ws * nG(th))
+    pen_b <- sum(ws * nG(thb))
+    b15 <- 18 * lam * pen_b + 48 * Bd2 + 48 * pj[["bias"]] + 3 * pj[["Peps"]]
+    b14 <- 18 * lam * sum(ws * nG(tho)) + 24 * pj[["bias"]] + 3 * pj[["Peps"]]
+    EBd <- EBd_exact(del, Jl)
+    RGw <- sum(pmin(lam * ws * nG(tho), nG(tho)^2))
+    RG1 <- sum(pmin(lam1 * nG(tho), nG(tho)^2))
+    c(Tw = max(z / ws) <= lam / 2, thm3i = lhs <= 3 * lam * pen_b + 2 * bb2 + 1e-12,
+      c15 = pred <= b15, folga = b15 / pred, razao = b15 / b14,
+      EBd_ok = EBd <= kap2 * C_U * sum(del^2) + 1e-15,
+      cadeia = (18 * lam * pen_b + 48 * kap2 * C_U * sum(del^2) <= Kcst * RGw + 1e-12) && (RGw <= rho * RG1 + 1e-12) &&
+        (RG1 <= p * q * bnd_RG(rg[["s"]], rg[["pi"]], rg[["Cg"]], b, lam1) + 1e-12),
+      Bd2 = Bd2, EBd = EBd, kkt = max(kkt_gl(pj[["G"]], pj[["h"]], grp, ws, lam, th)), gtil = pj[["gtil"]],
+      ntr = mean(keep))
+  }, numeric(12)))
+}
+tab9d <- do.call(rbind, lapply(names(regs9), function(nm) {
+  rg <- regs9[[nm]]
+  thf <- theta_besov(rg[["s"]], rg[["pi"]], rg[["Cg"]], "random", 95L)
+  rr <- lapply(seq_len(4L), function(i) one_IX(rg, thf))
+  do.call(rbind, lapply(1:2, function(iw) {
+    m <- do.call(rbind, lapply(rr, function(x) x[iw, ]))
+    data.frame(regime = nm, s = rg[["s"]], pi = rg[["pi"]], J = rg[["J"]], acima = 2^rg[["J"]] > n9 / log(n9),
+               pesos = c("1", "sqrt")[iw], Tw = mean(m[, "Tw"]),
+               viola = sum(m[, "Tw"] == 1 & (m[, "thm3i"] == 0 | m[, "c15"] == 0)),
+               EBd_ok = all(m[, "EBd_ok"] == 1), cadeia = all(m[, "cadeia"] == 1),
+               folga_min = min(m[, "folga"]), razao = median(m[, "razao"]),
+               Bd2_EBd = mean(m[, "Bd2"]) / mean(m[, "EBd"]), retidos = median(m[, "ntr"]),
+               gtil = median(m[, "gtil"]), kkt = max(m[, "kkt"]))
+  }))
+}))
+print(tab9d, digits = 3, row.names = FALSE)
+chk(all(tab9d[["Tw"]] >= 1 - alpha) && max(tab9d[["kkt"]]) < 1e-6,
+    "T_{G,w} com a probabilidade nominal; o FISTA chega ao minimizador (KKT a 1e-6)")
+chk(all(tab9d[["viola"]] == 0),
+    "Corolário 15: no evento T_{G,w}, o Teorema 3(i) no comparador truncado e a cota com ||B delta||_n^2 valem em todos os ajustes, nos dois pesos, abaixo e acima do teto")
+chk(all(tab9d[["EBd_ok"]]) && all(tab9d[["cadeia"]]),
+    "E ||B delta||_n^2 <= kappa_2 C_U ||delta||^2, e a cadeia Kcst R_{G,w}(theta*; lambda) <= Kcst rho R_{G,1}(theta*; lambda_1) <= a contagem, no theta* de cada ajuste")
+
 cat(sprintf("\n  tempo: %.0f s\n", proc.time()[["elapsed"]] - t_start))
-if (ok) cat("OK\n") else stop("E1.12, E1.13 e E1.14: conferência numérica FALHOU (ver linhas acima)")
+if (ok) cat("OK\n") else stop("E1.12, E1.13, E1.14 e E1.15: conferência numérica FALHOU (ver linhas acima)")

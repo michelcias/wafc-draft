@@ -8,11 +8,15 @@
 % a perda quadrática tem curvatura constante e dispensa a localização, o que
 % remove as duas restrições (tau < 2/3 e o piso de regularidade do estimador
 % não modificado) que o WALL precisa impor.
-% Conferência numérica: check/05-taxas.R (imprime OK; ~8 min).
+% Conferência numérica: check/05-taxas.R (imprime OK; ~13 min).
 % E1.14 (2026-10-03) acrescentou à Proposição 4 os itens (iii) e (iv): a taxa
 % lenta em todo s' > 0 e na fronteira s = 1/2, com o nível acima do teto do
 % Lema 6 de E1.5 e o lambda inflado por mu_J^{1/2}; a prova vai ao lado da
 % existente, e a conferência é a Parte VI do check. Nenhum número mudou.
+% E1.15 (2026-10-04) acrescentou a Proposição 8: a taxa lenta pelo comparador
+% truncado theta* 1{|theta*| > lambda} no Lema 8, que em s < 1/2 e pi < 2 melhora
+% a Proposição 4 em todo par (e dá a taxa do Corolário 5(iii) sem condição de
+% desenho) e em s >= 1/2 não muda nada; a conferência é a Parte VII do check.
 % Notação: docs/notacao.md (congelada em E1.1). Macros: derivations/macros.tex.
 \documentclass[11pt,a4paper]{article}
 \usepackage[T1]{fontenc}
@@ -102,6 +106,12 @@ observação que faz o Corolário~\ref{cor:compressivel} recuperar a taxa de
 aproximação não linear $n^{-2s/(2s+1)}$ onde a aproximação linear só alcança
 $n^{-2\seff/(2\seff+1)}$, exatamente a diferença que E1.3 registrou em ``o
 que isto não cobre''.
+
+E1.15 acrescentou a (a) uma segunda leitura, sem condição de desenho
+(Proposição~\ref{prop:truncada}): o mesmo Lema~\ref{lem:comparador}(i) num
+comparador truncado em $\pen$, que em $s < 1/2$ e $\pi < 2$ alcança a taxa de
+(c), $(\log n/n)^{2s/(2s+1)}$, na mesma janela de $J_{n}$, e que em
+$s \ge 1/2$ não muda a ordem de (a).
 
 \paragraph{Diante de Klopp e Pensky (2015).} Para $q = 1$ e
 $\bX \perp \bU$, a taxa adaptativa em Besov com o índice de esparsidade
@@ -522,6 +532,138 @@ irrepresentabilidade é usada --- mas uma \emph{taxa de estimação} governada
 por $\Mstar_{n}$ em vez de $d_{n}$. A distinção é a mesma que o WALL faz.
 \end{remark}
 
+\subsection*{Sem condição de desenho, pelo comparador truncado (E1.15)}
+
+A Proposição~\ref{prop:lenta} lê o Lema~\ref{lem:comparador}(i) só no
+comparador $\thetastar$, e paga $\pen\norm{\thetastar}_{1}$ por inteiro,
+inclusive pelos coeficientes menores que $\pen$, que custariam menos como
+viés. O Lema~\ref{lem:comparador} vale para todos os comparadores no mesmo
+evento, e o \emph{comparador truncado} em $t > 0$,
+\begin{equation}
+  \label{eq:truncado}
+  \bar\theta_{a} \;=\; \theta^{*}_{a}\,\mathbf{1}\{|\theta^{*}_{a}| > t\},
+  \qquad a = 1,\dots,d,
+\end{equation}
+cobra na penalidade só os coeficientes acima de $t$ e manda os de baixo ao
+viés. O que sobra é, com $t = \pen$, a quantidade
+\begin{equation}
+  \label{eq:R1}
+  \mathcal{R}_{1}(\btheta;t) \;=\; \sum_{a=1}^{d}\min\bigl(t|\theta_{a}|,\,\theta_{a}^{2}\bigr),
+  \qquad
+  \mathcal{R}_{1}(\btheta;t) \le t\norm{\btheta}_{1},
+\end{equation}
+o par em norma $\ell_{1}$ do risco ideal $\sum_{a}\min(\theta_{a}^{2},t^{2})$.
+O viés novo, $\Bmat(\thetastar - \thbar)$, é controlado em esperança por uma
+cota \emph{superior} da Gram populacional, sem $c_{U}$, sem $\kappa_{1}$ e sem
+nenhuma propriedade de $\Gramhat$.
+
+\setcounter{proposition}{7}
+\begin{proposition}[taxa lenta pelo comparador truncado]\label{prop:truncada}
+Nas hipóteses da Proposição~\ref{prop:lenta}:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(não assintótico)} no evento $\mathcal{T}$, para todo
+    $\pen \ge 2\pen_{0}$ e todo $t > 0$, com $\thbar$ de \eqref{eq:truncado},
+    \[
+      \normn{\widehat f - f}^{2}
+      \;\le\; 18\pen\norm{\thbar}_{1} + 48\normn{\Bmat(\thetastar - \thbar)}^{2}
+      + 48\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2};
+    \]
+    se $t$ é determinístico,
+    \[
+      \E\normn{\Bmat(\thetastar - \thbar)}^{2}
+      \;\le\; \kappa_{2}C_{U}\norm{\thetastar - \thbar}_{2}^{2},
+    \]
+    e também $\le pqB_{X}^{2}C_{U}\norm{\thetastar - \thbar}_{2}^{2}$, que só
+    usa as hipóteses de E1.3. Com $t = \pen$ determinístico,
+    \[
+      18\pen\norm{\thbar}_{1} + 48\kappa_{2}C_{U}\norm{\thetastar - \thbar}_{2}^{2}
+      \;\le\; \max(18, 48\kappa_{2}C_{U})\,\mathcal{R}_{1}(\thetastar;\pen),
+    \]
+    e
+    \[
+      \normn{\widehat f - f}^{2}
+      \;=\; O_{p}\Bigl(\mathcal{R}_{1}(\thetastar;\pen_{n})
+      + \mathcal{B}_{J_{n}}^{2} + \tfrac{p}{n}\Bigr)
+    \]
+    sempre que $2^{J_{n}}\log d_{n}/n \to 0$; com $\pen_{n}^{+}$ de
+    \eqref{eq:mu} no lugar de $\pen_{n}$ (no estimador e na cota), para toda
+    sequência $J_{n}$ com $2^{J_{n}} \le n^{2}$.
+  \item \textup{(a contagem sob Besov)} Sob as hipóteses de E1.3, com
+    $\tau = (s+1/2)^{-1}$, para todo $J$ e todo $t > 0$: se $s < 1/2$,
+    \begin{equation}
+      \label{eq:contagem-truncada}
+      \mathcal{R}_{1}(\thetastar;t) \;\le\; pq\,C_{g}^{\tau}\,
+      t^{4s/(2s+1)}\Bigl\{\frac{1}{1 - 2^{s-1/2}}
+      + \frac{1}{1 - 2^{-\min(\pi,2)\seff}}\Bigr\};
+    \end{equation}
+    se $s \ge 1/2$, nada se ganha em ordem: $\mathcal{R}_{1}(\thetastar;t) \le
+    t\norm{\thetastar}_{1}$ e, para $t \le C_{g}$, a classe contém um
+    $\thetastar$ com $\mathcal{R}_{1}(\thetastar;t) \ge tC_{g}$ (se $s > 1/2$)
+    e com $\mathcal{R}_{1}(\thetastar;t) \ge tC_{g}\min\{J,
+    \lfloor\log_{2}(C_{g}/t)\rfloor + 1\}$ (se $s = 1/2$), da ordem do
+    $t\norm{\thetastar}_{1}$ da Proposição~\ref{prop:lenta}.
+  \item \textup{($s < 1/2$ e $\seff > s/(2s+1)$)} com
+    $J_{n} = \lceil c\log_{2}n\rceil$ e $c$ na janela
+    \begin{equation}
+      \label{eq:janela-truncada}
+      \frac{s}{(2s+1)\seff} \;\le\; c \;<\; 1,
+    \end{equation}
+    que é a do Corolário~\ref{cor:compressivel}(iii),
+    \[
+      \normn{\widehat f - f}^{2} \;=\; O_{p}\Bigl(\Bigl(\frac{\log n}{n}\Bigr)^{2s/(2s+1)}\Bigr);
+    \]
+  \item \textup{($s < 1/2$ e $\seff \le s/(2s+1)$, só com $\pi < 2$)} com
+    $\pen_{n}^{+}$ e a escolha $2^{J_{n}} \asymp
+    (n/\log n)^{2s/(s+\seff(2s+1))}$, que tem $2^{J_{n}} \gtrsim n/\log n$,
+    \[
+      \normn{\widehat f - f}^{2} \;=\; O_{p}\Bigl(\Bigl(\frac{\log n}{n}\Bigr)^{4s\seff/(s+\seff(2s+1))}\Bigr);
+    \]
+    em $\seff = s/(2s+1)$ o expoente é $2s/(2s+1)$, o de (iii).
+\end{enumerate}
+\end{proposition}
+
+\begin{remark}[o que muda diante da Proposição~\ref{prop:lenta}]\label{rem:truncada}
+\emph{Em $s < 1/2$ e $\pi < 2$, a taxa melhora em todo par.} O item (iii)
+troca a Proposição~\ref{prop:lenta}(ii) por $(\log n/n)^{2s/(2s+1)}$, que é a
+taxa do Corolário~\ref{cor:compressivel}(iii), na mesma janela de $J_{n}$,
+agora sem condição de desenho; o ganho no expoente é
+$2(s-\seff)(1-2s)/\{(2s+1)(1-2s+4\seff)\} > 0$. O item (iv) troca a
+Proposição~\ref{prop:lenta}(iii)(b) e a parte de (ii) com
+$s/2 < \seff \le s/(2s+1)$; contra (iii)(b) o ganho é
+$2\seff(s-\seff)(1-2s)/\{(s+\seff(2s+1))(1-s+2\seff)\} > 0$. Em
+$\pi \ge 2$ ($\seff = s$) a taxa é a mesma da
+Proposição~\ref{prop:lenta}(ii), mas deixa de depender do balanço: qualquer
+$c \in [1/(2s+1), 1)$ serve, porque a contagem
+\eqref{eq:contagem-truncada} não depende de $J$.
+
+\emph{Em $s \ge 1/2$ nada muda.} O item (ii) mostra que
+$\mathcal{R}_{1}(\thetastar;\pen)$ tem a ordem de
+$\pen\norm{\thetastar}_{1}$ no pior caso da classe: um coeficiente grosso de
+tamanho $C_{g}$ custa $\pen C_{g}$ na penalidade ou $C_{g}^{2}$ no viés, e o
+primeiro é menor. A rota lenta, por qualquer comparador, não desce de
+$\pen_{n} \asymp (\log n/n)^{1/2}$, e é exatamente em $s > 1/2$ que
+$2s/(2s+1) > 1/2$. Os itens (i), (iii)(a) e (iv) da
+Proposição~\ref{prop:lenta} continuam sendo o enunciado sem condição de
+desenho nesses pares; passar deles pede a condição de desenho
+(Corolário~\ref{cor:compressivel}).
+
+\emph{Acima do teto (E1.14).} O item (iv) é inteiro acima do teto do Lema~6
+de E1.5 e usa o $\pen_{n}^{+}$ de \eqref{eq:mu} e o evento
+\eqref{eq:smax-teto} da prova da Proposição~\ref{prop:lenta}, sem mudança; a
+forma geral de (i) vale com $\pen_{n}^{+}$ em toda sequência $J_{n}$. Nos
+pares de (iii) basta ficar abaixo do teto. A Observação~\ref{rem:teto}
+continua certa como está, porque fala do comparador $\thetastar$: o $J_{n}$ de
+(iv) é, a menos de constante, o minimizador em $J$ da cota com o comparador
+truncado (conferência, Parte~VII).
+
+\emph{O desenho.} A única propriedade do desenho usada fora da calibração é
+$\lmaxx(\Gram) \le \kappa_{2}C_{U}$, a metade superior da Proposição~3(iii)
+de E1.4, e mesmo ela pode ser trocada por $pqB_{X}^{2}C_{U}$; o valor
+esperado é sobre $(\bX,\bU)$ com $\thetastar - \thbar$ fixo, e nada de
+$\Gramhat$ entra. A taxa é de predição: a passagem às componentes
+(Corolário~\ref{cor:componentes-taxa}) continua pedindo $\lmin(\Gramhat)$.
+\end{remark}
+
 \section{Provas}
 
 \subsection*{Lema~\ref{lem:comparador}}
@@ -816,6 +958,110 @@ $2s^{2}/(2s+1) > 1/\pi - 1/2$. Que $2s/(2s+1) \ge 2\seff/(2\seff+1)$, com
 igualdade só quando $\seff = s$, segue da monotonia de $x \mapsto 2x/(2x+1)$
 e de $\seff \le s$. \qed
 
+\subsection*{Proposição~\ref{prop:truncada}}
+
+\emph{(i).} Aplique o Lema~\ref{lem:comparador} com $\bar\bbeta =
+(\bc,\thbar)$. Por (i) dele, descartando $\pen\norm{\thetahat}_{1} \ge 0$,
+$\normn{\Btil\bar v}^{2} \le 6\pen\norm{\thbar}_{1} + 4\normn{\bbar}^{2}$; por
+(iii) e $(x+y+z)^{2} \le 3(x^{2}+y^{2}+z^{2})$,
+$\normn{\widehat f - f}^{2} \le 18\pen\norm{\thbar}_{1} + 24\normn{\bbar}^{2} +
+3\normn{\PA\bveps}^{2}$. Como $\bbar = f - \Amat\bc - \Bmat\thbar = \bb +
+\Bmat(\thetastar - \thbar)$, $\normn{\bbar}^{2} \le 2\normn{\bb}^{2} +
+2\normn{\Bmat(\thetastar - \thbar)}^{2}$, e sai a cota. Se $t$ é
+determinístico, $u = \thetastar - \thbar$ também é, e
+$\E\normn{\Bmat u}^{2} = u\T\E(\Bmat\T\Bmat/n)u$, com $\E(\Bmat\T\Bmat/n)$ a
+submatriz de $\Gram$ nas colunas penalizadas; logo $\E\normn{\Bmat u}^{2} \le
+\lmaxx(\Gram)\norm{u}_{2}^{2} \le \kappa_{2}C_{U}\norm{u}_{2}^{2}$ pela
+Proposição~3(iii) de E1.4. Sem ela: $(\Bmat u)_{i} =
+\sum_{\cv}X_{i\cv}\sum_{\md}h_{\cv\md}(U_{i\md})$ com $h_{\cv\md} =
+\sum_{\lev\tsl}u_{\cv\md,\lev\tsl}\wav{\lev}{\tsl}$, e Cauchy--Schwarz duas
+vezes dá $(\Bmat u)_{i}^{2} \le pqB_{X}^{2}\sum_{\cv\md}h_{\cv\md}(U_{i\md})^{2}$;
+a densidade marginal de $U_{\md}$ é no máximo $C_{U}$ e a base é ortonormal,
+logo $\E h_{\cv\md}(U_{\md})^{2} \le C_{U}\norm{u_{\cv\md,\cdot}}_{2}^{2}$.
+Com $t = \pen$: nas coordenadas com $|\theta^{*}_{a}| > \pen$,
+$\pen|\theta^{*}_{a}| = \min(\pen|\theta^{*}_{a}|,\theta^{*2}_{a})$; nas
+outras, $\theta^{*2}_{a} = \min(\pen|\theta^{*}_{a}|,\theta^{*2}_{a})$; somar
+dá a cota por $\max(18,48\kappa_{2}C_{U})\mathcal{R}_{1}(\thetastar;\pen)$. A
+forma $O_{p}$ é a da prova da Proposição~\ref{prop:lenta}: o evento
+$\mathcal{T}$ com $\pen_{n} \ge 2\pen_{0}$ (Lema~6 de E1.5, abaixo do teto) ou
+com $\pen_{n}^{+} \ge 2\pen_{0}$ (o evento \eqref{eq:smax-teto}, em todo
+$J$), e Markov em $\normn{\bb}^{2}$, $\normn{\Bmat(\thetastar-\thbar)}^{2}$ e
+$\normn{\PA\bveps}^{2}$.
+
+\emph{(ii), $s < 1/2$.} Fixe um bloco $(\cv,\md)$ e um nível $\lev$, e escreva
+$\theta_{\lev} \in \R^{2^{\lev}}$ para os seus coeficientes, com
+$\norm{\theta_{\lev}}_{\pi} \le C_{g}2^{-\lev(s+1/2-1/\pi)}$ pela Hipótese de
+Besov, e $v_{\lev} = \sum_{\tsl}\min(t|\theta_{\lev\tsl}|,\theta_{\lev\tsl}^{2})$.
+Duas cotas. A primeira é $\ell_{1}$: por Hölder em $\R^{2^{\lev}}$
+($\pi \ge 1$), $v_{\lev} \le t\norm{\theta_{\lev}}_{1} \le
+t2^{\lev(1-1/\pi)}\norm{\theta_{\lev}}_{\pi} \le tC_{g}2^{\lev(1/2-s)}
+=: A_{\lev}$. A segunda é a cauda: se $\pi \le 2$, $\min(tx,x^{2}) \le
+t^{2-\pi}x^{\pi}$ para $x \ge 0$ (se $x \le t$, $x^{2} =
+x^{\pi}x^{2-\pi} \le x^{\pi}t^{2-\pi}$; se $x > t$, $tx =
+t^{2-\pi}t^{\pi-1}x \le t^{2-\pi}x^{\pi}$, porque $\pi \ge 1$), logo
+$v_{\lev} \le t^{2-\pi}\norm{\theta_{\lev}}_{\pi}^{\pi} \le
+t^{2-\pi}C_{g}^{\pi}2^{-\lev\pi\seff}$, já que $\pi(s+1/2-1/\pi) = \pi\seff$;
+se $\pi \ge 2$, $v_{\lev} \le \norm{\theta_{\lev}}_{2}^{2} \le
+C_{g}^{2}2^{-2\lev s}$ por Hölder. Nos dois casos a segunda é
+$B_{\lev} := h\,2^{-(\lev - x)\min(\pi,2)\seff}$ e a primeira é $A_{\lev} =
+h\,2^{(\lev-x)(1/2-s)}$, com
+\[
+  2^{x} = (C_{g}/t)^{\tau},
+  \qquad
+  h = C_{g}^{\tau}t^{2-\tau} = C_{g}^{\tau}t^{4s/(2s+1)}:
+\]
+em $\lev = x$, $A_{x} = tC_{g}(C_{g}/t)^{\tau(1/2-s)} = C_{g}^{\tau}t^{2-\tau}$,
+porque $1 + \tau(1/2-s) = \tau$; e
+\[
+  B_{x} = t^{2-\pi}C_{g}^{\pi}(C_{g}/t)^{-\tau\pi\seff} = C_{g}^{\tau}t^{2-\tau},
+\]
+porque $\tau\pi\seff =
+\tau\pi(s+1/2) - \tau = \pi - \tau$ (em $\pi \ge 2$, $B_{x} =
+C_{g}^{2}(C_{g}/t)^{-2s\tau}$ e $2s\tau = 2 - \tau$). Somando $A_{\lev}$ nos
+níveis $\lev \le x$ e $B_{\lev}$ nos $\lev > x$, que são geométricas de razões
+$2^{-(1/2-s)}$ e $2^{-\min(\pi,2)\seff}$ a partir de no máximo $h$,
+\[
+  \sum_{\lev}v_{\lev} \;\le\; h\Bigl\{\frac{1}{1 - 2^{s-1/2}} +
+  \frac{1}{1 - 2^{-\min(\pi,2)\seff}}\Bigr\}.
+\]
+Truncar em $\lev < J$ só tira parcelas, e somar
+os $pq$ blocos dá \eqref{eq:contagem-truncada}. É a conta do Lema~15 de
+\texttt{08-blocos.tex} com $\min(tx,x^{2})$ no lugar de $\min(x^{2},\eta)$,
+e a mesma do Lema~\ref{lem:weak}(i): o expoente é $2 - \tau$, o de
+$\pen^{2-\tau}$ na Observação~\ref{rem:tres}.
+
+\emph{(ii), $s \ge 1/2$.} $\min(t|x|,x^{2}) \le t|x|$ dá a primeira
+afirmação. Para a segunda, tome o bloco $(\cv,\md)$ com
+$\theta^{*}_{\cv\md,00} = C_{g}$, que satisfaz a Hipótese de Besov no nível
+$0$, e os demais nulos: $\mathcal{R}_{1} \ge \min(tC_{g},C_{g}^{2}) = tC_{g}$.
+Em $s = 1/2$, ponha em cada nível $\lev < J$ com $2^{\lev} \le C_{g}/t$ todos
+os $2^{\lev}$ coeficientes iguais a $C_{g}2^{-\lev} \ge t$, o que dá
+$\norm{\theta_{\lev}}_{\pi} = C_{g}2^{-\lev(1-1/\pi)}$, o limite da Hipótese
+de Besov em $s = 1/2$, e cada nível contribui $2^{\lev}\cdot tC_{g}2^{-\lev} =
+tC_{g}$.
+
+\emph{(iii).} Com $J_{n} = \lceil c\log_{2}n\rceil$, $c < 1$,
+$2^{J_{n}}\log d_{n}/n \asymp n^{c-1}\log n \to 0$, e (i) vale com $\pen_{n}
+\asymp (\log n/n)^{1/2}$ (Hipótese~\ref{ass:regime}, $L_{n} \asymp J_{n}
+\asymp \log n$). Por \eqref{eq:contagem-truncada},
+$\mathcal{R}_{1}(\thetastar;\pen_{n}) \lesssim (\log n/n)^{2s/(2s+1)}$; o viés
+é $\mathcal{B}_{J_{n}}^{2} \asymp 2^{-2J_{n}\seff} \le n^{-2c\seff} \le
+n^{-2s/(2s+1)}$ pela cota inferior da janela; e $p/n$ é de ordem menor. A
+janela é não vazia se e só se $s/((2s+1)\seff) < 1$.
+
+\emph{(iv).} Escreva $\eta = 2s/(s+\seff(2s+1))$, que está em $[1,2)$
+exatamente quando $\seff \le s/(2s+1)$; logo $2^{J_{n}} \asymp
+(n/\log n)^{\eta} \gtrsim n/\log n$, $2^{J_{n}} \le n^{2}$ e, por
+\eqref{eq:lam-plus}, $\pen_{n}^{+} \asymp 2^{J_{n}/2}\log n/n \asymp
+(\log n/n)^{1-\eta/2}$. Por \eqref{eq:contagem-truncada},
+$\mathcal{R}_{1}(\thetastar;\pen_{n}^{+}) \lesssim (\log
+n/n)^{(1-\eta/2)4s/(2s+1)}$, e $(1-\eta/2)4s/(2s+1) =
+\{\seff(2s+1)/(s+\seff(2s+1))\}\,4s/(2s+1) = 4s\seff/(s+\seff(2s+1))$; o viés é
+$2^{-2J_{n}\seff} \asymp (\log n/n)^{2\seff\eta}$, com $2\seff\eta$ igual ao
+mesmo expoente. Em $\seff = s/(2s+1)$, $\eta = 1$ e o expoente é
+$4s^{2}/\{(2s+1)2s\} = 2s/(2s+1)$. Fora da janela de (iii), $\pi < 2$, porque
+em $\pi \ge 2$ vale $\seff = s > s/(2s+1)$. \qed
+
 \section{O que foi transposto e o que é novo}
 
 \begin{itemize}[nosep, leftmargin=*]
@@ -856,6 +1102,14 @@ e de $\seff \le s$. \qed
     $\pen$ inflado por $\mu_{J}^{1/2}$ \eqref{eq:smax-teto}; acima do teto o
     expoente é estritamente melhor que o de $J$ parado nele
     (Observação~\ref{rem:teto}).
+  \item \textbf{Novo em E1.15:} a Proposição~\ref{prop:truncada}, o
+    Lema~\ref{lem:comparador}(i) no comparador truncado
+    \eqref{eq:truncado}, com o resto mandado ao viés por uma cota em
+    esperança que não usa $\Gramhat$, e a contagem
+    \eqref{eq:contagem-truncada} de $\mathcal{R}_{1}(\thetastar;t)$ sob Besov,
+    justa em $t$; com ela a taxa lenta alcança, em $s < 1/2$, a do
+    Corolário~\ref{cor:compressivel}(iii), e o piso $tC_{g}$ mostra que em
+    $s \ge 1/2$ nenhum comparador faz a rota lenta descer de $\pen_{n}$.
 \end{itemize}
 
 \section{O que isto não cobre}
@@ -890,17 +1144,14 @@ e de $\seff \le s$. \qed
     2^{J})$ de E1.4 entram nas taxas, e a janela \eqref{eq:janela} estreita.
   \item \textbf{$\sigma$ desconhecido e $\pen$ aleatório}, e a base do
     intervalo, pelas mesmas razões de E1.5.
-  \item \textbf{A taxa lenta além do comparador $\thetastar$.} A
-    Proposição~\ref{prop:lenta} lê o Teorema~1(i) de E1.5 só em $\thetastar$.
-    O Lema~\ref{lem:comparador}(i) com o comparador determinístico
-    $\thetastar\mathbf{1}\{|\thetastar| > \pen\}$ troca
-    $\pen\norm{\thetastar}_{1}$ por uma quantidade da ordem de
-    $\sum_{a}\min(\pen|\theta^{*}_{a}|, \theta^{*2}_{a})$ (o resto vai ao
-    viés por $\E\normn{\Bmat\delta}^{2} \le \kappa_{2}C_{U}\norm{\delta}_{2}^{2}$,
-    sem condição de desenho), que sob o Lema~\ref{lem:weak}(i) e $s < 1/2$ é
-    da ordem de $\pen^{4s/(2s+1)}$; isso parece dar $(\log n/n)^{2s/(2s+1)}$ em
-    $\pi < 2$ e $\seff > s/(2s+1)$, melhor que (ii) e (iii)(b). Não foi
-    escrito nem conferido (E1.14 só o esboçou).
+  \item \textbf{A taxa lenta além do comparador truncado.} A
+    Proposição~\ref{prop:truncada} esgota a rota do Lema~\ref{lem:comparador}(i)
+    em $s \ge 1/2$ (o piso $tC_{g}$ vale para todo comparador, porque um
+    coeficiente grosso de tamanho fixo paga $\pen$ ou paga $O(1)$), e em
+    $s < 1/2$ a contagem é justa em $t$. O que ela não dá: a taxa das
+    componentes, que continua pedindo $\lmin(\Gramhat)$; e, em
+    $\seff \le s/(2s+1)$, a taxa $(\log n/n)^{2s/(2s+1)}$, que nem o
+    Corolário~\ref{cor:compressivel} alcança nesses pares.
   \item \textbf{$\smax$ muito acima do teto.} A cota \eqref{eq:smax-teto}
     tem $2^{J}\log d/n$, de Bernstein; quando $2^{J}/n$ cresce como potência
     de $n$ (as escolhas de (iii)(a) e (iv) com $\seff < 1/4$), o máximo das
@@ -917,7 +1168,7 @@ e de $\seff \le s$. \qed
 
 \section{Conferência numérica}
 
-\texttt{check/05-taxas.R} (imprime \texttt{OK}; cerca de 8~min). Desenho de
+\texttt{check/05-taxas.R} (imprime \texttt{OK}; cerca de 13~min). Desenho de
 E1.4 e E1.5: Daublets com filtro 8, $p = 2$ com $X_{1}\equiv 1$ e
 $X_{2} = 1/2+\eta$, $q = 2$, $\bU$ uniforme em $[0,1]^{2}$ (logo
 $c_{U} = C_{U} = 1$ e $\gamma = \kappa_{1}c_{U} = 0.25$), erro gaussiano com
@@ -1011,6 +1262,43 @@ números que importam:
     $78$ vezes; com $\pen_{n}^{+}$, de $2{,}1$ a $3{,}1$ vezes $\pen_{n}$, o
     ajuste é nulo nos três pares e a cota vale trivialmente, e com $2\pen_{0}$
     não.
+  \item \textbf{Proposição~\ref{prop:truncada}} (Parte~VII, E1.15). A
+    contagem \eqref{eq:contagem-truncada} contra o supremo exato de
+    $\mathcal{R}_{1}(\thetastar;t)$ na classe (a classe é produto nos níveis;
+    por nível, o supremo fica entre um elemento explícito e a envoltória
+    côncava, que diferem por no máximo $2\%$), em $9$ pares com $s < 1/2$
+    ($\pi$ de $1{,}25$ a $\infty$), $t$ de $10^{-1}$ a $10^{-60}$ e
+    $J \le 600$: razão máxima à cota de $0{,}97$ e mínima de $0{,}89$; o
+    supremo cai como $t^{4s/(2s+1)}$ (a $0{,}001$). Em $s \ge 1/2$ o supremo é
+    pelo menos $tC_{g}$ e cai como $t$ (expoente $1{,}000$ em quatro pares com
+    $s > 1/2$), e em $s = 1/2$ é $tC_{g}\log_{2}(1/t)$ a menos de $17\%$. A
+    cota $\max(18,48\kappa_{2}C_{U})\,pq\sup\mathcal{R}_{1}(\thetastar;\pen_{n}^{+})
+    + 48\mathcal{B}_{J}^{2} + 3\sigma^{2}p/n$ minimizada em $J$ com
+    $2^{J} \le n^{2}$ ($n$ de $10^{15}$ a $10^{150}$), em $17$ pares: o
+    expoente de $n$ é o da proposição a $0{,}01$, e o do logaritmo a $0{,}1$
+    lido em $n \ge 10^{60}$ (as somas geométricas de razão $2^{s-1/2}$ só
+    assentam aí; por exemplo $0{,}28$ contra $0{,}28$ em $(s,\pi) =
+    (0{,}4;1{,}25)$); o expoente é estritamente melhor que o da
+    Proposição~\ref{prop:lenta} nos $8$ pares com $s < 1/2$ e $\pi < 2$ (por
+    exemplo $-0{,}276$ contra $-0{,}250$ em $(0{,}4;1{,}25)$ e $-0{,}197$
+    contra $-0{,}158$ em $(0{,}2;1{,}6)$) e igual nos outros; nos $6$ pares de
+    (iv) o minimizador passa do teto e cresce como o $J_{n}$ do enunciado (a
+    $0{,}03$), e a cota no $J_{n}$ do enunciado (o meio da janela, em (iii))
+    fica a menos de um fator $1{,}8$ do mínimo. Numa grade de $212$ pares com
+    $\seff > 0$, o expoente de $n$ é o da proposição com desvio máximo de
+    $0{,}002$, nunca pior que o da Proposição~\ref{prop:lenta}; $18$ pares
+    ganham, até $0{,}040$ no expoente. Em ajustes ($n = 250$ e $500$, $6$
+    réplicas, $\pen_{n}^{+}$ e $2\pen_{0}$) com $(s,\pi) = (0{,}4;1{,}8)$ em
+    $J = 5$, abaixo do teto, e $(0{,}4;1{,}25)$ em $J = 8$ e $(0{,}3;2)$ em
+    $J = 7$, acima: cobertura de $\mathcal{T}$ igual a $1{,}000$, nenhuma
+    violação do Lema~\ref{lem:comparador}(i) no comparador truncado nem da
+    cota de (i), folga mínima de $40$ vezes; $\E\normn{\Bmat(\thetastar -
+    \thbar)}^{2}$, calculado exatamente no desenho, fica sob
+    $\kappa_{2}C_{U}\norm{\thetastar - \thbar}_{2}^{2}$, e a média realizada
+    está a $6\%$ dele. A cota truncada é de $0{,}33$ a $0{,}90$ vezes a da
+    Proposição~\ref{prop:lenta} acima do teto, e de $0{,}94$ a $1{,}19$ vezes
+    em $(0{,}4;1{,}8)$, onde as constantes $48$ contra $24$ ainda pesam em
+    $n \le 500$.
 \end{itemize}
 
 \section*{Referências}

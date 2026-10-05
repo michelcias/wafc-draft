@@ -37,8 +37,8 @@ teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 4` (`manuscript/ms_4.tex`,
 `supp_4.tex`, `references_4.bib`), aberta pela E5d em 2026-10-04 com a
 teoria em blocos (D44 a D51); as versões `k = 1` a `k = 3` ficam intactas.
-Os dois compilam limpos em **50 e 60 páginas** com a marcação, **43 e 59**
-sem o texto removido; com as Seções 5 a 7 o corpo projeta ~54 páginas,
+Os dois compilam limpos em **50 e 68 páginas** com a marcação, **43 e 67**
+sem o texto removido (depois da E5e); com as Seções 5 a 7 o corpo projeta ~54 páginas,
 contra o teto de 40 (D21, pergunta 47(e)).
 **Cor da rodada corrente:** `colR1`, em uso desde `k = 2` (a rodada não foi
 aceita, então a marcação de E5c segue em `colR1` na `k = 3` e na `k = 4`).
@@ -2102,6 +2102,82 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-05: E1.15 fechada, o comparador truncado na taxa lenta
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina, em cópias
+congeladas: o `check/05-taxas.R` (Parte VII nova) e o `check/08-blocos.R`
+(Parte IX nova, 767 s) imprimem **`OK`**; o `05-taxas.tex` compila em **15
+páginas** e o `08-blocos.tex` em **23**, sem referência indefinida. Nenhum
+enunciado existente mudou.
+
+**A resposta: sim em `s < 1/2`, não em `s ≥ 1/2`.** Com o comparador
+truncado `θ̄ = θ*·1{|θ*| > t}` (nos blocos, `θ*_G·1{‖θ*_G‖ > λw_G}`), o termo
+`λ‖θ*‖_1` vira `ℛ_1(θ*; λ) = Σ_a min(λ|θ*_a|, θ*_a²)` e o resto vai ao viés
+por `E‖B(θ* − θ̄)‖²_n ≤ κ_2C_U‖θ* − θ̄‖²`, só com cotas superiores do desenho.
+
+- **Proposição 8** (`05`, `prop:truncada`): em `s < 1/2`,
+  `ℛ_1(θ*; t) ≲ t^{4s/(2s+1)}` em todo `J`; com `s' > s/(2s+1)`,
+  `(log n/n)^{2s/(2s+1)}`, **a taxa do Corolário 5(iii) sem condição de
+  desenho**; com `s' ≤ s/(2s+1)` (só `π < 2`), acima do teto,
+  `(log n/n)^{4ss'/(s+s'(2s+1))}`.
+- **Corolário 15** (`08`, `cor:truncada-blocos`): em `s < 1/2` e
+  `s' > s/(2s+1)`, `n^{−2s/(2s+1)}(log n)^{(2/π−1)_+/(2s+1)}`, **a taxa do
+  Corolário 11 (o Theorem 1) sem condição de desenho**; abaixo da janela, a
+  forma acima do teto.
+- **Em `s ≥ 1/2` nenhum comparador faz melhor que `λ_n ≍ (log n/n)^{1/2}`:**
+  um coeficiente grosso de tamanho fixo custa `λC_g` na penalidade ou `C_g²`
+  no viés. A condição de desenho de E1.4 só é necessária, para a predição,
+  em `s ≥ 1/2`; para as componentes continua sendo.
+- **Diante da Proposição 4 e do Corolário 14:** melhora estrita em `s < 1/2`
+  e `π < 2`; a mesma taxa sem balanço em `π ≥ 2`; nada em `s ≥ 1/2`.
+- **A conferência:** a contagem contra o supremo exato da classe (razão
+  máxima 0,97, expoente em `t` a 0,001); a cota minimizada em `J` em 17 e 16
+  pares, estritamente melhor que a Proposição 4 e o Corolário 14 nos 8 pares
+  com `s < 1/2` e `π < 2` e igual nos outros, numa grade de 212 pares nunca
+  pior; ajustes acima e abaixo do teto, sem violação, folga mínima de 40.
+- **Lições:** o resto `E − ⌊E/T⌋T` em ponto flutuante com `E/T > 2^{53}` é
+  lixo (escrever `T(r − ⌊r⌋)`); os expoentes de somas geométricas de razão
+  perto de 1 só assentam em `n ≥ 1e60`.
+
+### 2026-10-05: E5e fechada, a E1.14 na `k = 4`
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: `ms_4` e `supp_4`
+compilam sem referência indefinida nem rótulo duplicado, em **50 e 68
+páginas** (43 e 67 sem o removido; o corpo não mudou); `references_4.bib`
+intacto.
+
+- No `ms_4`, uma frase depois da Proposition 3 manda ao supp os pares
+  `s' ≤ 1/4` com `s > 1/2`, `s' ≤ s/2` com `s < 1/2` e a fronteira `s = 1/2`
+  (**Proposition S6.1**, `prop:slow-ceiling`), com `λ_n^{𝒢,+}`; a frase de
+  D49(b) revista nos dois lugares ("an upper bound on `λ_max(Σ̂)`");
+  "program"; "thresholding" nas palavras-chave (D53); `\lamGp` nos dois
+  preâmbulos.
+- No supp, a Proposition S6.1 em S6, com `μ^𝒢_J`, `c_μ`, `ξ` e a prova, e na
+  S8 os itens (iii) e (iv) da Proposition S8.1, com a Remark S8.2
+  (`rem:ceiling`).
+- **Sinal:** no `08`, o Corolário 14(iii)(b) e o (ii) emendam em `n`, mas
+  não no logaritmo, em `s' = s/2` (`(log n)^{s/π}` contra
+  `(log n)^{(2/π−1)s}`); a Proposition S6.1 diz "the powers of `n` join". No
+  lasso a emenda é exata.
+- **Lição:** com a S8 inteira em `colR1` (D52), o que uma rodada seguinte
+  acrescentar lá não se distingue no PDF; o comentário `% E5e` no fonte é o
+  único rastro.
+
+### 2026-10-05: L10 fechada, a bibliografia do `grpreg` e do group lasso
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina:
+`referencias-verificadas.bib` com **86 entradas** (eram 83), 86
+`\bibitem` e nenhum aviso do BibTeX; o diff só acrescenta. Entraram Yuan &
+Lin (2006, *JRSS-B* 68(1), 49–67; o group lasso é a eq. (2.1), p. 51, e o
+peso `√p_j` vem da p. 53), Breheny & Huang (2015, *Statist. Comput.* 25(2),
+173–187; o objetivo do group lasso é a eq. (2.5) e a ortonormalização por
+grupo o §2.1, lidos no arXiv:1209.2160v2) e o `grpreg` 3.6.0 (Breheny &
+Miller, por D25). **A frase do §4.1 do `ms_4` sobre a ortonormalização e o
+`(2n)^{-1}` está certa**, conferida no artigo e no help do pacote. A
+citação proposta para o §4.1 e o §2.3 está na pergunta 48. Lição: o PDF da
+Springer e o do Europe PMC não abrem por `curl`; o arXiv e a página do
+autor abrem.
+
 ### 2026-10-04: E1.14 fechada, a taxa lenta em todo `s' > 0`
 
 Chat de tarefa, integrado aqui. Conferido nesta máquina, em cópias
@@ -3275,11 +3351,54 @@ Ordenadas pelo que bloqueia mais.
    - (g) Símbolos do `ms` fora do `notacao.md` §10 (o comparador `β̄`, `b̄`,
      `v̄`, `𝒢̄`, `𝒲̄`, `M_1`, `Σ̂_{GG}`): levá-los ao §10 junto com os da 46(d).
 
+48. **Pendências de E1.15, E5e e L10** (2026-10-05). Recomendação do chat
+   principal:
+   - (a) **O Corolário 15 e a Proposição 8 na `k = 4`**, na forma (a) da
+     E1.15: uma ou duas frases no corpo depois da Proposition 3 (a taxa do
+     Theorem 1 sem condição de desenho em `s < 1/2`, e o limite em
+     `s ≥ 1/2`), o enunciado e a prova no supp (uma Proposition S6.x a partir
+     do Corolário 15 e a versão do lasso na S8); e a frase do §3 que atribui
+     a taxa do Theorem 1 à condição de desenho passa a dizer "for the
+     components, and for prediction when `s ≥ 1/2`". O rascunho da frase
+     está no fim desta pergunta. Recomendação: sim, pelo teto de páginas.
+   - (b) **O posicionamento (D50) não muda:** a introdução não diz que a
+     condição de desenho é o preço da taxa rápida; a qualificação vai ao §3.
+   - (c) A variante branca com o comparador truncado: não abrir; uma linha em
+     "what this does not cover" no supp.
+   - (d) **As citações de L10 na `k = 4`:** no §4.1, "group descent
+     \citep{Breheny-Huang-2015}" e "the grpreg package
+     \citep{Breheny-Miller-grpreg-2026}", tirando o `[VERIFICAR]` (nota de
+     trabalho, sem cinza); no §2.3, "a group lasso \citep{Yuan-Lin-2006}";
+     as três entradas no `references_4.bib`.
+   - (e) **As hipóteses da Proposition S8.1:** acrescentar "together with
+     the upper bounds in Assumptions 2 and 3", marcado, porque o `λ_n` e a
+     prova usam `B_X` e `C_U` (herdado da `k = 3`).
+   - (f) **Simon & Tibshirani (2012, *Statist. Sinica* 22, "Standardization
+     and the group lasso penalty")** como referência da Remark S5.2 (a
+     escala `‖Q_G^{1/2}θ_G‖_2`): é da revista-alvo; verificar antes, numa
+     frente curta de bibliografia (L11), com a paginação de Breheny & Huang
+     no periódico se o manuscrito citar seção ou página.
+   - (g) Breheny & Huang ficam na seção de software do `.bib` (D25), como o
+     artigo do `glmnet`.
+   - (h) **Símbolos para o `notacao.md` §10:** `ℛ_1(θ; t)`,
+     `ℛ_{𝒢,w}(θ; λ)` e `ℛ_{𝒢,1}(θ; t)` (`\mathcal{R}`, sem uso anterior),
+     que não se confundem com o risco ideal `R_𝒢(θ; η)` do Lema 15.
+   Rascunho da frase de (a), da E1.15: "When $s < 1/2$ the slow rate
+   improves further: comparing with the truncated oracle
+   $\theta^{*}_{G}\mathbf{1}\{\lVert\theta^{*}_{G}\rVert_{2} > \lambda w_{G}\}$
+   instead of $\theta^{*}$ gives, without any design condition, the
+   prediction rate of Theorem 1 whenever $s' > s/(2s+1)$ (Proposition S6.x);
+   when $s \ge 1/2$ no comparator does better than
+   $\lambda^{\mathcal{G}}_{n,1} \asymp (\log n/n)^{1/2}$, and the design
+   condition is what the faster rate costs."
+
 ---
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-04).** **E1.14 e E5d fechadas e integradas**: a
+**Onde parou (2026-10-05).** **E1.15, E5e e L10 fechadas e integradas**;
+pendências na pergunta 48. A E6.1b vai em 107 de 120 unidades. **E1.14 e
+E5d fechadas e integradas**: a
 taxa lenta cobre todo `s' > 0`, e o manuscrito está em `k = 4` (43 páginas
 sem o removido, sem os itens de E1.14 na Proposition 3); pendências nas
 perguntas 46 e 47. **A E6.1b está rodando** (4 processos, 20 partições,
@@ -3360,6 +3479,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-05 | E1.15 fechada e integrada (`OK` nas duas conferências; 15 e 23 páginas): Proposição 8 e Corolário 15, a taxa lenta pelo comparador truncado, que em `s < 1/2` alcança a do Theorem 1 sem condição de desenho e em `s ≥ 1/2` não melhora. E5e fechada e integrada (50 e 68 páginas): a E1.14 na `k = 4`, "program", "thresholding". L10 fechada e integrada (86 entradas). Pergunta 48 |
 | 2026-10-04 | Resumo da `k = 4` aprovado (D53), com "thresholding" no lugar de "effective dimension" nas palavras-chave, a cargo da E5e |
 | 2026-10-04 | Perguntas 46 e 47 decididas (D52): `ξ` no lugar do `Δ` no `08`; símbolos de E1.14 e do `ms_4` no `notacao.md` §10; "program" no `alvo-revista.md`; E1.15 (comparador truncado), E5e (E1.14 na `k = 4`) e L10 (bibliografia do `grpreg`) catalogadas; o resumo vai ao autor |
 | 2026-10-04 | E1.14 fechada e integrada (`OK` nas duas conferências; 12 e 20 páginas): a Proposição 4 e o Corolário 14 em todo `s' > 0` e em `s = 1/2`, com o `λ` inflado acima do teto, que faz melhor que parar `J_n` nele; pergunta 46. E5d fechada e integrada: `k = 4` viva, 50 e 60 páginas (43 e 59 sem o removido), 40 entradas no `.bib`; sem os itens de E1.14; pergunta 47. `manuscript/README.md` em `k = 4`; duas lições de marcação no `instrucoes.md` §3 |

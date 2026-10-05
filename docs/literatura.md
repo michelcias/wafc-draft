@@ -119,3 +119,33 @@ como as de L1, e estão em
 corrigiu três dados que L2 trazia errados: o ano de Deshpande et al. (2026,
 não 2024), o ano de Zhou, Xu & Lin (2017, não 2016) e o terceiro autor de
 Zhou, Yang & Xiang (2022).
+
+## Aplicação (E6.1b, 2026-10-03)
+
+Linhas novas de E6.1b, todas com status `[VERIFICAR]` até a rodada
+bibliográfica: título, autores, ano, veículo e DOI foram conferidos no
+Crossref em 2026-10-03, mas nenhum PDF foi lido, e o que a coluna do meio
+atribui a cada trabalho vem do resumo ou de busca. Os detalhes da base
+estão em [`aplicacao-candidatas.md`](aplicacao-candidatas.md) §9 em diante.
+
+| Referência | O que resolve | O que não cobre | Status |
+|---|---|---|---|
+| Liang, Zou, Guo, Li, Zhang, Zhang, Huang & Chen (2015), *Proc. R. Soc. A* 471(2182) 20150257, "Assessing Beijing's PM2.5 pollution: severity, weather impact, APEC and winter heating" (DOI 10.1098/rspa.2015.0257) | a temporada de aquecimento de Pequim, de 15 de novembro a 15 de março, como quase experimento, com aumento de PM2.5 significativo em todas as temporadas: o limiar administrativo da base `beijing.heat` | usa a série da embaixada dos EUA (2010–2014), não a do Dongsi; as datas efetivas de cada ano não foram conferidas | `[VERIFICAR]` (Crossref; o intervalo de 31% a 72% em março vem de busca, PDF não lido) |
+| Carslaw (2005), *Atmos. Environ.* 39(26) 4793–4802, "Evidence of an increasing NO2/NOX emissions ratio from road traffic emissions" (DOI 10.1016/j.atmosenv.2005.06.023) | a fração primária NO2/NOx do tráfego de ~5–6% (1997) a ~17% (2003) em Londres, ligada aos filtros dos ônibus: a mudança datada da base `marylebone` | se a mudança é degrau ou rampa, e em quais sítios | `[VERIFICAR]` (Crossref; o Crossref grafa o título sem os subscritos; PDF não lido) |
+| Carslaw & Beevers (2005), *Atmos. Environ.* 39(1) 167–177, "Estimations of road vehicle primary NO2 exhaust emission fractions using monitoring data in London" (DOI 10.1016/j.atmosenv.2004.08.053) | a estimação da fração primária a partir das medidas de Marylebone Road | | `[VERIFICAR]` (Crossref; PDF não lido) |
+| Clapp & Jenkin (2001), *Atmos. Environ.* 35(36) 6391–6405, "Analysis of the relationship between ambient levels of O3, NO2 and NO as a function of NOx in the UK" (DOI 10.1016/S1352-2310(01)00378-8) | o oxidante `OX = NO2 + O3` linear em NOx, com o fundo regional como intercepto e a fração primária como inclinação: o modelo da base `marylebone` | | `[VERIFICAR]` (o Crossref só lista "L. Clapp"; o segundo autor, M. E. Jenkin, vem da literatura e não foi conferido) |
+| Carslaw & Ropkins (2012), *Environ. Model. Softw.* 27–28, 52–61, "openair — An R package for air quality data analysis" (DOI 10.1016/j.envsoft.2011.09.008) | o pacote de onde vem o `mydata` (Marylebone Road, 1998–2005) | a licença dos dados: o pacote é MIT, as medidas são do LAQN (OGL v2), a fonte do vento não é declarada | `[VERIFICAR]` (Crossref) |
+| Lee, Ding, Genton & Xie (2015), *JASA* 110(509) 56–67, "Power curve estimation with multivariate environmental factors for inland and offshore wind farms" (DOI 10.1080/01621459.2014.977385) | a curva de potência com a densidade do ar e a turbulência como covariáveis, num periódico de estatística geral: a âncora da base `kelmarsh` | estimador por núcleo, não aditivo em coeficientes; o que diz sobre a densidade acima da velocidade nominal não foi conferido | `[VERIFICAR]` (Crossref; PDF não lido) |
+| Plumley (2022), "Kelmarsh wind farm data", Zenodo, versão 0.0.3 (DOI 10.5281/zenodo.5841834), CC BY 4.0 | o SCADA de 10 min de seis turbinas Senvion MM92, 2016 a 2021, com licença declarada | é dado, não literatura; se a base for escolhida, vai ao `.bib` como os conjuntos do UCI | `[VERIFICAR]` (API do Zenodo: título, autor, data, licença e MD5 conferidos) |
+| Nadeau & Bengio (2003), *Machine Learning* 52(3) 239–281, "Inference for the generalization error" (DOI 10.1023/A:1024068626366) | a correção da variância do erro estimado por partições repetidas com treinos sobrepostos, `(1/K + n_teste/n_treino)` no lugar de `1/K`, usada no erro-padrão corrigido das tabelas de E6.1b | o bloqueio por semana ou ladrilho não entra na correção, que supõe partições aleatórias de observações | `[VERIFICAR]` (Crossref; a fórmula está como usada no script 10 e não foi conferida no PDF) |
+
+## Group lasso (L10, 2026-10-04)
+
+Linha nova de L10, conferida no Crossref e no PDF (`refs/yuan2006.pdf`);
+a entrada está em [`referencias-verificadas.bib`](referencias-verificadas.bib). O
+artigo do `grpreg` (Breheny & Huang 2015) e o pacote entraram na seção de
+software do `.bib`, como o `glmnet`, e por D25 não têm linha aqui.
+
+| Referência | O que resolve | O que não cobre | Status |
+|---|---|---|---|
+| Yuan & Lin (2006), *JRSS B* 68(1) 49–67, "Model selection and estimation in regression with grouped variables" (DOI 10.1111/j.1467-9868.2005.00532.x) | o group lasso, eq. (2.1), p. 51, `½‖Y − Σ X_j β_j‖² + λ Σ ‖β_j‖_{K_j}`; o peso `K_j = p_j I`, p. 53, que é o `|G|^{1/2}` padrão do `grpreg`; os grupos ortonormalizados, §1, p. 50, que são a padronização do `grpreg`; o modelo aditivo como caso em que cada fator é um grupo de funções de base (§1, p. 49) | sem teoria de taxa ou de seleção em alta dimensão; grupos por fator, não pedaços dentro de um nível; ortonormalidade suposta, não discutida (Breheny & Huang 2015, §2.1) | `verificado` (`Yuan-Lin-2006`) |

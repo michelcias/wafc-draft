@@ -2,7 +2,7 @@
 # (derivations/05-taxas.tex). Roda ANTES da prova; imprime OK ou falha com
 # stop(). Notação: docs/notacao.md (congelada em E1.1).
 #
-# O que confere, em seis partes (a VI é de E1.14):
+# O que confere, em sete partes (a VI é de E1.14, a VII de E1.15):
 #
 #   I.  (determinístico, sem simulação)
 #       1. Lema 9(i): a Hipótese de Besov de E1.3 implica weak-ell_tau com
@@ -42,8 +42,15 @@
 #       sigma_max^2 <= 2 B_X^2 C_U mu_J acima do teto; e a cota em ajustes com
 #       s' pequeno e d > n.
 #
+#   VII. (E1.15) a taxa lenta pelo comparador truncado, a Proposição 8: a
+#       contagem de R_1(theta*; t) = sum_a min(t |theta*_a|, theta*_a^2) sob
+#       Besov contra o supremo exato da classe (e o piso t C_g em s >= 1/2);
+#       os expoentes de n e do logaritmo da cota minimizada em J, ao lado da
+#       Proposição 4, numa grade de pares; e a cota em ajustes, abaixo e acima
+#       do teto, com E ||B delta||_n^2 exato.
+#
 # Dependências: WaveBased (wbasis, wtable), glmnet.
-# Tempo nesta máquina: cerca de 7 min.
+# Tempo nesta máquina: cerca de 13 min (com outra carga ao lado).
 
 suppressPackageStartupMessages({
   library(WaveBased)
@@ -674,5 +681,269 @@ chk(all(tabVI3[["T"]] >= 1 - alpha), "o evento T tem a probabilidade nominal com
 chk(all(tabVI3[["viola"]] == 0) && max(tabVI3[["kkt"]]) < 1 + 1e-6,
     "Proposição 4(iii) e (iv): no evento T, o Teorema 1(i) e ||f_hat - f||_n^2 <= 18 lambda ||theta*||_1 + 24 ||b||_n^2 + 3 ||P_A eps||_n^2 valem em todos os ajustes (KKT a 1e-6)")
 
+## ===========================================================================
+cat("\nPARTE VII. A taxa lenta pelo comparador truncado: Proposição 8 (E1.15)\n")
+## ===========================================================================
+
+# A Proposição 8 é o Lema 8(i) com o comparador truncado theta_bar = theta* 1{|theta*| > t}:
+# no evento T,
+#   ||f_hat - f||_n^2 <= 18 lambda ||theta_bar||_1 + 48 ||B delta||_n^2 + 48 ||b||_n^2 + 3 ||P_A eps||_n^2,
+# delta = theta* - theta_bar, e E ||B delta||_n^2 <= kappa_2 C_U ||delta||_2^2 para t determinístico.
+# Com t = lambda, os dois primeiros termos ficam sob max(18, 48 kappa_2 C_U) R_1(theta*; lambda),
+#   R_1(theta; t) = sum_a min(t |theta_a|, theta_a^2),
+# e a contagem sob Besov, em s < 1/2, é
+#   R_1(theta*; t) <= pq C_g^tau t^{4s/(2s+1)} {(1 - 2^{s-1/2})^{-1} + (1 - 2^{-min(pi,2) s'})^{-1}}.
+# VII.1 confere a contagem contra o supremo exato da classe (nível a nível) e o
+# piso t C_g em s >= 1/2; VII.2 lê os expoentes da cota minimizada em J, ao lado
+# da Proposição 4; VII.3 confere a cota em ajustes, abaixo e acima do teto.
+
+kap2 <- 4 / 3                                   # lambda_max(E XX') no cenário A
+Kcst <- max(18, 48 * kap2 * C_U)
+ipi_of <- function(pii) if (is.infinite(pii)) 0 else 1 / pii
+# Supremo de sum_{k <= N} min(t |x_k|, x_k^2) sobre {x in R^N : ||x||_pi <= eps}, por
+# nível (eps e N vetores, t escalar). Com z = |x|^pi, a parcela é g(z) = min(t z^{1/pi},
+# z^{2/pi}): côncava se pi >= 2 (o espalhado é o supremo, exato); se 1 <= pi < 2, convexa
+# até t^pi e côncava depois, e o supremo fica entre lo (um elemento explícito: m
+# coordenadas em t e uma com o resto) e hi (a envoltória côncava, inclinação t^{2-pi}),
+# que coincidem fora do regime do meio, com hi <= 2 lo.
+sup_lvl <- function(t, eps, N, pii) {
+  if (pii >= 2) {
+    a <- eps * N^(-ipi_of(pii))
+    v <- N * pmin(t * a, a^2)
+    return(cbind(lo = v, hi = v))
+  }
+  E <- eps^pii
+  Tp <- t^pii
+  spread <- E >= N * Tp
+  tl <- E < Tp
+  mid <- !spread & !tl
+  lo <- hi <- numeric(length(E))
+  vs <- N * t * eps * N^(-1 / pii)
+  lo[spread] <- hi[spread] <- vs[spread]
+  lo[tl] <- hi[tl] <- (eps^2)[tl]
+  rt <- E / Tp
+  m <- floor(rt)
+  lo[mid] <- (t^2 * (m + (rt - m)^(2 / pii)))[mid]        # resto (rt - m) t^pi, sem cancelamento
+  hi[mid] <- (E * t^(2 - pii))[mid]
+  cbind(lo = lo, hi = hi)
+}
+eps_lvl <- function(s, pii, Cg, Jl) Cg * 2^(-(0:(Jl - 1L)) * (s + 0.5 - ipi_of(pii)))
+# Supremo na classe de R_1(theta*; t) num bloco, para J = 1..Jl (a classe é produto nos níveis).
+supR1_path <- function(s, pii, Cg, Jl, t) {
+  sl <- sup_lvl(t, eps_lvl(s, pii, Cg, Jl), 2^(0:(Jl - 1L)), pii)
+  cbind(lo = cumsum(sl[, "lo"]), hi = cumsum(sl[, "hi"]))
+}
+Ktr <- function(s, pii) 1 / (1 - 2^(s - 0.5)) + 1 / (1 - 2^(-min(pii, 2) * sp_of(s, pii)))
+bnd_R1 <- function(s, pii, Cg, t) Cg^tau_of(s) * t^(4 * s / (2 * s + 1)) * Ktr(s, pii)   # por bloco
+
+## ---- VII.1 a contagem e o piso -------------------------------------------------
+tgr <- 10^seq(-1, -60, by = -0.5)
+pairs7a <- list(c(0.2, 2), c(0.3, 1.5), c(0.4, 1.25), c(0.45, 1.6), c(0.3, 4), c(0.3, Inf),
+                c(0.4, 1.8), c(0.1, 3), c(0.35, 1.9))
+tab7a <- do.call(rbind, lapply(pairs7a, function(sp_) {
+  s <- sp_[1]
+  pii <- sp_[2]
+  r <- t(vapply(tgr, function(t) {
+    sp <- supR1_path(s, pii, 1, 600L, t)
+    b <- bnd_R1(s, pii, 1, t)
+    c(viol = max(sp[, "hi"] / b), justa = unname(sp[600, "lo"]) / b, lo = unname(sp[600, "lo"]),
+      hilo = max(sp[, "hi"] / pmax(sp[, "lo"], 1e-300)))
+  }, numeric(4)))
+  sm <- tgr <= 1e-20
+  c(s = s, pi = pii, sprime = sp_of(s, pii), max_hi_cota = max(r[, "viol"]),
+    min_lo_cota = min(r[sm, "justa"]), hi_lo = max(r[, "hilo"]),
+    expo = 4 * s / (2 * s + 1), expo_hat = unname(coef(lm(log(r[sm, "lo"]) ~ log(tgr[sm])))[2]))
+}))
+print(round(tab7a, 3))
+chk(all(tab7a[, "max_hi_cota"] <= 1 + 1e-12),
+    "contagem da Proposição 8: o supremo de R_1(theta*; t) na classe fica sob pq C_g^tau t^{4s/(2s+1)} K em s < 1/2 (9 pares, t de 1e-1 a 1e-60, J = 1..600)")
+chk(all(tab7a[, "hi_lo"] <= 2 + 1e-9), "o supremo está entre lo (um elemento da classe) e hi, com hi <= 2 lo")
+chk(all(abs(tab7a[, "expo_hat"] - tab7a[, "expo"]) < 0.01) && all(tab7a[, "min_lo_cota"] > 0.05),
+    "o supremo cai como t^{4s/(2s+1)} (a 0,01) e fica a um fator fixo da cota: a contagem é justa em t")
+# s >= 1/2: nada a ganhar. O piso: o coeficiente do nível 0 sozinho dá t C_g.
+pairs7b <- list(c(0.6, 1), c(1, 2), c(0.8, 1.5), c(1.5, Inf), c(0.5, 1.5), c(0.5, 2), c(0.5, Inf))
+tab7b <- do.call(rbind, lapply(pairs7b, function(sp_) {
+  s <- sp_[1]
+  pii <- sp_[2]
+  lo <- vapply(tgr, function(t) unname(supR1_path(s, pii, 1, 600L, t)[600, "lo"]), 1)
+  l1 <- if (s > 0.5) 1 / (1 - 2^(0.5 - s)) else NA
+  sm <- tgr <= 1e-6
+  c(s = s, pi = pii, piso = min(lo / tgr), l1_razao = if (s > 0.5) max(lo / (tgr * l1)) else NA,
+    expo_hat = unname(coef(lm(log(lo[sm]) ~ log(tgr[sm])))[2]),
+    log_razao = if (s == 0.5) max(abs(lo[sm] / (tgr[sm] * log2(1 / tgr[sm])) - 1)) else NA)
+}))
+print(round(tab7b, 3))
+chk(all(tab7b[, "piso"] >= 1 - 1e-12), "em s >= 1/2 o supremo de R_1 é pelo menos t C_g (o piso do nível 0)")
+chk(all(tab7b[tab7b[, "s"] > 0.5, "l1_razao"] <= 1 + 1e-12) &&
+      all(abs(tab7b[tab7b[, "s"] > 0.5, "expo_hat"] - 1) < 0.01),
+    "em s > 1/2 o supremo é da ordem de t (o mesmo t ||theta*||_1 da Proposição 4): o truncado não muda a ordem")
+chk(all(tab7b[tab7b[, "s"] == 0.5, "log_razao"] < 0.25),
+    "em s = 1/2 o supremo é t C_g log2(1/t) a 25%: da ordem de t J_n, como na Proposição 4(iv)")
+
+## ---- VII.2 os expoentes da cota minimizada em J ---------------------------------
+# log da cota max(18, 48 kappa_2 C_U) pq sup R_1(theta*; lambda) + 48 B^2 + 3 sigma^2 p/n,
+# com lambda = lambda_n^+ (mu_J = 1 + c_psi 2^J log d/n) e o supremo lo da classe.
+logF15 <- function(lnn, s, pii, Jv, Cg = 1, mu = TRUE) {
+  n <- exp(lnn)
+  sp <- sp_of(s, pii)
+  ep <- eps_lvl(s, pii, Cg, max(Jv))
+  N <- 2^(0:(max(Jv) - 1L))
+  logd <- log(p * q) + Jv * log(2) + log1p(-2^(-Jv))
+  lam <- 2 * sig * B_X * sqrt(2 * C_U) * sqrt(2 * (log(2 / alpha) + logd) / n)
+  if (mu) lam <- lam * sqrt(1 + cpsi * 2^Jv * logd / n)
+  S <- vapply(seq_along(Jv), function(i) {
+    ii <- seq_len(Jv[i])
+    sum(sup_lvl(lam[i], ep[ii], N[ii], pii)[, "lo"])
+  }, 1)
+  B2 <- (p * q)^2 * B_X^2 * C_U * Cg^2 / (1 - 2^(-2 * sp)) * 2^(-2 * Jv * sp)
+  log(Kcst * p * q * S + 48 * B2 + 3 * sig^2 * p / n)
+}
+# O regime da Proposição 8: s >= 1/2, o da Proposição 4 (nada muda); s < 1/2 e
+# s' > s/(2s+1), (log n/n)^{2s/(2s+1)} na janela de c; s' <= s/(2s+1), acima do teto.
+reg15 <- function(s, pii) {
+  sp <- sp_of(s, pii)
+  if (s >= 0.5 - 1e-12) return(reg05(s, pii))
+  if (sp > s / (2 * s + 1)) c(reg = 5, a = -2 * s / (2 * s + 1), k = 2 * s / (2 * s + 1),
+                              eJ = (s / ((2 * s + 1) * sp) + 1) / 2, kJ = 0)
+  else {
+    e <- 4 * s * sp / (s + sp * (2 * s + 1))
+    eJ <- 2 * s / (s + sp * (2 * s + 1))
+    c(reg = 6, a = -e, k = e, eJ = eJ, kJ = -eJ)
+  }
+}
+lnn7 <- log(10^seq(15, 150, length.out = 80))
+up7 <- lnn7 >= log(1e60)        # o expoente do logaritmo só assenta em n >= 1e60 (as somas
+                                # geométricas de razão 2^{s - 1/2} convergem devagar perto de s = 1/2)
+scan15 <- function(s, pii, lnns = lnn7, st = TRUE) {
+  th <- reg15(s, pii)
+  t(vapply(lnns, function(lnn) {
+    Jv <- seq_len(floor(2 * lnn / log(2)))
+    lf <- logF15(lnn, s, pii, Jv)
+    Jst <- if (st) min(max(Jv), max(1, round((th[["eJ"]] * lnn + th[["kJ"]] * log(lnn)) / log(2)))) else 1
+    c(minF = min(lf), Jopt = Jv[which.min(lf)], Fst = lf[Jst], teto = (lnn - log(lnn)) / log(2))
+  }, numeric(4)))
+}
+pairs7c <- list(c(0.3, 2), c(0.45, 1.6), c(0.4, 1.8), c(0.3, Inf), c(0.2, 4),         # s' > s/(2s+1)
+                c(0.4, 1.25), c(0.3, 1.5), c(0.2, 1.6), c(0.45, 1.25), c(0.3, 1.6),   # s' < s/(2s+1)
+                c(0.25, 1.7),
+                c(0.6, 1), c(1, 2), c(1.2, 1), c(0.6, 1.15), c(0.5, 1.5), c(0.5, 1.2))  # s >= 1/2
+tab7c <- do.call(rbind, lapply(pairs7c, function(sp_) {
+  s <- sp_[1]
+  pii <- sp_[2]
+  th <- reg15(s, pii)
+  old <- reg05(s, pii)
+  sc <- scan15(s, pii)
+  c(s = s, pi = pii, sprime = sp_of(s, pii), reg = th[["reg"]], a = th[["a"]],
+    a_hat = fit2(lnn7, sc[, "minF"])[1], k = th[["k"]],
+    k_hat = unname(coef(lm((sc[, "minF"] - th[["a"]] * lnn7)[up7] ~ log(lnn7[up7])))[2]),
+    a_P4 = old[["a"]], eJ = th[["eJ"]], eJ_hat = fit2(lnn7, sc[, "Jopt"] * log(2))[1],
+    acima = mean((sc[, "Jopt"] > sc[, "teto"])[lnn7 >= median(lnn7)]),
+    a_st = fit2(lnn7, sc[, "Fst"])[1], Jst = max(sc[, "Fst"] - sc[, "minF"]))
+}))
+print(round(tab7c, 3))
+r5 <- tab7c[, "reg"] == 5
+r6 <- tab7c[, "reg"] == 6
+ganha <- tab7c[, "s"] < 0.5 & tab7c[, "pi"] < 2
+chk(all(abs(tab7c[, "a_hat"] - tab7c[, "a"]) < 0.01),
+    "o expoente de n da cota minimizada em J é o da Proposição 8 (a 0,01; n de 1e15 a 1e150, 2^J <= n^2)")
+chk(all(abs(tab7c[, "k_hat"] - tab7c[, "k"]) < 0.1), "o do logaritmo também, a 0,1 (lido em n de 1e60 a 1e150)")
+chk(all(tab7c[ganha, "a"] < tab7c[ganha, "a_P4"] - 1e-6) && all(abs(tab7c[!ganha, "a"] - tab7c[!ganha, "a_P4"]) < 1e-12),
+    "a taxa é estritamente melhor que a da Proposição 4 exatamente em s < 1/2 e pi < 2; igual em pi >= 2 e em s >= 1/2")
+chk(all(abs(tab7c[r6, "eJ_hat"] - tab7c[r6, "eJ"]) < 0.03) && all(tab7c[r6, "acima"] == 1),
+    "em s' < s/(2s+1) o minimizador passa do teto e cresce como 2^J ~ n^{2s/(s + s'(2s+1))} (a 0,03)")
+chk(all(abs(tab7c[r5 | r6, "a_st"] - tab7c[r5 | r6, "a"]) < 0.01) && all(tab7c[r5 | r6, "Jst"] < log(3)),
+    "a cota no J_n do enunciado (o meio da janela em s' > s/(2s+1)) tem o expoente da teoria e fica a menos de um fator 3 do mínimo")
+# A cobertura: numa grade de pares com s' > 0, o expoente de n da cota minimizada é
+# o da Proposição 8; e a taxa de (iv) emenda com a de (iii) em s' = s/(2s+1).
+gr7 <- expand.grid(s = seq(0.05, 1.5, by = 0.05), pi = c(1, 1.1, 1.25, 1.5, 1.75, 2, 4, Inf))
+gr7[["sp"]] <- mapply(sp_of, gr7[["s"]], gr7[["pi"]])
+gr7 <- gr7[gr7[["sp"]] > 1e-9, ]
+lnn_c7 <- log(10^seq(60, 150, length.out = 12))
+ah7 <- vapply(seq_len(nrow(gr7)), function(i) {
+  fit2(lnn_c7, scan15(gr7[["s"]][i], gr7[["pi"]][i], lnns = lnn_c7, st = FALSE)[, "minF"])[1]
+}, 1)
+at7 <- vapply(seq_len(nrow(gr7)), function(i) reg15(gr7[["s"]][i], gr7[["pi"]][i])[["a"]], 1)
+ao7 <- vapply(seq_len(nrow(gr7)), function(i) reg05(gr7[["s"]][i], gr7[["pi"]][i])[["a"]], 1)
+cat(sprintf("  grade de %d pares com s' > 0: desvio máximo do expoente de n = %.4f; %d pares com ganho sobre a Proposição 4, ganho máximo no expoente = %.3f\n",
+            nrow(gr7), max(abs(ah7 - at7)), sum(at7 < ao7 - 1e-9), max(ao7 - at7)))
+chk(max(abs(ah7 - at7)) < 0.02 && all(at7 <= ao7 + 1e-12),
+    "em todos os pares da grade o expoente de n da cota minimizada é o da Proposição 8, nunca pior que o da Proposição 4")
+sb <- seq(0.02, 0.48, by = 0.02)
+chk(max(abs(4 * sb * (sb / (2 * sb + 1)) / (sb + sb) - 2 * sb / (2 * sb + 1))) < 1e-12,
+    "a taxa de (iv) coincide com a de (iii) em s' = s/(2s+1)")
+
+## ---- VII.3 a cota em ajustes, com o comparador truncado ------------------------
+# E ||B delta||_n^2 exato no cenário A: X independente de U, U uniforme e wavelets de
+# média nula e ortonormais dão sum_m sum_{jk} delta_{.m,jk}' E(XX') delta_{.m,jk}.
+MXX <- matrix(c(1, 0.5, 0.5, 7 / 12), 2, 2)
+EBd_exact <- function(del, Jl) {
+  NJ <- 2L^Jl - 1L
+  D <- matrix(del, NJ, p * q)                           # coluna bb = (l - 1) q + m (D12)
+  sum(vapply(seq_len(q), function(m) {
+    Dm <- D[, (seq_len(p) - 1L) * q + m, drop = FALSE]
+    sum((Dm %*% MXX) * Dm)
+  }, 1))
+}
+regs7 <- list(a = list(s = 0.4, pi = 1.8, Cg = 1.5, J = 5L),     # s' > s/(2s+1), abaixo do teto
+              b = list(s = 0.4, pi = 1.25, Cg = 1.2, J = 8L),    # s' < s/(2s+1), acima do teto
+              c = list(s = 0.3, pi = 2, Cg = 1, J = 7L))         # pi = 2, acima do teto
+one_7 <- function(n, theta_full, Jl) {
+  dat <- sim_data(n, theta_full)
+  Z <- design_from(dat[["X"]], dat[["Wl"]], Jl)
+  rp <- resid_pen(Z)
+  d <- ncol(Z) - p
+  th_or <- theta_full[keep_idx(Jl)]
+  fJ <- as.numeric(Z %*% c(c_true, th_or))
+  eps <- dat[["y"]] - dat[["f"]]
+  smax <- sqrt(max(colSums(rp[["B"]]^2) / n))
+  Ln <- log(2 * d / alpha)
+  lam_n <- 2 * sig * B_X * sqrt(2 * C_U) * sqrt(2 * Ln / n)
+  lams <- c(plus = sqrt(mu_of(n, Jl)) * lam_n, exato = 2 * sig * smax * sqrt(2 * Ln / n))
+  z <- max(abs(crossprod(rp[["Bt"]], eps))) / n
+  bias <- mean((dat[["f"]] - fJ)^2)
+  Peps <- mean(rp[["proj"]](eps)^2)
+  t(vapply(lams, function(lam) {
+    fit <- fit_resid(rp, dat[["y"]], lam)
+    th <- fit[["theta"]]
+    pred <- mean((as.numeric(Z %*% c(fit[["c"]], th)) - dat[["f"]])^2)
+    thb <- th_or * (abs(th_or) > lam)
+    del <- th_or - thb
+    bb2 <- mean((dat[["f"]] - as.numeric(Z %*% c(c_true, thb)))^2)
+    Bd2 <- mean((rp[["B"]] %*% del)^2)
+    lhs <- 0.5 * mean((rp[["Bt"]] %*% (th - thb))^2) + lam * sum(abs(th))
+    b15 <- 18 * lam * sum(abs(thb)) + 48 * Bd2 + 48 * bias + 3 * Peps
+    b4 <- 18 * lam * sum(abs(th_or)) + 24 * bias + 3 * Peps
+    EBd <- EBd_exact(del, Jl)
+    R1 <- sum(pmin(lam * abs(th_or), th_or^2))
+    c(T = z <= lam / 2, lem8 = lhs <= 3 * lam * sum(abs(thb)) + 2 * bb2 + 1e-12,
+      young = bb2 <= 2 * bias + 2 * Bd2 + 1e-12, c15 = pred <= b15, folga = b15 / pred,
+      razao = b15 / b4, EBd_ok = EBd <= kap2 * C_U * sum(del^2) + 1e-15 && EBd <= p * q * B_X^2 * C_U * sum(del^2),
+      R1_ok = 18 * lam * sum(abs(thb)) + 48 * kap2 * C_U * sum(del^2) <= Kcst * R1 + 1e-12,
+      Bd2 = Bd2, EBd = EBd, ntr = sum(thb != 0) / length(thb))
+  }, numeric(11)))
+}
+tab7d <- do.call(rbind, lapply(names(regs7), function(nm) {
+  rg <- regs7[[nm]]
+  thf <- theta_besov(rg[["s"]], rg[["pi"]], rg[["Cg"]], Jmax, p * q, spread = "random", seed = 51L)
+  do.call(rbind, lapply(c(250L, 500L), function(n) {
+    rr <- lapply(seq_len(6L), function(i) one_7(n, thf, rg[["J"]]))
+    do.call(rbind, lapply(1:2, function(il) {
+      m <- do.call(rbind, lapply(rr, function(x) x[il, ]))
+      data.frame(regime = nm, n = n, J = rg[["J"]], acima = 2^rg[["J"]] > n / log(n),
+                 lambda = c("plus", "exato")[il], T = mean(m[, "T"]),
+                 viola = sum(m[, "T"] == 1 & (m[, "lem8"] == 0 | m[, "c15"] == 0)),
+                 young = all(m[, "young"] == 1), EBd_ok = all(m[, "EBd_ok"] == 1), R1_ok = all(m[, "R1_ok"] == 1),
+                 folga_min = min(m[, "folga"]), razao = median(m[, "razao"]),
+                 Bd2_EBd = mean(m[, "Bd2"]) / mean(m[, "EBd"]), retidos = median(m[, "ntr"]))
+    }))
+  }))
+}))
+print(tab7d, digits = 3, row.names = FALSE)
+chk(all(tab7d[["T"]] >= 1 - alpha), "o evento T tem a probabilidade nominal, abaixo e acima do teto")
+chk(all(tab7d[["viola"]] == 0) && all(tab7d[["young"]]),
+    "Proposição 8(i): no evento T, o Lema 8(i) no comparador truncado e ||f_hat - f||_n^2 <= 18 lambda ||theta_bar||_1 + 48 ||B delta||_n^2 + 48 ||b||_n^2 + 3 ||P_A eps||_n^2 valem em todos os ajustes")
+chk(all(tab7d[["EBd_ok"]]) && all(tab7d[["R1_ok"]]),
+    "E ||B delta||_n^2 <= kappa_2 C_U ||delta||_2^2 (e <= pq B_X^2 C_U ||delta||_2^2), e 18 lambda ||theta_bar||_1 + 48 kappa_2 C_U ||delta||^2 <= max(18, 48 kappa_2 C_U) R_1(theta*; lambda)")
+
 cat("\n")
-if (ok) cat("OK\n") else stop("E1.6 e E1.14: conferência numérica FALHOU (ver linhas acima)")
+if (ok) cat("OK\n") else stop("E1.6, E1.14 e E1.15: conferência numérica FALHOU (ver linhas acima)")

@@ -24,9 +24,12 @@
 % estão no adendo de E1.12 de 06-selecao-limiar.tex. E1.14 acrescentou ao
 % Corolário 14 os itens (iii) e (iv) (todo s' > 0 e a fronteira s = 1/2, com o
 % nível acima do teto e lambda_n^G inflado por (mu^G_J)^{1/2}), sem número novo,
-% e a Parte VIII da conferência.
+% e a Parte VIII da conferência. E1.15 acrescentou o Corolário 15 (a taxa lenta
+% pelo comparador truncado por pedaço, com a contagem de
+% sum_G min(lambda w_G ||theta*_G||, ||theta*_G||^2) sob Besov), na §5, depois da
+% Observação rem:lenta-desenho, e a Parte IX da conferência.
 %
-% Conferência numérica: check/08-blocos.R (imprime OK; ~6,5 min).
+% Conferência numérica: check/08-blocos.R (imprime OK; ~12 min).
 % Notação: docs/notacao.md (congelada em E1.1). Os símbolos da teoria em
 % blocos (os de E1.11) são macros locais deste arquivo, como em 07, até
 % entrarem no notacao.md (§10) pelo chat principal.
@@ -144,6 +147,11 @@ resultados numerados e provados. São seis peças:
     $\norm{\thetastar}_{1}$, e sem o logaritmo em $s < 1/2$ e $\pi \ge 2$
     pela contagem na norma de grupos.
 \end{enumerate}
+
+E1.15 acrescentou (g), a \textbf{taxa lenta pelo comparador truncado por
+pedaço} (Corolário~\ref{cor:truncada-blocos}): em $s < 1/2$ ela alcança a taxa
+do Corolário~\ref{cor:adaptativa-blocos} sem condição de desenho, e em
+$s \ge 1/2$ não muda a de (f).
 
 Pelo D16 o enunciado principal do artigo é o Corolário~5 de E1.6. Com D44 o
 candidato passa a ser o Corolário~\ref{cor:adaptativa-blocos}, que é o mesmo
@@ -840,6 +848,129 @@ superior passa a $\lmaxx(\Gramhat) \le \Lambda\mu^{\Gcal}_{J}$, da mesma cauda
 com $t$ crescente; continua sem $c_{U}$ nem $\kappa_{1}$.
 \end{remark}
 
+\subsection*{Sem condição de desenho, pelo comparador truncado por pedaço (E1.15)}
+
+O Corolário~\ref{cor:lenta-blocos} lê o
+Teorema~\ref{thm:oraculo-blocos}(i) só no comparador $\betastar$. Como na
+Proposição~8 de E1.6, o comparador truncado por pedaço,
+\begin{equation}
+  \label{eq:truncado-blocos}
+  \thbar_{G} \;=\; \thetastar_{G}\,\mathbf{1}\bigl\{\norm{\thetastar_{G}}_{2} > \pen w_{G}\bigr\},
+  \qquad G \in \Gcal,
+\end{equation}
+cobra na penalidade só os pedaços acima do limiar do pedaço e manda os
+outros ao viés. O que sobra é
+\begin{equation}
+  \label{eq:RG}
+  \mathcal{R}_{\Gcal,w}(\btheta;\pen) = \sum_{G\in\Gcal}
+  \min\bigl(\pen w_{G}\norm{\btheta_{G}}_{2},\,\norm{\btheta_{G}}_{2}^{2}\bigr),
+  \qquad
+  \mathcal{R}_{\Gcal,1}(\btheta;t) = \sum_{G\in\Gcal}
+  \min\bigl(t\norm{\btheta_{G}}_{2},\,\norm{\btheta_{G}}_{2}^{2}\bigr),
+\end{equation}
+o par em norma de grupos do risco ideal $\Rid$, com
+$\mathcal{R}_{\Gcal,1}(\btheta;t) \le t\nGone{\btheta}$. A contagem nova é a
+de $\mathcal{R}_{\Gcal,1}(\thetastar;t)$ sob Besov: nos níveis finos ela junta
+a do Corolário~\ref{cor:lenta-blocos} (o ganho $\bn^{-\vartheta_{\pi}}$ da
+norma de grupos) com a do Lema~\ref{lem:risco-pedacos} (o corte em que o
+pedaço deixa de pagar penalidade e passa a pagar viés).
+
+\begin{corollary}[taxa lenta em blocos pelo comparador truncado; nenhuma condição de desenho]
+\label{cor:truncada-blocos}
+Sob as Hipóteses~1 e~2 de E1.5, as hipóteses de E1.3, a
+Hipótese~\ref{ass:regime-blocos} e $\Amat$ de posto $p$:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(não assintótico)} no evento $\Tw$, para todo $\pen > 0$, com
+    $\thbar$ de \eqref{eq:truncado-blocos},
+    \[
+      \normn{\widehat f - f}^{2}
+      \;\le\; 18\pen\nGw{\thbar} + 48\normn{\Bmat(\thetastar - \thbar)}^{2}
+      + 48\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2};
+    \]
+    se $\pen$ e $w$ são determinísticos,
+    $\E\normn{\Bmat(\thetastar - \thbar)}^{2} \le \kappa_{2}C_{U}
+    \norm{\thetastar - \thbar}_{2}^{2}$ (e $\le pqB_{X}^{2}C_{U}
+    \norm{\thetastar - \thbar}_{2}^{2}$, só com as hipóteses de E1.3),
+    \[
+      18\pen\nGw{\thbar} + 48\kappa_{2}C_{U}\norm{\thetastar - \thbar}_{2}^{2}
+      \;\le\; \max(18,48\kappa_{2}C_{U})\,\mathcal{R}_{\Gcal,w}(\thetastar;\pen),
+    \]
+    e $\mathcal{R}_{\Gcal,w}(\thetastar;\lamG) \le
+    \bar\varrho\,\mathcal{R}_{\Gcal,1}(\thetastar;\lamGone)$. Logo
+    \[
+      \normn{\widehat f - f}^{2} \;=\; O_{p}\Bigl(\mathcal{R}_{\Gcal,1}(\thetastar;\lamGone)
+      + \mathcal{B}_{J_{n}}^{2} + \frac{p}{n}\Bigr)
+    \]
+    sempre que $pq2^{J_{n}}\log(pq2^{J_{n}})/n \to 0$; com as trocas do
+    Corolário~\ref{cor:lenta-blocos}(iii) ($\lamGp$ no estimador, $2^{J_{n}} \le
+    n^{2}$), a mesma forma vale com $(\mu^{\Gcal}_{J_{n}})^{1/2}\lamGone$ no lugar
+    de $\lamGone$, para toda sequência $J_{n}$.
+  \item \textup{(a contagem sob Besov)} Na forma balanceada com $b \ge 2$, para
+    todo $J$ e todo $t > 0$, com $\tau = (s+1/2)^{-1}$: se $s < 1/2$,
+    \begin{equation}
+      \label{eq:contagem-truncada-blocos}
+      \begin{aligned}
+      \mathcal{R}_{\Gcal,1}(\thetastar;t) \le pq\Bigl\{&\frac{C_{g}\,t}{1 - 2^{-\seff}}\\
+      &+ C_{g}^{\tau}\,t^{4s/(2s+1)}\,b^{((2/\pi-1)_{+}-2s)/(2s+1)}
+      \Bigl(\frac{1}{1 - 2^{s-1/2}} + \frac{1}{1 - 2^{-\min(\pi,2)\seff}}\Bigr)\Bigr\};
+      \end{aligned}
+    \end{equation}
+    se $s \ge 1/2$, nada se ganha em ordem: $\mathcal{R}_{\Gcal,1}(\thetastar;t)
+    \le t\nGone{\thetastar}$, e para $t \le C_{g}$ a classe contém um
+    $\thetastar$ com $\mathcal{R}_{\Gcal,1}(\thetastar;t) \ge tC_{g}$ (se
+    $s > 1/2$) e um com $\mathcal{R}_{\Gcal,1}(\thetastar;t) \ge
+    tC_{g}b^{-\vartheta_{\pi}}/2$ por nível fino $\lev < J$ com
+    $2^{\lev} \le C_{g}b^{1-\vartheta_{\pi}}/t$ (se $s = 1/2$), da ordem de
+    \eqref{eq:contagem-lenta}.
+  \item \textup{($s < 1/2$ e $\seff > s/(2s+1)$)} com $J_{n} = \lceil
+    c\log_{2}n\rceil$ e $c$ na janela \eqref{eq:janela-blocos},
+    \[
+      \normn{\widehat f - f}^{2}
+      \;=\; O_{p}\Bigl(n^{-2s/(2s+1)}(\log n)^{(2/\pi-1)_{+}/(2s+1)}\Bigr),
+    \]
+    a taxa do Corolário~\ref{cor:adaptativa-blocos}, sem condição de desenho;
+  \item \textup{($s < 1/2$ e $\seff \le s/(2s+1)$, só com $\pi < 2$)} com as
+    trocas de (i) e a escolha $2^{J_{n}} \asymp (n^{2s}\bn^{-(2s+2/\pi-1)/2})^{1/(s+\seff(2s+1))}$,
+    que passa de $n/\bn$,
+    \[
+      \normn{\widehat f - f}^{2}
+      \;=\; O_{p}\Bigl(n^{-e}(\log n)^{e(2s+2/\pi-1)/(4s)}\Bigr),
+      \qquad e = \frac{4s\seff}{s+\seff(2s+1)};
+    \]
+    em $\seff = s/(2s+1)$, $n^{-2s/(2s+1)}(\log n)^{(2s+2/\pi-1)/(2(2s+1))}$.
+\end{enumerate}
+\end{corollary}
+
+\begin{remark}[o que muda diante do Corolário~\ref{cor:lenta-blocos}]\label{rem:truncada-blocos}
+\emph{Em $s < 1/2$ e $\pi < 2$, a taxa melhora em todo par, com os mesmos
+expoentes de $n$ da Proposição~8 de E1.6.} O item (iii) dá, na janela do
+Corolário~\ref{cor:adaptativa-blocos}, a taxa dele, sem a condição de desenho
+de E1.4: em $s < 1/2$, a taxa de predição do Corolário~11 não precisa da
+condição de desenho (a das componentes continua precisando). O item (iv) troca o Corolário~\ref{cor:lenta-blocos}(iii)(b) e a
+parte de (ii) com $s/2 < \seff \le s/(2s+1)$. Em $\pi \ge 2$ a taxa,
+$n^{-2s/(2s+1)}$ sem logaritmo, é a do Corolário~\ref{cor:lenta-blocos}(ii),
+mas qualquer $c \in [1/(2s+1),1)$ serve.
+
+\emph{Em $s \ge 1/2$ nada muda}, pela razão do LASSO: o pedaço grosso, de
+norma $C_{g}$, custa $\pen C_{g}$ na penalidade ou $C_{g}^{2}$ no viés, e a
+rota lenta não desce de $\lamGone \asymp (\log n/n)^{1/2}$. Os itens (i),
+(iii)(a) e (iv) do Corolário~\ref{cor:lenta-blocos} continuam sendo o
+enunciado sem condição de desenho nesses pares.
+
+\emph{Diante do LASSO truncado}, o ganho no logaritmo é o mesmo mecanismo da
+Observação~\ref{rem:logaritmo}: $(\log n)^{2\seff/(2s+1)}$ em (iii), o ganho
+do Corolário~\ref{cor:adaptativa-blocos} sobre o Corolário~5 de E1.6, e
+$(\log n)^{e\seff/(2s)}$ em (iv).
+
+\emph{O desenho.} Como na Observação~\ref{rem:lenta-desenho}, só entram cotas
+superiores: a de $\lmaxx(\Gramhat)$ na calibração ($\Lambda$, ou
+$\Lambda\mu^{\Gcal}_{J}$ acima do teto) e, no viés novo,
+$\lmaxx(\Gram) \le \kappa_{2}C_{U}$ (ou $pqB_{X}^{2}C_{U}$); nem $c_{U}$, nem
+$\kappa_{1}$, nem $\gtil$. Os pesos custam o fator $\bar\varrho$, como no
+Corolário~\ref{cor:lenta-blocos}. O enunciado é de predição: as componentes
+continuam pedindo $\lmin(\Gramhat)$ (Corolário~\ref{cor:componentes-blocos}).
+\end{remark}
+
 \section{Diante do Teorema~2 de Klopp e Pensky (2015)}\label{sec:kp}
 
 Lido no \emph{Annals} (L7): a norma (3.1) e o estimador (3.2)--(3.3) na
@@ -1456,6 +1587,113 @@ $\vartheta_{\pi} = 1 - 1/\pi$; com $2^{J_{n}} \asymp
 estimação é $2^{J_{n}/2}(\log n)^{1+1/\pi}/n \asymp
 ((\log n)^{1+1/\pi}/n)^{4\seff/(1+4\seff)}$, a ordem do viés. \qed
 
+\subsection*{Corolário~\ref{cor:truncada-blocos}}
+
+\emph{(i).} O Teorema~\ref{thm:oraculo-blocos}(i) e (iii) com $\bar\bbeta =
+(\bc,\thbar)$ dão, como na prova de \eqref{eq:lenta-nao-assint},
+$\normn{\widehat f - f}^{2} \le 18\pen\nGw{\thbar} + 24\normn{\bbar}^{2} +
+3\normn{\PA\bveps}^{2}$, e $\bbar = \bb + \Bmat(\thetastar - \thbar)$ dá
+$\normn{\bbar}^{2} \le 2\normn{\bb}^{2} + 2\normn{\Bmat(\thetastar -
+\thbar)}^{2}$. A cota em esperança é a da Proposição~8(i) de E1.6, porque
+$\thetastar - \thbar$ é determinístico quando $\pen$ e $w$ o são. Nos pedaços
+com $\norm{\thetastar_{G}}_{2} > \pen w_{G}$, $\pen w_{G}\norm{\thetastar_{G}}_{2}$
+é o mínimo de \eqref{eq:RG}; nos outros, $\norm{\thetastar_{G}}_{2}^{2}$ é; somar
+dá a cota por $\max(18,48\kappa_{2}C_{U})\mathcal{R}_{\Gcal,w}$. Pelo
+Lema~\ref{lem:calib-blocos}(iii), $\lamG w_{G} \le \varrho\lamGone$, e
+$\min(\varrho u, v) \le \varrho\min(u,v)$ para $\varrho \ge 1$ dá
+$\mathcal{R}_{\Gcal,w}(\thetastar;\lamG) \le
+\varrho\,\mathcal{R}_{\Gcal,1}(\thetastar;\lamGone)$; com $\lamGp$, o mesmo com
+$(\mu^{\Gcal}_{J})^{1/2}\lamGone$. A forma $O_{p}$ é a da prova do
+Corolário~\ref{cor:lenta-blocos}: os eventos $\Acal^{+}$ (abaixo do teto) ou
+$\Acal^{++}$ (em todo $J$), $\Ecal \subseteq \Tw$, e Markov em
+$\normn{\bb}^{2}$, $\normn{\Bmat(\thetastar - \thbar)}^{2}$ e
+$\normn{\PA\bveps}^{2}$.
+
+\emph{(ii), $s < 1/2$.} Fixe um bloco. O pedaço grosso contribui no máximo
+$t\norm{\theta_{\mathrm{grosso}}}_{2} \le tC_{g}(1-2^{-\seff})^{-1}$, pela
+prova de \eqref{eq:contagem-lenta}. Num nível fino $\lev$, com $\Gcal_{\lev}$
+os seus pedaços e $v_{\lev} = \sum_{G\in\Gcal_{\lev}}\min(t\norm{\theta_{G}}_{2},
+\norm{\theta_{G}}_{2}^{2})$, há duas cotas. A primeira é a de grupos:
+$v_{\lev} \le t\sum_{G}\norm{\theta_{G}}_{2} \le tC_{g}b^{-\vartheta_{\pi}}
+2^{\lev(1/2-s)} =: A_{\lev}$, pela prova de \eqref{eq:contagem-lenta}. A
+segunda é a cauda: se $\pi \le 2$, $\min(ty,y^{2}) \le t^{2-\pi}y^{\pi}$ e
+$\norm{\theta_{G}}_{2} \le \norm{\theta_{G}}_{\pi}$ dão $v_{\lev} \le
+t^{2-\pi}\sum_{G}\norm{\theta_{G}}_{\pi}^{\pi} =
+t^{2-\pi}\norm{\theta_{\lev}}_{\pi}^{\pi} \le t^{2-\pi}C_{g}^{\pi}2^{-\lev\pi\seff}$;
+se $\pi \ge 2$, $v_{\lev} \le \sum_{G}\norm{\theta_{G}}_{2}^{2} =
+\norm{\theta_{\lev}}_{2}^{2} \le C_{g}^{2}2^{-2\lev s}$. É a mesma cota $B_{\lev}$
+da prova da Proposição~8(ii) de E1.6; só $A_{\lev}$ ganhou o fator
+$b^{-\vartheta_{\pi}}$. Com
+\[
+  2^{x} = \bigl\{(C_{g}/t)\,b^{1-\vartheta_{\pi}}\bigr\}^{\tau},
+  \qquad
+  h = C_{g}^{\tau}\,t^{2-\tau}\,b^{\tau(1-\vartheta_{\pi})-1},
+\]
+vale $A_{\lev} = h2^{(\lev-x)(1/2-s)}$ e $B_{\lev} = h2^{-(\lev-x)\min(\pi,2)\seff}$:
+em $\lev = x$,
+\[
+  A_{x} = C_{g}^{\tau}t^{2-\tau}b^{-\vartheta_{\pi} + (1-\vartheta_{\pi})(\tau-1)},
+\]
+porque $\tau(1/2-s) = \tau - 1$, e o expoente de
+$b$ é $\tau(1-\vartheta_{\pi}) - 1$; se $\pi \le 2$, $1 - \vartheta_{\pi} =
+1/\pi$ e
+\[
+  B_{x} = t^{2-\pi}C_{g}^{\pi}\{(C_{g}/t)b^{1/\pi}\}^{-(\pi-\tau)} =
+  C_{g}^{\tau}t^{2-\tau}b^{\tau/\pi-1};
+\]
+se $\pi \ge 2$, $1 - \vartheta_{\pi} =
+1/2$ e $B_{x} = C_{g}^{2}\{(C_{g}/t)b^{1/2}\}^{-(2-\tau)} =
+C_{g}^{\tau}t^{2-\tau}b^{\tau/2-1}$. Em todo $\pi$, $\tau(1-\vartheta_{\pi}) - 1 =
+((2/\pi-1)_{+}-2s)/(2s+1)$, e $2 - \tau = 4s/(2s+1)$. Somar $A_{\lev}$ nos níveis
+finos $\lev \le x$ e $B_{\lev}$ nos $\lev > x$, como na Proposição~8 de E1.6,
+dá no máximo $h\{(1-2^{s-1/2})^{-1} + (1-2^{-\min(\pi,2)\seff})^{-1}\}$ por
+bloco. Truncar em $\lev < J$ só tira parcelas, e somar os $pq$ blocos dá
+\eqref{eq:contagem-truncada-blocos}.
+
+\emph{(ii), $s \ge 1/2$.} A primeira afirmação é $\min(tu,u^{2}) \le tu$. Em
+$s > 1/2$, o bloco com $\theta^{*}_{\cv\md,00} = C_{g}$ e o resto nulo tem
+pedaço grosso de norma $C_{g}$, que contribui $\min(tC_{g},C_{g}^{2}) = tC_{g}$.
+Em $s = 1/2$, num nível fino com $2^{\lev} \le C_{g}b^{1-\vartheta_{\pi}}/t$:
+se $\pi \le 2$, ponha uma espiga de altura $x_{\lev} = C_{g}2^{-\lev(1-1/\pi)}
+k_{\lev}^{-1/\pi}$ em cada um dos $k_{\lev}$ pedaços, o que satura a Hipótese de
+Besov no nível; como $k_{\lev} \le 2^{\lev}/b$, $x_{\lev} \ge
+C_{g}2^{-\lev}b^{1/\pi} \ge t$, e o nível contribui $k_{\lev}tx_{\lev} =
+tC_{g}2^{-\lev(1-1/\pi)}k_{\lev}^{1-1/\pi} \ge tC_{g}(2b)^{-(1-1/\pi)}$, porque
+$k_{\lev} \ge 2^{\lev}/(2b)$; se $\pi \ge 2$, espalhe $C_{g}2^{-\lev}$ em todas
+as coordenadas: cada pedaço tem norma $|G|^{1/2}C_{g}2^{-\lev} \ge
+b^{1/2}C_{g}2^{-\lev} \ge t$, e o nível contribui
+$tC_{g}2^{-\lev}\sum_{G}|G|^{1/2} \ge tC_{g}2^{-\lev}k_{\lev}b^{1/2} \ge
+tC_{g}b^{-1/2}/2$. Nos dois casos, pelo menos $tC_{g}b^{-\vartheta_{\pi}}/2$.
+
+\emph{(iii).} Com $\pen = \lamG$ e $(\lamGone)^{2} \le C_{\pen}\sigma^{2}\bn/n$
+\eqref{eq:ordem-lambda}, \eqref{eq:contagem-truncada-blocos} com $b = \bn$
+dá $\mathcal{R}_{\Gcal,1}(\thetastar;\lamGone) \lesssim (\bn/n)^{1/2} +
+(\bn/n)^{2s/(2s+1)}\bn^{((2/\pi-1)_{+}-2s)/(2s+1)} = (\bn/n)^{1/2} +
+n^{-2s/(2s+1)}\bn^{(2/\pi-1)_{+}/(2s+1)}$, e a primeira parcela é de ordem
+menor porque $2s/(2s+1) < 1/2$. O viés e a condição de dimensão são os da
+prova do Corolário~\ref{cor:adaptativa-blocos}: $c \ge s/((2s+1)\seff)$ dá
+$\mathcal{B}_{J_{n}}^{2} \lesssim n^{-2s/(2s+1)}$, e $c < 1$ dá
+$pq2^{J_{n}}\log(pq2^{J_{n}})/n \to 0$ e $2^{J_{n}} \le 2n$.
+
+\emph{(iv).} Escreva $\eta = 2s/(s+\seff(2s+1)) \in [1,2)$ e $\beta =
+(2s+2/\pi-1)/(2s+1)$, que está em $(0,\, 4s/(2s+1))$ porque $\pi < 2$ e
+$2\seff = 2s+1-2/\pi > 0$. A escolha do enunciado é $2^{J_{n}} \asymp
+n^{\eta}\bn^{-\eta\beta(2s+1)/(4s)}$, que passa de $n/\bn$ porque
+$\beta(2s+1)/(4s) < 1$ e tem $2^{J_{n}} \le n^{2}$. Por
+\eqref{eq:lam-plus-blocos}, $t = (\mu^{\Gcal}_{J_{n}})^{1/2}\lamGone \asymp
+2^{J_{n}/2}\bn/n$, e \eqref{eq:contagem-truncada-blocos} dá
+\[
+  t^{4s/(2s+1)}\bn^{\beta - 4s/(2s+1)}
+  \;\asymp\; 2^{J_{n}\cdot 2s/(2s+1)}\,n^{-4s/(2s+1)}\,\bn^{\beta},
+\]
+que, igualado ao viés $2^{-2J_{n}\seff}$, dá $2^{J_{n}(2s/(2s+1)+2\seff)} =
+n^{4s/(2s+1)}\bn^{-\beta}$: é a escolha do enunciado, porque
+$(2s/(2s+1) + 2\seff)(2s+1) = 2\{s + \seff(2s+1)\}$. O valor comum é
+$2^{-2J_{n}\seff} = (\bn^{\beta}/n^{4s/(2s+1)})^{2\seff/(2s/(2s+1)+2\seff)} =
+n^{-e}\bn^{e\beta(2s+1)/(4s)}$, e $\beta(2s+1)/(4s) = (2s+2/\pi-1)/(4s)$. O
+termo do pedaço grosso, $t \asymp 2^{J_{n}/2}\bn/n$, é polinomialmente menor,
+porque $t \to 0$ e $4s/(2s+1) < 1$. \qed
+
 \section{O que foi transposto e o que é novo}
 
 \begin{itemize}[nosep, leftmargin=*]
@@ -1495,6 +1733,15 @@ estimação é $2^{J_{n}/2}(\log n)^{1+1/\pi}/n \asymp
     $(\mu^{\Gcal}_{J})^{1/2}$, que cobre ao mesmo tempo $\smax$ e
     $\lmaxx(\Gramhat)$ acima do teto \eqref{eq:mu-blocos}; o ganho em logaritmo
     sobre o LASSO em (iii)(b) e em (iv).
+  \item \textbf{Novo em E1.15:} o Corolário~\ref{cor:truncada-blocos} e a
+    contagem \eqref{eq:contagem-truncada-blocos} de
+    $\mathcal{R}_{\Gcal,1}(\thetastar;t)$ sob Besov, justa em $t$ e em $b$, que
+    junta a contagem do Corolário~\ref{cor:lenta-blocos} com o corte do
+    Lema~\ref{lem:risco-pedacos}; com ela a taxa do
+    Corolário~\ref{cor:adaptativa-blocos} sai, em $s < 1/2$, sem condição de
+    desenho. O comparador truncado por pedaço é o do
+    Corolário~\ref{cor:risco-ideal}, lido no Teorema~\ref{thm:oraculo-blocos}(i)
+    em vez de (ii).
 \end{itemize}
 
 \section{O que isto não cobre}
@@ -1534,17 +1781,14 @@ estimação é $2^{J_{n}/2}(\log n)^{1+1/\pi}/n \asymp
     colunas dos níveis $\lev \le \jst$ e o termo $\sigma^{2}p_{0}/n$,
     $p_{0} = p + pq(2^{\jst+1}-1)$, que é $O(\log n/n)$; não enunciado aqui,
     porque D44 não adotou essa forma.
-  \item \textbf{A taxa lenta além de $\thetastar$.} O
-    Corolário~\ref{cor:lenta-blocos} lê o
-    Teorema~\ref{thm:oraculo-blocos}(i) só no comparador $\betastar$, como a
-    Proposição~4; um comparador truncado por pedaço trocaria parte de
-    $\pen\nGw{\thetastar}$ por viés. No LASSO, E1.14 esboçou que o truncado
-    melhora (ii) e (iii) em $s < 1/2$ e $\pi < 2$ (o que isto não cobre do
-    \texttt{05}); em blocos, pediria uma contagem nova de
-    $\sum_{G}\min(\pen\norm{\theta^{*}_{G}}_{2}, \norm{\theta^{*}_{G}}_{2}^{2})$
-    sob Besov. Não foi feito. (Em $s = 1/2$ e nos pares fora de (i) e (ii),
-    os itens (iii) e (iv), de E1.14, substituem o que aqui estava em
-    aberto.)
+  \item \textbf{A taxa lenta além do comparador truncado.} O
+    Corolário~\ref{cor:truncada-blocos} esgota a rota do
+    Teorema~\ref{thm:oraculo-blocos}(i) em $s \ge 1/2$ (o pedaço grosso paga
+    $\lamGone$ ou $O(1)$) e é justo em $t$ e $b$ em $s < 1/2$. Não dá as
+    componentes, que pedem $\lmin(\Gramhat)$. A variante branca da
+    Observação~\ref{rem:branca} pede o truncamento em $\pen w_{G}\Lambda^{1/2}$
+    (determinístico) no evento $q_{\max} \le \Lambda$; a conta é a mesma, mas não
+    foi escrita nem conferida.
   \item \textbf{$\smax$ e $\lmaxx(\Gramhat)$ muito acima do teto.} As cotas de
     \eqref{eq:mu-blocos} têm $2^{J}\log(2D)/n$, de Bernstein; quando $2^{J}/n$
     cresce como potência de $n$, as duas são da ordem de $2^{J}/n$, o que
@@ -1561,7 +1805,7 @@ estimação é $2^{J_{n}/2}(\log n)^{1+1/\pi}/n \asymp
 
 \section{Conferência numérica}
 
-\texttt{check/08-blocos.R} (imprime \texttt{OK}; cerca de $6{,}5$~min nesta máquina;
+\texttt{check/08-blocos.R} (imprime \texttt{OK}; cerca de $12$~min nesta máquina;
 dependências \texttt{WaveBased} e \texttt{glmnet}; não chama
 \texttt{wafc/R/}). Desenho de E1.4 a E1.6: Daublets com filtro $8$, $p = 2$
 com $X_{1}\equiv 1$ e $X_{2} = 1/2 + \mathrm{Unif}(-1,1)$, $q = 2$, $\bU$
@@ -1685,6 +1929,37 @@ Lema~\ref{lem:calib-blocos}(ii). O que saiu em 2026-10-03:
     com $d > n$ e $\gtil = 0$: cobertura $1{,}000$, nenhuma violação do
     Teorema~\ref{thm:oraculo-blocos}(i) nem de \eqref{eq:lenta-nao-assint},
     folga mínima de $61$ vezes.
+  \item \textbf{Corolário~\ref{cor:truncada-blocos}} (Parte~IX, E1.15). A
+    contagem \eqref{eq:contagem-truncada-blocos} contra o supremo exato de
+    $\mathcal{R}_{\Gcal,1}(\thetastar;t)$ na classe, na forma balanceada (nos
+    níveis finos com $\pi \le 2$, uma espiga por pedaço reduz o problema ao
+    coordenado com $k_{\lev}$ coordenadas; com $\pi > 2$, o espalhado contra
+    Jensen; o pedaço grosso, exato), em $9$ pares com $s < 1/2$, $b = 2$ a
+    $64$, $t$ de $10^{-1}$ a $10^{-40}$ e $J \le 400$: razão máxima à cota de
+    $0{,}97$, e o supremo a pelo menos $0{,}79$ dela; cai como $t^{4s/(2s+1)}$ e
+    como $b^{((2/\pi-1)_{+}-2s)/(2s+1)}$ (os dois a $0{,}002$). A cota com
+    $\pen = (\mu^{\Gcal}_{J})^{1/2}\lamGone$ (pesos~$1$) minimizada em $J$ com
+    $2^{J} \le n^{2}$ ($n$ de $10^{15}$ a $10^{140}$), em $16$ pares, ao lado da
+    do LASSO truncado: o expoente de $n$ é o do corolário nos dois (a $0{,}01$);
+    o do logaritmo, a $0{,}1$ em $n \ge 10^{60}$ (por exemplo $0{,}25$ contra
+    $0{,}24$ em $(0{,}4;1{,}25)$ e $-0{,}01$ contra $0$ em $(0{,}3;2)$); o ganho
+    no logaritmo sobre o LASSO truncado é o da teoria em todo par; o expoente é
+    estritamente melhor que o do Corolário~\ref{cor:lenta-blocos} nos $8$
+    pares com $s < 1/2$ e $\pi < 2$ e igual nos outros; nos $6$ pares de (iv)
+    o minimizador passa do teto e segue o $J_{n}$ do enunciado (a $0{,}03$), e
+    a cota no $J_{n}$ do enunciado fica a menos de um fator $7$ do mínimo. Numa
+    grade de $212$ pares, desvio máximo de $0{,}005$ no expoente de $n$, nunca
+    pior que o do Corolário~\ref{cor:lenta-blocos}. Em ajustes ($n = 250$, $4$
+    réplicas, $\pen = \pen_{w}$ exato, pesos~$1$ e $\sqrt{|G|}$) com
+    $(s,\pi) = (0{,}4;1{,}8)$ em $J = 5$, abaixo do teto, e $(0{,}4;1{,}25)$ e
+    $(0{,}3;2)$ em $J = 7$, acima e com $\gtil = 0$: cobertura de $\Tw$ igual
+    a $1{,}000$, nenhuma violação do Teorema~\ref{thm:oraculo-blocos}(i) no
+    comparador truncado nem da cota de (i), folga mínima de $40$ vezes; a
+    cadeia até a contagem vale no $\thetastar$ de cada ajuste; ficam no
+    comparador $53\%$, $7\%$ e $5\%$ dos pedaços. A cota truncada é de
+    $0{,}91$ a $0{,}94$ vezes a do Corolário~\ref{cor:lenta-blocos} acima do
+    teto e de $1{,}28$ a $1{,}33$ vezes abaixo dele, pela mesma razão das
+    constantes que no LASSO.
 \end{itemize}
 
 \section*{Referências}

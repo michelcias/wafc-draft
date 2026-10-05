@@ -123,6 +123,7 @@
 \newcommand{\Rid}{R_{\mathcal{G}}}
 \newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
 \newcommand{\lamGone}{\lambda^{\mathcal{G}}_{n,1}}
+\newcommand{\lamGp}{\lambda^{\mathcal{G},+}_{n}}   % E1.14 (E5e): \lamG inflado acima do teto
 \newcommand{\lamz}[1]{\lambda_{0,#1}}
 \newcommand{\lamzbar}[1]{\bar{\lambda}_{0,#1}}
 \newcommand{\rhoG}{\rho^{\mathcal{G}}_{n}}
@@ -1303,6 +1304,197 @@ to $s < 1/2$. The conditions of the statement hold because $\seff > s/2$ gives
 $1/(1-2s+4\seff) < 1$, and $2^{J_n} \ge \bn$ for $n$ large. When $\pi \ge 2$,
 $\seff = s$, $(2/\pi-1)_{+} = 0$ and $1-2s+4s = 2s+1$. \qed
 
+% derivations/08-blocos.tex, Corolario 14(iii) e (iv), a equacao mu-blocos e a
+% prova dos dois itens (E1.14; E5e, D52).
+\subsection*{Proposition 3 above the concentration ceiling}
+
+The conditions $\seff > 1/4$ in Proposition~3(i) and $\seff > s/2$ in
+Proposition~3(ii) keep the resolution of the balance below the ceiling
+$2^{J_n} \asymp n/\log n$, under which $\smax^{2} \le 2B_X^{2}C_U$ and
+$\lmaxx(\Gramhat) \le \Lambda$ hold with probability tending to one. The pairs
+that they exclude, all with $\pi < 2$, and the boundary $s = 1/2$ call for
+$2^{J_n}$ above that ceiling, where neither bound holds: the wavelets of the
+finest level take values up to $2^{(J-1)/2}\norm{\psi}_{\infty}$ and have one
+or two sample points in their support, so that $\smax^{2}$ and
+$\lmaxx(\Gramhat)$ grow with $2^{J}/n$, and the deterministic level (3.1) is
+no longer admissible. With $D = p + d$, $\xi = \Lambda - \kappa_2C_U > 0$,
+$C_\psi$ as in Proposition~2(ii) and $\norm{\psi}_{\infty}$ as in
+Lemma~\ref{lem:columns}, write
+\begin{equation}
+  \label{eq:mu-blocks}
+  \mu^{\Gcal}_{J} = 1 + c_{\mu}\frac{2^{J}\log(2D)}{n},
+  \qquad
+  \lamGp = (\mu^{\Gcal}_{J_n})^{1/2}\lamG,
+\end{equation}
+with
+\[
+  c_{\psi} = \frac{7\norm{\psi}_{\infty}^{2}}{12C_U},
+  \qquad
+  c_{\mu} = \max\Bigl\{c_{\psi},\
+  \frac{2pB_X^{2}(1+qC_\psi)}{\Lambda}
+  \Bigl(\frac{\kappa_2C_U}{2\xi} + \frac43\Bigr)\Bigr\}.
+\]
+When $pq2^{J_n}\log(pq2^{J_n})/n \to 0$, $\lamGp = \lamG\{1 + o(1)\}$.
+
+\begin{proposition}[Proposition 3 above the concentration ceiling]
+\label{prop:slow-ceiling}
+Let the assumptions of Proposition~3 hold, with the conditions $2^{J_n} \le 2n$
+and $pq2^{J_n}\log(pq2^{J_n})/n \to 0$ replaced by $2^{J_n} \le n^{2}$, and
+with $\lamGp$ of \eqref{eq:mu-blocks} in place of $\lamG$ in the estimator.
+Then
+\[
+  \normn{\widehat{f}-f}^{2} = O_p\bigl\{\lamGp\nGw{\thetastar} +
+  \mathcal{B}_{J_n}^{2} + p/n\bigr\},
+\]
+where $\lamGp\nGw{\thetastar} \le \bar\varrho\,(\mu^{\Gcal}_{J_n})^{1/2}
+\lamGone\nGone{\thetastar}$,
+with $(\lamGone)^{2} \le (C_{\pen} + 16\Lambda)\sigma^{2}\bn/n$ and $C_{\pen}$
+as in \eqref{eq:order-lambda}, and:
+\begin{enumerate}
+\item[(iii)] (the pairs that Proposition~3(i) and (ii) exclude, all with
+$\pi < 2$) (a) if $s > 1/2$ and $\seff \le 1/4$, the choice
+$2^{J_n} \asymp (n/\log n)^{2/(1+4\seff)}$ gives
+\[
+  \normn{\widehat{f}-f}^{2} = O_p\bigl\{(\log n/n)^{4\seff/(1+4\seff)}\bigr\};
+\]
+(b) if $s < 1/2$ and $\seff \le s/2$, the choice
+$2^{J_n} \asymp (n/\bn^{1/\pi})^{1/(1-s+2\seff)}$ gives
+\[
+  \normn{\widehat{f}-f}^{2}
+  = O_p\bigl\{n^{-2\seff/(1-s+2\seff)}
+  (\log n)^{(1/\pi)2\seff/(1-s+2\seff)}\bigr\};
+\]
+in both, $2^{J_n} \gtrsim n/\log n$, and the powers of $n$ join those of
+Proposition~3(i) and (ii) at $\seff = 1/4$ and $\seff = s/2$;
+\item[(iv)] (the boundary $s = 1/2$, with $\pi > 1$)
+$\nGone{\thetastar} \le pqC_g\{(1-2^{-\seff})^{-1} + \bn^{-\vartheta_{\pi}}J_n\}$,
+and: if $\seff \ge 1/4$, that is $\pi \ge 4/3$, the choice
+$2^{J_n} \asymp (n/\bn)^{1/(4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} = O_p\{n^{-1/2}(\log n)^{3/2-\vartheta_{\pi}}\}$,
+which is $n^{-1/2}\log n$ when $\pi \ge 2$; if $\seff < 1/4$, that is
+$1 < \pi < 4/3$, the choice
+$2^{J_n} \asymp \{n/\bn^{1+1/\pi}\}^{2/(1+4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} =
+O_p[\{(\log n)^{1+1/\pi}/n\}^{4\seff/(1+4\seff)}]$.
+\end{enumerate}
+The proof uses no lower bound on $\Gramhat$, and no property of $\Gramhat$
+other than the upper bound $\lmaxx(\Gramhat) \le \Lambda\mu^{\Gcal}_{J_n}$, which
+holds with probability tending to one under the upper bounds of Assumptions~2
+and~3 alone, with no condition on $J_n$.
+\end{proposition}
+
+Stopping $J_n$ at the ceiling instead, with $2^{J_n} = n/(K\log n)$ and $K$
+fixed and large enough, keeps $\lamG$ admissible and gives
+$O_p\{(\log n/n)^{2\seff}\}$ in the pairs of (iii); above the ceiling the
+estimation term grows more slowly than the bias decreases, and the exponents
+of (iii) are strictly larger than $2\seff$ away from $\seff = 1/4$ and
+$\seff = s/2$ (Remark~\ref{rem:ceiling} in Section~S8, for the lasso). Compared
+with Proposition~\ref{prop:lasso-slow}(iii) and (iv) for the lasso, the chunks
+remove nothing in (iii)(a), where the coarse chunk dominates both norms, as in
+Proposition~3(i); the factor $(\log n)^{(1-1/\pi)2\seff/(1-s+2\seff)}$ in
+(iii)(b); and, in (iv), $(\log n)^{\vartheta_{\pi}}$ when $\seff \ge 1/4$, half
+a logarithm when $\pi \ge 2$, and $(\log n)^{(1-1/\pi)4\seff/(1+4\seff)}$ when
+$\seff < 1/4$. This is the mechanism of Proposition~3(ii): the logarithm comes
+from the size of the chunks, and the count of Lemma~\ref{lem:count} returns it
+to the extent that the signal is spread over them.
+
+\subsection*{Proof of Proposition~\ref{prop:slow-ceiling}}
+
+\emph{The two events above the ceiling.} Let
+$\Acal^{++} = \{\smax^{2} \le 2B_X^{2}C_U\mu^{\Gcal}_{J}\}\cap
+\{\lmaxx(\Gramhat) \le \Lambda\mu^{\Gcal}_{J}\}$. For the first, the Bernstein
+bound of Lemma~\ref{lem:columns} holds for every $J$ and every $t > 0$. With
+$x = 2\log d$ and $t = (2xR'_JB_X^{2}C_U/n)^{1/2} + 2xR'_J/(3n)$,
+$nt^{2} \ge 2xR'_JB_X^{2}C_U + (2/3)xR'_Jt$, so that the exponent is at most
+$-x$; and $(2ab)^{1/2} \le a + b/2$ with $a = B_X^{2}C_U$ and $b = xR'_J/n$
+gives $t \le B_X^{2}C_U + (7/6)xR'_J/n$. Since
+$2B_X^{2}C_U + (7/3)R'_J\log d/n = 2B_X^{2}C_U(1 + c_{\psi}2^{J}\log d/n)$,
+\begin{equation}
+  \label{eq:smax-ceiling}
+  \Prob\bigl\{\smax^{2} > 2B_X^{2}C_U(1 + c_{\psi}2^{J}\log d/n)\bigr\}
+  \;\le\; \frac{1}{d}
+  \qquad\text{for every } J,
+\end{equation}
+and $c_{\psi}2^{J}\log d \le c_{\mu}2^{J}\log(2D)$. For the second, the matrix
+Bernstein bound in the proof of Proposition~2(ii),
+$\Prob(\opnorm{\Gramhat-\Gram} \ge t) \le
+2D\exp\{-nt^{2}/(2R_J(\kappa_2C_U + 2t/3))\}$, holds for every $J$ and every
+$t > 0$. With $x = 2\log(2D)$ and
+$t = (2xR_J\kappa_2C_U/n)^{1/2} + (4/3)xR_J/n$,
+$nt^{2} \ge 2xR_J\kappa_2C_U + (4/3)xR_Jt$, and the probability is at most
+$2De^{-x} = 1/(2D)$; and $(2ab)^{1/2} \le \xi + ab/(2\xi)$ with
+$a = \kappa_2C_U$ and $b = xR_J/n$ gives
+$t \le \xi + \{\kappa_2C_U/(2\xi) + 4/3\}xR_J/n$. By Weyl's inequality and
+$\lmaxx(\Gram) \le \kappa_2C_U$, off that event
+$\lmaxx(\Gramhat) < \Lambda + \{\kappa_2C_U/(2\xi) + 4/3\}2\log(2D)R_J/n \le
+\Lambda\mu^{\Gcal}_{J}$, because
+$R_J = pB_X^{2}(1 + qC_\psi2^{J}) \le pB_X^{2}(1+qC_\psi)2^{J}$. Hence
+$\Prob(\Acal^{++}) \ge 1 - 1/d - 1/(2D) \to 1$, with no condition on $J_n$.
+Both bounds use only $|X_{\cv}| \le B_X$, $p_{\bU} \le C_U$ and
+$\lmaxx(\Gram) \le \kappa_2C_U$.
+
+\emph{The general bound.} On $\Acal^{++}$ the two bounds in the proof of
+Lemma~\ref{lem:calib-blocks}(ii), $\mathrm{tr}(\Psitil_{G}) \le |G|\smax^{2}$
+and $\opnorm{\Psitil_{G}} \le \lmaxx(\Gramhat)$, give
+$\lamz{G} \le (\mu^{\Gcal}_{J})^{1/2}\lamzbar{G}$ for every $G$, so that
+$\lamGp \ge \pen_{w}$ and $\Ecal \subseteq \Tw$, and the proof of
+Proposition~3 goes through with $\lamGp$ in place of $\lamG$ and $\Acal^{++}$
+in place of $\Acal^{+}$; the chain gives
+$\lamGp\nGw{\thetastar} \le \bar\varrho(\mu^{\Gcal}_{J_n})^{1/2}
+\lamGone\nGone{\thetastar}$. With $2^{J_n} \le n^{2}$,
+$|\Gcal_{n}| \le pq(1 + n^{2}/\bn) \le pqn^{2}$ and
+$\log(|\Gcal_{n}|/\alpha) \le \log(2pq/\alpha) + 2\bn$, and the computation in
+the proof of Lemma~\ref{lem:regime} gives
+$(\lamGone)^{2} \le (16\sigma^{2}/n)\{(2B_X^{2}C_U + 2\Lambda)\bn +
+\Lambda\log(2pq/\alpha)\} \le (C_{\pen} + 16\Lambda)\sigma^{2}\bn/n$. Since
+$\log(2D_n) \asymp \log n \asymp \bn$,
+\begin{equation}
+  \label{eq:lam-plus-blocks}
+  (\mu^{\Gcal}_{J_n})^{1/2}\lamGone \;\asymp\;
+  \Bigl(\frac{\log n}{n}\Bigr)^{1/2}
+  \Bigl(1 + \frac{2^{J_n}\log n}{n}\Bigr)^{1/2},
+\end{equation}
+which is of order $2^{J_n/2}\log n/n$ when $2^{J_n} \gtrsim n/\log n$.
+
+\emph{Part (iii)(a).} With $s > 1/2$, $\nGone{\thetastar} = O(1)$ as in the
+proof of Proposition~3(i). With
+$2^{J_n} \asymp (n/\log n)^{2/(1+4\seff)} \gtrsim n/\log n$, because
+$\seff \le 1/4$, \eqref{eq:lam-plus-blocks} gives the estimation term
+$(\log n/n)(n/\log n)^{1/(1+4\seff)} = (\log n/n)^{4\seff/(1+4\seff)}$, the
+order of the bias $2^{-2J_n\seff}$; $p/n$ is of smaller order.
+
+\emph{Part (iii)(b).} With $s < 1/2$ and $\pi < 2$,
+$\vartheta_{\pi} = 1 - 1/\pi$ and
+$\nGone{\thetastar} = O\{1 + \bn^{-\vartheta_{\pi}}2^{J_n(1/2-s)}\}$ as in the
+proof of Proposition~3(ii). With
+$2^{J_n} \asymp (n/\bn^{1/\pi})^{1/(1-s+2\seff)}$, which exceeds $n/\bn$ for
+$n$ large, because the exponent is at least $1$ and $1/\pi \le 1$, and which is
+at most $n^{2}$, because $1-s+2\seff > 1/2$, \eqref{eq:lam-plus-blocks} gives
+the estimation term
+\[
+  2^{J_n/2}\frac{\log n}{n}\bigl\{1 + \bn^{-(1-1/\pi)}2^{J_n(1/2-s)}\bigr\}
+  \;\asymp\; 2^{J_n/2}\frac{\log n}{n} +
+  2^{J_n(1-s)}\frac{(\log n)^{1/\pi}}{n},
+\]
+whose second term dominates and, at the choice of the statement, equals
+$(\bn^{1/\pi}/n)^{1-(1-s)/(1-s+2\seff)} =
+(\bn^{1/\pi}/n)^{2\seff/(1-s+2\seff)}$, the order of the bias
+$2^{-2J_n\seff}$.
+
+\emph{Part (iv).} With $s = 1/2$, the sum in \eqref{eq:count} is at most
+$J_n$, which gives the bound on $\nGone{\thetastar}$ of the statement, and
+$J_n \asymp \log n \asymp \bn$ in both choices, so that
+$\nGone{\thetastar} \asymp (\log n)^{1-\vartheta_{\pi}}$, since
+$\vartheta_{\pi} \le 1/2$. If $\seff \ge 1/4$,
+$2^{J_n} \asymp (n/\bn)^{1/(4\seff)} \lesssim n/\log n$,
+$\mu^{\Gcal}_{J_n}$ is bounded, the estimation term is
+$(\log n/n)^{1/2}(\log n)^{1-\vartheta_{\pi}}$, and the bias, of order
+$(\bn/n)^{1/2}$, is of smaller order. If $\seff < 1/4$, then $\pi < 4/3$ and
+$\vartheta_{\pi} = 1 - 1/\pi$; with
+$2^{J_n} \asymp (n/\bn^{1+1/\pi})^{2/(1+4\seff)}$, which exceeds $n/\log n$,
+the estimation term is $2^{J_n/2}(\log n)^{1+1/\pi}/n \asymp
+\{(\log n)^{1+1/\pi}/n\}^{4\seff/(1+4\seff)}$, the order of the bias. \qed
+
 % derivations/08-blocos.tex, prova do Teorema 4 (numeracao global).
 \subsection*{Proof of Theorem 3}
 
@@ -1799,7 +1991,21 @@ Theorem~\ref{thm:lasso-main} in place of $r_n$ under the conditions of that
 theorem.
 \end{corollary}
 
-% derivations/05-taxas.tex, Proposicao 4, emendada por D49(a).
+% E5e (E1.14; D52): a inflacao de penn acima do teto, eq. mu de 05-taxas.tex.
+The level $\penn$ is admissible only while $2^{J_n}\log d_n/n \to 0$, which
+Lemma~\ref{lem:columns} needs for $\smax^{2} \le 2B_X^{2}C_U$; above that
+ceiling $\smax^{2}$ grows with $2^{J}/n$. With $c_{\psi} =
+7\norm{\psi}_{\infty}^{2}/(12C_U)$ as in Section~S6, write
+\begin{equation}
+  \label{eq:lasso-lamplus}
+  \mu_{J} = 1 + c_{\psi}\frac{2^{J}\log d}{n},
+  \qquad
+  \penn^{+} = \mu_{J_n}^{1/2}\penn ;
+\end{equation}
+when $2^{J_n}\log d_n/n \to 0$, $\penn^{+} = \penn\{1 + o(1)\}$.
+
+% derivations/05-taxas.tex, Proposicao 4, emendada por D49(a), com os itens
+% (iii) e (iv) de E1.14 (E5e).
 \begin{proposition}[Slow rate for the lasso, no design condition]
 \label{prop:lasso-slow}
 Let Assumptions 1, 4 and 5 hold, with $\Amat$ of rank $p$ and $\penn$ as in
@@ -1807,12 +2013,33 @@ Let Assumptions 1, 4 and 5 hold, with $\Amat$ of rank $p$ and $\penn$ as in
 $\normn{\widehat{f}-f}^{2} = O_p\{\penn\norm{\thetastar}_{1} +
 \mathcal{B}_{J_n}^{2} + p/n\}$, where
 $\norm{\thetastar}_{1} \le pqC_g\sum_{\lev<J_n}2^{\lev(1/2-s)}$ does not
-depend on $\pi$. In particular, if $s > 1/2$ and $\seff > 1/4$ then
+depend on $\pi$, whenever $2^{J_n}\log d_n/n \to 0$; with $\penn^{+}$ of
+\eqref{eq:lasso-lamplus} in place of $\penn$, in the estimator and in the
+bound, the same holds for every sequence $J_n$. In particular, (i) if $s > 1/2$ and $\seff > 1/4$ then
 $\normn{\widehat{f}-f}^{2} = O_p\{(J_n/n)^{1/2}\}$ for every
-$J_n \ge \log_2 n/(4\seff)$; and if $s < 1/2$ and $\seff > s/2$, the choice
+$J_n \ge \log_2 n/(4\seff)$; and (ii) if $s < 1/2$ and $\seff > s/2$, the choice
 $2^{J_n} \asymp (n/J_n)^{1/(1-2s+4\seff)}$ gives
 $\normn{\widehat{f}-f}^{2} = O_p\{(J_n/n)^{2\seff/(1-2s+4\seff)}\}$, an
-exponent that equals $2s/(2s+1)$ when $\pi \ge 2$.
+exponent that equals $2s/(2s+1)$ when $\pi \ge 2$. With $\penn^{+}$:
+\begin{enumerate}
+\item[(iii)] (the pairs that (i) and (ii) exclude, all with $\pi < 2$)
+(a) if $s > 1/2$ and $\seff \le 1/4$, the choice
+$2^{J_n} \asymp (n/\log n)^{2/(1+4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} = O_p\{(\log n/n)^{4\seff/(1+4\seff)}\}$;
+(b) if $s < 1/2$ and $\seff \le s/2$, the choice
+$2^{J_n} \asymp (n/\log n)^{1/(1-s+2\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} = O_p\{(\log n/n)^{2\seff/(1-s+2\seff)}\}$;
+in both, $2^{J_n} \gtrsim n/\log n$, above the ceiling of
+Lemma~\ref{lem:columns}, and the rates join those of (i) and (ii) at
+$\seff = 1/4$ and $\seff = s/2$;
+\item[(iv)] (the boundary $s = 1/2$, with $\pi > 1$)
+$\norm{\thetastar}_{1} \le pqC_gJ_n$, and: if $\seff \ge 1/4$, that is
+$\pi \ge 4/3$, the choice $2^{J_n} \asymp (n/\log n)^{1/(4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} = O_p\{n^{-1/2}(\log n)^{3/2}\}$; if
+$\seff < 1/4$, that is $1 < \pi < 4/3$, the choice
+$2^{J_n} \asymp \{n/(\log n)^{2}\}^{2/(1+4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} = O_p[\{(\log n)^{2}/n\}^{4\seff/(1+4\seff)}]$.
+\end{enumerate}
 \end{proposition}
 
 For a vector $\btheta$ let $\theta_{(1)} \ge \theta_{(2)} \ge \cdots$ be the
@@ -2123,7 +2350,8 @@ $\penn$ admissible with probability tending to one, since
 $2^{J_n}\log d_n/n \to 0$ in both regimes, and it is for this that the conditions
 $\seff > 1/4$ in (i) and $\seff > s/2$ in (ii) are needed: without them the choice
 in (i) gives $2^{J_n} \ge n^{1/(4\seff)} \ge n$, and the balance in (ii) gives
-$2^{J_n} \gtrsim n/\log n$; Markov's inequality
+$2^{J_n} \gtrsim n/\log n$, and parts (iii) and (iv) cover those pairs with
+$\penn^{+}$; Markov's inequality
 applied to $\E\normn{\bb}^2 \le \mathcal{B}^2_{J_n}$, from Lemma 2, and to
 $\E(\normn{\PA\bveps}^2\mid\bX,\bU) \le \sigma^2p/n$ gives the general
 statement. If $s>1/2$, Lemma S5.4 gives $\norm{\thetastar}_1 = O(1)$ and
@@ -2134,7 +2362,80 @@ $\norm{\thetastar}_1 \asymp 2^{J_n(1/2-s)}$, the two terms are
 $(J_n/n)^{1/2}2^{J_n(1/2-s)}$ and $2^{-2J_n\seff}$, and equating them gives
 $2^{J_n} \asymp (n/J_n)^{1/(1-2s+4\seff)}$ with common value
 $(J_n/n)^{2\seff/(1-2s+4\seff)}$; when $\seff = s$ the denominator is
-$1+2s$. \qed
+$1+2s$.
+
+% E5e (E1.14; D52): a prova dos itens (iii) e (iv) da Proposicao 4 de 05-taxas.tex.
+\emph{The level above the ceiling, for (iii) and (iv).} By
+\eqref{eq:smax-ceiling}, $\Prob(\smax^{2} > 2B_X^{2}C_U\mu_{J}) \le 1/d$ for
+every $J$. Off that event,
+\[
+  2\pen_0 \;\le\; 2\sigma(2B_X^{2}C_U\mu_{J})^{1/2}
+  \Bigl\{\frac{2\log(2d/\alpha)}{n}\Bigr\}^{1/2} \;=\; \penn^{+},
+\]
+and the argument of the general statement goes through with
+$\penn^{+}$ and no condition on $J_n$: on $\mathcal{T}$,
+$\normn{\widehat{f}-f}^{2} \le 18\penn^{+}\norm{\thetastar}_{1} +
+24\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}$, and Markov's inequality
+concludes. In every choice of (iii) and (iv), $2^{J_n} \le n^{2}$, so that
+$\log d_n \asymp J_n \asymp \log n$ and
+\begin{equation}
+  \label{eq:lam-plus}
+  \penn^{+} \;\asymp\; \Bigl(\frac{\log n}{n}\Bigr)^{1/2}
+  \Bigl(1 + \frac{2^{J_n}\log n}{n}\Bigr)^{1/2},
+\end{equation}
+in particular $\penn^{+} \asymp 2^{J_n/2}\log n/n$ if
+$2^{J_n} \gtrsim n/\log n$.
+
+\emph{Part (iii)(a).} With $s > 1/2$, $\norm{\thetastar}_{1} = O(1)$ as in
+(i). With $2^{J_n} \asymp (n/\log n)^{2/(1+4\seff)} \gtrsim n/\log n$,
+because $\seff \le 1/4$, \eqref{eq:lam-plus} gives
+$\penn^{+}\norm{\thetastar}_{1} \asymp (\log n/n)(n/\log n)^{1/(1+4\seff)} =
+(\log n/n)^{4\seff/(1+4\seff)}$, and the bias is
+$2^{-2J_n\seff} \asymp (\log n/n)^{4\seff/(1+4\seff)}$; $p/n$ is of smaller
+order.
+
+\emph{Part (iii)(b).} With $s < 1/2$, $\norm{\thetastar}_{1} \asymp
+2^{J_n(1/2-s)}$ as in (ii). With
+$2^{J_n} \asymp (n/\log n)^{1/(1-s+2\seff)} \gtrsim n/\log n$, because
+$\seff \le s/2$, \eqref{eq:lam-plus} gives
+$\penn^{+}\norm{\thetastar}_{1} \asymp 2^{J_n(1-s)}\log n/n \asymp
+(\log n/n)^{1-(1-s)/(1-s+2\seff)} = (\log n/n)^{2\seff/(1-s+2\seff)}$, which
+is also the order of the bias $2^{-2J_n\seff}$. At the boundaries,
+$\seff = 1/4$ in (a) and $\seff = s/2$ in (b), $2^{J_n} \asymp n/\log n$,
+$\mu_{J_n}$ is bounded, and the rates are $(\log n/n)^{1/2}$ and
+$(\log n/n)^{s}$, those of (i) and (ii) at these points.
+
+\emph{Part (iv).} With $s = 1/2$, Lemma S5.4 gives
+$\norm{\thetastar}_{1} \le pqC_gJ_n$, and $J_n \asymp \log n$ in both
+choices. If $\seff \ge 1/4$,
+$2^{J_n} \asymp (n/\log n)^{1/(4\seff)} \lesssim n/\log n$, $\mu_{J_n}$ is
+bounded, $\penn^{+}\norm{\thetastar}_{1} \asymp (\log n/n)^{1/2}\log n$,
+and the bias, $2^{-2J_n\seff} \asymp (\log n/n)^{1/2}$, is of smaller order.
+If $\seff < 1/4$, $2^{J_n} \asymp \{n/(\log n)^{2}\}^{2/(1+4\seff)}$, which
+exceeds $n/\log n$ for $n$ large, and $\penn^{+}\norm{\thetastar}_{1} \asymp
+2^{J_n/2}(\log n)^{2}/n \asymp \{(\log n)^{2}/n\}^{4\seff/(1+4\seff)}$, the
+order of the bias. \qed
+
+% derivations/05-taxas.tex, Observacao rem:teto (E1.14; E5e).
+\begin{remark}[Why the resolution passes the ceiling]
+\label{rem:ceiling}
+In the pairs of (iii) the bound $\penn\norm{\thetastar}_{1} +
+\mathcal{B}_{J}^{2}$ is dominated by the bias at every $J$ below the ceiling,
+and the best that can be done there is to stop at it: $2^{J_n} = n/(K\log n)$
+with $K > 4\norm{\psi}_{\infty}^{2}/(3C_U)$ fixed keeps $\penn$ admissible,
+because the exponent of Lemma~\ref{lem:columns} at $t = B_X^{2}C_U$ is then
+$-\{3C_UK/(4\norm{\psi}_{\infty}^{2})\}\log n$ and $d_n \le pqn$, and gives
+$O_p\{(\log n/n)^{2\seff}\}$. Above the ceiling $\penn^{+}$ pays for the
+growth of $\smax$, and the estimation term,
+$2^{J/2}(\log n/n)\norm{\thetastar}_{1}$, grows more slowly than the bias
+decreases until $J$ reaches the $J_n$ of (iii). The exponents of (iii),
+$4\seff/(1+4\seff)$ and $2\seff/(1-s+2\seff)$, are strictly larger than
+$2\seff$ away from $\seff = 1/4$ and $\seff = s/2$, and the $J_n$ of (iii)
+minimizes the bound over $J$ up to a constant, so that this is the best bound
+that the argument gives. In (iv) with $\seff \ge 1/4$, the factor
+$(\log n)^{3/2}$ comes from $\norm{\thetastar}_{1} \asymp J_n \asymp \log n$,
+which no choice avoids.
+\end{remark}
 
 \subsection*{Proof of Theorem~\ref{thm:lasso-linear}}
 

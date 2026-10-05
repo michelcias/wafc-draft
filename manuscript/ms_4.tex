@@ -21,7 +21,9 @@
 %                              Corollary S5.1, a Proposicao 7 e a Proposition S5.1
 %   Teorema 4               -> Theorem 3      (thm:sieve)
 %   Corolario 10            -> Corollary 1    (cor:components)
-%   Corolario 14            -> Proposition 3  (prop:slow; D47(c), D49(b))
+%   Corolario 14            -> Proposition 3  (prop:slow; D47(c), D49(b)); os itens
+%                              (iii) e (iv) de E1.14 sao a Proposition S6.1 do supp
+%                              (prop:slow-ceiling; E5e, D52)
 %   Lema 15                 -> Lemma 3        (lem:weak; o rotulo ficou com o nome antigo)
 %   Corolario 12, Hipotese S com rho_n^G
 %                           -> Corollary 2 (cor:threshold), Assumption 6 (ass:sep);
@@ -29,7 +31,8 @@
 %   Corolario 13            -> Corollary 3    (cor:thrisk; D45); o Lema 16 e o
 %                              Lemma S7.2 do supp (lem:thrisk)
 %   Teoria do lasso coordenado (Corolario 5, Teorema 1, Teorema 2, Corolario 4,
-%   Proposicao 4 emendada por D49, Lema 9, Corolario 8): Secao S8 do supp,
+%   Proposicao 4 emendada por D49 e com os itens (iii) e (iv) de E1.14 (E5e),
+%   Lema 9, Corolario 8): Secao S8 do supp,
 %   como Theorems S8.1 a S8.3, Corollaries S8.1 e S8.2, Proposition S8.1 e
 %   Lemma S8.1 (D51(a)).
 %   Os rotulos sec:sieve, thm:sieve e lem:weak ficaram com o nome antigo (D33 muda
@@ -167,6 +170,7 @@
 \newcommand{\Rid}{R_{\mathcal{G}}}
 \newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
 \newcommand{\lamGone}{\lambda^{\mathcal{G}}_{n,1}}
+\newcommand{\lamGp}{\lambda^{\mathcal{G},+}_{n}}   % E1.14 (E5e): \lamG inflado acima do teto
 \newcommand{\lamz}[1]{\lambda_{0,#1}}
 \newcommand{\lamzbar}[1]{\bar{\lambda}_{0,#1}}
 \newcommand{\rhoG}{\rho^{\mathcal{G}}_{n}}
@@ -250,9 +254,9 @@ numerical result of the paper are made available with it.}
 
 \vspace{9pt}
 \noindent {\it Key words and phrases:}
-Additive coefficient model, Besov space, effective dimension, \textcolor{colR1}{group
+Additive coefficient model, Besov space, \textcolor{gray}{\sout{effective dimension,}} \textcolor{colR1}{group
 lasso,} lasso, oracle
-inequality, varying coefficient model, wavelets.
+inequality, \textcolor{colR1}{thresholding,} varying coefficient model, wavelets.
 \par
 \end{quotation}\par
 
@@ -307,7 +311,7 @@ function in an orthonormal basis, estimate the resulting array by a block
 lasso, and obtain a nonasymptotic oracle inequality, a Besov rate that adapts
 to inhomogeneous smoothness, and a matching minimax lower bound, under the
 assumption that the covariates are independent of the index. The present paper
-carries that programme to the situation an applied problem usually presents,
+carries that \textcolor{gray}{\sout{programme}} \textcolor{colR1}{program} to the situation an applied problem usually presents,
 in which several variables modulate a coefficient at once. We let each
 coefficient be additive in the modulators, which keeps the estimator free of
 the curse of dimensionality in their number, we allow the covariates to depend
@@ -1103,8 +1107,10 @@ slower rate, and is the unconditional statement of this paper.
 % derivations/05-taxas.tex, Proposicao 4 (numeracao global). Substituida em
 % k = 4 pelo Corolario 14 de derivations/08-blocos.tex (D47(c)); a do lasso,
 % emendada por D49(a), e a Proposition S8.1.
-% E1.14 (em curso, nao integrada em 2026-10-03): acrescenta um regime (iii),
-% s' <= 1/4 com s > 1/2 e s' <= s/2 com s < 1/2, e a fronteira s = 1/2.
+% E1.14 (integrada pela E5e, 2026-10-04): os itens (iii) e (iv) do Corolario 14,
+% s' <= 1/4 com s > 1/2, s' <= s/2 com s < 1/2 e a fronteira s = 1/2, estao na
+% Proposition S6.1 do supp (prop:slow-ceiling); aqui, uma frase depois da
+% proposicao, e a frase de D49(b) revista (D52).
 {\color{gray}\removedk
 \begin{propositionold}[Slow rate, no design condition]
 Let Assumptions~\ref{ass:sample}, \ref{ass:basis} and \ref{ass:besov} hold,
@@ -1157,7 +1163,8 @@ which, when $\pi \ge 2$, is $n^{-2s/(2s+1)}$, the rate of
 Theorems~\ref{thm:main} and \ref{thm:sieve}, with no logarithmic factor.
 \end{enumerate}
 The proof uses no lower bound on $\Gramhat$, and no property of $\Gramhat$
-other than $\lmaxx(\Gramhat) \le \Lambda$.
+other than \textcolor{gray}{\sout{$\lmaxx(\Gramhat) \le \Lambda$}} an upper bound on
+$\lmaxx(\Gramhat)$.
 \end{proposition}
 }
 
@@ -1172,12 +1179,27 @@ $\bn^{-\vartheta_\pi}$, which in (ii) cancels the factor $\bn^{1/2}$ that the
 size of the chunks puts in $\lamGone$, entirely when $\pi \ge 2$ and in part
 when $\pi < 2$; in (i) the coarse chunk dominates both norms and nothing
 changes. No lower bound on $\Gramhat$ enters: the only property of $\Gramhat$
-that the proof uses is $\lmaxx(\Gramhat) \le \Lambda$, which makes the
+that the proof uses is \textcolor{gray}{\sout{$\lmaxx(\Gramhat) \le \Lambda$}} an upper bound on
+$\lmaxx(\Gramhat)$, here $\lmaxx(\Gramhat) \le \Lambda$, which makes the
 deterministic level \eqref{eq:lambda} admissible and holds with probability
 tending to one under the upper bounds of Assumptions~\ref{ass:X}
 and~\ref{ass:U} alone, so that neither $c_U$ nor $\kappa_1$ is needed. The
 conditions $\seff > 1/4$ in (i) and $\seff > s/2$ in (ii) bite only when
-$\pi < 2$, and make the resolution of the balance admissible.}
+$\pi < 2$, and make the resolution of the balance admissible.
+% E5e (D52): os pares que (i) e (ii) excluem e a fronteira s = 1/2 vao ao supp.
+The pairs that these conditions leave out, $\seff \le 1/4$ with $s > 1/2$ and
+$\seff \le s/2$ with $s < 1/2$, all with $\pi < 2$, and the boundary $s = 1/2$
+call for a resolution above $n/\log n$, where the column norms and
+$\lmaxx(\Gramhat)$ grow with $2^{J_n}/n$; Proposition~S6.1 in the
+Supplementary Material covers them with the level inflated to
+$\lamGp = (\mu^{\Gcal}_{J_n})^{1/2}\lamG$, where
+$\mu^{\Gcal}_{J} = 1 + c_{\mu}2^{J}\log(2D)/n$ for a constant $c_{\mu}$ given
+there, so that the first display of Proposition~\ref{prop:slow}, with $\lamGp$
+in place of $\lamG$, holds for every $\seff > 0$. There, too, the only
+property of $\Gramhat$ that the proof uses is an upper bound,
+$\lmaxx(\Gramhat) \le \Lambda\mu^{\Gcal}_{J_n}$, which holds with probability
+tending to one with no condition on $J_n$ and, again, without $c_U$ or
+$\kappa_1$.}
 
 The second is the approximation lemma that produces Theorem~\ref{thm:main}.
 \textcolor{gray}{\sout{For a vector $\btheta$ let $\theta_{(1)} \ge \theta_{(2)} \ge \cdots$ be the

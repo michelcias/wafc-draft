@@ -268,6 +268,12 @@ que D49 excluiu (`s' ≤ 1/4` com `s > 1/2`, `s' ≤ s/2` com `s < 1/2`) e na
 fronteira `s = 1/2`, parando `J_n` no maior nível admissível (pergunta 45
 do `ESTADO.md`).
 
+### E1.15 O comparador truncado na taxa lenta (fechada em 2026-10-05)
+
+Proposição 8 no `05` e Corolário 15 no `08`: em `s < 1/2`, a taxa lenta pelo
+comparador truncado alcança a taxa do Theorem 1 sem condição de desenho; em
+`s ≥ 1/2` nenhum comparador melhora. Números no `ESTADO.md` §2.
+
 ### E1.9 (não aberta) Cota inferior para `q ≥ 2`
 
 Klopp & Pensky (2015) têm a cota inferior minimax para `q = 1` com
