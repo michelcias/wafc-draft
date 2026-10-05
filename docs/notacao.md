@@ -227,6 +227,7 @@ as copia em `k = 4`.
 | `μ^𝒢_J`, `λ_n^{𝒢,+}`, `c_μ`, `ξ` | o mesmo nos blocos, cobrindo também `λ_max(Σ̂)`; `ξ = Λ − κ_2C_U` | Corolário 14(iii) e (iv) do `08` (E1.14; D52); `ξ` no lugar do `Δ` da tarefa, que colidia com `Δ` e `Δ̄_n` (D40); macro local `\lamGp` |
 | `β̄ = (c̄, θ̄)`, `b̄`, `v̄`, `𝒢̄ = 𝒢_0(θ̄)`, `𝒲̄ = 𝒲(𝒢̄)` | o comparador do oráculo em blocos, o seu viés, o seu erro e os seus pedaços ativos | Teorema 3 do `08`, Theorem 2 do `ms_4` (D52) |
 | `M_1`, `Σ̂_{GG}` | o centrador da variante branca; a Gram empírica do pedaço | Observação 2 do `08`, Remark S5.2 (D52) |
+| `ℛ_1(θ; t)`, `ℛ_{𝒢,w}(θ; λ)`, `ℛ_{𝒢,1}(θ; t)` | `Σ_a min(t\|θ_a\|, θ_a²)` e os pares em norma de grupos, `Σ_G min(λw_G‖θ_G‖_2, ‖θ_G‖_2²)` e com pesos 1 | Proposição 8 do `05` e Corolário 15 do `08` (E1.15; D54); `\mathcal{R}`, sem uso anterior; não confundir com o risco ideal `R_𝒢(θ; η)` do Lema 15 |
 | `ϑ_π` | expoente da contagem, `min(1 − 1/π, 1/2)`: nos níveis finos, `‖θ*‖_{𝒢,1}` fica abaixo de `‖θ*‖_1` por `b_n^{−ϑ_π}` | Corolário 14 (E1.13; D49); `\vartheta_{\pi}`, sem uso no `ms_3` nem no `supp_3` |
 
 No LaTeX: `\mathcal{G}`, `b_{n}`, `w_{G}`, `\varrho`, `\bar\varrho`,
