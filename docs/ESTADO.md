@@ -2753,7 +2753,13 @@ Ordenadas pelo que bloqueia mais.
      menos margem é necessária. É implicitamente o que motiva a construção
      de Cohen, Daubechies e Vial, que corrige as wavelets da borda em vez
      de negociar a largura da faixa.
-20. **Cota inferior, registrada como E1.9 no plano** (mais visível depois de
+20. **Cota inferior: catalogada como E1.9 em 2026-10-05, com escopo
+   reduzido** (no nível da taxa, pela subclasse com uma componente; a
+   constante em `pq` opcional; o logaritmo em `π < 2` fora). A leitura do
+   chat principal: com `p` e `q` fixos, a cota `n^{−2s/(2s+1)}` sai da
+   regressão não paramétrica univariada com desenho aleatório, e o
+   Corolário 11 seria ótimo em `π ≥ 2` para todo `q`; a frase de D50 sobre
+   a cota inferior mudaria. Texto original: **Cota inferior, registrada como E1.9 no plano** (mais visível depois de
    D18, porque o artigo se declara extensão de quem tem a dele). Não existe
    aqui, e Klopp & Pensky têm a deles para `q = 1` com `X ⊥ U`. **A decisão
    de abrir fica para depois dos resultados de E2.5 e E4**, por escolha do
@@ -3533,6 +3539,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-05 | E1.9 (a cota inferior) catalogada com escopo reduzido: no nível da taxa, pela subclasse com uma componente e o lema de Assouad; pergunta 20 |
 | 2026-10-05 | Pergunta 49 aplicada (D55): a frase do §3.2 vale para todo `π` pela S6.2; Simon & Tibshirani (2012) no §4.1 e na Remark S5.2; `references_4.bib` com 44 entradas |
 | 2026-10-05 | E5f e L11 fechadas e integradas (52 e 80 páginas; 43 entradas no `references_4.bib`, 87 no verificado): a E1.15 na `k = 4` (Propositions S6.2 e S8.2) e as citações de L10; Simon & Tibshirani (2012) verificado; pergunta 49 |
 | 2026-10-05 | Pergunta 48 decidida (D54): E5f (a E1.15 e as citações de L10 na `k = 4`) e L11 (Simon & Tibshirani 2012) catalogadas; `ℛ_1`, `ℛ_{𝒢,w}`, `ℛ_{𝒢,1}` no `notacao.md` |

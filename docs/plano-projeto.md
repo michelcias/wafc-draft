@@ -274,7 +274,14 @@ Proposição 8 no `05` e Corolário 15 no `08`: em `s < 1/2`, a taxa lenta pelo
 comparador truncado alcança a taxa do Theorem 1 sem condição de desenho; em
 `s ≥ 1/2` nenhum comparador melhora. Números no `ESTADO.md` §2.
 
-### E1.9 (não aberta) Cota inferior para `q ≥ 2`
+### E1.9 Cota inferior para `q ≥ 2` (catalogada em 2026-10-05)
+
+**Catalogada em 2026-10-05, com escopo reduzido:** no nível da taxa, pela
+subclasse em que só uma componente é não nula (regressão não paramétrica
+com desenho aleatório), com o lema de Assouad; a constante em `pq` é
+opcional; o logaritmo em `π < 2` fica fora. Com `p` e `q` fixos a
+dificuldade da cota de K&P, que é de alta dimensão, não se aplica. O texto
+abaixo é o registro de quando ela não estava aberta.
 
 Klopp & Pensky (2015) têm a cota inferior minimax para `q = 1` com
 `X ⊥ U`; para o desenho aditivo com `q ≥ 2` e `X` dependente de `U` **não
