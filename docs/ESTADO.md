@@ -2644,6 +2644,7 @@ entrou sem os itens de E1.14** (pergunta 47(a)).
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
 | D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
+| D57 | 10-05 | **Duas aplicações e as pendências de E6.1b e E1.9 (perguntas 2, 50 e 51):** marylebone como aplicação principal (a estrutura: o degrau de 2003, o zero no vento) e beijing.heat como segunda (a predição: ~9% sobre os splines de D46, a modulação sazonal densa), a principal no corpo e a segunda em um parágrafo no corpo com tabela e figura no supp, com a divisão final na decisão do teto (D21); se marylebone não fechar a licença limpa ou o degrau não se repetir com os dados limpos, beijing.heat sobe a principal. O limiar padrão continua o `cv1se`, a aplicação relata a predição do `+cv` e só afirma ausência de efeito onde os dois zeram. Catalogadas E6.1c (marylebone com dados de licença declarada), E3.4 (`J` por moduladora limitado pelos valores distintos) e E5g (a E1.9 na `k = 4`, com as recomendações da pergunta 51) | recomendações do chat principal, aceitas pelo autor: as duas bases respondem a perguntas diferentes de um referee, e a segunda no supp poupa o teto de páginas |
 | D56 | 10-05 | **Na aplicação, cada método nos seus próprios termos:** o WAFC com a sintonia dele (validação cruzada, aqui nas dobras por bloco) contra o `gam` como ele é usado, com REML e GCV (as duas colunas de D46); **o `gam.cv` em blocos não entra como concorrente** no artigo, porque escolher `k` do `gam` por validação cruzada não é o uso dele, como não é usual sintonizar o WAFC por REML. A medição do `gam.cv` fica nos documentos de trabalho (D43). O texto da aplicação diz que os dois métodos foram sintonizados nos critérios usuais e que nenhum modela a dependência do erro | decisão do autor, no princípio de D30 e da E2.5h (o concorrente sintonizado nos termos dele): o objetivo é mostrar que o WAFC é uma boa opção, não que vence sempre. Risco registrado: com erro dependente, o uso de referência do `mgcv` é o `gamm` com erro autorregressivo, que um referee pode pedir |
 | D55 | 10-05 | **Pergunta 49, aplicada no chat principal na `k = 4`:** no §3.2, a frase de D49(c) passa a "When `s < 1/2`, the prediction rate of Theorem 1 holds with no design condition at all, under its other assumptions and in the same window for `J_n` (Proposition S6.2)", com a antiga tachada; Simon & Tibshirani (2012) no §4.1, ao lado de Breheny & Huang, e na Remark S5.2 (eq. 1.4 e §2), não no argumento pivotal; a entrada no `references_4.bib` (44 entradas); Breheny & Huang citados por seção. `ms_4` e `supp_4` em 52 e 80 páginas, sem referência indefinida | recomendações do chat principal, aceitas pelo autor |
 | D54 | 10-05 | **Pendências de E1.15, E5e e L10 (pergunta 48):** a Proposição 8 e o Corolário 15 vão à `k = 4` com uma ou duas frases no corpo depois da Proposition 3 e o enunciado com a prova no supp (S6 e S8); a frase do §3 passa a dizer que a condição de desenho é necessária para as componentes, e para a predição quando `s ≥ 1/2`; a introdução (D50) não muda; a variante branca com o comparador truncado não se abre (uma linha no supp); as citações de L10 entram no §4.1 e no §2.3, com as três entradas no `references_4.bib`; a Proposition S8.1 cita as cotas superiores das Assumptions 2 e 3; Simon & Tibshirani (2012) a verificar (L11); Breheny & Huang ficam na seção de software do `.bib` (D25); `ℛ_1`, `ℛ_{𝒢,w}`, `ℛ_{𝒢,1}` no `notacao.md` §10. Catalogadas E5f e L11 | recomendações do chat principal, aceitas pelo autor |
@@ -2707,7 +2708,8 @@ Ordenadas pelo que bloqueia mais.
 
 1. **~~D5 e D8~~ ratificadas em 2026-09-19.** O alvo é a *Statistica
    Sinica* e o método se chama WAFC; **E5a está destravada**.
-2. **Aplicação (E6.1), agora com sondagem feita e negativa.** **Depois de
+2. **Aplicação: decidida em D57 (2026-10-05)**, marylebone como principal e
+   beijing.heat como segunda, condicionada à E6.1c. **Aplicação (E6.1), agora com sondagem feita e negativa.** **Depois de
    D44 (2026-10-03):** a tese passa a estrutura recuperada com predição
    competitiva, o que torna a saída (b) mais forte do que era; **E6.1b
    catalogada** para medir as duas saídas no critério novo, e a escolha
@@ -3546,7 +3548,7 @@ Ordenadas pelo que bloqueia mais.
    inferida. O supp cresceu de 67 para 79 páginas, o que não conta no teto
    (D21).
 
-50. **Pendências de E6.1b** (2026-10-05). Recomendação do chat principal:
+50. **~~Pendências de E6.1b~~ decididas em 2026-10-05 (D56, D57).** Texto original: (2026-10-05). Recomendação do chat principal:
    - (a) **A pergunta 2, a aplicação:** marylebone, como aplicação de
      estrutura, assumindo os ~2% contra o spline sintonizado em blocos. É a
      única base com um resultado substantivo que a literatura da área
@@ -3571,7 +3573,8 @@ Ordenadas pelo que bloqueia mais.
    - (d) **Truncar `J` por moduladora** no número de valores distintos
      (lição 3): catalogar uma tarefa curta de código.
 
-51. **Pendências de E1.9** (2026-10-05). Recomendação do chat principal:
+51. **~~Pendências de E1.9~~ decididas em 2026-10-05 (D57); a E5g leva tudo
+   à `k = 4`.** Texto original: (2026-10-05). Recomendação do chat principal:
    - (a) **A introdução:** trocar "so that with a single modulator
      independent of the covariates it is minimax optimal there" por "where
      it is minimax optimal", e a frase de D50 sobre a cota inferior por "The
@@ -3592,11 +3595,44 @@ Ordenadas pelo que bloqueia mais.
    - (f) **Catalogar a E5g** para levar (a) a (c) à `k = 4`, com
      `Tsybakov-2009` no `references_4.bib`.
 
+   Texto da terceira leitura do Theorem 1, do handoff da E1.9 (guardado
+   aqui porque o handoff foi apagado na integração); "Theorem S6.1" é
+   provisório e depende de onde a cota entrar no supp:
+
+   ```latex
+   \textcolor{colR1}{Third, \textcolor{gray}{\sout{$n^{-2s/(2s+1)}$ is the minimax rate over Besov bodies
+   in the Gaussian sequence model with noise level of order $n^{-1/2}$
+   \mbox{\citep[Theorems~4 and~5]{Donoho-Johnstone-1998}}, and with a single modulator,
+   independent of the covariates, and Gaussian errors, the minimax lower bound of
+   \mbox{\citet[Theorem~1]{Klopp-Pensky-2015}} holds over the class of
+   \mbox{Assumption~\ref{ass:besov}} (Remark~S6.1 in the Supplementary Material), so that
+   in that case \mbox{Theorem~\ref{thm:main}} is minimax optimal when $\pi \ge 2$.}} the rate
+   cannot be improved. With Gaussian errors and any law of $(\bX,\bU)$ that
+   satisfies Assumptions~\ref{ass:X} and~\ref{ass:U}, the minimax risk over the
+   class of Assumption~\ref{ass:besov}, in the prediction norm and for the
+   components, is at least a constant multiple of $pq\,n^{-2s/(2s+1)}$, for every
+   $\pi$ (Theorem~S6.1 in the Supplementary Material). This is the regression
+   counterpart of the lower bound of \citet[Theorem~5]{Donoho-Johnstone-1998} for
+   Besov bodies in the Gaussian sequence model, and with a fixed number of
+   covariates it extends that of \citet[Theorem~1]{Klopp-Pensky-2015}, who have a
+   single modulator independent of the covariates. Theorem~\ref{thm:main} is
+   therefore minimax optimal when $\pi \ge 2$, with any number of modulators and
+   with covariates that depend on them. When
+   $\pi < 2$ the remaining factor $(\log n)^{(2/\pi-1)/(2s+1)}$ is the one in the
+   rate of \citet[eq.~3.19]{Klopp-Pensky-2015} with a fixed number of covariates,
+   and in that of block thresholding in the sequence model
+   \citep[Theorem~4]{Cai-1999}; \textcolor{gray}{\sout{whether it is necessary for this estimator is not
+   known, and no lower bound is proved here for $q \ge 2$.}} the lower bound carries
+   no such factor, and whether the factor is necessary for this estimator is not
+   known.
+   ```
+
 ---
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-05).** **E1.9 e E6.1b fechadas e integradas**: a cota
+**Onde parou (2026-10-05).** **D57: duas aplicações** (marylebone e
+beijing.heat); **E6.1c, E3.4 e E5g catalogadas.** **E1.9 e E6.1b fechadas e integradas**: a cota
 inferior faz o Theorem 1 ótimo em `π ≥ 2` para todo `q`, e nenhuma base da
 aplicação passa contra o spline sintonizado em blocos (marylebone é a melhor
 estrutura). Pendências nas perguntas 50 e 51; **catálogo vazio**. E5f e L11
@@ -3684,6 +3720,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-05 | D57: duas aplicações, marylebone (estrutura) e beijing.heat (predição); perguntas 2, 50 e 51 decididas; E6.1c, E3.4 e E5g catalogadas; o texto da terceira leitura do Theorem 1 guardado na pergunta 51 |
 | 2026-10-05 | D56: na aplicação, cada método nos seus termos; o `gam.cv` em blocos fica fora do artigo, e contra os splines de D46 beijing.heat vence por ~9% e marylebone empata |
 | 2026-10-05 | E1.9 fechada e integrada (`OK` em 80 s, 11 páginas, 88 entradas): Teorema 5 e Corolário 16, a cota inferior com constante proporcional a `pq` e `X` dependente de `U`; pergunta 51. E6.1b fechada e integrada (120 + 120 unidades, 39 h 32 min): nenhuma base passa contra o `gam.cv` em dobras por bloco; marylebone é a melhor estrutura; pergunta 50. `CONTINUAR.md` §3 atualizado |
 | 2026-10-05 | E1.9 (a cota inferior) catalogada com escopo reduzido: no nível da taxa, pela subclasse com uma componente e o lema de Assouad; pergunta 20 |

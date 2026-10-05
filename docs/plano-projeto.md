@@ -445,6 +445,12 @@ limpo em menos de 60 s.
 verdade) e o caminho das normas por par; `plot.cv.wafc`; cabeçalhos roxygen
 completos; exemplo reproduzível em `wafc/README.md`.
 
+### E3.4 `J` por moduladora (catalogada em 2026-10-05)
+
+O nível de cada moduladora limitado pelo número de valores distintos, para
+que um bloco de moduladora discreta fique identificado (lição da E6.1b,
+D57).
+
 ### E3.3 Empacotamento (decisão do autor)
 
 Com o código testado, decidir: pacote próprio `wafc`, função dentro do
@@ -534,6 +540,12 @@ interface de D48 na §4, e a teoria do LASSO numa seção do supp (D51). As
 remoções inteiras ficam em blocos cinza sem tachado (D51). Sem as Seções 5
 a 7, que são da E5b.
 
+### E5g. A cota inferior na `k = 4` (catalogada em 2026-10-05)
+
+A introdução e a terceira leitura do Theorem 1 passam à otimalidade em
+`π ≥ 2` para todo `q`, e o Teorema 5 entra no supp no lugar da Remark S6.1
+(D57).
+
 ### E5b. Seções que dependem dos números (abre quando E4 e E6 fecharem)
 
 Simulation; Application; Discussion. Verificação de teto; cada número
@@ -562,6 +574,10 @@ de adaptação (`aplicacao-candidatas.md`). **E6.1b (catalogada em
 2026-10-03)** refaz a sondagem no critério de D44, estrutura estável com
 predição competitiva, nas três e em até três candidatas novas com salto
 documentado; a escolha continua do autor (pergunta 2 do `ESTADO.md`).
+
+**E6.1c (catalogada em 2026-10-05):** marylebone com dados de licença
+declarada (UK-AIR e vento de fonte declarada); **D57 escolheu duas
+aplicações**, marylebone (estrutura) e beijing.heat (predição).
 
 ### E6.2 Ajustar e comparar
 
