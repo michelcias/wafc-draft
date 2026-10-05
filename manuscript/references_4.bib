@@ -678,3 +678,36 @@
   doi          = {10.32614/CRAN.package.grpreg},
   url          = {https://CRAN.R-project.org/package=grpreg}
 }
+
+% L11 (2026-10-05). O Crossref confere título (em caixa de título),
+% autores, veículo, volume 22, número 3, `published-print` 2012 e DOI, sem
+% páginas; as páginas vêm do cabeçalho do PDF da editora
+% (refs/simon2012.pdf, "Statistica Sinica 22 (2012), 983-1001"), e o
+% OpenAlex confirma 22(3), 983--1001. Nomes como impressos na folha de
+% rosto (D39); o título, impresso em versal, vai em caixa de sentença,
+% como em `Wei-Huang-Li-2011`. O que o projeto usa: o group lasso
+% padronizado, eq. (1.4), §1, p. 984, com penalidade
+% √p_l ‖X^{(l)}β^{(l)}‖_2 em vez de √p_l ‖β^{(l)}‖_2, e a equivalência,
+% afirmada na mesma página, entre ele e ortonormalizar cada grupo, rodar o
+% group lasso não padronizado e voltar à escala original, isto é,
+% penalizar o ajuste X^{(l)}β^{(l)} de cada grupo e não os coeficientes. A
+% prova é a do §2, eqs. (2.2)--(2.4), p. 986: X^{(l)} = U^{(l)}R^{(l)},
+% com ‖U^{(l)}θ^{(l)}‖_2 = ‖θ^{(l)}‖_2 e β^{(l)} = (R^{(l)})^{-1}θ^{(l)};
+% pede posto coluna cheio (p_l ≤ n). Com X^{(l)} = M_1 B_G, a penalidade
+% é √n vezes a ‖Q_G^{1/2}θ_G‖_2 da Remark S5.2, e o √n vai ao λ. O peso
+% √p_l vem do §3.2, p. 987 (sob a nula, E‖P_{col(X^{(m)})} r^{(-m)}‖² =
+% p_m σ²), a mesma conta de traço que torna o λ_{0G} da Remark S5.2
+% pivotal. Três notas: o artigo cita Yuan & Lin como "(2007)" (é 2006,
+% `Yuan-Lin-2006`); remete a uma "Section 4.3" que não existe (o caso de
+% posto deficiente é o §7, p. 997); e Breheny & Huang (2015, §2.1)
+% citam este artigo como "(2011)", ano da versão on-line.
+@article{Simon-Tibshirani-2012,
+  author  = {Simon, Noah and Tibshirani, Robert},
+  title   = {Standardization and the group lasso penalty},
+  journal = {Statistica Sinica},
+  year    = {2012},
+  volume  = {22},
+  number  = {3},
+  pages   = {983--1001},
+  doi     = {10.5705/ss.2011.075}
+}

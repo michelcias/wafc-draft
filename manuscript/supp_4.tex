@@ -968,7 +968,14 @@ The software standardizes the columns, orthonormalizes each chunk and
 penalizes the orthonormalized coordinates with the weights $|G|^{1/2}$. On the
 original scale its penalty is $\sum_{G}w_{G}\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$,
 with $Q_{G} = \Bmat_{G}\T M_{1}\Bmat_{G}/n$ the centered Gram matrix of the
-chunk, $M_{1} = I_{n} - n^{-1}\mathbf{1}\mathbf{1}\T$. Theorem~2 holds with any
+chunk, $M_{1} = I_{n} - n^{-1}\mathbf{1}\mathbf{1}\T$.
+% L11 (D55, pergunta 49(c)): Simon & Tibshirani (2012), eq. (1.4) e Section 2.
+Since
+$\norm{M_{1}\Bmat_{G}\btheta_{G}}_{2} = n^{1/2}\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$,
+this is the standardized group lasso of
+\citet[eq.~1.4]{Simon-Tibshirani-2012}, which penalizes the fit of each
+chunk rather than its coefficients and which they show to be equivalent to
+orthonormalizing within groups (their Section~2). Theorem~2 holds with any
 $Q_{G}$ positive definite and measurable with respect to the covariates, with
 three changes: the event becomes
 $\{\max_{G}\norm{Q_{G}^{-1/2}(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \pen/2\}$, by

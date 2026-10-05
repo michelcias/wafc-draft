@@ -783,10 +783,15 @@ and in that of block thresholding in the sequence model
 known, and no lower bound is proved here for $q \ge 2$. Compared with the
 coordinatewise lasso, whose rate under the same conditions is
 $(\log n/n)^{2s/(2s+1)}$ (Theorem~S8.3 in the Supplementary Material), the
-chunks remove a factor $(\log n)^{2\seff/(2s+1)}$. When $s < 1/2$ and
-$\pi \ge 2$, the rate $n^{-2s/(2s+1)}$ of Theorem~\ref{thm:main} is attained
+chunks remove a factor $(\log n)^{2\seff/(2s+1)}$.
+% D55 (pergunta 49(a)): a frase de D49(c) passa a valer para todo pi, pela S6.2.
+\textcolor{gray}{\sout{When $s < 1/2$ and
+$\pi \ge 2$, the rate $n^{-2s/(2s+1)}$ of \mbox{Theorem~\ref{thm:main}} is attained
 with no design condition at all, at another resolution
-(Proposition~\ref{prop:slow}(ii) below).}
+\mbox{(Proposition~\ref{prop:slow}(ii) below)}.}} When $s < 1/2$, the prediction
+rate of Theorem~\ref{thm:main} holds with no design condition at all, under
+its other assumptions and in the same window for $J_{n}$ (Proposition~S6.2
+in the Supplementary Material).}
 
 The proof combines three ingredients, given below: the approximation error of
 \textcolor{colR1}{$\WJ$}, the design condition, and a nonasymptotic oracle inequality.
@@ -1504,7 +1509,9 @@ which \textcolor{gray}{\sout{coordinate descent}}\textcolor{colR1}{group descent
 \textcolor{gray}{\sout{\texttt{glmnet}}}\textcolor{colR1}{\texttt{grpreg}} package\textcolor{gray}{\sout{ \mbox{\citep{friedman2010regularization}}}} \textcolor{colR1}{\citep{Breheny-Miller-grpreg-2026}} \textcolor{colR1}{of R
 \citep{RCoreTeam-2026}}. Two points of scale deserve care, because they are
 what ties the software to the theory. First, \textcolor{colR1}{the solver standardizes
-the columns and orthonormalizes each chunk before penalizing it, so that what
+the columns and orthonormalizes each chunk before penalizing it
+% L11 (D55, pergunta 49(b)): Simon & Tibshirani (2012), eq. (1.4) e Section 2.
+\citep{Simon-Tibshirani-2012}, so that what
 it computes is \eqref{eq:estimator} with $\norm{\btheta_{G}}_{2}$ replaced by
 $\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$, where $Q_{G}$ is the Gram matrix of the
 columns of the chunk after centering, which is the estimator of Remark~S5.2 in

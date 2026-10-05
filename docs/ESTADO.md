@@ -2551,6 +2551,7 @@ entrou sem os itens de E1.14** (pergunta 47(a)).
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
 | D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
+| D55 | 10-05 | **Pergunta 49, aplicada no chat principal na `k = 4`:** no §3.2, a frase de D49(c) passa a "When `s < 1/2`, the prediction rate of Theorem 1 holds with no design condition at all, under its other assumptions and in the same window for `J_n` (Proposition S6.2)", com a antiga tachada; Simon & Tibshirani (2012) no §4.1, ao lado de Breheny & Huang, e na Remark S5.2 (eq. 1.4 e §2), não no argumento pivotal; a entrada no `references_4.bib` (44 entradas); Breheny & Huang citados por seção. `ms_4` e `supp_4` em 52 e 80 páginas, sem referência indefinida | recomendações do chat principal, aceitas pelo autor |
 | D54 | 10-05 | **Pendências de E1.15, E5e e L10 (pergunta 48):** a Proposição 8 e o Corolário 15 vão à `k = 4` com uma ou duas frases no corpo depois da Proposition 3 e o enunciado com a prova no supp (S6 e S8); a frase do §3 passa a dizer que a condição de desenho é necessária para as componentes, e para a predição quando `s ≥ 1/2`; a introdução (D50) não muda; a variante branca com o comparador truncado não se abre (uma linha no supp); as citações de L10 entram no §4.1 e no §2.3, com as três entradas no `references_4.bib`; a Proposition S8.1 cita as cotas superiores das Assumptions 2 e 3; Simon & Tibshirani (2012) a verificar (L11); Breheny & Huang ficam na seção de software do `.bib` (D25); `ℛ_1`, `ℛ_{𝒢,w}`, `ℛ_{𝒢,1}` no `notacao.md` §10. Catalogadas E5f e L11 | recomendações do chat principal, aceitas pelo autor |
 | D53 | 10-04 | **O resumo da `k = 4` aprovado** como a E5d o escreveu (block lasso com pedaços, pesos de razão limitada, sem logaritmo em `π ≥ 2`, o risco ideal no lugar da compressibilidade, a frase do limiar, "standard group lasso software"), **com uma troca nas palavras-chave: "effective dimension" sai e "thresholding" entra**, marcada, na E5e | recomendação do chat principal, aceita pelo autor: o texto está coerente com o corpo e com D50, e a dimensão efetiva deixou de ser central |
 | D52 | 10-04 | **Pendências de E1.14 e E5d (perguntas 46 e 47):** catalogar o comparador truncado da taxa lenta (E1.15), os itens de E1.14 na `k = 4` com o "program" (E5e) e a bibliografia do `grpreg` e do group lasso (L10); não abrir o refinamento de `σ̂_max` acima do teto; os itens (iii) e (iv) no supp com uma frase no corpo; os símbolos de E1.14 e os do `ms_4` no `notacao.md` §10, com **`ξ = Λ − κ_2C_U`** no lugar do `Δ` (8 trocas no `08`, que recompila em 20 páginas); "programme" vira "program" (`alvo-revista.md` agora, `ms_4` na E5e); o resumo da E5d vai ao autor; o teto de páginas fica para o fim (D21), sabendo que vai mexer na §3; **ratificada a leitura de D51 nos deslocamentos do supp** (o lasso que foi de S5 a S7 para a S8 não se repete em cinza no lugar antigo; uma linha cinza diz o que saiu e para onde) | recomendações do chat principal, aceitas pelo autor |
@@ -3428,7 +3429,8 @@ Ordenadas pelo que bloqueia mais.
    $\lambda^{\mathcal{G}}_{n,1} \asymp (\log n/n)^{1/2}$, and the design
    condition is what the faster rate costs."
 
-49. **Pendências de E5f e L11** (2026-10-05), três edições pequenas na
+49. **~~Pendências de E5f e L11~~ aplicadas em 2026-10-05 (D55).** Texto
+   original: três edições pequenas na
    `k = 4`, com o `.tex` proposto na resposta do chat principal de
    2026-10-05: (a) a frase do §3.2 depois do Theorem 1 ("When `s < 1/2` and
    `π ≥ 2`, the rate ... is attained with no design condition at all, at
@@ -3446,8 +3448,8 @@ Ordenadas pelo que bloqueia mais.
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-05).** **E5f e L11 fechadas e integradas**; três
-edições pequenas na pergunta 49. A E6.1b vai em 113 de 120 unidades.
+**Onde parou (2026-10-05).** **E5f e L11 fechadas e integradas**, e as três
+edições da pergunta 49 aplicadas (D55); catálogo só com a E6.1b. A E6.1b vai em 113 de 120 unidades.
 **E1.15, E5e e L10 fechadas e integradas**, com a pergunta 48 decidida
 (D54). **E1.14 e
 E5d fechadas e integradas**: a
@@ -3531,6 +3533,7 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-05 | Pergunta 49 aplicada (D55): a frase do §3.2 vale para todo `π` pela S6.2; Simon & Tibshirani (2012) no §4.1 e na Remark S5.2; `references_4.bib` com 44 entradas |
 | 2026-10-05 | E5f e L11 fechadas e integradas (52 e 80 páginas; 43 entradas no `references_4.bib`, 87 no verificado): a E1.15 na `k = 4` (Propositions S6.2 e S8.2) e as citações de L10; Simon & Tibshirani (2012) verificado; pergunta 49 |
 | 2026-10-05 | Pergunta 48 decidida (D54): E5f (a E1.15 e as citações de L10 na `k = 4`) e L11 (Simon & Tibshirani 2012) catalogadas; `ℛ_1`, `ℛ_{𝒢,w}`, `ℛ_{𝒢,1}` no `notacao.md` |
 | 2026-10-05 | E1.15 fechada e integrada (`OK` nas duas conferências; 15 e 23 páginas): Proposição 8 e Corolário 15, a taxa lenta pelo comparador truncado, que em `s < 1/2` alcança a do Theorem 1 sem condição de desenho e em `s ≥ 1/2` não melhora. E5e fechada e integrada (50 e 68 páginas): a E1.14 na `k = 4`, "program", "thresholding". L10 fechada e integrada (86 entradas). Pergunta 48 |
