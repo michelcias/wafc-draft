@@ -274,7 +274,11 @@ Proposição 8 no `05` e Corolário 15 no `08`: em `s < 1/2`, a taxa lenta pelo
 comparador truncado alcança a taxa do Theorem 1 sem condição de desenho; em
 `s ≥ 1/2` nenhum comparador melhora. Números no `ESTADO.md` §2.
 
-### E1.9 Cota inferior para `q ≥ 2` (catalogada em 2026-10-05)
+### E1.9 Cota inferior para `q ≥ 2` (fechada em 2026-10-05)
+
+**Fechada:** `09-cota-inferior.tex` (Lema 17, Teorema 5, Corolário 16), a
+cota no nível da taxa com constante proporcional a `pq`, para qualquer `q`
+e `X` dependente de `U`; números no `ESTADO.md` §2.
 
 **Catalogada em 2026-10-05, com escopo reduzido:** no nível da taxa, pela
 subclasse em que só uma componente é não nula (regressão não paramétrica

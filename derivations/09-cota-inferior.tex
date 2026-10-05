@@ -1,0 +1,885 @@
+% E1.9 -- a cota inferior minimax no nível da taxa: um hipercubo de wavelets
+% num nível j, em um ou mais blocos (l, m), com o lema de Assouad, dá
+% n^{-2s/(2s+1)} para o risco de predição (norma empírica e populacional) e
+% para o das componentes, com q >= 2 moduladoras, X dependente de U e
+% qualquer pi, sobre a classe de Besov de E1.3. Com todos os blocos, a
+% constante é proporcional a pq; é aí que entra a Proposição 3 de E1.4.
+%
+% Consome: a hipótese de Besov e a base de E1.3 (02-aproximacao-besov.tex), a
+% Proposição 3 de E1.4 (03-desenho-produtos.tex), a Proposição 1 de E1.2
+% (01-identificabilidade.md), e, no Corolário 16, o Teorema 4 e os Corolários
+% 11 e 14 de E1.12 e E1.13 (08-blocos.tex) e o Corolário 5 de E1.6
+% (05-taxas.tex). NÃO altera nenhum deles.
+%
+% Molde: Tsybakov (2009), Exemplo 2.2 e Teorema 2.12(iv) (o lema de Assouad
+% numa regressão em L_2); a construção por caixas de Donoho e Johnstone (1998,
+% §4.5) e o hipercubo denso de Klopp e Pensky (2015, §5.1, eq. 5.4). O WALL
+% teórico não tem cota inferior (ms_theo_1.tex, Observação "Minimax context" e
+% os problemas em aberto), e nada dele é transposto aqui.
+%
+% Numeração global (docs/TAREFA.md, §5): Lema 17, Teorema 5 e Corolário 16,
+% impressos pelo \setcounter abaixo. A Proposição 9 fica livre.
+%
+% Conferência numérica: check/09-cota-inferior.R (imprime OK; ~2 min).
+% Notação: docs/notacao.md (congelada em E1.1). Os símbolos do hipercubo
+% (K, C, Omega, zeta, d_H, rho_n sublinhado, c_A) são macros locais deste
+% arquivo, como em 07 e 08; a proposta para o notacao.md vai ao handoff.
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage[margin=2.6cm]{geometry}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black]{hyperref}
+\input{macros}
+
+% --- atalhos locais deste arquivo (como em 04, 05, 07 e 08) -----------------
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+% --- símbolos do hipercubo (E1.9; proposta para o notacao.md) ---------------
+\newcommand{\Kcal}{\mathcal{K}}
+\newcommand{\Ccal}{\mathcal{C}}
+\newcommand{\Fcal}{\mathcal{F}}
+\newcommand{\dH}{d_{H}}
+\newcommand{\rlow}{\underline{\rho}_{n}}
+\newcommand{\cA}{c_{\mathrm{A}}}
+\newcommand{\bz}{\mathbf{z}}
+\newcommand{\ECc}{\mathcal{E}_{\mathcal{C}}}
+\newcommand{\KL}{\operatorname{KL}}
+\newcommand{\Lk}{L_{\mathcal{K}}}
+% --- do 08, só para citar os seus objetos no Corolário 16 --------------------
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
+\newcommand{\Acal}{\mathcal{A}_{n}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\PA}{\Pi_{\mathbf{A}}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\Rid}{R_{\mathcal{G}}}
+\newcommand{\nGone}[1]{\lVert #1\rVert_{\mathcal{G},1}}
+\newcommand{\bn}{b_{n}}
+
+% Numeração global (docs/TAREFA.md, §5): Proposição 9, Lema 17, Teorema 5 e
+% Corolário 16 são os próximos números livres.
+\setcounter{proposition}{8}
+\setcounter{lemma}{16}
+\setcounter{theorem}{4}
+\setcounter{corollary}{15}
+
+\title{E1.9. A cota inferior minimax no nível da taxa}
+\author{wafc-draft, \texttt{derivations/09-cota-inferior.tex}}
+\date{2026-10-05}
+
+\begin{document}
+\maketitle
+
+\section*{Onde este resultado entra}
+
+Todas as taxas de \texttt{05-taxas.tex} e \texttt{08-blocos.tex} são cotas
+superiores. A única cota inferior disponível era a de Klopp e Pensky (2015,
+Teorema~1), que vale sobre a nossa classe só com uma moduladora independente
+das covariáveis (Observação~\texttt{rem:inferior} do \texttt{08}, Remark~S6.1
+do \texttt{supp\_4}), e a introdução da $k = 4$ diz por isso ``A lower bound
+for several modulators remains open'' (D50; pergunta~20 do \texttt{ESTADO.md}).
+Este arquivo fecha a pergunta no nível da taxa:
+
+\begin{enumerate}[label=(\alph*), leftmargin=*, nosep]
+  \item o \textbf{hipercubo de wavelets} (Lema~\ref{lem:hipercubo}): funções
+    com um único nível $\lev$ não nulo, em um conjunto $\Kcal$ de blocos
+    $(\cv,\md)$, com o pertencimento à classe de E1.3 para todo $\pi$, o
+    Kullback--Leibler entre vizinhos, a separação e a redução de um
+    estimador qualquer a um ponto do hipercubo;
+  \item a \textbf{cota inferior} (Teorema~\ref{thm:inferior}):
+    $|\Kcal|\,n^{-2s/(2s+1)}$, a menos de constante, para o risco das
+    componentes, para o de predição em $L_{2}(P)$ e para o de predição em
+    $\normn{\cdot}$, em esperança e em probabilidade, para toda lei de
+    $(\bX,\bU)$ que satisfaça as hipóteses de E1.3 e E1.4, com erro
+    gaussiano;
+  \item a \textbf{taxa minimax} (Corolário~\ref{cor:minimax}): em $\pi \ge 2$,
+    $n^{-2s/(2s+1)}$ é a taxa minimax da classe e o WAFC do Corolário~11 a
+    atinge, uniformemente na classe, para todo $q$ e com $\bX$ dependente de
+    $\bU$; em $\pi < 2$ sobra o fator $(\log n)^{(2/\pi-1)/(2s+1)}$.
+\end{enumerate}
+
+A ideia é a leitura do chat principal no catálogo da tarefa, conferida: uma
+cota inferior sobre uma subclasse vale para a classe inteira, e na subclasse
+em que só $\gcomp{1}{1}$ é não nula o modelo é $Y = X_{1}\gcomp{1}{1}(U_{1}) +
+\varepsilon$, uma regressão não paramétrica com desenho aleatório. Ela fecha
+como foi lida, com duas precisões. A primeira: a perda de predição de um
+estimador arbitrário não se decompõe por coordenada, e a redução passa por
+uma projeção sobre o espaço gerado pelo hipercubo, em $L_{2}(P)$ ou na norma
+empírica, que é onde entram o autovalor mínimo e, com vários blocos, a
+Proposição~3 de E1.4; com uma só componente basta $\E(X_{1}^{2}\mid\bU) \ge
+\kappa_{1}$ e a densidade de $U_{1}$ limitada por baixo. A segunda: o mesmo
+argumento, com o hipercubo produto sobre todos os blocos, dá a constante
+proporcional a $pq$, de modo que o item opcional (ii) da tarefa fecha. As
+respostas às perguntas do catálogo:
+
+\begin{itemize}[leftmargin=*, nosep]
+  \item \textbf{A faixa de $(s,\pi)$.} A construção vale para todo $s > 0$,
+    todo $1 \le \pi \le \infty$ e todo índice fino $r$, com a mesma constante;
+    o expoente não depende de $\pi$. Em particular cobre toda a faixa
+    $\seff > 0$ da hipótese de Besov de E1.3.
+  \item \textbf{Denso ou esparso.} O hipercubo denso basta em toda essa
+    faixa. Para a perda $L_{2}$, a construção esparsa só ganharia onde
+    $\seff \le 0$, onde a classe nem é limitada em $L_{2}$
+    (Observação~\ref{rem:esparso}).
+  \item \textbf{O ruído.} Gaussiano, dito no enunciado. Sem ele: nada muda
+    para a classe das cotas superiores, que tem erro sub-gaussiano e contém
+    o gaussiano; para uma lei de erro fixa, vale a mesma prova sob a condição
+    (2.29) de Tsybakov (Observação~\ref{rem:ruido}).
+\end{itemize}
+
+\section{Objetos}
+
+\paragraph{Modelo e amostra.} Como em E1.5, $(Y_{i},\bX_{i},\bU_{i})$,
+$i = 1,\dots,n$, são i.i.d.\ com $Y_{i} = f(\bX_{i},\bU_{i}) +
+\varepsilon_{i}$ e $f(x,u) = \sum_{\cv}x_{\cv}\{\lvl{\cv} +
+\sum_{\md}\gcomp{\cv}{\md}(u_{\md})\}$. Aqui a lei $P$ de $(\bX,\bU)$ é
+\emph{fixa}: qualquer lei que satisfaça as hipóteses de E1.3 e E1.4, isto é,
+$\bU \in [0,1]^{q}$ com densidade conjunta $c_{U} \le p_{\bU} \le C_{U}$,
+$\norm{\bX}_{\infty} \le B_{X}$ e $\kappa_{1} \le
+\lmin\{\E(\bX\bX\T\mid\bU)\} \le \lmaxx\{\E(\bX\bX\T\mid\bU)\} \le \kappa_{2}$
+quase certamente; $\bX$ pode depender de $\bU$. O erro é
+\begin{equation}
+  \label{eq:gauss}
+  \varepsilon_{i} \sim N(0,\sigma^{2}),\ \text{independente de }
+  (\bX_{i},\bU_{i}),
+\end{equation}
+que satisfaz a Hipótese~2 de E1.5 (sub-gaussiano de parâmetro $\sigma$), com
+igualdade na cota da função geradora. $\Prob_{f}$ e $\E_{f}$ são a lei e a
+esperança da amostra quando a função de regressão é $f$.
+
+\paragraph{A classe.} $\Fcal = \Fcal(s,\pi,C_{g})$ é o conjunto das $f$ da
+forma acima com $\bc \in \R^{p}$ qualquer e cada $\gcomp{\cv}{\md}$ satisfazendo
+a hipótese de Besov de E1.3: $\int_{0}^{1}\gcomp{\cv}{\md} = 0$ e
+$\norm{\theta_{\cv\md,\lev\cdot}}_{\pi} \le C_{g}2^{-\lev(s+1/2-1/\pi)}$ para
+todo $\lev \ge 0$. Pela Proposição~1 de E1.2, $f$ determina $(\bc,
+(\gcomp{\cv}{\md}))$, de modo que as perdas das componentes abaixo são
+funções de $f$.
+
+\paragraph{Estimadores e perdas.} Um estimador é qualquer função mensurável
+da amostra. Para a predição, $\widehat f$ com valores em $L_{2}(P)$ (perda
+populacional) ou só os valores $\widehat f(\bX_{i},\bU_{i})$ (perda empírica);
+para as componentes, $\widehat g = (\widehat g_{\cv\md})$ com
+$\widehat g_{\cv\md} \in L_{2}[0,1]$. Para um conjunto $\Kcal \subseteq
+\{1,\dots,p\}\times\{1,\dots,q\}$ de blocos, as perdas são
+\[
+  L_{n}(\widehat f,f) = \normn{\widehat f - f}^{2},
+  \qquad
+  L_{P}(\widehat f,f) = \normL{\widehat f - f}^{2},
+  \qquad
+  \Lk(\widehat g,f) = \sum_{(\cv,\md)\in\Kcal}
+  \lVert\widehat g_{\cv\md} - \gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}^{2},
+\]
+as três em que as taxas de E1.5, E1.6 e E1.12 são enunciadas (a
+populacional ainda sem cota superior; §\ref{sec:naocobre}).
+
+\paragraph{O hipercubo.} Fixe $\Kcal \ne \emptyset$, $K = |\Kcal|$, um nível
+$\lev \ge 0$ e uma altura $\zeta > 0$. As coordenadas são
+\[
+  \Ccal = \Ccal(\Kcal,\lev) = \{(\cv,\md,\tsl) : (\cv,\md) \in \Kcal,\
+  0 \le \tsl < 2^{\lev}\},
+  \qquad M = |\Ccal| = K2^{\lev},
+\]
+e $\Omega = \{0,1\}^{\Ccal}$. Para $\omega \in \Omega$, a componente
+$\gcomp{\cv}{\md}^{\omega} = \zeta\sum_{\tsl}\omega_{\cv\md,\tsl}
+\wav{\lev}{\tsl}$ se $(\cv,\md) \in \Kcal$ e $0$ fora de $\Kcal$, os níveis
+são $\bc = 0$, e
+\[
+  f_{\omega}(x,u) = \sum_{(\cv,\md)\in\Kcal}x_{\cv}\,\gcomp{\cv}{\md}^{\omega}(u_{\md})
+  = \zeta\,\bz_{\Ccal}(x,u)\T\omega,
+  \qquad
+  \bz_{\Ccal}(x,u) = \bigl(x_{\cv}\wav{\lev}{\tsl}(u_{\md})\bigr)_{(\cv,\md,\tsl)\in\Ccal}.
+\]
+As entradas de $\bz_{\Ccal}$ são as colunas de $\bZ$ (\texttt{notacao.md},
+§3) em $\Ccal$, com $J = \lev + 1$. Escrevemos
+\[
+  \Gram_{\Ccal\Ccal} = \E\{\bz_{\Ccal}(\bX,\bU)\bz_{\Ccal}(\bX,\bU)\T\},
+  \qquad
+  \Gramhat_{\Ccal\Ccal} = \frac1n\sum_{i}\bz_{\Ccal}(\bX_{i},\bU_{i})
+  \bz_{\Ccal}(\bX_{i},\bU_{i})\T,
+\]
+as submatrizes principais de $\Gram$ e $\Gramhat$ de E1.4 (com $J = \lev+1$)
+nas colunas de $\Ccal$; $\dH(\omega,\omega') = \sum_{a\in\Ccal}
+\mathbf{1}\{\omega_{a} \ne \omega'_{a}\}$ é a distância de Hamming, e
+$\Prob_{\omega} = \Prob_{f_{\omega}}$.
+
+\paragraph{Constantes e escolhas.} $\gamma = \kappa_{1}c_{U}$, como em E1.6
+e no \texttt{08}; $\cA = (1 - 2^{-1/2})/2 \approx 0{,}146$. Para $n \ge
+n_{0} = \lceil 2\sigma^{2}/(C_{g}^{2}B_{X}^{2}C_{U})\rceil$,
+\begin{equation}
+  \label{eq:escolhas}
+  \zeta_{n}^{2} = \frac{2\sigma^{2}}{nB_{X}^{2}C_{U}},
+  \qquad
+  x_{n} = \frac{C_{g}^{2}}{\zeta_{n}^{2}} \ge 1,
+  \qquad
+  \lev_{n} = \max\{\lev \ge 0 : 2^{\lev(2s+1)} \le x_{n}\},
+  \qquad
+  \rlow^{2} = C_{g}^{2/(2s+1)}\Bigl(\frac{\sigma^{2}}{nB_{X}^{2}C_{U}}\Bigr)^{2s/(2s+1)} .
+\end{equation}
+$\rlow^{2} \asymp n^{-2s/(2s+1)}$ é a taxa da cota; tem a forma
+$C^{2(1-r)}\varepsilon^{2r}$ de Donoho e Johnstone (1998, eq.~18), com $r =
+2s/(2s+1)$, raio $C = C_{g}$ e ruído por coordenada $\varepsilon^{2} =
+\sigma^{2}/(nB_{X}^{2}C_{U})$.
+
+\section{A ferramenta: o lema de Assouad}
+
+O que se usa de Tsybakov (2009, Lema~2.12 e Teorema~2.12(iv),
+pp.~117--119), no nosso símbolo: seja $\Omega = \{0,1\}^{M}$ e
+$\{\Prob_{\omega} : \omega\in\Omega\}$ medidas de probabilidade no mesmo
+espaço. Se $\KL(\Prob_{\omega},\Prob_{\omega'}) \le \alpha < \infty$ para todo
+par com $\dH(\omega,\omega') = 1$, então
+\begin{equation}
+  \label{eq:assouad}
+  \inf_{\widehat\omega}\max_{\omega\in\Omega}\E_{\omega}\dH(\widehat\omega,\omega)
+  \;\ge\; \frac{M}{2}\max\Bigl(\frac{e^{-\alpha}}{2},\ 1 - \sqrt{\alpha/2}\Bigr),
+\end{equation}
+com o ínfimo sobre todos os estimadores com valores em $\Omega$. Com
+$\alpha = 1$ o lado direito é $\cA M$. A prova de Tsybakov passa pela média
+uniforme sobre $\Omega$ (eq.~2.77), de modo que \eqref{eq:assouad} é também
+uma cota inferior do risco de Bayes de Hamming sob a priori uniforme, que é o
+que a Parte~VI da conferência mede.
+
+\section{O hipercubo}
+
+\begin{lemma}[o hipercubo de wavelets]\label{lem:hipercubo}
+Com $P$, a classe $\Fcal$ e o erro \eqref{eq:gauss} como na §1, para todo
+$\Kcal \ne \emptyset$, todo $\lev \ge 0$ e todo $\zeta > 0$:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(pertencimento)} $f_{\omega} \in \Fcal(s,\pi,C_{g})$ para todo
+    $\omega \in \Omega$ se e só se $\zeta2^{\lev(s+1/2)} \le C_{g}$, para
+    todo $s > 0$ e todo $1 \le \pi \le \infty$; a norma de Besov em sequência
+    de $\gcomp{\cv}{\md}^{\omega}$ é a mesma para todo índice fino $r$.
+  \item \textup{(Kullback--Leibler)} para todo par,
+    \[
+      \KL(\Prob_{\omega},\Prob_{\omega'}) \;=\; \frac{n\zeta^{2}}{2\sigma^{2}}
+      (\omega - \omega')\T\Gram_{\Ccal\Ccal}(\omega - \omega');
+    \]
+    se $\omega$ e $\omega'$ diferem só na coordenada $(\cv,\md,\tsl)$,
+    \[
+      \KL(\Prob_{\omega},\Prob_{\omega'}) \;=\; \frac{n\zeta^{2}}{2\sigma^{2}}
+      \E\{X_{\cv}^{2}\wav{\lev}{\tsl}(U_{\md})^{2}\}
+      \;\le\; \frac{n\zeta^{2}}{2\sigma^{2}}\min(B_{X}^{2},\kappa_{2})\,C_{U}.
+    \]
+  \item \textup{(separação)} $\lmin(\Gram_{\Ccal\Ccal}) \ge \gamma$; logo
+    $\normL{f_{\omega} - f_{\omega'}}^{2} \ge \gamma\zeta^{2}\dH(\omega,\omega')$,
+    e $\sum_{(\cv,\md)\in\Kcal}\lVert\gcomp{\cv}{\md}^{\omega} -
+    \gcomp{\cv}{\md}^{\omega'}\rVert_{L_{2}[0,1]}^{2} =
+    \zeta^{2}\dH(\omega,\omega')$. Com $\Kcal = \{(\cv,\md)\}$, a primeira
+    afirmação só usa $\E(X_{\cv}^{2}\mid\bU) \ge \kappa_{1}$ e a densidade de
+    $U_{\md}$ limitada por $c_{U}$.
+  \item \textup{(redução)} para cada uma das três perdas e cada estimador,
+    existe $\widehat\omega$, função mensurável da amostra com valores em
+    $\Omega$, tal que, para todo $\omega \in \Omega$,
+    \begin{enumerate}[label=\textup{(\alph*)}, leftmargin=*, nosep]
+      \item $\Lk(\widehat g, f_{\omega}) \ge (\zeta^{2}/4)\,\dH(\widehat\omega,\omega)$;
+      \item $L_{P}(\widehat f, f_{\omega}) \ge (\gamma\zeta^{2}/4)\,\dH(\widehat\omega,\omega)$;
+      \item $L_{n}(\widehat f, f_{\omega}) \ge (\gamma\zeta^{2}/8)\,\dH(\widehat\omega,\omega)
+        \,\mathbf{1}_{\ECc}$, com $\ECc = \{\lmin(\Gramhat_{\Ccal\Ccal}) \ge \gamma/2\}$,
+        evento que só depende de $(\bX_{i},\bU_{i})_{i\le n}$ e tem
+        \begin{equation}
+          \label{eq:evento}
+          \Prob(\ECc^{c}) \;\le\; 2D_{\lev}\exp\Bigl(-\frac{n\gamma^{2}}
+          {8R_{\lev+1}(\kappa_{2}C_{U} + \gamma/3)}\Bigr),
+          \quad D_{\lev} = p\{1 + q(2^{\lev+1}-1)\},
+          \quad R_{J} = pB_{X}^{2}(1 + qC_{\psi}2^{J}),
+        \end{equation}
+        a cota da Proposição~3(iv) de E1.4 com $J = \lev + 1$ e $t = \gamma/2$.
+    \end{enumerate}
+\end{enumerate}
+\end{lemma}
+
+O Kullback--Leibler só usa cotas superiores do desenho, e a separação das
+componentes não usa nenhuma: o desenho entra por baixo só na predição, pelo
+autovalor mínimo. É o que se esperaria: com $X_{\cv} = 0$ quase certamente o
+bloco $(\cv,\md)$ não aparece em $f$, e nenhuma cota inferior de predição
+pode valer sobre ele.
+
+\section{A cota inferior}
+
+\begin{theorem}[cota inferior minimax no nível da taxa]\label{thm:inferior}
+Seja $P$ qualquer lei de $(\bX,\bU)$ que satisfaça as hipóteses de E1.3 e
+E1.4, com $q \ge 1$ e $\bX$ possivelmente dependente de $\bU$, e o erro
+gaussiano \eqref{eq:gauss}. Para todo $s > 0$, todo $1 \le \pi \le \infty$,
+todo $\Kcal \ne \emptyset$ com $K = |\Kcal|$ e todo $n \ge n_{0}$, com
+$\rlow$ de \eqref{eq:escolhas}:
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{(componentes)}
+    \[
+      \inf_{\widehat g}\sup_{f\in\Fcal}\E_{f}\Lk(\widehat g,f)
+      \ge \frac{\cA}{8}K\rlow^{2},
+      \qquad
+      \inf_{\widehat g}\sup_{f\in\Fcal}\Prob_{f}\Bigl\{\Lk(\widehat g,f)
+      \ge \frac{\cA}{16}K\rlow^{2}\Bigr\} \ge \frac{\cA}{2};
+    \]
+  \item \textup{(predição, norma populacional)} o mesmo para $L_{P}$, com
+    $\gamma K\rlow^{2}$ no lugar de $K\rlow^{2}$;
+  \item \textup{(predição, norma empírica)} se além disso $n \ge n_{1}$, o
+    menor inteiro a partir do qual o lado direito de \eqref{eq:evento} com
+    $\lev = \lev_{n}$ fica abaixo de $\cA/4$ (finito, porque $2^{\lev_{n}}
+    \le x_{n}^{1/(2s+1)}$),
+    \[
+      \inf_{\widehat f}\sup_{f\in\Fcal}\E_{f}L_{n}(\widehat f,f)
+      \ge \frac{\cA}{32}\gamma K\rlow^{2},
+      \qquad
+      \inf_{\widehat f}\sup_{f\in\Fcal}\Prob_{f}\Bigl\{L_{n}(\widehat f,f)
+      \ge \frac{\cA}{32}\gamma K\rlow^{2}\Bigr\} \ge \frac{\cA}{4}.
+    \]
+\end{enumerate}
+As constantes não dependem de $\pi$, de $r$, de $p$, de $q$ nem de $P$ além
+de $(B_{X},C_{U})$ em $\rlow$ e de $\gamma = \kappa_{1}c_{U}$; $n_{0}$ só
+depende de $(\sigma,C_{g},B_{X},C_{U})$, e $n_{1}$ também de $(p,q,s,
+\kappa_{1},\kappa_{2},c_{U},C_{\psi})$. Em particular:
+\begin{enumerate}[label=\textup{(\alph*)}, leftmargin=*, nosep]
+  \item com $\Kcal = \{(\cv,\md)\}$ (a subclasse de uma componente), cada
+    componente e a predição têm risco minimax de ordem pelo menos
+    $n^{-2s/(2s+1)}$, com $q \ge 2$ e $\bX$ dependente de $\bU$;
+  \item com $\Kcal$ todos os blocos, $K = pq$: a cota é proporcional a $pq$.
+\end{enumerate}
+\end{theorem}
+
+O enunciado não é assintótico: vale em todo $n \ge n_{0}$ (ou $n_{1}$), e
+$\rlow^{2} = C_{g}^{2/(2s+1)}\{\sigma^{2}/(B_{X}^{2}C_{U})\}^{2s/(2s+1)}
+n^{-2s/(2s+1)}$. A forma em probabilidade é a que se compara com as cotas
+superiores, que são $O_{p}$. Pela Observação~\ref{rem:desenho}, $B_{X}^{2}$
+pode dar lugar a $\kappa_{2}$ em $\zeta_{n}$, $x_{n}$ e $\rlow$.
+
+\begin{corollary}[a taxa minimax]\label{cor:minimax}
+Sob as hipóteses do Corolário~11 do \texttt{08} ($p$, $q$ e as constantes
+fixos, a Hipótese~B, $\lambda = \lamG$ e $J_{n} = \lceil c\log_{2}n\rceil$
+na janela $s/((2s+1)\seff) \le c < 1$), com o erro gaussiano
+\eqref{eq:gauss}, seja $\widehat f$ o WAFC do Corolário~11 e $\widehat
+g_{\cv\md}$ as suas componentes; seja $L$ qualquer das perdas $L_{n}$ e
+$L_{\Kcal}$ com $\Kcal$ todos os blocos, e $\psi_{n} = n^{-2s/(2s+1)}$.
+\begin{enumerate}[label=\textup{(\roman*)}, leftmargin=*]
+  \item \textup{($\pi \ge 2$, todo $s > 0$)} $\psi_{n}$ é a taxa minimax de
+    $\Fcal$ e o WAFC a atinge uniformemente: existem $c, c' > 0$ com
+    \[
+      \liminf_{n\to\infty}\,\inf_{\widetilde f}\sup_{f\in\Fcal}
+      \Prob_{f}\{L(\widetilde f,f) \ge c\,\psi_{n}\} \ge c',
+      \qquad
+      \lim_{A\to\infty}\limsup_{n\to\infty}\sup_{f\in\Fcal}
+      \Prob_{f}\{L(\widehat f,f) > A\,\psi_{n}\} = 0 .
+    \]
+    O mesmo vale para o estimador do Teorema~4 do \texttt{08}, com $J_{n}$
+    de \texttt{eq:Jn-blocos}, e, para $L_{n}$ e $s < 1/2$, para o do
+    Corolário~14(ii), que não usa condição de desenho.
+  \item \textup{($\pi < 2$, $\seff > s/(2s+1)$)} vale a primeira afirmação de
+    (i), e a segunda com $A\psi_{n}(\log n)^{(2/\pi-1)/(2s+1)}$ no lugar de
+    $A\psi_{n}$: o WAFC é minimax a menos desse fator. O Teorema~4, com
+    $n^{-2\seff/(2\seff+1)}$, fica acima da cota por uma potência de $n$.
+  \item \textup{(o LASSO coordenado)} a taxa do Corolário~5 de E1.6,
+    $(\log n/n)^{2s/(2s+1)}$, fica acima da cota pelo fator
+    $(\log n)^{2s/(2s+1)}$, em todo $\pi$.
+\end{enumerate}
+\end{corollary}
+
+\section{Observações}
+
+\begin{remark}[a faixa de $(s,\pi)$ e a construção esparsa]\label{rem:esparso}
+O expoente de $n$ e as constantes do Teorema~\ref{thm:inferior} não dependem
+de $\pi$: o hipercubo tem um só nível, e nele a restrição de Besov é
+$\zeta\,2^{\lev/\pi}2^{\lev(s+1/2-1/\pi)} = \zeta\,2^{\lev(s+1/2)} \le C_{g}$
+para todo $\pi$. A construção esparsa de praxe (Fano e Varshamov--Gilbert,
+Tsybakov, 2009, Teorema~2.5 e Lema~2.9) põe $d$ picos de altura $\zeta$ entre
+os $2^{\lev}$ de um nível. Em expoentes, com $2^{\lev} = n^{a}$ e $d =
+n^{a-\delta}$, $0 \le \delta \le a$, o Kullback--Leibler permitido dá
+$\zeta^{2} \asymp \delta\log n/n$ (o $\log$ do número de hipóteses por pico),
+a restrição de Besov é $(a-\delta)/\pi + a(s + 1/2 - 1/\pi) \le 1/2$ a menos
+de logaritmos, e o risco é da ordem de $d\zeta^{2}$; o máximo em $a$ dá, a
+menos de constantes,
+\[
+  d\zeta^{2} \;\asymp\; n^{-2s/(2s+1)}\cdot
+  n^{-\delta\{1 - 1/(\pi(s+1/2))\}}\cdot(\delta\log n)^{2s/(2s+1)} .
+\]
+Em $\seff > 0$, isto é $\pi(s+1/2) > 1$, o expoente do segundo fator é
+negativo para $\delta > 0$, e o produto dos dois últimos, uma função de
+$u = \delta\log n$ da forma $e^{-cu}u^{2s/(2s+1)}$, é limitado uniformemente
+em $\delta$: a construção esparsa nunca supera a densa por mais que uma
+constante, e a densa ($\delta = 0$) é a que se usa. Em $\seff < 0$ o
+expoente muda de sinal e o risco cresce sem limite, mas ali a classe não é
+limitada em $L_{2}$ (cada nível pode carregar um pico de norma maior que
+$C_{g}$), e a hipótese de E1.3 exclui o caso. É a mesma conclusão de Donoho e
+Johnstone (1998), cuja cota inferior (18), no modelo de sequência, vale para
+todo $\alpha > 0$ e todos os índices porque vem de caixas nível a nível (as
+prioris independentes limitadas da §4.5, com a função $\tilde\gamma$ do corpo
+com $p = \infty$). A conferência (Parte~IX) refaz a conta numa grade de 27
+pares $(s,\pi)$ com $\seff > 0$.
+\end{remark}
+
+\begin{remark}[o que muda sem ruído gaussiano]\label{rem:ruido}
+(a) Para a classe das cotas superiores, nada: a Hipótese~2 de E1.5 admite
+qualquer erro condicionalmente sub-gaussiano de parâmetro $\sigma$, o
+gaussiano \eqref{eq:gauss} é um deles, e uma cota inferior sobre uma
+subfamília de modelos vale para a família. (b) Para uma lei de erro
+\emph{fixa}, de densidade $p_{\varepsilon}$, independente de $(\bX,\bU)$, a
+prova é a mesma sob a condição (2.29) de Tsybakov (2009, pp.~91--92):
+$\int p_{\varepsilon}(y)\log\{p_{\varepsilon}(y)/p_{\varepsilon}(y+v)\}\,dy
+\le p_{*}v^{2}$ para $|v| \le v_{0}$. Os vizinhos diferem por
+$|f_{\omega} - f_{\omega'}| = \zeta|X_{\cv}\wav{\lev}{\tsl}(U_{\md})| \le
+\zeta B_{X}2^{\lev/2}\norm{\psi}_{\infty} \le C_{g}B_{X}\norm{\psi}_{\infty}
+2^{-\lev s}$, que fica abaixo de $v_{0}$ para $n$ grande; então
+$\KL(\Prob_{\omega},\Prob_{\omega'}) \le np_{*}\E(f_{\omega} -
+f_{\omega'})^{2}$, e o Teorema~\ref{thm:inferior} vale com $1/(2\sigma^{2})$
+trocado por $p_{*}$ (isto é, $\sigma^{2}$ por $1/(2p_{*})$ em $\zeta_{n}$ e
+$\rlow$), para $n \ge \max(n_{0},n_{0}')$ com $C_{g}B_{X}\norm{\psi}_{\infty}
+2^{-\lev_{n}s} \le v_{0}$. Aqui a cota quase certa $B_{X}$ e
+$\norm{\psi}_{\infty}$ são usadas; com o erro gaussiano não são. A gaussiana
+tem $p_{*} = 1/(2\sigma^{2})$ e $v_{0} = \infty$; a conferência (Parte~X)
+acha $p_{*} = 1{,}45$ com $v_{0} = 1$ para a mistura $\frac12N(-1,\frac14) +
+\frac12N(1,\frac14)$, sub-gaussiana e não gaussiana, com $\KL/v^{2} \to I/2$
+quando $v \to 0$. (c) Sem (2.29), por exemplo com erro de suporte limitado,
+o Kullback--Leibler pode ser infinito, e o caminho seria a versão de
+Hellinger do lema (Tsybakov, 2009, Teorema~2.12(iii)); não é feito.
+\end{remark}
+
+\begin{remark}[o que a cota usa do desenho]\label{rem:desenho}
+O Kullback--Leibler usa $\E(X_{\cv}^{2}\mid\bU) \le \min(B_{X}^{2},\kappa_{2})$
+e a densidade de $U_{\md}$ limitada por $C_{U}$, e só isso: vale com $\bX$
+dependente de $\bU$, porque o que entra é o segundo momento condicional, e
+não o marginal (Klopp e Pensky, \S5.1, calculam $\E\{(f-\tilde
+f)\T(t)W W\T(f-\tilde f)(t)\} = \E\{(f-\tilde f)\T\Sigma(f-\tilde f)\}$, que
+pede $W$ independente de $t$). Trocar $B_{X}^{2}$ por $\kappa_{2}$ melhora a
+constante (na conferência, $\kappa_{2} = 2{,}18$ contra $B_{X}^{2} = 4$). A
+separação das componentes não usa o desenho; a da predição usa
+$\lmin(\Gram_{\Ccal\Ccal}) \ge \gamma$, e é só aí que entram os termos
+cruzados entre moduladoras e entre covariáveis: na conferência eles chegam a
+$0{,}65$ fora dos blocos diagonais, e o autovalor mínimo com os quatro blocos
+cai a $0{,}17$--$0{,}26$, contra $0{,}56$--$0{,}94$ com um bloco só, e fica
+$2{,}8$ vezes acima de $\gamma$. Com $K = 1$ o autovalor sai sem a Proposição~3.
+\end{remark}
+
+\begin{remark}[a constante em $pq$ diante das cotas superiores]\label{rem:pq}
+O Teorema~4(iii) do \texttt{08} tem o termo de estimação
+$384\bar\varrho^{2}C_{\pen}\sigma^{2}pq(\bn + 2^{J_{n}})/(\gamma n)$, proporcional
+a $pq$ a menos do $\log(2pq/\alpha)$ dentro de $C_{\pen}$, e o de viés
+$\mathcal{B}_{J_{n}}^{2} \propto (pq)^{2}$, do Corolário~1 de E1.3, onde um
+fator $pq$ vem de Cauchy--Schwarz sobre os $pq$ termos. Esse segundo fator não
+é necessário: como $\E\normn{\bb}^{2} = \normL{\bb}^{2}$ e
+$\lmaxx(\Gram) \le \kappa_{2}C_{U}$ para todo $J$ (Proposição~3(iii)),
+passando ao limite nos níveis finos,
+\[
+  \normL{f - f_{J}}^{2} \;\le\; \kappa_{2}C_{U}\sum_{\cv,\md}
+  \lVert\gcomp{\cv}{\md} - \PiJ\gcomp{\cv}{\md}\rVert_{L_{2}[0,1]}^{2}
+  \;\le\; pq\,\kappa_{2}C_{U}\frac{C_{g}^{2}}{1 - 2^{-2\seff}}2^{-2J\seff}.
+\]
+Com isso a cota superior em $\pi \ge 2$ é $pq\{C_{\pen} + O(1)\}n^{-2s/(2s+1)}$
+contra $pq\,n^{-2s/(2s+1)}$ da inferior: a dependência em $pq$ fica presa a
+menos do $\log(pq)$ da união sobre os pedaços. Não se altera o \texttt{02}
+nem o \texttt{08} aqui; a troca vai ao handoff.
+\end{remark}
+
+\section{Diante das cotas superiores e da literatura}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Corolário~11 do \texttt{08}.} Em $\pi \ge 2$ é ótimo na taxa
+    para todo $q$ e com $\bX$ dependente de $\bU$, uniformemente na classe
+    (Corolário~\ref{cor:minimax}(i)); isso responde à pergunta do catálogo.
+    Em $\pi < 2$ sobra $(\log n)^{(2/\pi-1)/(2s+1)}$; a cota inferior não tem
+    o fator, e no modelo de sequência ele não é do problema (Donoho e
+    Johnstone, 1998, Teoremas~4 e~5: o risco minimax sobre corpos de Besov é
+    da ordem $C^{2(1-r)}\varepsilon^{2r}$ para todo $p$). Se um estimador,
+    adaptativo ou não, o evita no modelo do WAFC fica fora (item (iii) da
+    tarefa).
+  \item \textbf{Teorema~4 do \texttt{08}.} Em $\pi \ge 2$ é ótimo na taxa,
+    com $J_{n}$ escolhido por $s$; em $\pi < 2$ a sua taxa
+    $n^{-2\seff/(2\seff+1)}$ é a dos estimadores lineares (Donoho e Johnstone,
+    1998, Teorema~1, p.~882: o expoente $r' = (2\alpha-\gamma_{\mathrm{DJ}})/(2\alpha + 1 -
+    \gamma_{\mathrm{DJ}})$, com o $\gamma_{\mathrm{DJ}} = 2/p - 1$ deles, é $2\seff/(2\seff+1)$) e fica acima da
+    cota por uma potência de $n$.
+  \item \textbf{Corolário~14(ii) do \texttt{08}.} Em $\pi \ge 2$ e
+    $s < 1/2$ a taxa lenta $n^{-2s/(2s+1)}$, que não usa condição de desenho,
+    também é ótima em predição; a condição de desenho é necessária para a
+    cota inferior (Observação~\ref{rem:desenho}), não para essa cota superior.
+  \item \textbf{Corolário~5 de E1.6 (o LASSO).} $(\log n/n)^{2s/(2s+1)}$ fica
+    acima da cota por $(\log n)^{2s/(2s+1)}$ em todo $\pi$; a
+    Observação~\texttt{rem:tres} do \texttt{05} comparava com a referência do
+    modelo de sequência no ruído $\pen_{n}$, e a comparação agora é com uma
+    cota inferior do próprio modelo.
+  \item \textbf{Klopp e Pensky (2015, Teorema~1, eqs.~3.6 e~3.7).} A cota
+    deles é na norma $L_{2}[0,1]$ do vetor de coeficientes funcionais, a nossa
+    $\Lk$ com $\Kcal$ todos os blocos, por Fano (Tsybakov, 2009, Teorema~2.5)
+    e Varshamov--Gilbert, em probabilidade. Ela tem dois termos: o primeiro,
+    $\kappa\sigma^{2}\{s\log(p/s) + s_{0}\log(p/s_{0})\}/(5n\omega^{*}_{\max}
+    \phi_{\max})$, é o de alta dimensão (a escolha do suporte entre $p$
+    coeficientes), de ordem paramétrica com $p$ fixo, e não tem análogo aqui;
+    o segundo, $\frac18\sum_{\cv\in J}C_{a}^{2/(2r_{\cv}+1)}
+    \{\sigma^{2}\kappa/(n\omega^{*}_{\max}\phi_{\max})\}^{2r_{\cv}/(2r_{\cv}+1)}$,
+    é o Teorema~\ref{thm:inferior}(i) com $K$ igual ao número de funções não
+    constantes e $B_{X}^{2}C_{U}$ no lugar de $\omega^{*}_{\max}\phi_{\max}$.
+    A construção deles (5.4) é um hipercubo denso nos índices $l_{0}$ a
+    $2l_{0}-1$ da base. O que eles não têm: a perda de predição, $q \ge 2$
+    com os termos cruzados, $\bX$ dependente de $\bU$. O que este arquivo não
+    tem: o regime $p \gg n$ e o termo de suporte.
+  \item \textbf{Donoho e Johnstone (1998, Teoremas~4 e~5).} No modelo de
+    sequência gaussiano com ruído $\varepsilon$, a (18) dá $R \ge
+    \tilde\gamma(C/\varepsilon)C^{2(1-r)}\varepsilon^{2r} - \varepsilon^{2}$
+    para todo $\alpha > 0$ e todos os índices, e a (17) com a (19) dão a
+    ordem exata. O Teorema~\ref{thm:inferior} é a versão de regressão com
+    desenho aleatório: o mesmo $C^{2(1-r)}\varepsilon^{2r}$, com
+    $\varepsilon^{2} = \sigma^{2}/(nB_{X}^{2}C_{U})$, a informação por
+    coordenada sendo no máximo $n\E\{X_{\cv}^{2}\wav{\lev}{\tsl}(U_{\md})^{2}\}
+    /\sigma^{2} \le nB_{X}^{2}C_{U}/\sigma^{2}$, e o hipercubo no lugar das
+    caixas. A função periódica $\tilde\gamma(\log_{2}(C/\varepsilon))$ deles
+    é, aqui, o piso em $\lev_{n}$: a razão entre a cota exata das componentes,
+    $(\cA/4)K2^{\lev_{n}}\zeta_{n}^{2}$, e $(\cA/8)K\rlow^{2}$ oscila entre
+    $2^{2s/(2s+1)}$ e $2^{(4s+1)/(2s+1)}$ (Parte~VIII).
+\end{itemize}
+
+\section{Provas}\label{sec:provas}
+
+\subsection*{Lema~\ref{lem:hipercubo}}
+
+\emph{(i).} Pela ortonormalidade de $\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$
+em $L_{2}[0,1]$ (Hipótese de base de E1.3), os coeficientes de
+$\gcomp{\cv}{\md}^{\omega}$ são $\theta_{\cv\md,\lev'\tsl} =
+\zeta\omega_{\cv\md,\tsl}\mathbf{1}\{\lev' = \lev\}$, e
+$\int_{0}^{1}\gcomp{\cv}{\md}^{\omega} = 0$ porque $\int_{0}^{1}\wav{\lev}{\tsl}
+= 0$. Só o nível $\lev$ é não nulo, logo a norma $b^{s}_{\pi,r}$ é
+$2^{\lev(s+1/2-1/\pi)}\norm{\theta_{\cv\md,\lev\cdot}}_{\pi}$ para todo $r$, e a
+hipótese de Besov se reduz a esse nível. Para $\pi < \infty$,
+$\norm{\theta_{\cv\md,\lev\cdot}}_{\pi} = \zeta\{\sum_{\tsl}\omega_{\cv\md,\tsl}\}^{1/\pi}
+\le \zeta2^{\lev/\pi}$, com igualdade em $\omega \equiv 1$; para $\pi = \infty$
+é $\zeta$ (se $\omega \ne 0$). Nos dois casos o máximo sobre $\Omega$ de
+$2^{\lev(s+1/2-1/\pi)}\norm{\theta_{\cv\md,\lev\cdot}}_{\pi}$ é
+$\zeta2^{\lev(s+1/2)}$, e a condição é $\zeta2^{\lev(s+1/2)} \le C_{g}$. As
+componentes fora de $\Kcal$ são nulas e $\bc = 0$.
+
+\emph{(ii).} Sob $\Prob_{\omega}$, os $(\bX_{i},\bU_{i})$ têm a lei $P$, a
+mesma para todo $\omega$, e, dados eles, $Y_{i} \sim
+N(f_{\omega}(\bX_{i},\bU_{i}),\sigma^{2})$ independentes. A divergência de
+leis produto é a soma, e a de leis com a mesma marginal é a média da
+condicional: $\KL(\Prob_{\omega},\Prob_{\omega'}) = n\E\,\KL\{N(f_{\omega},
+\sigma^{2}),N(f_{\omega'},\sigma^{2})\} = n\E\{(f_{\omega} -
+f_{\omega'})^{2}(\bX,\bU)\}/(2\sigma^{2})$, e $f_{\omega} - f_{\omega'} =
+\zeta\bz_{\Ccal}\T(\omega - \omega')$ dá a forma quadrática. Num vizinho,
+$\E\{(f_{\omega} - f_{\omega'})^{2}\} = \zeta^{2}\E\{X_{\cv}^{2}
+\wav{\lev}{\tsl}(U_{\md})^{2}\} = \zeta^{2}\E\{\E(X_{\cv}^{2}\mid\bU)
+\wav{\lev}{\tsl}(U_{\md})^{2}\}$, com $\E(X_{\cv}^{2}\mid\bU) \le B_{X}^{2}$ e
+$\E(X_{\cv}^{2}\mid\bU) = e_{\cv}\T\E(\bX\bX\T\mid\bU)e_{\cv} \le \kappa_{2}$;
+e $\E\{\wav{\lev}{\tsl}(U_{\md})^{2}\} \le C_{U}\int_{0}^{1}\wav{\lev}{\tsl}^{2} =
+C_{U}$, porque a marginal de $U_{\md}$ é limitada por $C_{U}$ (Hipótese de
+densidade de E1.3).
+
+\emph{(iii).} $\Gram_{\Ccal\Ccal}$ é a submatriz principal de $\Gram$ (E1.4,
+com $J = \lev + 1$) nas colunas de $\Ccal$: para $v \in \R^{\Ccal}$ e
+$\tilde v$ o vetor de $\R^{D}$ que o completa com zeros, $v\T\Gram_{\Ccal\Ccal}v
+= \tilde v\T\Gram\tilde v \ge \lmin(\Gram)\norm{v}^{2} \ge \gamma\norm{v}^{2}$,
+pela Proposição~3(iii). Como $\omega - \omega' \in \{-1,0,1\}^{\Ccal}$,
+$\norm{\omega - \omega'}^{2} = \dH(\omega,\omega')$, e
+$\normL{f_{\omega} - f_{\omega'}}^{2} = \zeta^{2}(\omega -
+\omega')\T\Gram_{\Ccal\Ccal}(\omega - \omega') \ge
+\gamma\zeta^{2}\dH(\omega,\omega')$. A identidade das componentes é Parseval.
+Com $\Kcal = \{(\cv,\md)\}$: $v\T\Gram_{\Ccal\Ccal}v =
+\E[\E(X_{\cv}^{2}\mid\bU)\{\sum_{\tsl}v_{\tsl}\wav{\lev}{\tsl}(U_{\md})\}^{2}]
+\ge \kappa_{1}c_{U}\int_{0}^{1}(\sum_{\tsl}v_{\tsl}\wav{\lev}{\tsl})^{2} =
+\gamma\norm{v}^{2}$, usando só $\E(X_{\cv}^{2}\mid\bU) \ge \kappa_{1}$ e
+$p_{U_{\md}} \ge c_{U}$ (a marginal herda a cota da conjunta).
+
+\emph{(iv).} Seja $\varpi(t) = \mathbf{1}\{t \ge \zeta/2\}$ para $t \in \R$.
+Para $b \in \{0,1\}$,
+\begin{equation}
+  \label{eq:limiar}
+  |t - \zeta b| \;\ge\; \frac{\zeta}{2}\,|\varpi(t) - b| ,
+\end{equation}
+porque se $\varpi(t) \ne b$ então $t$ e $\zeta b$ estão em lados opostos de
+$\zeta/2$. Aplicado coordenada a coordenada a um vetor $a \in \R^{\Ccal}$,
+$\norm{a - \zeta\omega}^{2} \ge (\zeta^{2}/4)\dH(\varpi(a),\omega)$.
+
+(a) Tome $a_{\cv\md,\tsl} = \inner{\widehat g_{\cv\md}}{\wav{\lev}{\tsl}}$ e
+$\widehat\omega = \varpi(a)$. Por Bessel, para cada $(\cv,\md) \in \Kcal$,
+$\lVert\widehat g_{\cv\md} - \gcomp{\cv}{\md}^{\omega}\rVert^{2} \ge
+\sum_{\tsl}\inner{\widehat g_{\cv\md} - \gcomp{\cv}{\md}^{\omega}}{\wav{\lev}{\tsl}}^{2}
+= \sum_{\tsl}(a_{\cv\md,\tsl} - \zeta\omega_{\cv\md,\tsl})^{2}$; some em
+$\Kcal$ e use \eqref{eq:limiar}.
+
+(b) Seja $\Pi_{\Ccal}$ a projeção ortogonal de $L_{2}(P)$ sobre
+$\operatorname{span}\{\bz_{\Ccal,a} : a \in \Ccal\}$, de dimensão $M$ porque
+$\Gram_{\Ccal\Ccal} \succ 0$ por (iii): $\Pi_{\Ccal}\widehat f =
+\bz_{\Ccal}\T a$ com $a = \Gram_{\Ccal\Ccal}^{-1}\E\{\bz_{\Ccal}(\bX,\bU)
+\widehat f(\bX,\bU)\}$, a esperança num $(\bX,\bU)$ novo, com $\widehat f$
+fixo. Como $P$ é fixa, $a$ é função mensurável da amostra. Como
+$f_{\omega}$ está no espaço, Pitágoras dá $L_{P}(\widehat f,f_{\omega}) \ge
+\normL{\Pi_{\Ccal}\widehat f - f_{\omega}}^{2} = (a -
+\zeta\omega)\T\Gram_{\Ccal\Ccal}(a - \zeta\omega) \ge \gamma\norm{a -
+\zeta\omega}^{2}$, e \eqref{eq:limiar} com $\widehat\omega = \varpi(a)$.
+
+(c) Seja $\bZ_{\Ccal}$ a matriz $n\times M$ de linhas
+$\bz_{\Ccal}(\bX_{i},\bU_{i})\T$ e $\widehat{\mathbf{F}} = (\widehat
+f(\bX_{i},\bU_{i}))_{i}$. No evento $\ECc$, $\bZ_{\Ccal}$ tem posto $M$; tome
+$a = (\bZ_{\Ccal}\T\bZ_{\Ccal})^{-1}\bZ_{\Ccal}\T\widehat{\mathbf{F}}$ e
+$\widehat\omega = \varpi(a)$, e fora dele $\widehat\omega = 0$. No evento,
+como $\bZ_{\Ccal}\zeta\omega$ está no espaço-coluna,
+$nL_{n}(\widehat f,f_{\omega}) = \norm{\widehat{\mathbf{F}} -
+\bZ_{\Ccal}\zeta\omega}^{2} \ge \norm{\bZ_{\Ccal}(a - \zeta\omega)}^{2} = n(a -
+\zeta\omega)\T\Gramhat_{\Ccal\Ccal}(a - \zeta\omega) \ge
+n(\gamma/2)\norm{a - \zeta\omega}^{2}$, e \eqref{eq:limiar}; fora dele o lado
+direito é zero. Para \eqref{eq:evento}: $\Gramhat_{\Ccal\Ccal} -
+\Gram_{\Ccal\Ccal}$ é submatriz principal de $\Gramhat - \Gram$, logo
+$\opnorm{\Gramhat_{\Ccal\Ccal} - \Gram_{\Ccal\Ccal}} \le \opnorm{\Gramhat -
+\Gram}$, e Weyl com (iii) dá $\lmin(\Gramhat_{\Ccal\Ccal}) \ge \gamma -
+\opnorm{\Gramhat - \Gram}$; assim $\ECc^{c} \subseteq \{\opnorm{\Gramhat -
+\Gram} > \gamma/2\}$, cuja probabilidade a Proposição~3(iv) de E1.4 limita
+com $t = \gamma/2$, $D = p(1 + q\NJ)$ e $\NJ = 2^{\lev+1} - 1$. \qed
+
+\subsection*{Teorema~\ref{thm:inferior}}
+
+\emph{Passo 1 (o hipercubo admissível).} Tome $\zeta = \zeta_{n}$ e $\lev =
+\lev_{n}$ de \eqref{eq:escolhas}; $\lev_{n}$ existe porque $x_{n} \ge 1$ em
+$n \ge n_{0}$. Como $2^{\lev_{n}(2s+1)} \le x_{n}$,
+$\zeta_{n}2^{\lev_{n}(s+1/2)} \le \zeta_{n}x_{n}^{1/2} = C_{g}$, e o
+Lema~\ref{lem:hipercubo}(i) dá $\{f_{\omega}\} \subseteq \Fcal$. Pelo
+Lema~\ref{lem:hipercubo}(ii), o Kullback--Leibler entre vizinhos é no máximo
+$n\zeta_{n}^{2}B_{X}^{2}C_{U}/(2\sigma^{2}) = 1$, e \eqref{eq:assouad} com
+$\alpha = 1$ dá, para todo $\widehat\omega$ com valores em $\Omega$,
+\begin{equation}
+  \label{eq:assouad-n}
+  \max_{\omega\in\Omega}\E_{\omega}\dH(\widehat\omega,\omega) \;\ge\; \cA M,
+  \qquad M = K2^{\lev_{n}}.
+\end{equation}
+
+\emph{Passo 2 (a escala).} Pela maximalidade de $\lev_{n}$,
+$2^{(\lev_{n}+1)(2s+1)} > x_{n}$, logo $2^{\lev_{n}} > x_{n}^{1/(2s+1)}/2$ e
+\[
+  2^{\lev_{n}}\zeta_{n}^{2} \;>\; \frac12\,C_{g}^{2}x_{n}^{-2s/(2s+1)}
+  = \frac12\,C_{g}^{2/(2s+1)}\Bigl(\frac{2\sigma^{2}}{nB_{X}^{2}C_{U}}\Bigr)^{2s/(2s+1)}
+  = 2^{-1/(2s+1)}\rlow^{2} \;\ge\; \frac12\rlow^{2},
+\]
+isto é, $\zeta_{n}^{2}M \ge K\rlow^{2}/2$. (Na outra direção,
+$2^{\lev_{n}}\zeta_{n}^{2} \le C_{g}^{2}x_{n}^{-2s/(2s+1)} =
+2^{2s/(2s+1)}\rlow^{2}$.)
+
+\emph{Passo 3 (esperança).} $\sup_{f\in\Fcal}\E_{f}L \ge
+\max_{\omega}\E_{\omega}L(\cdot,f_{\omega})$. Com o $\widehat\omega$ do
+Lema~\ref{lem:hipercubo}(iv)(a) e \eqref{eq:assouad-n},
+$\max_{\omega}\E_{\omega}\Lk \ge (\zeta_{n}^{2}/4)\cA M \ge
+(\cA/8)K\rlow^{2}$; com o de (iv)(b), o mesmo vezes $\gamma$. Para (iii),
+como $\dH \le M$ e a lei de $(\bX_{i},\bU_{i})$ não depende de $\omega$,
+$\E_{\omega}\{\dH\mathbf{1}_{\ECc}\} \ge \E_{\omega}\dH - M\Prob(\ECc^{c})$, e
+em $n \ge n_{1}$
+\[
+  \max_{\omega}\E_{\omega}L_{n} \;\ge\; \frac{\gamma\zeta_{n}^{2}}{8}
+  \Bigl(\cA M - \frac{\cA}{4}M\Bigr) = \frac{3\cA}{32}\gamma\zeta_{n}^{2}M
+  \;\ge\; \frac{3\cA}{64}\gamma K\rlow^{2} \;\ge\; \frac{\cA}{32}\gamma K\rlow^{2}.
+\]
+
+\emph{Passo 4 (probabilidade).} Seja $\omega^{*}$ o maximizador em
+\eqref{eq:assouad-n} ($\Omega$ é finito). Como $0 \le \dH \le M$,
+$\cA M \le \E_{\omega^{*}}\dH \le \cA M/2 + M\Prob_{\omega^{*}}(\dH \ge \cA
+M/2)$, logo $\Prob_{\omega^{*}}(\dH \ge \cA M/2) \ge \cA/2$. Nesse evento,
+(iv)(a) dá $\Lk \ge (\zeta_{n}^{2}/4)(\cA M/2) \ge (\cA/16)K\rlow^{2}$, e
+(iv)(b) o mesmo vezes $\gamma$; e no evento intersectado com $\ECc$, de
+probabilidade ao menos $\cA/2 - \cA/4$, (iv)(c) dá $L_{n} \ge
+(\gamma\zeta_{n}^{2}/8)(\cA M/2) \ge (\cA/32)\gamma K\rlow^{2}$. Como o
+estimador é arbitrário, valem os ínfimos.
+
+\emph{Passo 5 ($n_{1}$ é finito).} $2^{\lev_{n}+1} \le
+2x_{n}^{1/(2s+1)} = O(n^{1/(2s+1)})$, de modo que $D_{\lev_{n}}$ e
+$R_{\lev_{n}+1}$ são $O(n^{1/(2s+1)})$ e o lado direito de \eqref{eq:evento}
+é $O(n^{1/(2s+1)}\exp\{-c\,n^{2s/(2s+1)}\}) \to 0$. Os itens (a) e (b) são
+$\Kcal$ de um bloco e de todos. \qed
+
+\subsection*{Corolário~\ref{cor:minimax}}
+
+\emph{A cota inferior.} Com $p$, $q$ e as constantes fixos, o
+Teorema~\ref{thm:inferior}(iii) e (i) com $\Kcal$ todos os blocos dão a
+primeira afirmação de (i) em todo $\pi$, com $c = (\cA/32)\gamma pq$ vezes a
+constante de $\rlow^{2}/\psi_{n}$ e $c' = \cA/4$; a lei gaussiana satisfaz a
+Hipótese~2 de E1.5, e $P$ as de E1.3 e E1.4.
+
+\emph{A cota superior é uniforme na classe.} Lida nas provas do Teorema~4 e
+do Corolário~11 do \texttt{08}: fixado $\epsilon$, o evento da prova é a
+interseção de $\Acal$ e $\Ecal$, que não dependem de $f$; de
+$\{\normn{\PA\bveps}^{2} \le \sigma^{2}p/(n\alpha'')\}$, que só depende de
+$\bveps$ e do desenho; e de $\{\normn{\bb}^{2} \le
+\mathcal{B}_{J_{n}}^{2}/\alpha'\}$, cuja probabilidade é ao menos
+$1-\alpha'$ para toda $f \in \Fcal$, por Markov com $\E\normn{\bb}^{2} \le
+\mathcal{B}_{J_{n}}^{2}$, que só depende de $C_{g}$ (Corolário~1 de E1.3).
+Nesse evento a cota depende de $f$ só por $\mathcal{B}_{J_{n}}^{2}$ e por
+$\Rid(\thetastar;\bar\eta_{n})$, limitado pelo Lema~15 do \texttt{08}
+uniformemente na hipótese de Besov, e não depende dos níveis $\bc$, que saem
+na perfilagem (Lema~4 de E1.5: $\bb = f - f_{J}$ não envolve $\bc$). Logo
+$\sup_{f\in\Fcal}\Prob_{f}\{L(\widehat f,f) > M_{\epsilon}r_{n}\} < \epsilon$
+para $n$ grande, com $r_{n}$ a taxa do Corolário~11, que é $\psi_{n}$ em
+$\pi \ge 2$ e $\psi_{n}(\log n)^{(2/\pi-1)/(2s+1)}$ em $\pi < 2$; o mesmo
+para as componentes, no mesmo evento (Corolário~10 e a segunda cota do
+Corolário~9). O Teorema~4 é o mesmo argumento com o comparador $\thetastar$.
+Para o Corolário~14(ii), a cota \texttt{eq:lenta-blocos} depende de $f$ por
+$\nGone{\thetastar}$, limitado por \texttt{eq:contagem-lenta} só com
+$C_{g}$, e por $\mathcal{B}_{J_{n}}^{2}$.
+
+\emph{(ii) e (iii).} A comparação dos expoentes: $2\seff/(2\seff+1) <
+2s/(2s+1)$ quando $\seff < s$, e o Corolário~5 de E1.6 tem
+$(\log n/n)^{2s/(2s+1)}$. \qed
+
+\section{O que foi transposto e o que é novo}
+
+\begin{itemize}[leftmargin=*, nosep]
+  \item \textbf{Transposto.} O lema de Assouad com o Kullback--Leibler
+    (Tsybakov, 2009, Teorema~2.12(iv)) e a redução de um estimador a um
+    vértice pela distância a $0$ e a $\zeta$ (o Exemplo~2.2 dele, eq.~2.85);
+    a construção por caixas de um nível (Donoho e Johnstone, 1998, §4.5), que
+    explica por que $\pi$ não entra; o hipercubo denso de um bloco de
+    coeficientes (Klopp e Pensky, 2015, eq.~5.4).
+  \item \textbf{Novo.} O desenho aleatório com $\bX$ dependente de $\bU$, que
+    entra no Kullback--Leibler pelo segundo momento condicional; a perda de
+    predição, em $L_{2}(P)$ e na norma empírica, com a projeção sobre o
+    espaço do hipercubo no lugar dos suportes disjuntos do Exemplo~2.2 (que
+    precisa da hipótese (LP2) de desenho fixo) e o evento $\ECc$; a
+    separação pela Proposição~3 de E1.4, com os termos cruzados; o hipercubo
+    produto sobre $\Kcal$ e a constante proporcional a $K$; a forma em
+    probabilidade junto com a uniformidade das cotas superiores, que é o que
+    faz da comparação com os $O_{p}$ uma afirmação de taxa minimax.
+\end{itemize}
+
+\section{O que isto não cobre}\label{sec:naocobre}
+
+\begin{itemize}[leftmargin=*, nosep]
+  \item \textbf{O logaritmo em $\pi < 2$} (item (iii) da tarefa): se algum
+    estimador, adaptativo ou não, atinge $n^{-2s/(2s+1)}$ no modelo do WAFC
+    em $\pi < 2$.
+  \item \textbf{A constante.} $\cA/8 \approx 0{,}018$ não foi otimizada; não
+    há constante exata do tipo de Pinsker.
+  \item \textbf{$p$ crescente.} Os itens (i) e (ii) do
+    Teorema~\ref{thm:inferior} não dependem de $p$ nem de $q$, e valem com
+    $K = pq$ crescente; as cotas superiores não. O termo de alta dimensão de
+    Klopp e Pensky, $s\log(p/s)/n$, não é reproduzido.
+  \item \textbf{A norma populacional.} A cota em $L_{P}$ está provada, mas as
+    cotas superiores de E1.5, E1.6 e E1.12 são em $\normn{\cdot}$; em $L_{P}$
+    ela não tem par.
+  \item \textbf{Erro sem a condição (2.29)} (Observação~\ref{rem:ruido}(c)).
+  \item \textbf{A base do intervalo e a classe de funções.} A classe aqui é
+    a de E1.3, em sequência na base periodizada. Uma cota inferior sobre uma
+    subclasse vale para toda classe que a contenha: em particular para a bola
+    de $\Besov{s}{\pi}{r}$ periódica quando $\psi$ tem regularidade maior que
+    $s$ (equivalência de normas, Observação~(iii) da hipótese de Besov de
+    E1.3), com mudança de constante. Não se escreve a versão na base de
+    Cohen, Daubechies e Vial (D26).
+  \item \textbf{A seleção de estrutura.} Nenhuma cota inferior para a
+    separação $\nu_{\min}$ do Corolário~8 ou do Corolário~12.
+  \item \textbf{A uniformidade das cotas superiores} foi lida nas provas do
+    \texttt{08}, não reescrita como enunciado.
+\end{itemize}
+
+\section{Conferência numérica}
+
+\texttt{check/09-cota-inferior.R} (imprime \texttt{OK}; $94$~s nesta
+máquina, rodado numa cópia congelada; dependência \texttt{WaveBased}; não chama \texttt{wafc/R/}).
+Desenho com $\bX$ dependente de $\bU$ e $q = 2$: Daublets com filtro $8$,
+$p = 2$ com $X_{1} \equiv 1$ e $X_{2} = h(\bU) + V$, $h(u) = 1/2 +
+\sin(2\pi u_{1})u_{2}/2$, $V \sim \mathrm{Unif}(-1,1)$; $\bU$ com densidade
+conjunta $1 + 0{,}6(u_{1} - 1/2) + 0{,}3\cos\{2\pi(u_{1}+u_{2})\}$ (marginal de
+$U_{1}$ não uniforme); logo $c_{U} = 0{,}4$, $C_{U} = 1{,}6$, $B_{X} = 2$,
+$\kappa_{1} = 0{,}153$, $\kappa_{2} = 2{,}18$ e $\gamma = 0{,}061$. As integrais
+em $(\bX,\bU)$ são quadratura em $[0,1]^{2}$ com $\E(\bX\bX\T\mid\bU)$ em forma
+fechada. O que saiu em 2026-10-05:
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item \textbf{Base e quadratura (I, II).} Gram de Lebesgue dos níveis
+    $\lev \le 5$ a $6{,}4\cdot10^{-8}$ da identidade (grade de $8192$
+    pontos); na grade $1024^{2}$ da quadratura em $[0,1]^{2}$, a
+    $7{,}6\cdot10^{-6}$ nos níveis $\lev \le 4$, abaixo das folgas da Parte~V.
+  \item \textbf{Kullback--Leibler (III; Lema~\ref{lem:hipercubo}(ii)).} Em todo
+    $(\cv,\md,\lev,\tsl)$ com $\lev \le 4$, $\E\{X_{\cv}^{2}
+    \wav{\lev}{\tsl}(U_{\md})^{2}\}$ vai de $0{,}485$ a $1{,}243$, contra
+    $\kappa_{2}C_{U} = 3{,}49$ e $B_{X}^{2}C_{U} = 6{,}40$. A fórmula do
+    Kullback--Leibler com $\bX$ dependente de $\bU$, por Monte Carlo do log da
+    razão de verossimilhança ($4000$ amostras, $n = 200$, $\lev = 2$, os quatro
+    blocos, $\zeta$ do enunciado): num vizinho de $X_{2}$ em $U_{2}$,
+    $0{,}090$ pela quadratura contra $0{,}076 \pm 0{,}007$; num par com
+    $\dH = 9$, $1{,}157$ contra $1{,}167 \pm 0{,}024$. A cota do lema é $1$.
+  \item \textbf{Separação (IV; Lema~\ref{lem:hipercubo}(iii)).} Em cinco
+    conjuntos $\Kcal$ (um bloco, $(1,1)$ ou $(2,2)$; os dois blocos de uma
+    covariável nas duas moduladoras, de $X_{1}$ ou de $X_{2}$; os quatro) e
+    $\lev = 0,\dots,3$,
+    $\gamma \le \lmin(\Gram_{\Ccal\Ccal}) \le \lmaxx(\Gram_{\Ccal\Ccal}) \le
+    \kappa_{2}C_{U}$, com razão mínima $\lmin/\gamma = 2{,}76$ (os quatro
+    blocos em $\lev = 3$, $M = 32$); termos cruzados até $0{,}65$; em $500$
+    pares, $\normL{f_{\omega} - f_{\omega'}}^{2} \ge 6{,}2\,\gamma\zeta^{2}\dH$;
+    a identidade das componentes a $7\cdot10^{-10}$.
+  \item \textbf{Redução (V; Lema~\ref{lem:hipercubo}(iv)).} Em $200$
+    estimadores fora do hipercubo (ruído em níveis $0$ a $4$, nível constante,
+    termos não aditivos $x_{\cv}(u_{1}u_{2} - 1/4)$ e $x_{\cv}\cos(6\pi
+    u_{1})u_{2}$), a cadeia Pitágoras, autovalor, \eqref{eq:limiar} vale com
+    folgas mínimas $4{,}5\cdot10^{-4}$, $1{,}4\cdot10^{-5}$ e
+    $5{,}1\cdot10^{-5}$, com $\dH(\widehat\omega,\omega)$ até $13$ de $16$ e
+    positiva em $78\%$; nas componentes, em $300$ estimadores, Bessel e
+    \eqref{eq:limiar} com folgas $1{,}4\cdot10^{-4}$ e $1{,}6\cdot10^{-4}$; na
+    norma empírica ($n = 200$, $M = 16$), (iv)(c) vale nas $200$ amostras do
+    evento. Neste desenho $\ECc$ vale em todas as amostras em $n = 200$, $800$
+    e $3200$, porque o $\lmin(\Gram_{\Ccal\Ccal})$ populacional, $0{,}19$, está
+    longe de $\gamma/2 = 0{,}03$; a cota \eqref{eq:evento} não é posta à prova
+    neste desenho.
+  \item \textbf{Assouad (VI).} O risco de Bayes de Hamming sob a priori
+    uniforme, com o estimador de Bayes exato (a maioria das marginais a
+    posteriori sobre os $2^{M}$ vértices), em $3000$ amostras com $n = 100$:
+    com $M = 4$ (dois blocos de $X_{2}$, $\lev = 1$), $1{,}64 \pm 0{,}02$ com o
+    $\zeta$ do enunciado (Kullback--Leibler máximo efetivo $0{,}11$) e
+    $1{,}03 \pm 0{,}02$ com o Kullback--Leibler de vizinho igual a $1$, contra a
+    cota $0{,}59$; com $M = 8$ (os quatro blocos), $3{,}24 \pm 0{,}03$ e
+    $2{,}32 \pm 0{,}02$, contra $1{,}17$. A cota de Assouad fica a um fator
+    perto de $2$ do risco de Bayes no Kullback--Leibler igual a $1$.
+  \item \textbf{Pertencimento (VII; Lema~\ref{lem:hipercubo}(i)).} Os
+    coeficientes de $\gcomp{\cv}{\md}^{\omega}$ calculados da função por
+    quadratura são os do hipercubo a $1{,}5\cdot10^{-8}$; em $s = 0{,}3$, $1$ e
+    $2{,}5$ ($\lev_{n} = 6$, $3$ e $1$ em $n = 500$, $C_{g} = 1$) e $\pi \in
+    \{1; 1{,}5; 2; 4; \infty\}$, a norma $b^{s}_{\pi,\infty}$ de $\omega \equiv
+    1$ é $\zeta_{n}2^{\lev_{n}(s+1/2)}$ ($0{,}696$, $0{,}566$ e $0{,}200$) em
+    todo $\pi$, e a de um $\omega$ sorteado fica abaixo, crescendo com $\pi$.
+  \item \textbf{O expoente (VIII).} Com $\lev_{n}$ de \eqref{eq:escolhas}, a
+    cota das componentes $(\cA/4)K2^{\lev_{n}}\zeta_{n}^{2}$ tem inclinação
+    exatamente $-2s/(2s+1)$ na sequência diádica $x_{n} = 2^{k(2s+1)}$ e, em
+    $600$ valores de $n$ de $10$ a $10^{12}$, $-0{,}33328$, $-0{,}50000$,
+    $-0{,}66723$, $-0{,}80066$ e $-0{,}88606$ em $s = 0{,}25$, $0{,}5$, $1$, $2$
+    e $4$ (alvos $-1/3$, $-1/2$, $-2/3$, $-4/5$, $-8/9$); a razão para
+    $(\cA/8)K\rlow^{2}$ fica entre $1{,}26$ e $3{,}70$, dentro de $[2^{2s/(2s+1)},
+    2^{(4s+1)/(2s+1)}]$. Ao lado das cotas superiores: o Corolário~11 está a
+    razão $1$ em $\pi \ge 2$ e a $1{,}90$, $2{,}40$ e $2{,}75$ em $n = 10^{3}$,
+    $10^{6}$ e $10^{9}$ com $(s,\pi) = (1,1)$; o Teorema~4, a $3{,}2$, $10$ e
+    $32$ nesse par; o Corolário~5, a $3{,}6$, $5{,}8$ e $7{,}5$ com $(1,2)$.
+  \item \textbf{Esparso contra denso (IX).} Em $27$ pares $(s,\pi)$ com
+    $\seff > 0$ ($s$ de $0{,}1$ a $3$, $\pi$ de $1$ a $\infty$) o máximo do
+    expoente esparso é o denso, $\delta = 0$ e $1/(2s+1)$; nos $3$ pares com
+    $\seff < 0$ o expoente passa de $1$.
+  \item \textbf{Sem ruído gaussiano (X).} $\KL/v^{2} = 1/(2\sigma^{2})$
+    exatamente para a gaussiana; para a mistura, $\KL/v^{2}$ vai de $1{,}451$
+    em $v = 10^{-3}$ (igual a $I/2$) a $1{,}185$ em $v = 1$, logo $p_{*} =
+    1{,}451$ com $v_{0} = 1$.
+\end{itemize}
+
+\section*{Referências}
+\sloppy
+
+Todas em \texttt{docs/referencias-verificadas.bib}.
+
+\begin{itemize}[nosep, leftmargin=*]
+  \item Cai, T.~T. (1999). Adaptive wavelet estimation: a block thresholding
+    and oracle inequality approach. \emph{The Annals of Statistics} 27(3),
+    898--924. (\texttt{Cai-1999}, verificada em L5.) Teorema~4, eq.~(5.4),
+    p.~908, citado só por meio do \texttt{08}.
+  \item Donoho, D.~L.\ e Johnstone, I.~M. (1998). Minimax estimation via
+    wavelet shrinkage. \emph{The Annals of Statistics} 26(3), 879--921.
+    (\texttt{Donoho-Johnstone-1998}, verificada em L1.) Teorema~1 (p.~882,
+    as taxas minimax e linear em regressão sobre bolas de Besov, com
+    $\alpha > 1/p$); Teoremas~4 e~5, eqs.~(17) a~(19) (pp.~890--891); a prova
+    da (18) na §4.5 (p.~896), por prioris independentes limitadas, conferidos
+    no PDF em 2026-10-05.
+  \item Klopp, O.\ e Pensky, M. (2015). Sparse high-dimensional varying
+    coefficient model: nonasymptotic minimax study. \emph{The Annals of
+    Statistics} 43(3), 1273--1299. (\texttt{Klopp-Pensky-2015}, verificada em
+    L1, numeração conferida em L7.) Teorema~1, eqs.~(3.5) a~(3.8),
+    pp.~1281--1282; a prova na §5.1, construção (5.1)--(5.6) e o
+    Kullback--Leibler, pp.~1289--1291 (conferidos no PDF em 2026-10-05).
+  \item Tsybakov, A.~B. (2009). \emph{Introduction to Nonparametric
+    Estimation}. Springer Series in Statistics. Springer, New York.
+    (\texttt{Tsybakov-2009}, verificada em E1.9.) Hipótese (B) e a condição
+    (2.29), pp.~91--92; Teorema~2.5, p.~99; Lema~2.9 (Varshamov--Gilbert),
+    p.~104; Lema~2.12 e Teorema~2.12 (Assouad), pp.~117--119; Exemplo~2.2,
+    pp.~119--120.
+\end{itemize}
+
+\end{document}

@@ -4,7 +4,8 @@ Um resultado por arquivo, numerado na ordem de dependência do plano (E1):
 `01-identificabilidade.md`, `02-aproximacao-besov.tex` (com a emenda de
 E1.3b), `03-desenho-produtos.tex`, `04-oraculo.tex`, `05-taxas.tex`,
 `06-selecao-limiar.tex` (E1.7c, com o adendo de E1.12), `07-rota-intervalo.tex` (E1.8),
-`08-blocos.tex` (E1.12: a teoria do block LASSO balanceado de D44), mais as
+`08-blocos.tex` (E1.12: a teoria do block LASSO balanceado de D44),
+`09-cota-inferior.tex` (E1.9: a cota inferior minimax no nível da taxa), mais as
 sondagens `06a-sondagem-irrepresentabilidade.md` (E1.7a) e
 `08a-sondagem-blocos.md` (E1.11), que são veredito e não resultado. Cada um com
 enunciado, hipóteses, prova, "o que isso não cobre" e o parágrafo da
@@ -15,7 +16,7 @@ probabilidade em **romano**, como a revista exige.
 
 **A numeração dos resultados é global** e a tabela que manda está na §5 de
 [`../docs/TAREFA.md`](../docs/TAREFA.md), não nos contadores de cada
-arquivo: `02` e `03` ainda imprimem contador local; `04`, `05`, `06`, `07`, `08` e a emenda
+arquivo: `02` e `03` ainda imprimem contador local; `04`, `05`, `06`, `07`, `08`, `09` e a emenda
 de `02` imprimem o número global. Compilar com `latexmk -pdf <arquivo>.tex`;
 o `.pdf` é versionado, os auxiliares não.
 

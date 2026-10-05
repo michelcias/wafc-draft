@@ -541,3 +541,435 @@ figuras:** a curva do spline nelas é a de `k` grande (`k = 23` ou `k = 30`),
 porque só o estágio `full` desenha, e é justamente essa a dimensão que o
 §4.1 mostra ser pequena demais. A figura serve para ver a forma da
 componente do WAFC, não para julgar a comparação.
+
+---
+
+## 9. E6.1b: o critério de D44 e como a sondagem mediu
+
+**Atualização de 2026-10-05.** As seções 1 a 8 acima são de E6.1a e ficam
+como estão. Daqui em diante, os números são de
+`wafc/scripts/10-sondagem-aplicacao-b.R`, com o código do retrato
+`b0ea096` (`wafc/cache/e61b/snap/`, conferido arquivo a arquivo contra o
+commit a cada início).
+
+**O critério mudou com D44.** A tese deixou de ser "o WAFC ganha do spline
+por adaptação" e passou a ser **estrutura recuperada com predição
+competitiva**. Uma base passa se: (1) a estrutura que o WAFC devolve é
+estável entre partições e interpretável; e (2) a predição fica a menos de um
+erro-padrão do melhor `gam`.
+
+**O estimador é o de D44 e D45**, com todos os argumentos escritos na
+chamada:
+- o ajuste é o block LASSO balanceado (`wafc_fit_klopp` com níveis livres e
+  pesos do `grpreg`), com `J` em `2:8` e 10 dobras;
+- em seguida vem o limiar nas normas por bloco, com a regra `cv1se` (o padrão
+  de D45) e também com a `cv`;
+- as dobras do limiar são ajustadas uma vez para as duas regras.
+
+**Os concorrentes:**
+- os dois splines de D46, `gam.reml` e `gam.gcv` (`bam`, grade
+  `5, 10, 20, 40, 80` de D41);
+- o linear;
+- depois da primeira leitura, um terceiro spline, `gam.cv` (§13): `k`
+  escolhido na mesma grade pelo erro de validação cruzada nas mesmas dobras
+  por bloco do WAFC, com REML dentro de cada dobra (`k.select = "cv"` de
+  E2.5h).
+
+**A partição é por bloco** onde há dependência, a lição de §4.4:
+- os blocos são a semana nas séries e o ladrilho de 0,25° em housing;
+- 30% dos blocos vão ao teste;
+- as dobras internas também são formadas por blocos inteiros;
+- são **20 partições**, com semente por base e partição.
+
+O erro-padrão de cada método é o desvio-padrão entre partições dividido por
+`sqrt(20)`. A comparação com o melhor spline é pareada (a diferença de RMSE
+na mesma partição), e vem com dois erros-padrão:
+- o ingênuo, `sd/sqrt(20)`;
+- o corrigido para treinos sobrepostos, pelo fator de Nadeau & Bengio
+  (2003), `sqrt((1/K + n_teste/n_treino)/(1/K))`, que dá ~3,1 aqui.
+
+O critério (2) usa o ingênuo. O corrigido mostra o quanto a conclusão depende
+dessa escolha.
+
+**A estabilidade da estrutura** é medida assim:
+- o treino de cada partição é uma subamostra de 70% dos blocos;
+- para cada bloco `(ℓ, m)`, conta-se a fração das 20 em que ele fica no ajuste
+  limiarizado;
+- ao lado, a mesma fração para os suavizadores do `gam` com `edf > 0,1` (o
+  `select = TRUE` encolhe, mas nunca zera exatamente), e o `edf` mediano.
+
+**O custo:**
+- 120 unidades (6 bases × 20 partições);
+- lançada em 2026-10-03 às 22h16 com 4 processos;
+- parada às 07h31 de 2026-10-04, quando a swap passou de 1 GB (duas
+  conferências da E1.14 começaram às 07h24), com 4 unidades perdidas;
+- relançada às 07h33 com 3 processos, retomando do que estava gravado;
+- fim em 2026-10-05 às 13h48: 30 h 15 min de relógio desde o relançamento, 39 h 32 min desde o primeiro lançamento.
+
+Mediana por unidade:
+
+| base | WAFC (ajuste, as duas regras de limiar) | `gam.reml` | `gam.gcv` | `gam.cv` |
+|---|---|---|---|---|
+| bike | 1 691 s | 6 s | 85 s | 40 s |
+| beijing | 3 322 s | 8 s | 134 s | 42 s |
+| beijing.heat | 7 750 s | 18 s | 392 s | 108 s |
+| housing | 5 009 s | 12 s | 237 s | 77 s |
+| marylebone | 2 530 s | 7 s | 108 s | 25 s |
+| kelmarsh | 598 s | 6 s | 128 s | 35 s |
+
+O pico foi de 4,9 GB num processo e 16 GB somados; a swap chegou a 2,2 GB na fase de 3 processos, partindo do resíduo de 1,57 GB deixado pela parada.
+
+---
+
+## 10. As candidatas novas (frente ii)
+
+O critério de busca é o do §5: salto ou limiar documentado na literatura da
+área, dado público e citável, licença declarada, `n` na casa dos milhares,
+duas ou mais moduladoras. Três passaram e foram sondadas.
+
+| base | dado e licença | o salto documentado | mapeamento |
+|---|---|---|---|
+| `beijing.heat` | o Dongsi da §2.B, CC BY 4.0, DOI 10.24432/C5RK5G; mesmo arquivo, sem download | a temporada de aquecimento de Pequim, de 15 de novembro a 15 de março (Liang et al. 2015, Proc. R. Soc. A 471: 20150257) | `Y = log PM2.5`; `X = (1, vento, temp, pressão − 1000)`; `U = (dia do ano, umidade relativa)`. O dia do ano é periódico, como a base |
+| `marylebone` | `mydata` do `openair` 3.1.0 (Carslaw & Ropkins 2012): 65 533 horas, de 1998-01-01 a 2005-06-23, 60 780 completas | a fração primária NO2/NOx do tráfego de Londres subiu de ~5–6% (1997) a ~17% (2003), mudança ligada aos filtros dos ônibus (Carslaw 2005) | `Y = NO2 + O3` (o oxidante); `X = (1, NOx/100)`; `U = (data em dias, velocidade do vento)`. É a relação de Clapp & Jenkin (2001): `β_NOx(u)` é a fração primária |
+| `kelmarsh` | SCADA de 10 min de 2017 da turbina 1 (Senvion MM92, 2 050 kW); Plumley (2022), Zenodo 10.5281/zenodo.5841834, CC BY 4.0; 51 185 intervalos sem parada nem corte, de 52 560 | a velocidade nominal da curva de potência: a densidade do ar aumenta a potência só abaixo dela (normalização da IEC 61400-12-1; Lee, Ding, Genton & Xie 2015, JASA) | `Y = potência (MW)`; `X = (1, temperatura/10)`; `U = (velocidade, direção do vento)`. `β_temp(u)` deve ser negativo abaixo da nominal e voltar ao nível de fora da faixa acima dela |
+
+Detalhes de cada base:
+- **Licença do `mydata`.** O pacote é MIT. As medidas de poluição vêm do
+  London Air Quality Archive, e a London Air Quality Network declara a Open
+  Government Licence v2 na página da sua API. Ficam dois `[VERIFICAR]`: a
+  página não diz se a licença cobre o arquivo histórico, e o `mydata.Rd` não
+  diz de onde vêm o vento e a direção. A saída limpa, se a base for escolhida,
+  é a série de Marylebone Road (MY1) do UK-AIR (Defra, OGL v3), com vento de
+  fonte declarada.
+- **Direção do vento em marylebone.** Não é moduladora: tem 38 valores, em
+  passos de 10°, o caso discreto que o §5 exclui.
+- **Ano de Kelmarsh: 2017.** É um ano civil inteiro, com 97% dos intervalos
+  passando no filtro, e o menor zip depois do primeiro ano (174,6 MB).
+- **Turbulência em kelmarsh.** O desvio-padrão do vento, que daria a
+  intensidade de turbulência de Lee et al., falta em 73% dos intervalos e
+  ficou fora.
+
+---
+
+## 11. Predição
+
+RMSE no teste, média sobre as 20 partições, com o erro-padrão entre
+partições. "Razão" é a média, por partição, da razão ao melhor spline da
+mesma partição (o melhor de `gam.reml`, `gam.gcv` e `gam.cv`). "Diferença" é
+a média da diferença pareada ao spline de menor RMSE médio, com o erro-padrão
+ingênuo e o corrigido. "Vence" é a fração de partições em que o método bate
+esse spline.
+
+| base | método | RMSE | razão | diferença ao melhor `gam` | vence |
+|---|---|---|---|---|---|
+| bike | WAFC `+cv1se` | 0,6680 ± 0,0057 | 1,036 | 0,0225 ± 0,0037 (0,0114) | 1/20 |
+| | WAFC `+cv` | 0,6642 ± 0,0092 | 1,030 | 0,0187 ± 0,0067 (0,0208) | 1/20 |
+| | `gam.cv` (melhor) | 0,6454 ± 0,0041 | | | |
+| | `gam.reml` / `gam.gcv` / linear | 0,6563 / 0,7437 / 1,2939 | | | |
+| beijing | WAFC `+cv1se` | 0,9211 ± 0,0050 | 1,010 | 0,0087 ± 0,0011 (0,0034) | 0/20 |
+| | WAFC `+cv` | 0,9174 ± 0,0051 | 1,006 | 0,0050 ± 0,0005 (0,0016) | 0/20 |
+| | `gam.cv` (melhor) | 0,9124 ± 0,0050 | | | |
+| | `gam.reml` / `gam.gcv` / linear | 0,9125 / 0,9131 / 1,0543 | | | |
+| beijing.heat | WAFC `+cv1se` | 0,7945 ± 0,0041 | 1,026 | 0,0199 ± 0,0027 (0,0085) | 0/20 |
+| | WAFC `+cv` | 0,7902 ± 0,0037 | 1,020 | 0,0156 ± 0,0019 (0,0059) | 0/20 |
+| | `gam.cv` (melhor) | 0,7746 ± 0,0042 | | | |
+| | `gam.reml` / `gam.gcv` / linear | 0,8666 / 0,8844 / 1,0505 | | | |
+| housing | WAFC `+cv1se` | 0,3600 ± 0,0072 | 1,066 | 0,0176 ± 0,0051 (0,0155) | 4/20 |
+| | WAFC `+cv` | 0,3517 ± 0,0075 | 1,041 | 0,0093 ± 0,0049 (0,0150) | 6/20 |
+| | `gam.cv` (melhor) | 0,3424 ± 0,0060 | | | |
+| | `gam.reml` / `gam.gcv` / linear | 0,3483 / 0,3705 / 0,4236 | | | |
+| marylebone | WAFC `+cv1se` | 12,02 ± 0,10 | 1,040 | 0,444 ± 0,062 (0,192) | 1/20 |
+| | WAFC `+cv` | 11,79 ± 0,10 | 1,019 | 0,212 ± 0,040 (0,125) | 1/20 |
+| | `gam.cv` (melhor) | 11,58 ± 0,10 | | | |
+| | `gam.reml` / `gam.gcv` / linear | 11,77 / 11,80 / 15,69 | | | |
+| kelmarsh | WAFC `+cv1se` | 0,06129 ± 0,00076 | 1,072 | 0,0041 ± 0,0008 (0,0024) | 0/20 |
+| | WAFC `+cv` | 0,05901 ± 0,00075 | 1,033 | 0,0018 ± 0,0008 (0,0026) | 0/20 |
+| | `gam.cv` / `gam.reml` (melhores, iguais) | 0,05723 ± 0,00053 | | | |
+| | `gam.gcv` / linear | 0,05724 / 0,5988 | | | |
+
+O `R²` no teste fica em ~0,80 em bike, ~0,39 em beijing, ~0,55 em beijing.heat, ~0,63 em
+housing, ~0,69 em marylebone e ~0,99 em kelmarsh.
+
+Três leituras:
+1. **Nenhuma base passa a perna da predição contra o melhor spline.** O WAFC
+   fica de 0,6% a 7% atrás, em mais de um erro-padrão ingênuo em toda base.
+   Com o erro-padrão corrigido, só o `+cv` de bike, housing e kelmarsh fica
+   dentro.
+2. **Contra os dois splines de D46, o quadro seria outro.**
+   - Em beijing.heat o WAFC venceria por 8% em 20 de 20 partições (razão
+     0,917 contra o `gam.reml`).
+   - Em marylebone e housing o `+cv` empataria (diferença de 0,018 ± 0,043 e
+     0,0034 ± 0,0074 contra o `gam.reml`).
+   - A diferença vem toda do `gam.cv`; a §13 diz por quê.
+3. **O `cv1se` custa predição em toda base**, de 0,4% (beijing) a 3,9%
+   (kelmarsh) sobre o `+cv`. Ele zera blocos de efeito pequeno, mas real, que
+   o spline e o `+cv` usam: a direção do vento em kelmarsh, a velocidade do
+   vento em marylebone.
+
+---
+
+## 12. Estrutura, base por base
+
+Fração das 20 partições em que o bloco fica. Para o WAFC, a decisão do
+limiar; para os splines, `edf > 0,1`, com o `edf` mediano do `gam.cv` entre
+parênteses. "Forma" resume a componente mediana do WAFC `+cv1se`.
+
+**bike** (`U = hora, dia`).
+
+| bloco | `+cv1se` | `+cv` | `gam.reml` | `gam.cv` (`edf`) |
+|---|---|---|---|---|
+| one × hora | 1 | 1 | 1 | 1 (18) |
+| one × dia | 0,95 | 1 | 1 | 1 (12) |
+| temp × hora | 0,85 | 1 | 1 | 1 (8,6) |
+| temp × dia | 0,70 | 1 | 1 | 1 (15) |
+| umidade × hora | 0 | 0,20 | 1 | 1 (4,9) |
+| umidade × dia | 0,40 | 0,95 | 1 | 1 (17) |
+| vento × hora | 0,55 | 1 | 0,55 | 0,50 (0,1) |
+| vento × dia | 0,60 | 0,95 | 0,75 | 0,85 (7,9) |
+
+**A estrutura não é estável:**
+- metade dos blocos tem decisão entre 0,40 e 0,85 no `+cv1se`;
+- o único zero estável é umidade × hora, que o spline mantém com `edf` 4,9;
+- os quatro blocos da hora têm a mesma ressalva de beijing (24 valores,
+  forma e norma não identificadas com `J ≥ 5`, que a validação cruzada
+  escolheu em 15 de 20 partições);
+- o efeito do vento é o único que o spline também trata como fraco
+  (`edf` 0,1 na hora).
+
+**beijing** (`U = hora, umidade`).
+
+| bloco | `+cv1se` | `+cv` | `gam.reml` | `gam.cv` (`edf`) |
+|---|---|---|---|---|
+| one × hora | 1 | 1 | 1 | 1 (8,8) |
+| one × umidade | 1 | 1 | 1 | 1 (4,9) |
+| vento × hora | 0,95 | 1 | 1 | 1 (4,5) |
+| vento × umidade | 1 | 1 | 1 | 1 (7,6) |
+| temp × hora | 0,15 | 0,85 | 0,75 | 0,80 (2,6) |
+| temp × umidade | 0,05 | 0,65 | 1 | 1 (3,9) |
+| pressão × hora | 0,70 | 1 | 1 | 1 (7,2) |
+| pressão × umidade | 1 | 1 | 1 | 1 (6,7) |
+
+O WAFC zera, de modo estável, a modulação do efeito da temperatura nas duas
+moduladoras: o efeito é constante. Isso confirma §4.2 (normas de ordem
+`10⁻³`). Os três blocos da hora têm uma ressalva que os invalida como
+leitura de forma:
+- a hora tem 24 valores, e com `J ≥ 5` o bloco tem 31 ou mais colunas sobre
+  24 pontos;
+- a curva entre as horas inteiras e a norma do bloco não são identificadas
+  (a norma mediana de `one × hora` é 639, contra 0,29 de `one × umidade`);
+- a decisão do limiar nesses blocos depende de direções sem dado
+  (pressão × hora em 0,70), e o script não reporta a forma deles.
+
+**beijing.heat** (`U = dia do ano, umidade`). Todo bloco fica em todo
+método (pressão × umidade em 0,85 no `+cv1se`). Não há seleção, então a
+estabilidade é trivial. As formas são legíveis:
+- o nível tem o "U" sazonal, alto no inverno, mas a amplitude dele (~6 na
+  escala do log) não é o efeito sazonal: os termos da temperatura e da
+  pressão também variam com a estação, e só a soma é;
+- o efeito do vento é mais negativo no inverno (−0,21 por m/s em relação ao
+  verão): a dispersão pesa mais na temporada de aquecimento;
+- o efeito da temperatura é mais negativo no inverno (−0,056 por °C).
+
+**O limiar administrativo não aparece como salto estável.**
+- Na componente mediana do WAFC, a maior inclinação de `g[temp, dia do ano]`
+  está exatamente no dia 318 (15 de novembro), a primeira de 255 posições.
+- Partição a partição, porém, ela cai a até 10 dias de 15 de novembro em 7
+  de 20. No `gam.cv` são 5 de 20 (entre os dias 310 e 314), e no `gam.reml`,
+  1 de 20.
+- Em 15 de março, nada.
+- Com `J = 4` (17 de 20 partições), o nível mais fino do WAFC tem suporte de
+  quase um ano. Ele não resolve um degrau de dias; a validação cruzada por
+  semana preferiu suavidade.
+
+**housing** (`U = latitude, longitude`). Todo bloco fica, menos renda ×
+latitude (0,55 no `+cv1se`, 0,95 no `gam.cv`) e renda × longitude (0,90 e
+1). Esses dois blocos são os únicos com decisão instável.
+
+A forma das componentes é que não é estável. As faixas entre partições são
+largas, porque o ladrilho retido leva consigo trechos inteiros da costa. O
+pico de `g[one, longitude]` perto de −118,5 (Los Angeles) aparece; o degrau
+da área da baía de E6.1a não se distingue. A ressalva de §2.C sobre
+aditividade num campo espacial continua, e a licença também.
+
+**marylebone** (`U = data, velocidade do vento`).
+
+| bloco | `+cv1se` | `+cv` | `gam.reml` | `gam.cv` (`edf`) |
+|---|---|---|---|---|
+| one × data | 1 | 1 | 1 | 1 (37) |
+| one × vento | 0,60 | 1 | 1 | 1 (4,9) |
+| NOx × data | 1 | 1 | 1 | 1 (36) |
+| NOx × vento | 0 | 1 | 1 | 1 (10) |
+
+**É a estrutura mais forte da sondagem, e coincide com a literatura.**
+- `g[NOx, data]`, a fração primária ao longo do tempo, fica plana até 2002 e
+  sobe em degrau:
+  - no WAFC, ~10,3 por 100 ppb de NOx (entre 9,7 e 11,2 nas 20 partições),
+    de −3,2 a +7,2;
+  - no `gam.cv`, 11,2 (entre 10,9 e 12,3);
+  - os 10% da subida caem entre março e outubro de 2002 e os 90%, entre
+    julho e setembro de 2003, em toda partição.
+- São ~10 pontos percentuais de fração primária no período que Carslaw
+  (2005) dá para a passagem de ~5–6% a ~17%.
+- `g[one, data]` é o ciclo anual do oxidante de fundo, sete ciclos.
+- O `+cv1se` diz, em 20 de 20 partições, que a fração primária não depende
+  da velocidade do vento, e zera o vento no fundo em 8 de 20. O spline mantém
+  os dois blocos (`edf` 10 e 4,9).
+- Essa estrutura mais parcimoniosa custa 2,0% de predição contra o `+cv`, e
+  4% contra o `gam.cv`.
+- A queda de `g[NOx, data]` no último mês da série é artefato de borda da
+  base periodizada (data não é periódica).
+
+**kelmarsh** (`U = velocidade, direção do vento`).
+
+| bloco | `+cv1se` | `+cv` | `gam.reml` | `gam.cv` (`edf`) |
+|---|---|---|---|---|
+| one × velocidade | 1 | 1 | 1 | 1 (28) |
+| one × direção | 0 | 1 | 1 | 1 (36) |
+| temp × velocidade | 1 | 1 | 1 | 1 (16) |
+| temp × direção | 0 | 1 | 1 | 1 (31) |
+
+A forma de `g[temp, velocidade]` é a da física, e o WAFC e o `gam.cv` a dão
+iguais:
+- +0,056 MW por 10 °C abaixo da entrada (3 m/s);
+- mínimo de −0,090 em 9,7 m/s;
+- +0,045 acima de 12,5 m/s.
+
+O efeito da temperatura é negativo na carga parcial e volta ao nível de fora
+da faixa acima da nominal. A amplitude, ~0,14 MW por 10 °C na carga parcial,
+é cerca de 2,5 vezes a que a densidade sozinha daria (3,5% de 1,6 MW). A
+temperatura carrega também a estabilidade atmosférica sazonal; é leitura,
+não medida.
+
+Sobre a direção:
+- o `+cv1se` zera os dois blocos da direção em 20 de 20 partições;
+- o spline os mantém, com `edf` de 31 a 36 e amplitude pequena (0,17 e
+  0,08 MW);
+- o `+cv` os mantém e prediz 3,9% melhor que o `+cv1se`.
+
+Então o efeito das esteiras existe e é pequeno, e o `cv1se` o descarta.
+A borda da base periodizada aparece em `g[one, velocidade]` abaixo de 2 m/s.
+
+---
+
+## 13. A conferência dos splines: o `gam` sintonizado nas dobras por bloco
+
+Na primeira leitura, beijing.heat dava ao WAFC 8% de vantagem em 20 de 20
+partições. Mas o `k` do `gam.reml` estava no topo da grade (80) em toda
+partição, com `edf` de 61 a 71 nos suavizadores do dia do ano. Duas leituras
+cabiam, e diziam coisas opostas sobre o WAFC:
+- (a) a grade de D41 limita o spline, a lição de dimensão de E6.1a;
+- (b) o REML e o GCV supõem erros independentes e escolhem pouca suavização
+  numa série horária de resíduos correlacionados (Opsomer, Wang & Yang
+  2001), enquanto o WAFC escolhe `(J, λ)` por validação cruzada em semanas
+  inteiras.
+
+O `gam.cv` separa as duas: ele escolhe `k` na grade de D41 pelo erro nas
+dobras por semana do próprio WAFC, ~1 a 2 min por partição.
+
+| base | `k` do `gam.cv` (partições) | `gam.cv` contra `gam.reml` |
+|---|---|---|
+| beijing.heat | 5 (13), 10 (7); nunca o topo | 0,7746 contra 0,8666: −10,6% |
+| marylebone | 20 (9), 40 (11) | 11,58 contra 11,77: −1,6% |
+| housing | 10 (7), 20 (12), 80 (1) | 0,3424 contra 0,3483: −1,7% |
+| beijing | 10 (10), 20 (6), 23/40 (2), 23/80 (2) | igual (0,9124 contra 0,9125) |
+| kelmarsh | 40 (12), 80 (8) | igual |
+| bike | 20 (13), 23/40 (7) | 0,6454 contra 0,6563: −1,7% |
+
+**A leitura (b) é a que vale.**
+- Com `k` escolhido nas dobras por bloco, o spline de beijing.heat desce a
+  `k = 5` ou 10 (`edf` ~4 por suavizador) e passa à frente do WAFC por 2,0%
+  a 2,6%.
+- O topo da grade não estava limitando: o REML queria mais `k` porque
+  suavizava de menos.
+- Na fumaça com 3 000 pontos, o REML numa grade até 320 subiu a 320 e
+  predisse pior; não foi medido no tamanho cheio.
+
+**A lição vale para E4 e para o manuscrito, além da aplicação.** Em dado
+dependente, o spline tem de escolher a dimensão pela mesma validação cruzada
+por bloco que o WAFC usa. Senão a tabela mede o critério de sintonia, não o
+estimador, e mede a favor do WAFC.
+
+---
+
+## 14. Veredito por base no critério de D44
+
+| base | estrutura estável e interpretável? | predição a menos de 1 EP do melhor `gam`? | licença | veredito |
+|---|---|---|---|---|
+| bike | não: decisões entre 0,40 e 0,85 em metade dos blocos; os blocos da hora não identificados | não (+3,0% a +3,6%, 1/20) | CC BY 4.0 | **não passa** |
+| beijing | em parte: o efeito da temperatura sem modulação, estável; os blocos da hora não identificados | não (+0,6% a +1,0%, 0/20) | CC BY 4.0 | **não passa** |
+| beijing.heat | estável só porque nada é zerado; legível (sazonalidade dos efeitos); o limiar de 15 de novembro em 7/20 | não (+2,0% a +2,6% contra o `gam.cv`, 0/20); ganharia 8% contra os splines de D46, por causa do critério de sintonia deles | CC BY 4.0 | **não passa** |
+| housing | a decisão é estável fora dos dois blocos da renda, a forma não; aditividade espacial duvidosa | não (+4,1% a +6,6%; o `+cv` fica dentro só pelo EP corrigido) | não declarada | **não passa** |
+| marylebone | **sim**: o degrau documentado da fração primária em 2002–2003, estável em 20/20, mais a ausência de modulação pelo vento | não (+1,9% a +4,0%, 1/20); o `+cv` empataria com os splines de D46 | MIT; OGL v2 nas medidas; vento `[VERIFICAR]` | **não passa na predição; é a melhor estrutura** |
+| kelmarsh | sim na velocidade (curva de potência; efeito da temperatura que some acima da nominal); a direção, zerada, faz falta na predição | não (+3,3% a +7,2%, 0/20) | CC BY 4.0 | **não passa** |
+
+**Nenhuma das seis passa o critério de D44 contra o spline sintonizado nas
+mesmas dobras.**
+
+**Se o critério for contra os dois splines de D46**, a escolha que o
+`TAREFA.md` e o D46 fixam:
+- marylebone passa (a estrutura documentada mais o `+cv` empatado);
+- housing passa na predição e falha na licença;
+- beijing.heat venceria.
+
+A sondagem recomenda não usar essa leitura. A vantagem vem do critério de
+sintonia do spline, e um referee que rode `k` por validação cruzada em
+blocos a derruba.
+
+**A base mais forte para uma aplicação de estrutura é marylebone.** Ela
+mostra o que a tese de D44 promete: uma componente com um degrau datado,
+documentado na literatura da área, recuperado em toda partição. Também mostra
+o custo: o WAFC prediz ~2% pior que um spline que vê o mesmo degrau. A
+escolha continua do autor (pergunta 2 do `ESTADO.md`).
+
+---
+
+## 15. O que esta sondagem não cobre
+
+- **O erro-padrão é entre partições, e as partições compartilham ~70% do
+  treino.** A correção de Nadeau & Bengio supõe partições aleatórias de
+  observações, não de blocos; as duas colunas cercam o valor certo, sem
+  dá-lo.
+- **O `gam.cv` escolhe `k`, não os parâmetros de suavização**, que continuam
+  por REML dentro de cada dobra. Um spline com suavização escolhida por
+  validação cruzada por bloco, ou com erro correlacionado (`gamm`, `bam` com
+  `rho`), pode ir mais longe.
+- **A grade de REML acima de 80 não foi medida no tamanho cheio.**
+- **Moduladora discreta.** Com a hora (24 valores) e `J ≥ 5`, o bloco do WAFC
+  não é identificado fora das horas inteiras, e a norma que o limiar lê
+  também não. Truncar `J` por moduladora no número de valores distintos,
+  como `wafc_k_matched()` faz com o `k` do spline, resolveria; é proposta
+  para o código, não feita aqui.
+- **Borda da base periodizada.** Data, velocidade do vento e coordenadas não
+  são periódicas, e as componentes têm artefatos na primeira e na última
+  fração da grade. Os índices de localização e os "maiores saltos" nas
+  bordas não são leitura.
+- **Uma turbina, um sítio, um ano.** Kelmarsh usa a turbina 1 de 2017;
+  beijing.heat, o Dongsi; marylebone, um sítio.
+- **As datas efetivas da temporada de aquecimento** de cada ano de
+  2013–2017 não foram conferidas; as marcas são 15 de novembro e 15 de março
+  em todo ano.
+
+---
+
+## 16. Reprodução
+
+Da raiz do repositório:
+
+```
+NC=4 setsid nohup wafc/cache/e61b/run.sh > wafc/cache/e61b/run.out 2>&1 &
+E61B_EXTRA=gam.cv Rscript wafc/scripts/10-sondagem-aplicacao-b.R all extra 4 20 0
+Rscript wafc/scripts/10-sondagem-aplicacao-b.R all report 1 20 0
+```
+
+- **Ordem:** o `run.sh` (não versionado) roda as partes `fit` e `report` das
+  seis bases e escreve `run end` no `call1.log` ao terminar; a parte `extra`
+  acrescenta o `gam.cv`; o `report` final junta as duas.
+- **Custo:** ~39 h de relógio em 3 a 4 processos na parte `fit` (30 h sem a parada); ~1 h em 2
+  processos na `extra`.
+- **Retomada:** uma unidade já gravada em `units/` ou `units-extra/` não é
+  refeita.
+- **Saídas,** em `wafc/cache/e61b/`, não versionadas: `units/`,
+  `units-extra/`, `e61b-summary.rds`, `e61b-<base>.png`, `call1.log`,
+  `extra-call.log` e `mem.log`.
+- **Dados:** as somas SHA-256 dos arquivos estão no script; os de E6.1a,
+  também na §2.

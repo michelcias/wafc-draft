@@ -92,6 +92,8 @@ que ler antes está aqui e no plano.
 | L10 a bibliografia do `grpreg` e do group lasso | **fechada** (2026-10-05): Yuan & Lin (2006), Breheny & Huang (2015), `grpreg` 3.6.0; 86 entradas | `docs/referencias-verificadas.bib`, `docs/literatura.md` |
 | E5f a E1.15 e a L10 na `k = 4` | **fechada** (2026-10-05): Propositions S6.2 e S8.2, a frase do §3 qualificada, as citações do `grpreg` e do group lasso; 52 e 80 páginas | `manuscript/ms_4.tex`, `supp_4.tex`, `references_4.bib` |
 | L11 Simon & Tibshirani e Breheny & Huang no periódico | **fechada** (2026-10-05): `Simon-Tibshirani-2012` verificado, 87 entradas; a paginação de Breheny & Huang inferida | `docs/referencias-verificadas.bib`, `docs/literatura.md` |
+| E1.9 a cota inferior no nível da taxa | **fechada** (2026-10-05): Lema 17, Teorema 5, Corolário 16 em `09-cota-inferior.tex`; constante proporcional a `pq`; conferência `OK` | `derivations/09-cota-inferior.tex`, `check/09-cota-inferior.R` |
+| E6.1b a aplicação depois de D44 | **fechada** (2026-10-05): seis bases, 20 partições por bloco; nenhuma passa contra o `gam.cv` em blocos; marylebone é a melhor estrutura | `wafc/scripts/10-sondagem-aplicacao-b.R`, `docs/aplicacao-candidatas.md` §9 a §16, `wafc/cache/e61b/` |
 | E3.3, E4, E5b, E6.2, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
@@ -106,17 +108,14 @@ tarefa pode criar ou editar**.
 
 | Tarefa | Entregável | Depende de | Arquivos permitidos |
 |---|---|---|---|
-| **E1.9** a cota inferior no nível da taxa | uma cota inferior minimax para o modelo do WAFC, em **`derivations/09-cota-inferior.tex`** (novo; português, D29; numeração global por `\setcounter`, a partir de **Proposição 9, Lema 17, Teorema 5, Corolário 16**). **A ideia, leitura do chat principal a conferir e não a forçar:** uma cota inferior sobre uma subclasse vale para a classe inteira; na subclasse em que só `g_{11}` é não nula o modelo é `Y = X_1 g_{11}(U_1) + ε`, regressão não paramétrica com desenho aleatório, e o hipercubo de wavelets num nível `j` com `2^j ≍ n^{1/(2s+1)}` com o lema de Assouad dá `n^{−2s/(2s+1)}` para o risco de predição e para o das componentes, com qualquer `q ≥ 2` e com `X` dependente de `U`; o Kullback-Leibler entre hipóteses usa só cotas superiores (`\|X_1\| ≤ B_X`, densidade de `U_1` limitada por `C_U`), e a separação usa `E(X_1²\|U) ≥ κ_1` e a densidade limitada por baixo. **(i)** O teorema no nível da taxa, sob as hipóteses de E1.3 e E1.4, para a classe de Besov de E1.3 (dizer em que faixa de `(s, π)` a construção vale, e se o hipercubo denso basta ou se em `π < 2` é preciso a construção esparsa); com ruído gaussiano, dito no enunciado, e o que muda sem ele. **(ii) Opcional:** a constante proporcional a `pq`, por um hipercubo produto sobre todos os blocos `(ℓ, m)`, onde entram o termo cruzado entre moduladoras e os autovalores de E1.4 (Proposição 3); se não fechar, dizer por quê e parar em (i). **(iii) Fora:** se um estimador adaptativo pode evitar o `(log n)^{(2/π−1)/(2s+1)}` em `π < 2`. **A comparação:** com o Corolário 11 (ótimo em `π ≥ 2` para todo `q`?), com o Corolário 5 do LASSO, com a cota inferior de K&P (Teorema 1, eqs. 3.6 e 3.7, que é de alta dimensão), e com Donoho & Johnstone (1998, Teoremas 4 e 5). **A referência de base** (uma cota inferior para regressão com desenho aleatório sobre Besov, ou o lema de Assouad e o de Varshamov-Gilbert em Tsybakov 2009, *Introduction to Nonparametric Estimation*) entra só verificada como em L1, com D39, no `docs/referencias-verificadas.bib`; o PDF, se acessível, em `refs/` com o padrão sobrenome e ano. **Conferência antes da prova:** `derivations/check/09-cota-inferior.R`, rodado numa cópia congelada, com o que se confere numericamente numa cota inferior (as distâncias de Kullback-Leibler e as separações das hipóteses no hipercubo, com `X` dependente de `U` e `q ≥ 2`, contra as cotas do enunciado; o expoente de `n`); imprime `OK`. No handoff: o enunciado, a faixa de `(s, π)`, se (ii) fechou, e **a frase da introdução** que substitui "A lower bound for several modulators remains open." (D50), com a versão para a terceira leitura do Theorem 1 no §3 do `ms_4` (a troca no `.tex` é de uma rodada seguinte). Não tocar no manuscrito | E1.3, E1.4, E1.12 | `derivations/09-cota-inferior.tex`, `derivations/09-cota-inferior.pdf`, `derivations/check/09-cota-inferior.R`, `derivations/README.md` (a linha do `09`), `docs/referencias-verificadas.bib` (só entradas novas, verificadas), `docs/literatura.md` (só linhas novas), `refs/`, `docs/handoff-E1.9.md` |
-| **E6.1b** a aplicação depois de D44 | a sondagem que a pergunta 2 do `ESTADO.md` precisa para ser decidida, **sem escolher a aplicação** (é do autor). O critério de E6.1a (`docs/aplicacao-candidatas.md` §1) pedia que o WAFC ganhasse do spline por adaptação; com D44 a tese passa a ser **estrutura recuperada com predição competitiva**, e uma base neutra em predição pode servir se a estrutura que o WAFC devolve for estável e interpretável. Duas frentes. (i) **As três candidatas de E6.1a** (bike, beijing, housing; dados em `wafc/cache/data/`) com o estimador de D44, todos os argumentos explícitos: `wafc_fit_klopp(penalize.levels = FALSE, balanced = TRUE)` seguido de `wafc_threshold(rule = "cv1se")`, e também `rule = "cv"`; contra `gam.reml` e `gam.gcv` (`wafc_fit_gam(k.select = ...)`, D46) e o linear. Partição **por bloco** onde há dependência (tempo em bike e beijing, região em housing; a lição de E6.1a §4.4), **repetida** (por exemplo 20 partições) para dar erro-padrão; e **estabilidade da estrutura**: a frequência com que cada bloco `(ℓ, m)` fica no ajuste limiarizado em subamostras, ao lado dos suavizadores que o `select = TRUE` do `gam` zera (`edf` perto de 0). (ii) **Busca de candidatas novas** com o critério do veredito de E6.1a (§5): salto ou limiar documentado na literatura da área (limiar administrativo ou regulatório, quebra datada), público, citável, **licença declarada**, `n` na casa dos milhares, duas ou mais moduladoras; até três, cada uma com fonte, licença, DOI e variáveis, e a sondagem (i) nas que passarem. **O código vem de um retrato:** como a E3.1 mexe em `wafc/R/` ao mesmo tempo, o script carrega as funções de uma cópia extraída do `HEAD` no início (`git archive HEAD wafc/R` em `wafc/cache/e61b/`) e registra o hash do commit; não usa nada de `wafc/R/` da árvore de trabalho. **Núcleos:** até 6; rodada acima de 1 h espera o aviso do autor. No handoff: por base, predição (média e erro-padrão por partição), a tabela de estabilidade da estrutura com a leitura de cada bloco, a licença, e um veredito por base no critério novo (estrutura estável e interpretável, predição a menos de um erro-padrão do melhor `gam`) | D44, D45, D46; E6.1a | `wafc/scripts/10-sondagem-aplicacao-b.R`, `docs/aplicacao-candidatas.md` (seções novas a partir da §9, sem mexer nas antigas), `docs/literatura.md` (só linhas novas, com status `[VERIFICAR]`), `docs/handoff-E6.1b.md`; dados e saídas em `wafc/cache/data/` e `wafc/cache/e61b/`, não versionados |
 
 Duas tarefas não podem editar o mesmo arquivo ao mesmo tempo; se o
 catálogo tiver duas que tocam o mesmo arquivo, a segunda deixa as linhas
 no handoff. L1 e L2 fecharam, então nenhuma tarefa aberta encosta no
 `literatura.md`.
 
-**E1.9 catalogada em 2026-10-05** (a cota inferior no nível da taxa), ao
-lado da E6.1b, sem arquivo em comum fora do `docs/literatura.md`, onde as
-duas só acrescentam linhas.
+**Catálogo vazio** (2026-10-05): E1.9 e E6.1b fecharam; pendências nas
+perguntas 50 e 51 do `ESTADO.md`.
 
 **E5f e L11 fecharam em 2026-10-05.**
 
@@ -190,12 +189,13 @@ pelo chat principal, com o mapa abaixo.
 | `08-blocos.tex` (E1.13) | Corolário 14 (`cor:lenta-blocos`) |
 | `05-taxas.tex` (E1.15) | Proposição 8 (`prop:truncada`) |
 | `08-blocos.tex` (E1.15) | Corolário 15 (`cor:truncada-blocos`) |
+| `09-cota-inferior.tex` (E1.9) | Lema 17, Teorema 5, Corolário 16 (a Proposição 9 ficou livre) |
 
 **Este mapa é a autoridade**, e é ele que E5a usa ao montar o manuscrito. O
 `04-oraculo.tex` já imprime o número global (via `\setcounter` no
 preâmbulo), prática adotada daqui em diante; `02` e `03` ainda imprimem o
-contador local. O próximo resultado novo é **Proposição 9**, **Lema 17**, **Teorema 5**
-ou **Corolário 16**, conforme o tipo. O `06-selecao-limiar.tex` imprime `Hipótese S`, com letra
+contador local. O próximo resultado novo é **Proposição 9**, **Lema 18**, **Teorema 6**
+ou **Corolário 17**, conforme o tipo. O `06-selecao-limiar.tex` imprime `Hipótese S`, com letra
 em vez de número, porque é citada lado a lado com a `Hipótese 1` de E1.6;
 é desvio local e aceito.
 

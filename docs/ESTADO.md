@@ -2102,6 +2102,99 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-05: E1.9 fechada, a cota inferior no nível da taxa
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: o
+`check/09-cota-inferior.R`, numa cópia congelada, imprime **`OK` em 80 s**;
+o `09-cota-inferior.tex` compila em **11 páginas** sem aviso;
+`referencias-verificadas.bib` com **88 entradas** (Tsybakov 2009) e 0
+avisos.
+
+- **Teorema 5** (com o Lema 17, o hipercubo de wavelets): para qualquer lei
+  de `(X, U)` nas hipóteses de E1.3 e E1.4 (`X` pode depender de `U`;
+  qualquer `q`), erro gaussiano, e um conjunto `𝒦` de `K` blocos,
+  `inf sup E Σ_𝒦 ‖ĝ − g‖² ≥ (c_A/8) K ρ̲_n²`, com
+  `ρ̲_n² = C_g^{2/(2s+1)}{σ²/(nB_X²C_U)}^{2s/(2s+1)}` e `c_A ≈ 0,146`; na
+  predição o mesmo vezes `γ = κ_1c_U`. Vale para todo `s > 0`, todo `π`,
+  não assintótico, com constantes que não dependem de `π`, `p` nem `q`.
+- **O opcional fechou:** com `𝒦` todos os blocos, a constante é
+  proporcional a `pq`. O Kullback-Leibler entre vizinhos não vê os termos
+  cruzados; eles só entram na separação da predição, por `λ_min(Σ_𝒞𝒞)`.
+- **Corolário 16:** em `π ≥ 2`, `n^{−2s/(2s+1)}` é a taxa minimax, e o WAFC
+  a atinge uniformemente na classe (o `O_p` do Corolário 11 é uniforme,
+  lido na prova); em `π < 2`, ótimo a menos de
+  `(log n)^{(2/π−1)/(2s+1)}`; o LASSO fica `(log n)^{2s/(2s+1)}` acima em
+  todo `π`.
+- **O hipercubo denso basta em todo `s' > 0`**; a construção esparsa só
+  ganharia com `s' < 0`, onde a classe nem é limitada em `L_2`.
+- **Sem ruído gaussiano:** para a classe sub-gaussiana das cotas superiores
+  nada muda; para uma lei fixa, a condição (2.29) de Tsybakov.
+- **A conferência:** Kullback-Leibler de vizinho por Monte Carlo (0,090
+  contra 0,076 ± 0,007), separação com termos cruzados até 0,65, redução em
+  200 estimadores não aditivos, Assouad com risco de Bayes exato, o
+  pertencimento à classe, o expoente em 600 valores de `n`.
+- **Nota de bibliografia:** o DOI impresso no livro de Tsybakov
+  (`10.1007/978-0-387-79052-7`) não está registrado; ficou o do registro no
+  Crossref, `10.1007/b13794`.
+- **Lições:** para a perda de predição de um estimador arbitrário, a
+  redução ao hipercubo é uma projeção mais o autovalor mínimo, não os
+  suportes disjuntos de desenho fixo; com desenho aleatório o
+  Kullback-Leibler só usa o segundo momento condicional, e por isso `X`
+  dependente de `U` não custa nada na cota inferior.
+
+### 2026-10-05: E6.1b fechada, nenhuma base passa contra o spline sintonizado em blocos
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: 120 + 120
+unidades em `wafc/cache/e61b/`, e os erros médios por método reproduzem a
+tabela abaixo nas seis bases. A rodada levou 39 h 32 min (parada uma vez,
+às 07h31 de 10-04, com a swap acima de 1 GB quando duas conferências da
+E1.14 entraram, e relançada com 3 processos), pico de 4,9 GB por processo.
+`docs/aplicacao-candidatas.md` ganhou as §9 a §16; `literatura.md`, nove
+linhas `[VERIFICAR]`.
+
+RMSE no teste, média de 20 partições por bloco, e a razão ao melhor spline:
+
+| base | WAFC `+cv1se` | WAFC `+cv` | melhor `gam` | `gam.reml` | `gam.gcv` |
+|---|---|---|---|---|---|
+| bike | 0,6680 (1,036) | 0,6642 (1,030) | 0,6454 (`cv`) | 0,6563 | 0,7437 |
+| beijing | 0,9211 (1,010) | 0,9174 (1,006) | 0,9124 (`cv`) | 0,9125 | 0,9131 |
+| beijing.heat | 0,7945 (1,026) | 0,7902 (1,020) | 0,7746 (`cv`) | 0,8666 | 0,8844 |
+| housing | 0,3600 (1,066) | 0,3517 (1,041) | 0,3424 (`cv`) | 0,3483 | 0,3705 |
+| marylebone | 12,02 (1,040) | 11,79 (1,019) | 11,58 (`cv`) | 11,77 | 11,80 |
+| kelmarsh | 0,0613 (1,072) | 0,0590 (1,033) | 0,0572 (`cv` = `reml`) | 0,0572 | 0,0572 |
+
+- **Veredito no critério de D44: nenhuma base passa.** O WAFC vence o
+  melhor spline em 0 a 6 de 20 partições; com o erro-padrão corrigido por
+  Nadeau & Bengio (fator ~3,1), só o `+cv` de bike, housing e kelmarsh fica
+  dentro de um erro-padrão.
+- **O spline certo em dado dependente é o `gam.cv` nas mesmas dobras por
+  bloco.** Contra os dois splines de D46, o WAFC vencia beijing.heat por 8%
+  em 20 de 20 partições; o `gam.reml` estava no topo da grade (`k = 80`,
+  `edf` de 61 a 71) e, com `k` por validação cruzada por semana, desce a 5 ou
+  10 e passa à frente por 2,0% a 2,6%. REML e GCV suavizam de menos com
+  resíduo correlacionado (Opsomer, Wang & Yang 2001).
+- **Marylebone é a melhor estrutura:** o degrau da fração primária de NO2
+  em `NOx × data` (+10,3 por 100 ppb, 90% da subida entre julho e setembro
+  de 2003, em 20 de 20 partições), que é o de Carslaw (2005); e
+  `NOx × vento` zerado em 20 de 20, onde o spline mantém `edf` 10. Na
+  predição fica 1,9% (`+cv`) a 4,0% (`+cv1se`) atrás.
+- **Kelmarsh** recupera a física da curva de potência (o efeito da
+  temperatura some acima da velocidade nominal), mas o `cv1se` zera a
+  direção do vento em 20 de 20, que o spline mantém (`edf` 36).
+- **Licenças:** bike, beijing e kelmarsh com CC BY 4.0; housing sem licença;
+  marylebone com o pacote MIT e as medidas do LAQN sob OGL v2, sem dizer se
+  cobre o arquivo histórico, e a fonte do vento `[VERIFICAR]`.
+- **Lições:** (1) em dado dependente o spline escolhe a dimensão pela mesma
+  validação cruzada por bloco do WAFC, ou o WAFC parece melhor do que é; (2)
+  o `cv1se` custa de 0,4% a 3,9% sobre o `+cv` em dado real, porque zera
+  blocos pequenos e reais; (3) moduladora discreta com poucos valores (a
+  hora, 24) deixa o bloco não identificado quando `2^J − 1 > 23`, e a norma
+  que o limiar lê depende de direções sem dado (proposta para E3: truncar
+  `J` por moduladora no número de valores distintos); (4) a borda da base
+  periodizada aparece em data, velocidade e coordenadas; (5) o block LASSO
+  com `J = 2:8` em `n` de 2 a 6 × 10⁴ custa de 10 min a 2 h por partição e
+  até 5 GB por processo.
+
 ### 2026-10-05: E5f e L11 fechadas, a E1.15 na `k = 4` e Simon & Tibshirani
 
 Dois chats de tarefa, integrados aqui. Conferido nesta máquina: `ms_4` e
@@ -2551,6 +2644,7 @@ entrou sem os itens de E1.14** (pergunta 47(a)).
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
 | D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
+| D56 | 10-05 | **Na aplicação, cada método nos seus próprios termos:** o WAFC com a sintonia dele (validação cruzada, aqui nas dobras por bloco) contra o `gam` como ele é usado, com REML e GCV (as duas colunas de D46); **o `gam.cv` em blocos não entra como concorrente** no artigo, porque escolher `k` do `gam` por validação cruzada não é o uso dele, como não é usual sintonizar o WAFC por REML. A medição do `gam.cv` fica nos documentos de trabalho (D43). O texto da aplicação diz que os dois métodos foram sintonizados nos critérios usuais e que nenhum modela a dependência do erro | decisão do autor, no princípio de D30 e da E2.5h (o concorrente sintonizado nos termos dele): o objetivo é mostrar que o WAFC é uma boa opção, não que vence sempre. Risco registrado: com erro dependente, o uso de referência do `mgcv` é o `gamm` com erro autorregressivo, que um referee pode pedir |
 | D55 | 10-05 | **Pergunta 49, aplicada no chat principal na `k = 4`:** no §3.2, a frase de D49(c) passa a "When `s < 1/2`, the prediction rate of Theorem 1 holds with no design condition at all, under its other assumptions and in the same window for `J_n` (Proposition S6.2)", com a antiga tachada; Simon & Tibshirani (2012) no §4.1, ao lado de Breheny & Huang, e na Remark S5.2 (eq. 1.4 e §2), não no argumento pivotal; a entrada no `references_4.bib` (44 entradas); Breheny & Huang citados por seção. `ms_4` e `supp_4` em 52 e 80 páginas, sem referência indefinida | recomendações do chat principal, aceitas pelo autor |
 | D54 | 10-05 | **Pendências de E1.15, E5e e L10 (pergunta 48):** a Proposição 8 e o Corolário 15 vão à `k = 4` com uma ou duas frases no corpo depois da Proposition 3 e o enunciado com a prova no supp (S6 e S8); a frase do §3 passa a dizer que a condição de desenho é necessária para as componentes, e para a predição quando `s ≥ 1/2`; a introdução (D50) não muda; a variante branca com o comparador truncado não se abre (uma linha no supp); as citações de L10 entram no §4.1 e no §2.3, com as três entradas no `references_4.bib`; a Proposition S8.1 cita as cotas superiores das Assumptions 2 e 3; Simon & Tibshirani (2012) a verificar (L11); Breheny & Huang ficam na seção de software do `.bib` (D25); `ℛ_1`, `ℛ_{𝒢,w}`, `ℛ_{𝒢,1}` no `notacao.md` §10. Catalogadas E5f e L11 | recomendações do chat principal, aceitas pelo autor |
 | D53 | 10-04 | **O resumo da `k = 4` aprovado** como a E5d o escreveu (block lasso com pedaços, pesos de razão limitada, sem logaritmo em `π ≥ 2`, o risco ideal no lugar da compressibilidade, a frase do limiar, "standard group lasso software"), **com uma troca nas palavras-chave: "effective dimension" sai e "thresholding" entra**, marcada, na E5e | recomendação do chat principal, aceita pelo autor: o texto está coerente com o corpo e com D50, e a dimensão efetiva deixou de ser central |
@@ -2753,8 +2847,10 @@ Ordenadas pelo que bloqueia mais.
      menos margem é necessária. É implicitamente o que motiva a construção
      de Cohen, Daubechies e Vial, que corrige as wavelets da borda em vez
      de negociar a largura da faixa.
-20. **Cota inferior: catalogada como E1.9 em 2026-10-05, com escopo
-   reduzido** (no nível da taxa, pela subclasse com uma componente; a
+20. **Cota inferior: fechada no nível da taxa por E1.9 (2026-10-05, §2);**
+   fica aberto só o logaritmo em `π < 2`, a constante e `p` crescente.
+   Catalogada como E1.9 em 2026-10-05, com escopo
+   reduzido (no nível da taxa, pela subclasse com uma componente; a
    constante em `pq` opcional; o logaritmo em `π < 2` fora). A leitura do
    chat principal: com `p` e `q` fixos, a cota `n^{−2s/(2s+1)}` sai da
    regressão não paramétrica univariada com desenho aleatório, e o
@@ -3450,12 +3546,61 @@ Ordenadas pelo que bloqueia mais.
    inferida. O supp cresceu de 67 para 79 páginas, o que não conta no teto
    (D21).
 
+50. **Pendências de E6.1b** (2026-10-05). Recomendação do chat principal:
+   - (a) **A pergunta 2, a aplicação:** marylebone, como aplicação de
+     estrutura, assumindo os ~2% contra o spline sintonizado em blocos. É a
+     única base com um resultado substantivo que a literatura da área
+     confirma (o degrau de 2003) e que o spline não dá na forma de decisão.
+     Pede a licença limpa (a série MY1 do UK-AIR, OGL v3, e o vento de fonte
+     declarada) e, para a data, que não é periódica, pesar
+     `boundary = "interval"` (pergunta 6). As alternativas: aplicação neutra
+     (bike ou kelmarsh) ou outra busca.
+   - (b) ~~**O spline da aplicação:** o `gam.cv` nas mesmas dobras por
+     bloco, ao lado dos dois de D46.~~ **Decidido em D56: não.** Cada método
+     nos seus termos; contra os dois splines de D46, beijing.heat vence por
+     ~9% (`+cv` 0,790 contra `gam.reml` 0,867, 20 de 20 partições) e
+     marylebone empata a menos de um erro-padrão (`+cv` 11,79 contra 11,77);
+     housing passaria na predição e não tem licença. A escolha da base (a)
+     fica entre marylebone (a melhor estrutura, sem licença limpa) e
+     beijing.heat (a melhor predição, CC BY 4.0, o limiar de 15/11 em 7 de 20
+     partições).
+   - (c) **O limiar na aplicação:** o padrão `cv1se` (D45) fica; a aplicação
+     relata a predição do `+cv` e a estrutura dos dois, e só afirma ausência
+     de efeito onde os dois zeram. Em marylebone, `NOx × vento` é zerado
+     pelo `cv1se` e precisa dessa conferência antes de virar resultado.
+   - (d) **Truncar `J` por moduladora** no número de valores distintos
+     (lição 3): catalogar uma tarefa curta de código.
+
+51. **Pendências de E1.9** (2026-10-05). Recomendação do chat principal:
+   - (a) **A introdução:** trocar "so that with a single modulator
+     independent of the covariates it is minimax optimal there" por "where
+     it is minimax optimal", e a frase de D50 sobre a cota inferior por "The
+     lower bound that makes it optimal is proved here for any number of
+     modulators and for covariates that depend on them; Klopp and Pensky
+     have it with a single modulator independent of the covariates."
+   - (b) **A cota no artigo:** no supp, em S6, no lugar da Remark S6.1 (que
+     vira uma frase: K&P é o caso `q = 1`, `X ⊥ U`), com o enunciado nas três
+     perdas e a prova; no corpo, a terceira leitura do Theorem 1 no texto do
+     handoff da E1.9.
+   - (c) **A uniformidade do `O_p`:** uma frase na prova do Theorem 1 no
+     supp ("the event does not depend on `f` and the bound depends on `f`
+     only through `C_g`"), sem a qual "minimax optimal" fica no sentido
+     ponto a ponto.
+   - (d) O `(pq)²` do Corolário 1 de E1.3 fica como está.
+   - (e) Os símbolos do `09` ficam locais; só os que chegarem ao manuscrito
+     (`ρ̲_n`, `𝒦`, `K`, `c_A`) entram no `notacao.md` §10.
+   - (f) **Catalogar a E5g** para levar (a) a (c) à `k = 4`, com
+     `Tsybakov-2009` no `references_4.bib`.
+
 ---
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-05).** **E5f e L11 fechadas e integradas**, e as três
-edições da pergunta 49 aplicadas (D55); catálogo só com a E6.1b. A E6.1b vai em 113 de 120 unidades.
+**Onde parou (2026-10-05).** **E1.9 e E6.1b fechadas e integradas**: a cota
+inferior faz o Theorem 1 ótimo em `π ≥ 2` para todo `q`, e nenhuma base da
+aplicação passa contra o spline sintonizado em blocos (marylebone é a melhor
+estrutura). Pendências nas perguntas 50 e 51; **catálogo vazio**. E5f e L11
+fechadas, e as três edições da pergunta 49 aplicadas (D55). A E6.1b vai em 113 de 120 unidades.
 **E1.15, E5e e L10 fechadas e integradas**, com a pergunta 48 decidida
 (D54). **E1.14 e
 E5d fechadas e integradas**: a
@@ -3539,6 +3684,8 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-05 | D56: na aplicação, cada método nos seus termos; o `gam.cv` em blocos fica fora do artigo, e contra os splines de D46 beijing.heat vence por ~9% e marylebone empata |
+| 2026-10-05 | E1.9 fechada e integrada (`OK` em 80 s, 11 páginas, 88 entradas): Teorema 5 e Corolário 16, a cota inferior com constante proporcional a `pq` e `X` dependente de `U`; pergunta 51. E6.1b fechada e integrada (120 + 120 unidades, 39 h 32 min): nenhuma base passa contra o `gam.cv` em dobras por bloco; marylebone é a melhor estrutura; pergunta 50. `CONTINUAR.md` §3 atualizado |
 | 2026-10-05 | E1.9 (a cota inferior) catalogada com escopo reduzido: no nível da taxa, pela subclasse com uma componente e o lema de Assouad; pergunta 20 |
 | 2026-10-05 | Pergunta 49 aplicada (D55): a frase do §3.2 vale para todo `π` pela S6.2; Simon & Tibshirani (2012) no §4.1 e na Remark S5.2; `references_4.bib` com 44 entradas |
 | 2026-10-05 | E5f e L11 fechadas e integradas (52 e 80 páginas; 43 entradas no `references_4.bib`, 87 no verificado): a E1.15 na `k = 4` (Propositions S6.2 e S8.2) e as citações de L10; Simon & Tibshirani (2012) verificado; pergunta 49 |
