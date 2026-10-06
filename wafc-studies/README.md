@@ -98,7 +98,7 @@ options, the tuning grids by sample size, and the labels of the tables.
 | `bsgl` | cubic B-splines with a group lasso by block, `2^J` basis functions |
 | `aspline` | a spline with knots chosen adaptively per block |
 | `klopp` | the block lasso of Klopp and Pensky (2015) on the wavelet design |
-| `oracle` | the lasso on the wavelet design restricted to the truly active blocks (a reference) |
+| `oracle` | the block lasso of `wafc` restricted to the truly active blocks, `(J, λ)` by cross-validation, without threshold (a reference: the price of not knowing the structure) |
 | `linear` | constant coefficients, least squares on `X` (a reference) |
 | `vcbart` | VCBART (Deshpande et al.), Bayesian trees for varying coefficients |
 

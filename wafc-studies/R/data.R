@@ -9,53 +9,17 @@
 #' Draw a sample of a cell
 #'
 #' The entries of the cell other than the reserved ones are passed to
-#' simulate_wafc(). A cell with an explicit `structure` (a p by q matrix of
-#' component names, "" for a zero block) is drawn as simulate_wafc() draws
-#' a scenario: the covariates and the standard normal errors come from
-#' simulate_wafc() in the null scenario with unit error standard deviation,
-#' and the regression function is built from the components of
-#' wafc_component(), each multiplied by its amplitude, before the error
-#' scale is set from `snr` or `sigma`.
+#' simulate_wafc(), and so is an explicit `structure` (a p by q matrix of
+#' component names, "" for a zero block), which replaces the structure of
+#' the scenario.
 #'
 #' @return An object of class "wafc_dgp".
 draw_cell <- function(cell, n, seed) {
   a <- cell[setdiff(names(cell), c(cell_reserved, "name"))]
   a[["n"]] <- n
   a[["seed"]] <- seed
-  if (is.null(cell[["structure"]])) return(do.call(simulate_wafc, a))
-  snr <- a[["snr"]]
-  sigma <- a[["sigma"]]
-  a[["snr"]] <- NULL
-  a[["scenario"]] <- "null"
-  a[["sigma"]] <- 1
-  d <- do.call(simulate_wafc, a)
-  z <- d[["y"]] - d[["f"]]
-  s <- cell[["structure"]]
-  p <- d[["p"]]
-  q <- d[["q"]]
-  amp <- matrix(rep_len(if (is.null(a[["amplitude"]])) 1 else
-    unlist(a[["amplitude"]]), p * q), p, q)
-  g <- vector("list", p * q)
-  dim(g) <- c(p, q)
-  for (l in seq_len(p)) {
-    for (m in seq_len(q)) {
-      if (!nzchar(s[l, m])) next
-      g[[l, m]] <- local({
-        gg <- wafc_component(s[l, m])
-        aa <- amp[l, m]
-        function(v) aa * gg(v)
-      })
-    }
-  }
-  d[["g"]] <- g
-  d[["structure"]] <- s
-  d[["scenario"]] <- cell[["scenario"]]
-  d[["sprime"]] <- NA_real_
-  d[["beta"]] <- wafc_beta(d, d[["u"]])
-  d[["f"]] <- as.numeric(rowSums(d[["x"]] * d[["beta"]]))
-  d[["sigma"]] <- if (is.null(sigma)) stats::sd(d[["f"]]) / snr else sigma
-  d[["y"]] <- d[["f"]] + d[["sigma"]] * z
-  d
+  a[["structure"]] <- cell[["structure"]]
+  do.call(simulate_wafc, a)
 }
 
 #' The test sample of a replicate

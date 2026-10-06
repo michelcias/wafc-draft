@@ -42,6 +42,7 @@ methods: [wafc, lasso, gam.reml, gam.gcv, bsgl, aspline, klopp, oracle,
 method_options:
   gam.reml: {k.select: reml, engine: bam}
   gam.gcv:  {k.select: gcv, engine: bam}
+  oracle:   {penalty: block}
   vcbart:   {burn: 500, nd: 500, M: 50}
 
 # Tuning, declared per sample size so that a grid can change at one size

@@ -10,7 +10,7 @@
 ## output directory reuses this pipeline unchanged.
 
 ## The entries of a cell that are not arguments of simulate_wafc().
-cell_reserved <- c("seed_key", "exclude", "structure")
+cell_reserved <- c("seed_key", "exclude")
 
 ## The methods the code knows; see R/methods.R.
 known_methods <- function() names(study_methods)

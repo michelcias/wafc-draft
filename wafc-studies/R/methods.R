@@ -25,8 +25,11 @@
 ##   klopp     the block lasso of Klopp and Pensky (2015) on the wavelet
 ##             design: chunks of about log n coefficients, the level terms
 ##             penalized as blocks of their own.
-##   oracle    the lasso on the wavelet design restricted to the blocks that
-##             are truly active; a reference, not a competitor.
+##   oracle    the block lasso of wafc on the wavelet design restricted to
+##             the blocks that are truly active, (J, lambda) chosen by
+##             cross-validation over the grid of J, without threshold; a
+##             reference, not a competitor: the distance from wafc to it is
+##             the price of not knowing the structure.
 ##   linear    least squares on the linear covariates alone (constant
 ##             coefficients); the oracle of the null cell.
 ##   vcbart    Bayesian additive regression trees for varying coefficients

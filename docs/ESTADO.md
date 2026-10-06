@@ -2084,6 +2084,50 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: E4.1c fechada, o oráculo em blocos e o `structure`
+
+- **Assinaturas:** `simulate_wafc(..., x_u_rho = 0, structure = NULL)` e
+  `wafc_fit_oracle(..., penalty = c("lasso", "sglasso", "block"), ...,
+  block.size = NULL, thresh = NULL)`. O `structure` (matriz `p × q` de
+  nomes de `wafc_component()`) substitui a do cenário sem sorteio novo; com
+  ele dado, `sprime = NA`. O oráculo em blocos é o block LASSO balanceado
+  do `wafc()` nas colunas dos blocos ativos, com `(J, λ)` pelo
+  `wafc_cv_block()` e lido em `lambda.min`, sem limiar; o padrão continua
+  `"lasso"`. Nas duas penalidades, um `J` que o teto da E3.4 torna
+  repetido não é reajustado (resultado idêntico). A matriz de `FALSE` em
+  `active` continua dando o linear (o oráculo do nulo); `active` de
+  comprimento 0 dá erro. No compêndio: o `draw_cell()` só repassa
+  `structure`, e o `oracle` do estudo é o de blocos
+  (`method_options: oracle: {penalty: block}`).
+- **Conferência:** suíte com **1 730 expectativas, 0 falhas** (reconferida
+  no chat principal); o oráculo coordenado padrão idêntico ao `901fac7` em
+  4 casos, e 6 de 6 contra o `e25j`; a célula `scale` antes e depois
+  idêntica em `x`, `u`, `beta`, `f`, `σ`, `g` e no `.Random.seed` em 10 de
+  10, com o `y` de treino diferindo por no máximo 3,6e-15 (o arredondamento
+  da ida e volta do `draw_cell()` antigo; recomendação aceita antes da
+  execução); recuperação exata do oráculo em blocos (RMSE 5,8e-9 com
+  `thresh = 1e-8`); com todos os blocos ativos, igual ao `cv.wafc()` em
+  `J`, `λ` e `cc`. Fumaça: o `oracle` nas 12 células, 0 falhas; a `scale`
+  com todos os métodos, 0 falhas, 5,1 min, 1,0 GB (o `gam.reml` em 307 s).
+  **Décima primeira junção exata** (com o nulo em `n = 250`): JUNCTION OK,
+  171 linhas; contra as unidades da E4.1, 168 de 168 idênticas fora o
+  `oracle`.
+- **Tempo em `n = 250`:** o oráculo em blocos custa 0,64 do coordenado no
+  total (0,57 a 0,94 por célula), com `rmse_f` menor no não homogêneo, na
+  `mixed` e na `scale`, igual no `smooth` e um pouco maior no `uneven`.
+- **Correção no chat principal:** `cell_reserved` do
+  `wafc-studies/R/config.R` deixou de listar `"structure"`, para que o
+  `check_cells()` acuse código sem o argumento antes da primeira unidade;
+  a `scale` lista 900 unidades sem erro. O `PROVENANCE.md` aponta
+  `f14e6f2` (árvore `e262faa`).
+- **Para a E4.3:** o oráculo em blocos chega ao topo da grade efetiva em
+  `n = 250` em 3 das 4 células não homogêneas; o `top` dele já é gravado.
+  As unidades `oracle` em cache de antes estão obsoletas: o compêndio para
+  com nome, e `--refresh` ou pasta nova resolve.
+- **Lição:** uma expressão do `sed` montada por substituição de comando que
+  começa com `w` grava um arquivo; depois de um `sed` composto, conferir o
+  `git status`.
+
 ### 2026-10-06: L13 fechada, Liang et al. (2015) e Opsomer, Wang & Yang (2001)
 
 - **O que entrou:** `referencias-verificadas.bib` de 97 a **99 entradas**
@@ -4141,6 +4185,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E4.1c fechada e integrada (1 730 testes; décima primeira junção exata): o oráculo em blocos e o `structure`; `cell_reserved` corrigido no compêndio; `PROVENANCE.md` em `f14e6f2`. A E4.3 pode ser catalogada |
 | 2026-10-06 | L13 fechada e integrada (99 entradas): a temporada de Liang et al. e o 31% a 72% conferem, as datas são nominais; Opsomer et al. em 134–153, com o GML igual ao REML; pergunta 58 |
 | 2026-10-06 | L13 catalogada: Liang et al. (2015) e Opsomer, Wang & Yang (2001), as duas fontes da aplicação ainda `[VERIFICAR]` |
 | 2026-10-06 | E6.2 (a aplicação no compêndio) catalogada, em paralelo à E4.1c, com as 20 partições por bloco e a junção exata contra a E6.1b e a E6.1c |

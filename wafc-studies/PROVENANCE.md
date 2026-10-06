@@ -14,8 +14,8 @@ repository `michelcias/wafc-draft`, sourced through its loader
 | | |
 |---|---|
 | repository | `michelcias/wafc-draft` |
-| commit (last change to `wafc/R`) | `9b11273bd56130a692af03e794084d7b73fc8df5` |
-| tree of `wafc/R` at that commit | `0818de514a2412a832f082fbe98eed3cada3adae` |
+| commit (last change to `wafc/R`) | `f14e6f21702d842dc98ed2f307cf97f36abc051d` |
+| tree of `wafc/R` at that commit | `e262faac78b2af83011408fb0dae98a62977c67d` |
 
 In the standalone release of the compendium the same functions come from
 the version of `WaveBased` that contains them, pinned in `renv.lock`, and

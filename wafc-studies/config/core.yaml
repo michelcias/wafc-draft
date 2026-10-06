@@ -2,9 +2,9 @@
 # core.yaml -- the main design
 # ============================================================
 # Five cells, four sample sizes, 100 replicates. A cell's entries other
-# than `seed_key`, `exclude` and `structure` are arguments of
-# simulate_wafc(); `snr` sets the error standard deviation to sd(f)/snr on
-# the realised regression function of each sample, and `sigma` fixes it.
+# than `seed_key` and `exclude` are arguments of simulate_wafc(); `snr`
+# sets the error standard deviation to sd(f)/snr on the realised
+# regression function of each sample, and `sigma` fixes it.
 #
 #   smooth         three smooth components (sine, cubic, cosine)
 #   inhomogeneous  three spatially inhomogeneous components (bumps,
