@@ -120,12 +120,13 @@ E61B_EXTRA=gam.cv Rscript wafc/scripts/10-sondagem-aplicacao-b.R marylebone.ukai
 Rscript wafc/scripts/10-sondagem-aplicacao-b.R marylebone.ukair report 1 20 0      # E6.1c, as tabelas da §17
 ```
 
-## 3. Onde o trabalho está (resumo de 2026-10-05; o `ESTADO.md` manda)
+## 3. Onde o trabalho está (resumo de 2026-10-06; o `ESTADO.md` manda)
 
 - **Fechado:** E0, E1 (E1.2 a E1.15, E1.9 no nível da taxa), E2 inteira
-  (E2.1 a E2.5j; o rumo em D44 a D46), E3.1 e E3.2, E5a, E5c, E5d a E5f, as
-  sondagens E6.1a e E6.1b, e as rodadas de bibliografia L1 a L11. Decisões
-  D1 a D55 na tabela do `ESTADO.md` §2.
+  (E2.1 a E2.5j; o rumo em D44 a D46), E3.1 a E3.4, E5a, E5c, E5d a E5g, as
+  sondagens E6.1a a E6.1c, e as rodadas de bibliografia L1 a L11; no
+  catálogo, a L12 (as fontes da aplicação). Decisões
+  D1 a D59 na tabela do `ESTADO.md` §2.
 - **O método (D44, D45):** o block LASSO na forma balanceada, com os níveis
   livres e os pesos do `grpreg`, seguido do limiar `cv1se`; o LASSO
   coordenado fica como opção (D43). `cv.wafc(x, u, y)` é o estimador (D48).
@@ -147,10 +148,12 @@ Rscript wafc/scripts/10-sondagem-aplicacao-b.R marylebone.ukair report 1 20 0   
 - **Bibliografia:** 88 entradas verificadas em
   `docs/referencias-verificadas.bib`; os PDFs em `refs/` (§4), com o padrão
   sobrenome e ano.
-- **Aplicação:** a E6.1b mediu seis bases no critério de D44; nenhuma passa
-  contra o spline sintonizado nas mesmas dobras por bloco, e marylebone é a
-  estrutura mais forte (`docs/aplicacao-candidatas.md` §9 a §16). A escolha
-  é do autor (pergunta 2).
+- **Aplicação (D57, D59):** marylebone com dados do UK-AIR e do ERA5 (a
+  base `marylebone.ukair`, E6.1c) como principal e beijing.heat como
+  segunda, cada método nos seus termos (D56)
+  (`docs/aplicacao-candidatas.md` §9 a §17).
+- **O próximo passo é o estudo de simulação (E4)**, com a proposta de
+  desenho na pergunta 54 do `ESTADO.md`.
 - **Se aparecer um `docs/handoff-*.md`,** é de chat de tarefa que não foi
   integrado (§7 de `instrucoes.md`).
 

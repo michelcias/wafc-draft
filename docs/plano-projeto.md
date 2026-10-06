@@ -497,6 +497,43 @@ tabela principal do artigo é regularidade × método em `n = 1000`; a figura
 principal é `ĝ_{ℓm}` sobreposta à verdade em bumps e blocks, WAFC contra
 `mgcv`.
 
+**Proposta revista de 2026-10-06** (chat principal, depois de D44 a D59; à
+espera do autor, pergunta 54 do `ESTADO.md`). A tabela acima é o desenho
+original e fica como registro.
+
+- **Princípio:** o corpo do artigo leva uma tabela (regularidade × método em
+  `n = 1000`, com uma coluna de estrutura) e uma figura (`ĝ` sobre a verdade
+  em `bumps` e `blocks`, WAFC contra `gam.reml`); o resto vai ao supp (D21).
+  A E2.5 serviu de piloto: grade de `J` `2:8` (D34), 10 dobras, tabela da
+  base (D31).
+- **Métodos:** WAFC `+cv1se` (o principal, D44, D45) e `+cv` (a predição,
+  como na aplicação, D57); o LASSO coordenado só no supp (D43); `gam.reml` e
+  `gam.gcv` (D46; o `gam.gcv` fora da `mixed`, D41); `bsgl`; `aspline`;
+  `klopp` (o block LASSO de K&P na forma deles); o linear oráculo; e o
+  **VCBART por curiosidade**, porque é bayesiano e a decisão de usá-lo no
+  artigo vem depois (autor, 2026-10-06). Ficam no código e fora do estudo
+  (D43): o sparse group LASSO, as outras formas do block LASSO, o
+  `gam.matched`, o `gam.k128` e o `wafc.gcv`.
+- **O núcleo:** as cinco células do piloto (`smooth`, `uneven`, não
+  homogêneo, `mixed`, nulo) × `n ∈ {250, 500, 1000, 2000}` × 100 réplicas.
+  Custo medido no piloto, por réplica em `n = 1000`: ~450 s somando os
+  métodos (`gam.gcv` ~230 s, `bsgl` ~120 s, WAFC ~40 s, `gam.reml` ~8 s;
+  `gam.reml` ~86 s na `mixed`); `n = 2000` estimado em ~2,5 vezes. Com 100
+  réplicas, ~290 h de processador, ~37 h em 8 núcleos; com 50, a metade.
+- **Braços**, um fator por vez em `n = 1000` nas células não homogênea e
+  `mixed`, 100 réplicas, ~3 h cada: ruído alto (razão sinal-ruído 1 contra o
+  padrão 4); moduladoras correlacionadas (`u_rho = 0,5`, que exercita o termo
+  cruzado); `X` dependente de `U` (D13; pede uma opção nova no `dgp.R`); e,
+  opcional, escala `(p, q) = (6, 4)` com 6 blocos ativos e a grade `2:7`, com
+  o custo medido na E4.3 (o `(10, 5)` original tem 12 750 colunas em `J = 8`
+  e não cabe).
+- **Fora:** erro dependente (D56; a aplicação cobre o caso) e a dimensão
+  casada (E6.1a).
+- **Métricas:** erro de predição e ISE em separado, o ISE dividido em blocos
+  ativos e nulos; `P(Ŝ = S)` com as duas regras; o tempo com a busca; o `J`
+  escolhido; no supp, a inclinação do erro contra `n` diante da taxa da
+  teoria.
+
 ### E4.3 Piloto
 
 Réplicas, grade de `J` e de `λ`, e `nfolds` fixados por piloto **antes** da

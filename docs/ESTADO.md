@@ -1,39 +1,20 @@
 # Estado do trabalho, handoff de continuidade
 
-**Última atualização:** 2026-10-03.
-**Etapa corrente:** **E0, E1 (com E1.3b, E1.4c, E1.7a, E1.7c, E1.8,
-E1.10 e E1.11), E5a, E5c e E2 inteira fechadas**, mais L1 a L9 e a
-sondagem E6.1a. **E2.5 fechou em 2026-10-03 com a decisão de rumo do
-autor (D44 a D46): go reposicionado na *Statistica Sinica*, o block LASSO
-balanceado seguido do limiar `cv1se` é o WAFC, o LASSO fica como opção, e o
-spline de E4 entra com `gam.reml` e `gam.gcv`.** O caminho até ela: o LASSO puro levou
-no-go pelo critério literal em E2.5a; E2.5b a E2.5f mediram cinco formas
-do block LASSO (a balanceada é a que a teoria cobre e a melhor fora do
-suave); E2.5g mostrou que o limiar do Corolário 8 derruba o fator do suave
-abaixo de 1,5 contra o `gam.matched`; e **E2.5h, com o `gam` sintonizado
-nos termos dele (REML, validação cruzada nas dobras do WAFC e GCV), manteve
-o veredito**: o WAFC perde no `smooth` e no `uneven` em toda forma, o
-`klopp.balanced+cv` vence no não homogêneo, na `mixed` e no nulo, e o fator
-do `wafc.lasso+max` no suave fica no limite de 1,5 (1,49 contra o `gam.cv`
-em `n = 1000`). **Em 2026-10-03, relido no chat principal:** o limiar
-oráculo dá o teto de qualquer regra de `t`, e só o block LASSO balanceado
-passa a perna do não homogêneo com ele; contra o `gam.gcv` (o critério
-padrão do `mgcv::gam()`) essa perna some. **E2.5j (2026-10-03):** a regra `cv1se` (o maior
-`t` a um erro-padrão do mínimo) chega ao teto no suave, no `uneven`, no
-nulo e em `n = 1000`, e paga em `n ≤ 500` no não homogêneo e na `mixed`;
-o `c` relativo repete o `+cv`; a porta do QUT resolve o nulo das outras
-regras com nível acima do nominal; os cortes de caminho dos dois motores
-não tocam o `λ` escolhido. Por D43, nada medido em E2.5 é descartado. **E1.12
-fechou (2026-10-03):** a teoria em blocos está provada em `08-blocos.tex`
-(Corolário 11 sem logaritmo em `π ≥ 2`) e no adendo do `06` (o risco do
-limiarizado); a pergunta 42 foi decidida (D47). **E3.1 fechou
-(2026-10-03):** `cv.wafc(x, u, y)` é o WAFC de D44 e D45, a interface espera
-a ratificação do autor, dada em D48. **E1.13 e E3.2 fecharam (2026-10-03):**
-a taxa lenta em blocos (Corolário 14, que em `π ≥ 2` e `s < 1/2` dá
-`n^{−2s/(2s+1)}` sem logaritmo e sem condição de desenho) e os gráficos com
-a documentação; pendências decididas em D49. E6.1b está pronta e espera a
-ordem do autor para rodar (§5). A decidir: a saída da aplicação (pergunta 2). O
-teto de páginas fica para o fim (D21).
+**Última atualização:** 2026-10-06.
+**Etapa corrente:** **E0, E1, E2, E3.1 a E3.4, E5a, E5c, E5d a E5g, E6.1a a
+E6.1c e L1 a L11 fechadas.** O WAFC é o block LASSO na forma balanceada
+seguido do limiar `cv1se` (D44, D45), com o LASSO coordenado como opção
+(D43); o alvo é a *Statistica Sinica* (D5). A teoria em blocos está provada
+(`08-blocos.tex`: o Corolário 11 é o Theorem 1, D47), com a taxa lenta sem
+condição de desenho em todo `s' > 0` e, pelo comparador truncado, a taxa do
+Theorem 1 em `s < 1/2` (E1.13 a E1.15), e a cota inferior que o faz ótimo em
+`π ≥ 2` para todo `q` (E1.9). A interface `cv.wafc(x, u, y)` está
+ratificada (D48, D58). A aplicação tem duas bases (D57): **marylebone** com
+dados do UK-AIR e do ERA5 (o degrau de 2003, E6.1c; D59) como principal e
+**beijing.heat** como segunda; cada método é sintonizado nos seus termos
+(D56). **O próximo passo é o estudo de simulação (E4)**, com a proposta de
+desenho na pergunta 54, à espera do autor; a **L12** (as fontes da
+aplicação) está no catálogo. O teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 4` (`manuscript/ms_4.tex`,
 `supp_4.tex`, `references_4.bib`), aberta pela E5d em 2026-10-04 com a
 teoria em blocos (D44 a D51); as versões `k = 1` a `k = 3` ficam intactas.
@@ -3759,103 +3740,82 @@ Ordenadas pelo que bloqueia mais.
      Bengio (2003) e Opsomer, Wang & Yang (2001); Carslaw (2005) lido no PDF
      para conferir o degrau e os dois ressaltos.
 
+54. **O desenho do estudo de simulação (E4.2)** (2026-10-06), proposta do
+   chat principal, à espera do autor; o texto completo está no
+   `plano-projeto.md`, E4.2 ("Proposta revista de 2026-10-06"). Os pontos a
+   decidir:
+   - (a) **Réplicas:** 100 (recomendado; as frações de vitória e as caudas
+     pedem mais que as 50 do piloto) ou 50. O núcleo com 100 custa ~290 h de
+     processador, ~37 h em 8 núcleos; com 50, a metade.
+   - (b) **Os braços**, um fator por vez em `n = 1000` nas células não
+     homogênea e `mixed`, ~3 h cada: ruído alto (razão sinal-ruído 1),
+     moduladoras correlacionadas (`u_rho = 0,5`), e `X` dependente de `U`
+     (pede uma opção nova no `dgp.R`, tarefa curta de código).
+   - (c) **O braço de escala:** `(p, q) = (6, 4)` com 6 blocos ativos e a
+     grade `2:7`, com o custo medido na E4.3 antes de decidir; o
+     `(10, 5)` do plano antigo não cabe (12 750 colunas em `J = 8`).
+   - (d) **O VCBART:** é bayesiano (soma de árvores por MCMC, média a
+     posteriori), e o autor não sabe se faz sentido compará-lo aos
+     frequentistas. **Fica no estudo por curiosidade; a decisão de usá-lo no
+     artigo vem depois** (2026-10-06).
+   - (e) **O repositório `wafc-studies`:** o autor o cria no GitHub
+     (privado) antes da E4.1.
+
 ---
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-06).** **E6.1c fechada e integrada:** marylebone fica
-como a aplicação principal, com os dados do UK-AIR e do ERA5; o degrau de
-2003 se repete, e o zero no vento cai pela regra de D57. Pendências na
-pergunta 53; **catálogo vazio**. **E3.4 e E5g fechadas e integradas**, e a
-pergunta 52 aplicada (D58). A E6.1c segue no catálogo. **D57: duas
-aplicações** (marylebone e beijing.heat). **E1.9 e E6.1b fechadas e integradas**: a cota
-inferior faz o Theorem 1 ótimo em `π ≥ 2` para todo `q`, e nenhuma base da
-aplicação passa contra o spline sintonizado em blocos (marylebone é a melhor
-estrutura). Pendências nas perguntas 50 e 51; **catálogo vazio**. E5f e L11
-fechadas, e as três edições da pergunta 49 aplicadas (D55). A E6.1b vai em 113 de 120 unidades.
-**E1.15, E5e e L10 fechadas e integradas**, com a pergunta 48 decidida
-(D54). **E1.14 e
-E5d fechadas e integradas**: a
-taxa lenta cobre todo `s' > 0`, e o manuscrito está em `k = 4` (43 páginas
-sem o removido, sem os itens de E1.14 na Proposition 3); pendências nas
-perguntas 46 e 47. **A E6.1b está rodando** (4 processos, 20 partições,
-desde 2026-10-03 à noite): 20 de 120 unidades em ~6 h, com o `beijing.heat`
-a ~2,5 h por partição, o que projeta ~29 h no total. **E2 fechada.** O autor aceitou as
-recomendações das perguntas 33, 38 e 41 (D44 a D46): o WAFC é o block
-LASSO balanceado seguido do limiar `cv1se`, o LASSO fica como opção, o
-alvo continua a *Statistica Sinica*, e o spline de E4 entra com `gam.reml`
-e `gam.gcv`. **E1.12 fechada e integrada.** **E3.1** (a interface) em
-**E3.1 e E3.2 fechadas e integradas**, com a interface ratificada (D48) e
-as assinaturas de `plot` ratificadas (D49); E3.2 (gráficos e documentação) e E3.3 (empacotamento, do
-autor) seguem. **E6.1b** (a aplicação) está pronta e espera a **ordem do autor** para a
-rodada de 4 processos: o script 10 cobre seis bases (as três de E6.1a,
-`beijing.heat`, `marylebone` e `kelmarsh`, as duas últimas baixadas com a
-permissão do autor), a fumaça das seis passou sem falha, e o lançamento
-está em `wafc/cache/e61b/run.sh`. A estimativa é de **~24 h de relógio em 4
-processos** (~96 h de processador, pico de ~18 GB dos 31 GB da máquina),
-com erro possível de um fator 2. **O autor manteve as 20 partições
-(2026-10-03)**, pelo erro-padrão; a rodada continua à espera da ordem. O
-handoff parcial fica em `docs/handoff-E6.1b.md`. O manuscrito está em
-`k = 3`, ainda escrito para o LASSO; a bibliografia sem marca aberta (83
-entradas).
+**Onde parou (2026-10-06).** Tudo commitado. **Catálogo: só a L12** (as
+fontes da aplicação; `TAREFA.md` §3), que pede ao autor os PDFs que não
+abrirem. Nenhum handoff pendente. O manuscrito está em `k = 4` (52 e 90
+páginas com a marcação, 45 e 89 sem o removido), sem as Seções 5 a 7.
 
-**O que D44 a D46 abrem, na ordem sugerida:**
+**O próximo passo é o estudo de simulação (E4)**, na ordem:
 
-- (a) **Teoria em blocos nas derivações numeradas.** Promover a sondagem
-  `08a-sondagem-blocos.md` (§§ 1 a 12) a resultado numerado: o Teorema 1 em
-  blocos com a calibração de Hsu, Kakade & Zhang, o risco ideal por pedaços,
-  a taxa sem logaritmo em `π ≥ 2` e a cobertura dos pesos `sqrt(|G|)` na
-  forma balanceada (`ρ² ≤ 3`). O Corolário 8 passa ao ajuste em blocos, e
-  entra a **cota de risco do estimador limiarizado** (D45). D16 diz que o
-  enunciado principal é o Corolário 5; com D44 ele passa a ser a versão em
-  blocos, o que o autor confirma quando o enunciado existir. Os símbolos de
-  E1.11 (`𝒢`, `G`, `b_n`, `|𝒢|`, `w_G`, `‖θ‖_{𝒢,w}`, `𝒢_0`, `W(𝒢_0)`, `Ψ̃_G`,
-  `R_𝒢(θ; η)`, `λ_n^𝒢`) passam antes pelo `notacao.md`, com aval do autor.
-  **Fechada por E1.12 em 2026-10-03 (§2)**, e a pergunta 42 decidida
-  (D47): o Corolário 11 é o enunciado principal, `ϱ` e `𝒲` aplicados, a
-  lista no `notacao.md` §10. **Falta o Corolário 14** no `08`, a taxa lenta
-  em blocos como corolário do Teorema 3(i) (D47(c)), com a conferência da
-  ordem. **Fechado por E1.13 em 2026-10-03 (§2)**, com pendências
-  decididas em D49.
-- (b) **O parágrafo de posicionamento de D18** (`alvo-revista.md` §4),
-  reescrito para a penalidade em blocos, com a frase-tese e as
-  contribuições. **Aprovado em 2026-10-03 (D50)** e gravado no
-  `alvo-revista.md` §4, com as respostas ao referee revistas; entra no
-  `ms` na `k = 4`.
-- (c) **E3, a consolidação do código:** o block LASSO balanceado sai de
-  `wafc_fit_klopp()` (concorrente) para dentro de `wafc()` e `cv.wafc()`
-  como penalidade padrão, com o limiar `cv1se` na interface; o LASSO como
-  `penalty = "lasso"`; nada removido (D43). E3.3 (empacotamento) é decisão
-  do autor. **E3.1 catalogada em 2026-10-03.**
-- (d) **Catalogado como E5d em 2026-10-03**, com D51. **O manuscrito em `k = 4`** (D44): a teoria em blocos no `ms` e no
-  `supp` (~5 páginas), o posicionamento de (b), a §3.6 com o limiar em
-  blocos e a §4 com a interface de (c). Abre depois de (a) e (b).
-- (e) **E4 e E6 em paralelo**, depois de E3.1: o compêndio `wafc-studies`
-  com os métodos de D46; e a aplicação, que depende da **pergunta 2**,
-  ainda aberta e a maior lacuna para o formato da revista. **E6.1b
-  catalogada em 2026-10-03** para dar à pergunta 2 os números do critério
-  novo.
+1. **O autor decide o desenho** (pergunta 54): réplicas, braços, escala; o
+   VCBART fica por curiosidade, com a decisão de usá-lo depois.
+2. **O autor cria o repositório `wafc-studies`** (privado) no GitHub.
+3. **E4.1**, o nascimento do compêndio nos moldes do `wall` (`R/`,
+   `scripts/`, `config/*.yaml`, `renv`, o código de `wafc/` fixado pelo hash
+   do commit do `wafc-draft`, `PROVENANCE.md`, `INSTRUCTIONS.md`,
+   `CLAUDE.md`), e, em paralelo, **a opção de `X` dependente de `U` no
+   `dgp.R`** (se o braço for aceito).
+4. **E4.3**, o piloto reduzido: os tempos em `n = 2000` e nos braços, e o
+   custo do braço de escala. A grade de `J` (D34), as 10 dobras e a tabela
+   da base (D31) já estão fixadas pela E2.5.
+5. **E4.4**, a produção, com a rodada longa esperando o aviso do autor.
 
-**Medições opcionais** (não catalogadas; uma rodada por vez): `n = 2000`
-no não homogêneo e na `mixed`, que diz se a vantagem que cresce com `n`
-continua e se o `gam.gcv` fica para trás; `boundary = "interval"`, que pede
-antes a reparametrização do bloco de escala (`01-identificabilidade.md`
-§5) e é a única alavanca que sobra no fator do suave; um meio-termo entre o
-`cv1se` e o `+cv` (meio erro-padrão); o `gam.k128` na `mixed` com 50
-réplicas (36(b)); a guarda de `edf` no `gam` (36(c)).
+**Em paralelo ao E4:**
 
-**Sem bloquear:** 12 (cenário `smooth`), 13 (nome da (BD)), 20 (cota
-inferior, o risco assumido com D18; com os blocos, a taxa atinge a cota de
-K&P em `q = 1` e `X ⊥ U`), 21 (`p` crescente); 32(d), o Lema 10 no `supp`.
+- **E6.2**, a aplicação: marylebone (`marylebone.ukair`) e beijing.heat com
+  uma partição cada, contra os dois splines de D46, com as leituras de D59
+  (o degrau e o ciclo anual; o vento numa frase; a borda da data cortada na
+  figura; os ressaltos de 2002 e 2003 descritos sem interpretação até a
+  L12 ler Carslaw 2005). A primeira no corpo, a segunda com tabela e figura
+  no supp (D57).
+- **E3.3**, o empacotamento (decisão do autor: pacote próprio, dentro do
+  `WaveBased`, ou o código em `wafc/`), que pesa na E7 (DOI do software).
 
-**Depois:** E5b (Seções 5 a 7, com a tabela da §4.3, 32(g), e o endereço
-de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
-27(b) e (c) do checklist).
+**Depois:** E5b (Seções 5 a 7 com os números de E4 e E6, a tabela da §4.3
+(32(g)) e o endereço de reprodutibilidade (32(f))); a decisão do teto de
+páginas (D21), sabendo que o corpo já tem 45 páginas sem as Seções 5 a 7 e
+que a §3 tem 19 (pergunta 47(e)); E7 (submissão, com os itens 27(b) e (c)
+do checklist).
+
+**Medições opcionais** (não catalogadas): `boundary = "interval"`, que pede
+a reparametrização do bloco de escala (`01-identificabilidade.md` §5;
+pergunta 6) e só se um referee pedir (D59); um meio-termo entre o `cv1se` e
+o `+cv`.
+
+**Sem bloquear:** 12 (o cenário `smooth`), 13 (o nome da (BD)), 21 (`p`
+crescente), 32(d) (o Lema 10 no supp), 36(b) e (c) (sem objeto depois de
+D46).
 
 ## 6. Histórico de sessões
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | Proposta de desenho da E4.2 registrada (pergunta 54, `plano-projeto.md` E4.2); o VCBART fica por curiosidade, com a decisão depois; cabeçalho e §5 reescritos para um orquestrador novo começar de um quadro limpo |
 | 2026-10-06 | Pergunta 53 decidida (D59): o vento numa frase, a borda da data cortada na figura, os ressaltos descritos sem interpretação; L12 catalogada |
 | 2026-10-06 | E6.1c fechada e integrada (5 h 27 min em 3 processos): marylebone com UK-AIR e ERA5, o degrau de 2003 em 20 de 20 partições, o `+cv` empatado com os splines de D46, o zero no vento derrubado pelo `+cv`; marylebone fica como principal; pergunta 53 |
 | 2026-10-05 | Pergunta 52 aplicada (D58): interface de E3.4 ratificada; a cota inferior no resumo e na primeira contribuição da `k = 4`; a condição de Cai no supp |
