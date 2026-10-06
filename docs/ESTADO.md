@@ -2084,6 +2084,73 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: L12 fechada, as fontes da aplicação lidas no PDF
+
+- **O que entrou:** `referencias-verificadas.bib` de 88 a **97 entradas**,
+  com duas seções novas: "Aplicação" (`Carslaw-2005`,
+  `Carslaw-Beevers-2005`, `Clapp-Jenkin-2001`, `Hersbach-2020`,
+  `Nadeau-Bengio-2003`, todos lidos no PDF, com a localização no
+  comentário) e "Dados da aplicação" (`Hersbach-ERA5-2023`,
+  `Zippenfenig-OpenMeteo-2024`, `Defra-UKAIR-2026`, `Defra-2005`);
+  compilado com `natbib` e `chicago.bst` sem aviso. O `chicago.bst` não
+  imprime o `doi` de `@misc`, então o DOI do ERA5 e o do Open-Meteo vão
+  também no `howpublished`. No `literatura.md`, oito linhas passam a
+  verificadas; seguem `[VERIFICAR]`, fora do escopo, Liang et al. (2015),
+  Carslaw & Ropkins (2012), Lee et al. (2015), Plumley (2022) e Opsomer,
+  Wang & Yang (2001). O relatório da Defra foi baixado para
+  `refs/defra2005.pdf`.
+- **O "de ~5–6% a ~17%" é a média dos 36 sítios de Londres**, não
+  Marylebone Road. Em Marylebone Road, Carslaw (2005, §3.1 e §3.2,
+  Fig. 3(a)) dá ~10 vol% estável de 1997 a 2002 (média de 9,5 em
+  1998–2002) e uma subida sustentada durante 2002 e 2003, até **~23 vol%
+  no fim de 2003**, "not gradual". **O degrau do WAFC (9,65 pontos depois;
+  ~12 no pico de outubro de 2003) se compara a esse, de ~13 pontos.** Na
+  posição, o WAFC marca 0,25 da subida em janeiro e 0,90 em julho de 2003;
+  a figura de Carslaw dá ~0,3 e ~0,8 (leitura de figura). A causa que ele
+  dá: os filtros CDPF dos ônibus (33% da frota em dezembro de 2001, 79% em
+  março de 2004) e o fluxo de ônibus antes do pedágio urbano, com a
+  ressalva de que os ônibus não explicam toda a subida.
+- **O mergulho do começo de 2002 está nos dados de Carslaw** (Fig. 3(a):
+  ~7 vol% em dezembro de 2001 e janeiro de 2002, ~2,5 pontos abaixo, o
+  mesmo −0,19 da tabela da E6.1c), sem comentário no texto. **O pico do fim
+  de 2003 e a volta em 2004–2005 ficam depois do fim da série dele**
+  (dezembro de 2003, ainda subindo), sem fonte; 2003 teve oxidante de
+  fundo 3 a 4 ppb acima, e Clapp & Jenkin (2001, pp. 6394–6395) mostram que
+  episódios de ozônio movem o intercepto e não a inclinação.
+- **A inclinação de `OX` contra NOx é a contribuição local ao oxidante**
+  (Clapp & Jenkin 2001, §2.3: a reação `2NO + O2` e o HONO também contam,
+  e à noite ela é 2 a 3 pontos menor), que Carslaw & Beevers (2005,
+  §2.4) usam como estimativa direta da fração primária (9,1 ± 0,4 vol% em
+  Marylebone Road em 2000–2002, contra 9,5 do método químico). O texto do
+  artigo diz "estimativa", não "a fração por definição".
+- **Nadeau & Bengio (2003):** a correção do script 10 confere com o
+  "corrected resampled t" (Tabela 1, p. 251), aproximação que os autores
+  chamam de "gross". **Hersbach et al. (2020):** 31 km, horário, grade de
+  0,25° no CDS; um salto de ~0,25 m/s no vento a 10 m entre janelas de
+  assimilação (§10.2).
+- **Frases de atribuição** (UK-AIR pela OGL, ERA5 pela CC-BY do
+  Copernicus, Open-Meteo pela CC BY 4.0) guardadas para a E5b:
+
+```text
+© Crown 2026 copyright Defra via uk-air.defra.gov.uk, licenced under the
+Open Government Licence (OGL).
+
+Generated using or contains modified Copernicus Climate Change Service
+information 2026. Neither the European Commission nor ECMWF is responsible
+for any use that may be made of the Copernicus information or data it
+contains.
+
+Hourly ERA5 wind data were retrieved through the Open-Meteo historical
+weather API (Zippenfenig, 2024; https://open-meteo.com/), licensed under
+CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/); the
+instantaneous values were linearly interpolated to the middle of each hour.
+```
+
+- **Lição:** a primeira página de um artigo resume a média de uma rede; o
+  número de um sítio está no texto e na figura do sítio, e só a leitura do
+  PDF o separa.
+- Pendências na pergunta 57.
+
 ### 2026-10-06: E4.1 fechada, o compêndio nasce na pasta `wafc-studies/`
 
 - **O que existe:** `README.md`, `INSTRUCTIONS.md`, `CLAUDE.md`,
@@ -3926,6 +3993,25 @@ Ordenadas pelo que bloqueia mais.
      reproduzindo os sorteios, e o compêndio repassando-os), a catalogar se
      aceitas; a E4.3 espera por ela.
 
+57. **Pendências de L12** (2026-10-06). Recomendação do chat principal:
+   - (a) **A frase de D59 sobre os ressaltos:** o artigo descreve os dois
+     numa frase, dizendo que o mergulho do começo de 2002 aparece também
+     nas estimativas mensais de Carslaw (2005, Fig. 3(a)) e que a série
+     dele termina antes do pico do fim de 2003, sem interpretar nenhum dos
+     dois. **Recomendação:** aceitar; fecha a ressalva "até a L12 ler
+     Carslaw" de D59.
+   - (b) **O número de comparação do degrau:** Marylebone Road (~10 a ~23
+     vol%), não a média de Londres; e a inclinação como estimativa da
+     fração primária, com a qualificação de Clapp & Jenkin. **Recomendação:**
+     aceitar; vale para a E6.2, a E5b e o comentário do script 10 (linhas
+     400–405), corrigido pela próxima tarefa que tocar o script; o
+     `aplicacao-candidatas.md` ganhou nota nas duas linhas.
+   - (c) **A forma do ERA5:** uma entrada só, a de 15 autores (2023), que o
+     CDS dá para os dados, com o mesmo título e DOI da entrada do catálogo.
+     **Recomendação:** manter.
+   - (d) **O ano do Open-Meteo:** 2024, o do registro no DataCite, como no
+     `Wood-mgcv-2025`. **Recomendação:** manter.
+
 ---
 
 ## 5. Próximos passos
@@ -3934,8 +4020,9 @@ Ordenadas pelo que bloqueia mais.
 `wafc-studies/` criada; E3.3 decidida (D61); **E4.1b fechada e
 integrada** (`x_u_rho`, pergunta 55, D62). **E4.1 fechada e integrada**
 (o compêndio na pasta, décima junção exata; pergunta 56, D63). **Catálogo:
-L12** (em andamento) **e E4.1c** (o oráculo em blocos e o `structure`;
-`TAREFA.md` §3), sem arquivo em comum. A E4.3 espera a E4.1c. **Catálogo: só a L12** (as
+E4.1c** (o oráculo em blocos e o `structure`; `TAREFA.md` §3). A E4.3
+espera a E4.1c. **L12 fechada e integrada** (97 entradas; o degrau de
+Marylebone Road é de ~10 a ~23 vol%, não a média de Londres; pergunta 57). **Catálogo: só a L12** (as
 fontes da aplicação; `TAREFA.md` §3), que pede ao autor os PDFs que não
 abrirem. Nenhum handoff pendente. O manuscrito está em `k = 4` (52 e 90
 páginas com a marcação, 45 e 89 sem o removido), sem as Seções 5 a 7.
@@ -3986,6 +4073,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | L12 fechada e integrada (97 entradas no verificado, cinco artigos lidos no PDF): o "~5–6% a ~17%" é a média de Londres, e Marylebone Road vai de ~10 a ~23 vol%; o mergulho de 2002 está em Carslaw, o pico de 2003 fica depois da série dele; pergunta 57 |
 | 2026-10-06 | Pergunta 56 decidida (D63): o oráculo em blocos, `snr` 1 contra 3, a escala por `structure`, as duas linhas do lasso, `GPL (>= 3)`; E4.1c catalogada |
 | 2026-10-06 | E4.1 fechada e integrada: o compêndio na pasta `wafc-studies/` (fumaça de 164 unidades sem falha; décima junção exata, com as 3 linhas do nulo em `n = 250` explicadas pela E3.4); sementes do estudo independentes do piloto; pergunta 56 |
 | 2026-10-06 | Pergunta 55 decidida (D62): o salto da variância no uniforme fica; a limitação de `X` numa frase da Seção 5 |

@@ -7,6 +7,15 @@
 % redigitar; nelas só se acrescentou a linha `doi`, conferida no Crossref.
 % Nada daqui leva mais a nota "[L1: confirmar]".
 %
+% Oitava rodada (L12, 2026-10-06): as fontes da aplicação marylebone. Numa
+% seção nova antes do software, os cinco artigos (Carslaw 2005; Carslaw &
+% Beevers 2005; Clapp & Jenkin 2001; Hersbach et al. 2020; Nadeau &
+% Bengio 2003), todos lidos no PDF (refs/), com as localizações que a
+% aplicação usa no comentário de cada um. Numa seção nova no fim, os
+% dados: o conjunto ERA5 do CDS, o Open-Meteo, as séries do UK-AIR e o
+% relatório de conversão da Defra, este baixado para refs/defra2005.pdf.
+% Os dados ficam fora do docs/literatura.md, como o software (D25).
+%
 % Sétima rodada (L11, 2026-10-05): entrou Simon & Tibshirani (2012), o
 % group lasso padronizado, na seção do LASSO, logo depois de Yuan & Lin
 % (2006): é a referência da escala ‖Q_G^{1/2}θ_G‖_2 da Remark S5.2 do
@@ -1228,6 +1237,119 @@
 }
 
 % ---------------------------------------------------------------------
+% Aplicação: a fração primária de NO2 em Marylebone Road (L12)
+% ---------------------------------------------------------------------
+
+% L12 (2026-10-06), lido no PDF (refs/carslaw2005a.pdf, a versão "article
+% in press" já paginada). O Crossref confere 39(26), 4793--4802, DOI e
+% `published-print` 2005-08; grafa o título sem os subscritos ("NO/NO")
+% e o autor como "D CARSLAW"; o nome é o da linha de autoria ("David C.
+% Carslaw", D39). Localizações: a média dos 36 sítios de Londres sobe de
+% ~5--6 vol% (1997) a ~17 vol% no fim de 2003 (resumo, p. 4793; §3.1,
+% p. 4795; Fig. 3(d), p. 4797); em Marylebone Road a fração fica em ~10
+% vol% de 1997 a 2002 e sobe durante 2002 e 2003 até ~23 vol% no fim de
+% 2003 (§3.1, p. 4795; Fig. 3(a), p. 4797), com média de 9,5 vol% em
+% 1998--2002 (§3.2, p. 4797); os filtros CDPF dos ônibus (33% da frota em
+% dezembro de 2001, 79% em março de 2004) e a parcela dos ônibus no NOx
+% da via (Tabela 4, p. 4801) como causa importante mas não única (§3.3 e
+% §3.4, pp. 4800--4802); o oxidante rural de 2003, 3 a 4 ppb acima dos
+% outros anos (Tabela 3 e texto, p. 4799). A série termina em dezembro de
+% 2003.
+@article{Carslaw-2005,
+  author  = {Carslaw, David C.},
+  title   = {Evidence of an increasing {NO$_2$}/{NO$_X$} emissions ratio from road traffic emissions},
+  journal = {Atmospheric Environment},
+  year    = {2005},
+  volume  = {39},
+  number  = {26},
+  pages   = {4793--4802},
+  doi     = {10.1016/j.atmosenv.2005.06.023}
+}
+
+% L12 (2026-10-06), lido no PDF (refs/carslaw2005b.pdf). O Crossref
+% confere 39(1), 167--177, DOI e `published-print` 2005-01, com o título
+% sem o subscrito e os autores em maiúsculas com a inicial; os nomes são os
+% da linha de autoria (D39). O que a aplicação usa: a inclinação do
+% oxidante NO2 + O3 contra o NOx como estimativa direta da fração primária
+% local, "consistent with the approach of Clapp and Jenkin (2001)" (§2.4,
+% pp. 173--174); em Marylebone Road, 9,1 a 10,0 vol% em 1998--2002 com
+% quatro sítios de fundo (Tabela 1, p. 172) e 9,1 ± 0,4 vol% pelo oxidante
+% em 2000--2002 (Tabela 2, p. 174).
+@article{Carslaw-Beevers-2005,
+  author  = {Carslaw, David C. and Beevers, Sean D.},
+  title   = {Estimations of road vehicle primary {NO$_2$} exhaust emission fractions using monitoring data in {L}ondon},
+  journal = {Atmospheric Environment},
+  year    = {2005},
+  volume  = {39},
+  number  = {1},
+  pages   = {167--177},
+  doi     = {10.1016/j.atmosenv.2004.08.053}
+}
+
+% L12 (2026-10-06), lido no PDF (refs/clapp2001.pdf). O Crossref confere
+% título, 35(36), 6391--6405, DOI e `published-print` 2001-12, mas só lista
+% "L Clapp"; o segundo autor, Michael E. Jenkin, está na linha de autoria
+% do PDF (D39) e na lista de referências de Carslaw & Beevers (2005). O que
+% a aplicação usa: OX = O3 + NO2 cresce linearmente com o NOx (§2.3,
+% pp. 6393--6395, Fig. 2b), com uma parte independente do NOx, regional,
+% igual ao O3 de fundo e com máximo na primavera (Fig. 4a, p. 6396), e
+% uma parte local proporcional ao NOx, ~10% dele e quase sem sazonalidade
+% (Fig. 4b; p. 6395). A parte local não é só a emissão direta de NO2: a
+% reação térmica do NO com O2 e a emissão de HONO também contribuem
+% (p. 6395; §2.4, p. 6397), e à noite ela é 2 a 3 pontos menor (p. 6397).
+% Marylebone Road é um dos seis sítios (Tabela 1, p. 6393).
+@article{Clapp-Jenkin-2001,
+  author  = {Clapp, Lynette J. and Jenkin, Michael E.},
+  title   = {Analysis of the relationship between ambient levels of {O$_3$}, {NO$_2$} and {NO} as a function of {NO$_x$} in the {UK}},
+  journal = {Atmospheric Environment},
+  year    = {2001},
+  volume  = {35},
+  number  = {36},
+  pages   = {6391--6405},
+  doi     = {10.1016/S1352-2310(01)00378-8}
+}
+
+% L12 (2026-10-06), lido no PDF da editora (refs/hersbach2020.pdf). O
+% Crossref confere título, 146(730), 1999--2049, DOI, 43 autores e
+% `published-print` 2020-07 (on-line 2020-06-15). Nomes como na linha de
+% autoria do PDF (D39), que grafa "Muñoz-Sabater" com hífen. Localizações:
+% a resolução horizontal de 31 km e a saída horária (resumo, p. 1999); a
+% grade regular de 0,25° em que o CDS distribui o produto determinístico
+% (§3, p. 2008); um salto sistemático de ~0,25 m/s no vento a 10 m entre
+% janelas de assimilação, visto sobre Paris às 10 UTC (§10.2, p. 2038).
+% Artigo em acesso aberto sob CC BY.
+@article{Hersbach-2020,
+  author  = {Hersbach, Hans and Bell, Bill and Berrisford, Paul and Hirahara, Shoji and Hor{\'a}nyi, Andr{\'a}s and Mu{\~n}oz-Sabater, Joaqu{\'\i}n and Nicolas, Julien and Peubey, Carole and Radu, Raluca and Schepers, Dinand and Simmons, Adrian and Soci, Cornel and Abdalla, Saleh and Abellan, Xavier and Balsamo, Gianpaolo and Bechtold, Peter and Biavati, Gionata and Bidlot, Jean and Bonavita, Massimo and De Chiara, Giovanna and Dahlgren, Per and Dee, Dick and Diamantakis, Michail and Dragani, Rossana and Flemming, Johannes and Forbes, Richard and Fuentes, Manuel and Geer, Alan and Haimberger, Leo and Healy, Sean and Hogan, Robin J. and H{\'o}lm, El{\'\i}as and Janiskov{\'a}, Marta and Keeley, Sarah and Laloyaux, Patrick and Lopez, Philippe and Lupu, Cristina and Radnoti, Gabor and de Rosnay, Patricia and Rozum, Iryna and Vamborg, Freja and Villaume, Sebastien and Th{\'e}paut, Jean-No{\"e}l},
+  title   = {The {ERA5} global reanalysis},
+  journal = {Quarterly Journal of the Royal Meteorological Society},
+  year    = {2020},
+  volume  = {146},
+  number  = {730},
+  pages   = {1999--2049},
+  doi     = {10.1002/qj.3803}
+}
+
+% L12 (2026-10-06), lido no PDF (refs/nadeau2003.pdf). O Crossref confere
+% 52(3), 239--281, DOI e `published-print` 2003-09; nomes como na folha de
+% rosto ("Claude Nadeau", "Yoshua Bengio"). O erro-padrão corrigido do
+% script 10 é o do "corrected resampled t" (Tabela 1, p. 251; item 6 do §4,
+% p. 254): a variância amostral das J estimativas multiplicada por
+% (1/J + n_2/n_1), com n_1 o treino e n_2 o teste, no lugar de 1/J. Os
+% autores chamam a aproximação de "gross" e a justificam supondo a
+% correlação entre as J estimativas igual a n_2/(n_1 + n_2), com divisões
+% aleatórias das observações.
+@article{Nadeau-Bengio-2003,
+  author  = {Nadeau, Claude and Bengio, Yoshua},
+  title   = {Inference for the generalization error},
+  journal = {Machine Learning},
+  year    = {2003},
+  volume  = {52},
+  number  = {3},
+  pages   = {239--281},
+  doi     = {10.1023/A:1024068626366}
+}
+
+% ---------------------------------------------------------------------
 % Software (entraram em L4; não vão ao docs/literatura.md)
 % ---------------------------------------------------------------------
 
@@ -1481,4 +1603,78 @@
   number  = {519},
   pages   = {1199--1210},
   doi     = {10.1080/01621459.2016.1195744}
+}
+
+% ---------------------------------------------------------------------
+% Dados da aplicação (L12; não vão ao docs/literatura.md, como o software)
+% ---------------------------------------------------------------------
+
+% L12 (2026-10-06). O conjunto do ERA5 de onde vem o vento horário a 10 m
+% da base `marylebone.ukair`. A forma é a que o Climate Data Store pede no
+% botão "Citation and attribution" da página do conjunto (lido no layout do
+% catálogo do CDS em 2026-10-06), "Citing the data": quinze autores, ano
+% 2023, o DOI. O DataCite registra o mesmo DOI com criador "C3S",
+% editora "Copernicus Climate Change Service (C3S) Climate Data Store
+% (CDS)" e ano 2018 (o do primeiro registro); o CDS também manda citar a
+% entrada do catálogo, "Copernicus Climate Change Service, Climate Data
+% Store, (2023)", com o mesmo título e DOI, que esta entrada cobre. O
+% Open-Meteo cita a mesma forma. Licença CC-BY 4.0 (`license` do catálogo).
+% Nomes como o CDS os imprime (D39): "Muñoz Sabater" sem hífen, ao
+% contrário do artigo de 2020. O `howpublished` leva a data de acesso que o
+% CDS pede, a do download (2026-10-05), e o DOI, que o chicago.bst não
+% imprime num `misc` pelo campo `doi`.
+@misc{Hersbach-ERA5-2023,
+  author       = {Hersbach, H. and Bell, B. and Berrisford, P. and Biavati, G. and Hor{\'a}nyi, A. and Mu{\~n}oz Sabater, J. and Nicolas, J. and Peubey, C. and Radu, R. and Rozum, I. and Schepers, D. and Simmons, A. and Soci, C. and Dee, D. and Th{\'e}paut, J.-N.},
+  title        = {{ERA5} hourly data on single levels from 1940 to present},
+  year         = {2023},
+  howpublished = {Copernicus Climate Change Service (C3S) Climate Data Store (CDS), \url{https://doi.org/10.24381/cds.adbb2d47}, accessed 5 October 2026},
+  doi          = {10.24381/cds.adbb2d47},
+  url          = {https://doi.org/10.24381/cds.adbb2d47}
+}
+
+% L12 (2026-10-06). O serviço pelo qual o ERA5 foi baixado (a API
+% histórica, `archive-api.open-meteo.com`, com `models=era5`). O DataCite
+% registra o DOI conceitual 10.5281/zenodo.7970649 com autor "Zippenfenig,
+% Patrick", editora Zenodo, ano 2024, versão 1.4.0, tipo Software e
+% licença CC BY 4.0; a página de licença do Open-Meteo sugere a mesma
+% referência com o ano 2023. Fica o ano do registro (como L8 fez com o
+% `mgcv`), e a diferença vai ao handoff de L12. Tipo `misc` pela razão da
+% entrada do `WaveBased`.
+@misc{Zippenfenig-OpenMeteo-2024,
+  author       = {Zippenfenig, Patrick},
+  title        = {{Open-Meteo.com} {W}eather {API}},
+  year         = {2024},
+  howpublished = {Zenodo, version 1.4.0, \url{https://doi.org/10.5281/zenodo.7970649}},
+  doi          = {10.5281/zenodo.7970649},
+  url          = {https://doi.org/10.5281/zenodo.7970649}
+}
+
+% L12 (2026-10-06). Os poluentes da base `marylebone.ukair`: os arquivos
+% anuais MY1_1998 a MY1_2005 da rede AURN, servidos em
+% https://uk-air.defra.gov.uk/openair/R_data/ e baixados em 2026-10-05 (as
+% somas SHA-256 em docs/aplicacao-candidatas.md §17.1). Sem DOI e sem forma
+% de citação publicada; a página de dados (https://uk-air.defra.gov.uk/data/,
+% lida em 2026-10-06) pede só a frase de atribuição da OGL, que vai aos
+% agradecimentos. A página aponta a OGL v2 e o rodapé do site, a v3.
+@misc{Defra-UKAIR-2026,
+  author       = {{Department for Environment, Food and Rural Affairs}},
+  title        = {Hourly measurements at {M}arylebone {R}oad ({MY1}), {A}utomatic {U}rban and {R}ural {N}etwork, 1998--2005},
+  year         = {2026},
+  howpublished = {UK-AIR, \url{https://uk-air.defra.gov.uk}, accessed 5 October 2026, Open Government Licence},
+  url          = {https://uk-air.defra.gov.uk/data/}
+}
+
+% L12 (2026-10-06), baixado e lido (refs/defra2005.pdf, uma página, 71 478
+% B, SHA-256 cc452628a3a3f1e1e4221f3545d362e3b1709f217f06b39197e430460ab7cca8).
+% Sem autor nem data no PDF; a ficha da biblioteca do UK-AIR
+% (https://uk-air.defra.gov.uk/library/reports?report_id=306) dá "Report
+% Date: 01/02/2005", sem autor, na categoria "Local Authority Guidance". Os
+% fatores que a base usa, a 20 °C e 1013 mb: 1 ppb de NO2 = 1,9125 µg/m³,
+% 1 ppb de O3 = 1,9957 µg/m³, e o NOx em µg/m³ expresso como NO2.
+@misc{Defra-2005,
+  author       = {{Department for Environment, Food and Rural Affairs}},
+  title        = {Conversion factors between ppb and {$\mu$g m$^{-3}$} and ppm and {mg m$^{-3}$}},
+  year         = {2005},
+  howpublished = {UK-AIR report 0502160851, \url{https://uk-air.defra.gov.uk/library/reports?report_id=306}},
+  url          = {https://uk-air.defra.gov.uk/assets/documents/reports/cat06/0502160851_Conversion_Factors_Between_ppb_and.pdf}
 }

@@ -630,7 +630,7 @@ duas ou mais moduladoras. Três passaram e foram sondadas.
 | base | dado e licença | o salto documentado | mapeamento |
 |---|---|---|---|
 | `beijing.heat` | o Dongsi da §2.B, CC BY 4.0, DOI 10.24432/C5RK5G; mesmo arquivo, sem download | a temporada de aquecimento de Pequim, de 15 de novembro a 15 de março (Liang et al. 2015, Proc. R. Soc. A 471: 20150257) | `Y = log PM2.5`; `X = (1, vento, temp, pressão − 1000)`; `U = (dia do ano, umidade relativa)`. O dia do ano é periódico, como a base |
-| `marylebone` | `mydata` do `openair` 3.1.0 (Carslaw & Ropkins 2012): 65 533 horas, de 1998-01-01 a 2005-06-23, 60 780 completas | a fração primária NO2/NOx do tráfego de Londres subiu de ~5–6% (1997) a ~17% (2003), mudança ligada aos filtros dos ônibus (Carslaw 2005) | `Y = NO2 + O3` (o oxidante); `X = (1, NOx/100)`; `U = (data em dias, velocidade do vento)`. É a relação de Clapp & Jenkin (2001): `β_NOx(u)` é a fração primária |
+| `marylebone` | `mydata` do `openair` 3.1.0 (Carslaw & Ropkins 2012): 65 533 horas, de 1998-01-01 a 2005-06-23, 60 780 completas | a fração primária NO2/NOx do tráfego de Londres subiu de ~5–6% (1997) a ~17% (2003), mudança ligada aos filtros dos ônibus (Carslaw 2005); em Marylebone Road, de ~10 a ~23 vol% (nota da L12) | `Y = NO2 + O3` (o oxidante); `X = (1, NOx/100)`; `U = (data em dias, velocidade do vento)`. É a relação de Clapp & Jenkin (2001): `β_NOx(u)` é a fração primária |
 | `kelmarsh` | SCADA de 10 min de 2017 da turbina 1 (Senvion MM92, 2 050 kW); Plumley (2022), Zenodo 10.5281/zenodo.5841834, CC BY 4.0; 51 185 intervalos sem parada nem corte, de 52 560 | a velocidade nominal da curva de potência: a densidade do ar aumenta a potência só abaixo dela (normalização da IEC 61400-12-1; Lee, Ding, Genton & Xie 2015, JASA) | `Y = potência (MW)`; `X = (1, temperatura/10)`; `U = (velocidade, direção do vento)`. `β_temp(u)` deve ser negativo abaixo da nominal e voltar ao nível de fora da faixa acima dela |
 
 Detalhes de cada base:
@@ -809,7 +809,10 @@ aditividade num campo espacial continua, e a licença também.
   - os 10% da subida caem entre março e outubro de 2002 e os 90%, entre
     julho e setembro de 2003, em toda partição.
 - São ~10 pontos percentuais de fração primária no período que Carslaw
-  (2005) dá para a passagem de ~5–6% a ~17%.
+  (2005) dá para a passagem de ~5–6% a ~17%. **Nota da L12 (2026-10-06):**
+  esse é o número da média dos 36 sítios de Londres; em Marylebone Road,
+  Carslaw (2005, §3.1, Fig. 3(a)) dá ~10 vol% até 2002 e ~23 vol% no fim
+  de 2003, e é a esse, de ~13 pontos, que o degrau se compara.
 - `g[one, data]` é o ciclo anual do oxidante de fundo, sete ciclos.
 - O `+cv1se` diz, em 20 de 20 partições, que a fração primária não depende
   da velocidade do vento, e zera o vento no fundo em 8 de 20. O spline mantém

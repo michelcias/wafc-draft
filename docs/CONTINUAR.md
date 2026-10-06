@@ -137,8 +137,8 @@ Rscript run_all.R                                                               
 
 - **Fechado:** E0, E1 (E1.2 a E1.15, E1.9 no nível da taxa), E2 inteira
   (E2.1 a E2.5j; o rumo em D44 a D46), E3.1 a E3.4, E5a, E5c, E5d a E5g, as
-  sondagens E6.1a a E6.1c, e as rodadas de bibliografia L1 a L11; no
-  catálogo, a L12 (as fontes da aplicação). Decisões
+  sondagens E6.1a a E6.1c, e as rodadas de bibliografia L1 a L12; no
+  catálogo, a E4.1c (o oráculo em blocos e o `structure`). Decisões
   D1 a D62 na tabela do `ESTADO.md` §2; E4.1 e E4.1b fechadas, o compêndio na pasta `wafc-studies/` (D60).
 - **O método (D44, D45):** o block LASSO na forma balanceada, com os níveis
   livres e os pesos do `grpreg`, seguido do limiar `cv1se`; o LASSO
