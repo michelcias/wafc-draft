@@ -2084,6 +2084,74 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: E4.1 fechada, o compêndio nasce na pasta `wafc-studies/`
+
+- **O que existe:** `README.md`, `INSTRUCTIONS.md`, `CLAUDE.md`,
+  `PROVENANCE.md` (`wafc/R` em `9b11273`, `WaveBased` `e494b0e` = 2.6-0,
+  R 4.6.1), `DESCRIPTION` (`Type: Compendium`, `GPL (>= 3)`), `renv.lock`
+  (19 pacotes; o `WaveBased` do GitHub em `e494b0e`; o `mgcv` apontado
+  para CRAN), `run_all.R`, `config/` (`study.yaml`, `core.yaml`,
+  `arms.yaml`, `scale.yaml`), `R/` (`config`, `seeds`, `data`, `methods`,
+  `metrics`, `run`, `aggregate`, `cli`) e `scripts/` (`00_setup`,
+  `01_simulate`, `02_aggregate`). Em inglês, sem D-números nem documentos de
+  trabalho. Fora da pasta e não versionado: `wafc/cache/e41/` (o
+  `check-junction.R`, o `smoke-arms.yaml`, saídas e logs).
+- **Como funciona:** o método é lido de `../wafc/R/load.R` (`code:` no
+  `study.yaml`), e `code: package:WaveBased` já é aceito para a extração
+  (D61), troca de uma linha. A unidade é um método numa réplica, com cache
+  atômico, parâmetros gravados e parada com nome quando a configuração
+  muda (`--refresh` refaz); cada unidade grava o commit e a árvore do
+  código lido. Linha de comando: `--config`, `--study`, `--out`,
+  `--workers`, `--cells`, `--sizes`, `--methods`, `--reps`, `--refresh`,
+  `--list`. As grades por `n` ficam numa âncora `tuning`, e a regra de
+  D60(e) é uma entrada `"2000"` (exemplo comentado no `study.yaml`).
+- **Sementes:** mestre **`20261006`**, codificação injetiva por chave,
+  `n`, réplica e fluxo (dados, teste, dobras), sem colisão possível; **os
+  sorteios do estudo são independentes dos do piloto**, então o estudo não
+  avalia o método nos dados em que ele foi escolhido. Um braço usa a chave
+  da célula do núcleo que varia: a réplica `r` do braço é a do núcleo em
+  `n = 1000` com um fator mudado.
+- **Linhas:** `wafc.cv1se` e `wafc.cv` de uma busca só; `lasso` e
+  `lasso.cv1se`; `gam.reml`, `gam.gcv` (com `k.check()`), `bsgl`,
+  `aspline`, `klopp`, `oracle`, `linear`, `vcbart`. Métricas da E4.2
+  (`rmse_f`, `rmse_y`, `mse_beta`, ISE total, ativo e nulo, falsos
+  positivos e negativos, o `J` ou `k` e o `top`, o tempo com a busca, o
+  `k.check`); a agregação dá `summary.csv`, `paired.csv` (razões ao
+  `wafc.cv1se` na réplica), `slopes.csv` e `missing.csv`.
+- **Fumaça:** o núcleo em `n = 250`, 2 réplicas, todas as células e
+  métodos: 98 unidades, **0 falhas**, 4 min 35 s em 8 núcleos, 0,65 GB por
+  processo; braços (com `x_u_rho`) e escala em `n = 250`, 1 réplica: 66
+  unidades, 0 falhas, 5 min 40 s, 1,04 GB. Em `n = 250`, ~200 s de CPU por
+  réplica de célula, quase tudo `gam.gcv`; na escala em `n = 250`, o
+  `gam.reml` já custa 224 s. Retomada, proteção contra unidade obsoleta e
+  determinismo (16 linhas refeitas em outro processo, VCBART incluído)
+  conferidos.
+- **Décima junção exata, com a regra de sementes do `04-pilot.R`
+  injetada:** 171 linhas contra o `e25j-joined.rds`, **JUNCTION OK**:
+  `gam.reml` 48 de 48, `wafc.cv1se` 43 de 43 e `wafc.cv` 43 de 43 nas
+  células `smooth` e `mixed`; os outros métodos 3 de 3 na `smooth`. **No
+  nulo em `n = 250`, 3 de 5 linhas diferem, e a causa é a E3.4**
+  (`b845cca`): com 249 pontos distintos no círculo, `J = 8` passa a ser
+  construído em 7 e empata com `J = 7`; o `04-pilot.R` de hoje dá as mesmas
+  5 linhas que o compêndio. As linhas do `e25j` em `n = 250` com `J = 8`
+  (o `klopp.balanced` 8 de 50 no nulo; o `wafc.lasso` 7 de 50 no nulo e 1
+  de 50 no não homogêneo) não se reproduzem mais; o estudo as substitui, e
+  nada decidido depende delas.
+- **Lição:** junção só na `smooth` não vê mudança que age onde `J` chega
+  ao topo (a nona, da E3.4, não viu esta). **Junção futura inclui o nulo
+  em `n = 250`.**
+- **Sinal para o texto:** em `n = 250` a grade `2:8` é `2:7` de fato, e o
+  `top` do compêndio é lido nos níveis efetivos; a Seção 5 ou o supp dizem
+  a grade efetiva.
+- **Para a E4.3:** o mesmo pipeline com `--config` e `--out` fora da pasta
+  (`../wafc/cache/e43`); o desenho do piloto pode sobrescrever `tuning`,
+  `methods` ou `seeds`. Com a semente mestra do estudo, a réplica `r` do
+  piloto é a da produção (mesmos dados); para sorteios separados,
+  `seeds: {master: <outro>}`. O `summary.csv` já dá `time_median`,
+  `top_fraction` e a tabela do `J` ou `k`; o pico de memória sai do
+  `/usr/bin/time -v`.
+- Pendências na pergunta 56.
+
 ### 2026-10-06: E4.1b fechada, `X` dependente de `U` no gerador
 
 - **O que entrou:** `simulate_wafc(..., x_u_rho = 0)`, no fim da
@@ -3828,14 +3896,44 @@ Ordenadas pelo que bloqueia mais.
      trocar o gerador.
    - (c) `ρ` negativo fica fora (só inverte `h`).
 
+56. **Pendências de E4.1** (2026-10-06). Recomendação do chat principal:
+   - (a) **Os oráculos:** a E4.1 leu "o linear oráculo" como as duas
+     colunas do piloto, `linear` (coeficientes constantes, a referência do
+     nulo) e `oracle` (o LASSO coordenado restrito aos blocos verdadeiros).
+     **Recomendação:** ficam os dois, e o `oracle` passa à forma em blocos
+     (o block LASSO balanceado restrito aos blocos verdadeiros), porque
+     desde D44 o estimador é o block LASSO e o oráculo coordenado mede o
+     custo da seleção de outro estimador; o coordenado fica no código
+     (D43). Pede `penalty` no `wafc_fit_oracle()`.
+   - (b) **O braço de ruído:** o plano dizia "razão sinal-ruído 1 contra o
+     padrão 4", mas o padrão das células não homogênea e `mixed` é 3; a
+     E4.1 usou 1 contra 3. **Recomendação:** aceitar e corrigir o plano.
+   - (c) **O braço de escala:** o padrão do não homogêneo duas vezes, em
+     `(x1, x2) × (u1, u2)` e `(x3, x4) × (u3, u4)`, com `β5` e `β6`
+     constantes, `snr = 3`, `gam.gcv` fora; hoje a célula é montada no
+     compêndio, porque o `simulate_wafc()` sempre ativa 3 blocos.
+     **Recomendação:** aceitar, com um argumento `structure` no
+     `simulate_wafc()` e o compêndio só repassando-o.
+   - (d) **O lasso no supp:** as duas linhas, `lasso` e `lasso.cv1se`
+     (saem do mesmo ajuste, sem custo). **Recomendação:** ficam as duas.
+   - (e) **Licença:** `GPL (>= 3)` no `DESCRIPTION` e no README, sem
+     arquivo `LICENSE`; o `WaveBased` é `GPL (>= 2)`, compatível. **Decisão
+     do autor**; a recomendação é manter e pôr o `LICENSE` na extração.
+   - (f) O custo no README entra depois da E4.3.
+   - **(a) e (c) juntas são uma tarefa curta de código** (E4.1c: `penalty`
+     no `wafc_fit_oracle()`, `structure` no `simulate_wafc()`, com o padrão
+     reproduzindo os sorteios, e o compêndio repassando-os), a catalogar se
+     aceitas; a E4.3 espera por ela.
+
 ---
 
 ## 5. Próximos passos
 
 **Onde parou (2026-10-06).** Pergunta 54 decidida (D60); a pasta
 `wafc-studies/` criada; E3.3 decidida (D61); **E4.1b fechada e
-integrada** (`x_u_rho`, pergunta 55). **Catálogo: L12 e E4.1** (`TAREFA.md`
-§3), em andamento. **Catálogo: só a L12** (as
+integrada** (`x_u_rho`, pergunta 55, D62). **E4.1 fechada e integrada**
+(o compêndio na pasta, décima junção exata; pergunta 56). **Catálogo: L12**
+(`TAREFA.md` §3), em andamento. **Catálogo: só a L12** (as
 fontes da aplicação; `TAREFA.md` §3), que pede ao autor os PDFs que não
 abrirem. Nenhum handoff pendente. O manuscrito está em `k = 4` (52 e 90
 páginas com a marcação, 45 e 89 sem o removido), sem as Seções 5 a 7.
@@ -3886,6 +3984,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E4.1 fechada e integrada: o compêndio na pasta `wafc-studies/` (fumaça de 164 unidades sem falha; décima junção exata, com as 3 linhas do nulo em `n = 250` explicadas pela E3.4); sementes do estudo independentes do piloto; pergunta 56 |
 | 2026-10-06 | Pergunta 55 decidida (D62): o salto da variância no uniforme fica; a limitação de `X` numa frase da Seção 5 |
 | 2026-10-06 | E4.1b fechada e integrada (1 422 testes em 54 s; o padrão reproduz o `HEAD` em 900 de 900): `x_u_rho` no `simulate_wafc()`, `h` linear e limitada, pareamento fixo, nenhum sorteio novo; pergunta 55 |
 | 2026-10-06 | E3.3 decidida (D61): `wafc/` fica no `wafc-draft` até o fim e vai então ao `WaveBased`; o compêndio extraído dependerá dessa versão |

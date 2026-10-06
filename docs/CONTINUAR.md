@@ -57,6 +57,7 @@ decisão em E3.3.
 | `sparsegl` | exigido por `wafc(penalty = "sglasso")`; o resto de `wafc/` roda sem ele, e os testes pulam os blocos de grupo se faltar | `install.packages("sparsegl")` |
 | `quadprog` | constante de compatibilidade exata em `check/03-desenho-produtos.R` (E1.4) | `install.packages("quadprog")` |
 | `VCBART` | exigido por `wafc_competitor("vcbart")` (E2.4); o resto de `wafc/` roda sem ele e os testes pulam o bloco se faltar. Instalado aqui: 1.2.5 | `install.packages("VCBART")` |
+| `yaml` | só o compêndio (`wafc-studies/`), para ler `config/*.yaml`; 2.3.12 no `renv.lock` | `renv::restore()` dentro de `wafc-studies/` instala tudo, com o `WaveBased` do GitHub em `e494b0e` |
 | o próprio `WaveBased`, instalado de `../../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
 
 No Ubuntu, `grpreg`, `gglasso` e `sparsegl` também saem do repositório da
@@ -120,13 +121,25 @@ E61B_EXTRA=gam.cv Rscript wafc/scripts/10-sondagem-aplicacao-b.R marylebone.ukai
 Rscript wafc/scripts/10-sondagem-aplicacao-b.R marylebone.ukair report 1 20 0      # E6.1c, as tabelas da §17
 ```
 
+O compêndio (`wafc-studies/`, E4.1), sempre de dentro da pasta, com o
+`renv` dela:
+
+```bash
+cd wafc-studies
+Rscript -e 'renv::restore()'                                                                         # o ambiente do compêndio
+Rscript scripts/01_simulate.R --sizes=250 --reps=2 --workers=8 --out=../wafc/cache/e41/smoke-core   # fumaça, ~4,6 min, 0 falhas
+Rscript scripts/02_aggregate.R --sizes=250 --reps=2 --out=../wafc/cache/e41/smoke-core             # as tabelas da fumaça
+Rscript ../wafc/cache/e41/check-junction.R 6                                                        # décima junção exata, ~5 min; o script não é versionado
+Rscript run_all.R                                                                                   # o estudo inteiro: centenas de horas de CPU, só com o aviso do autor
+```
+
 ## 3. Onde o trabalho está (resumo de 2026-10-06; o `ESTADO.md` manda)
 
 - **Fechado:** E0, E1 (E1.2 a E1.15, E1.9 no nível da taxa), E2 inteira
   (E2.1 a E2.5j; o rumo em D44 a D46), E3.1 a E3.4, E5a, E5c, E5d a E5g, as
   sondagens E6.1a a E6.1c, e as rodadas de bibliografia L1 a L11; no
   catálogo, a L12 (as fontes da aplicação). Decisões
-  D1 a D59 na tabela do `ESTADO.md` §2.
+  D1 a D62 na tabela do `ESTADO.md` §2; E4.1 e E4.1b fechadas, o compêndio na pasta `wafc-studies/` (D60).
 - **O método (D44, D45):** o block LASSO na forma balanceada, com os níveis
   livres e os pesos do `grpreg`, seguido do limiar `cv1se`; o LASSO
   coordenado fica como opção (D43). `cv.wafc(x, u, y)` é o estimador (D48).
