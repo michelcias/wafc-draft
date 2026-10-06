@@ -98,7 +98,8 @@ que ler antes está aqui e no plano.
 | E5g a E1.9 na `k = 4` | **fechada** (2026-10-05): Theorem S6.1 e Lemma S6.3 no supp, a otimalidade na introdução e na terceira leitura; 52 e 90 páginas | `manuscript/ms_4.tex`, `supp_4.tex`, `references_4.bib` |
 | E6.1c marylebone com dados de licença declarada | **fechada** (2026-10-06): UK-AIR e ERA5; o degrau de 2003 em 20 de 20 partições; o `+cv` empata com os splines de D46; marylebone fica como principal | `wafc/scripts/10-sondagem-aplicacao-b.R`, `docs/aplicacao-candidatas.md` §17, `wafc/cache/e61c/` |
 | E4.2 desenho do estudo | **decidido** (2026-10-06, D60): 100 réplicas, três braços, a escala sob condição de custo, a regra do topo das grades em `n = 2000`; o compêndio nasce como a pasta `wafc-studies/` | `plano-projeto.md` E4.1 e E4.2 |
-| E3.3, E4.3, E4.4, E5b, E6.2, E7 | não abertas | |
+| E3.3 empacotamento | **decidida** (2026-10-06, D61): `wafc/` fica até o fim e vai então ao `WaveBased` | `plano-projeto.md` E3.3 |
+| E4.3, E4.4, E5b, E6.2, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
 

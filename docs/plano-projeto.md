@@ -459,6 +459,11 @@ revista pede é código disponível e citável; a decisão afeta E7 (DOI), não
 E4 e E6. A pasta já está organizada como `R/` + `tests/` para que qualquer
 das três saídas seja mover arquivos.
 
+**Decidida em 2026-10-06 (D61):** `wafc/` fica onde está enquanto o
+trabalho durar e vai ao `WaveBased` só quando tudo estiver pronto, antes da
+E7; o compêndio extraído passa então a depender dessa versão do
+`WaveBased`, fixada pelo `renv`.
+
 **Critério de saída de E3:** interface congelada; testes limpos; um usuário
 que não é o autor ajusta o exemplo do `wafc/README.md` seguindo só ele;
 decisão de E3.3 registrada.
@@ -478,7 +483,7 @@ cache por unidade retomável, semente mestra única, `INSTRUCTIONS.md` e
 **Emenda de D60 (2026-10-06):** o compêndio nasce como a pasta
 `wafc-studies/` deste repositório, não como repositório próprio. Enquanto
 for pasta, lê o código de `../wafc/` diretamente; na extração, o código vai
-junto (cópia de `wafc/` ou o pacote de E3.3) com o hash do `wafc-draft` no
+junto como a versão do `WaveBased` que o contiver (D61), com o hash do `wafc-draft` no
 `PROVENANCE.md`. O repositório é criado pelo autor no fim, **por cópia, sem
 o histórico** (um `git subtree split` levaria as tentativas), e reproduz só
 o que está no manuscrito e no supp. Por isso: a documentação da pasta é
@@ -647,7 +652,7 @@ figura e parágrafo de interpretação prontos para E5b.
 
 ## E7. Fechamento e submissão
 
-1. Código de `wafc/` na forma decidida em E3.3, etiquetado; DOI Zenodo do
+1. Código de `wafc/` movido ao `WaveBased` (D61), versão etiquetada; DOI Zenodo do
    código e do compêndio.
 2. Suplementar montado: provas, tabelas extras, diagnósticos.
 3. Checklist de `alvo-revista.md` §6 inteiro; instruções da revista relidas
