@@ -1,0 +1,81 @@
+# ============================================================
+# sources.yaml -- the source files of the two data applications
+# ============================================================
+# Each file is downloaded from `url` into <dest>/<dir>/<file> by
+# data-raw/fetch.R and checked against `sha256`, the digest of the file
+# the data in data/ were built from. A file marked `volatile` is generated
+# by its server at each request: a new download may differ in its digest
+# without differing in its values, so a mismatch there is a warning, and
+# data-raw/prepare.R --check compares the values instead.
+# ------------------------------------------------------------
+
+marylebone:
+  dir: marylebone
+  title: Marylebone Road (London), hourly NOx, NO2 and O3, 1998-2005, with
+    the hourly 10 m wind of ERA5 at the nearest grid point
+  licence: |
+    The pollutant files are published by Defra on UK-AIR under the Open
+    Government Licence. Attribution: "(c) Crown 2026 copyright Defra via
+    uk-air.defra.gov.uk, licenced under the Open Government Licence (OGL)."
+    The wind is ERA5 (Copernicus Climate Change Service, CC BY 4.0),
+    retrieved through the Open-Meteo historical weather API (CC BY 4.0).
+    Attribution: "Generated using or contains modified Copernicus Climate
+    Change Service information 2026. Neither the European Commission nor
+    ECMWF is responsible for any use that may be made of the Copernicus
+    information or data it contains." and "Hourly ERA5 wind data were
+    retrieved through the Open-Meteo historical weather API (Zippenfenig,
+    2024; https://open-meteo.com/), licensed under CC BY 4.0
+    (https://creativecommons.org/licenses/by/4.0/); the instantaneous
+    values were linearly interpolated to the middle of each hour."
+  files:
+    - file: MY1_1998.RData
+      url: https://uk-air.defra.gov.uk/openair/R_data/MY1_1998.RData
+      sha256: 503ee40cef24944022f7f78424d2092c81934753b8a429d83cc91cc74fa85412
+    - file: MY1_1999.RData
+      url: https://uk-air.defra.gov.uk/openair/R_data/MY1_1999.RData
+      sha256: 4007f98e51d3efdcdc39ef1b97e0119b36d25e04a6bcf65eec4a5ae0c45e085b
+    - file: MY1_2000.RData
+      url: https://uk-air.defra.gov.uk/openair/R_data/MY1_2000.RData
+      sha256: f157a23b0a2e6221c2da10603c5a325fd35fea8e29dcd3428b27f9c4eb915715
+    - file: MY1_2001.RData
+      url: https://uk-air.defra.gov.uk/openair/R_data/MY1_2001.RData
+      sha256: 63b8283f629327bc36fb1fc34693b84f0b9989331d516867940217926e6a48fd
+    - file: MY1_2002.RData
+      url: https://uk-air.defra.gov.uk/openair/R_data/MY1_2002.RData
+      sha256: 6db6ebae8d683d69879c27f6102e267df38d800bb926a47756102d37b3589c7f
+    - file: MY1_2003.RData
+      url: https://uk-air.defra.gov.uk/openair/R_data/MY1_2003.RData
+      sha256: 2b32e149445b83d49125c3b8f3046ba8a1efb95a22fbfe09ef5a0b993a37ec6b
+    - file: MY1_2004.RData
+      url: https://uk-air.defra.gov.uk/openair/R_data/MY1_2004.RData
+      sha256: fe88b12e189772938251e5a1031ffc0f6a7ecf33236f90c3913bb663591c3651
+    - file: MY1_2005.RData
+      url: https://uk-air.defra.gov.uk/openair/R_data/MY1_2005.RData
+      sha256: a3ed2c09c8feee9085bf54863e4757ed13a8220693634a30da9f281787e91324
+    - file: era5-wind-my1-1998-2005.csv
+      url: "https://archive-api.open-meteo.com/v1/archive?latitude=51.5225&longitude=-0.1546&start_date=1998-01-01&end_date=2005-12-31&hourly=wind_speed_10m,wind_direction_10m&models=era5&wind_speed_unit=ms&timezone=GMT&format=csv"
+      sha256: e026ea3fa1ca311e599e87b52b9415499f419d7f87d05983974d5f9d64f25641
+      volatile: true
+
+beijing:
+  dir: beijing
+  title: Beijing Multi-Site Air Quality, hourly, March 2013 to February
+    2017, site Dongsi
+  licence: |
+    UCI Machine Learning Repository, data set 501 (doi:10.24432/C5RK5G),
+    licensed under CC BY 4.0; described by Zhang,
+    Guo, Dong, He, Xu and Chen (2017, Proc. R. Soc. A 473: 20170457).
+    Attribution: "Beijing Multi-Site Air Quality data, UCI Machine Learning
+    Repository (https://doi.org/10.24432/C5RK5G), licensed under CC BY 4.0
+    (https://creativecommons.org/licenses/by/4.0/); only the site Dongsi
+    is used."
+  files:
+    - file: beijing.zip
+      url: https://archive.ics.uci.edu/static/public/501/beijing+multi+site+air+quality+data.zip
+      sha256: b04da438b2f331ac0ffd45aebdfec0d20d2367feb5f6948c4b1f7ce1191e33c4
+      # the archive holds a second archive, which holds one file per site
+      extract:
+        - archive: PRSA2017_Data_20130301-20170228.zip
+          sha256: d1b9261c54132f04c374f762f1e5e512af19f95c95fd6bfa1e8ac7e927e3b0b8
+          member: PRSA_Data_20130301-20170228/PRSA_Data_Dongsi_20130301-20170228.csv
+          member_sha256: 9c0020214425e5ee2a64d42f97a1f632e1d8f6b53ad50edd85a686cc7999f27e

@@ -1,10 +1,13 @@
-## run_all.R -- the whole simulation study, in one call.
+## run_all.R -- the whole simulation study and the data applications, in
+## one call.
 ##
 ##   Rscript run_all.R            (from the root of the compendium)
 ##
 ## For each design listed in `designs` of config/study.yaml: fits every
 ## unit (scripts/01_simulate.R) and writes its tables
-## (scripts/02_aggregate.R), under outputs/<design>/. Every unit is cached
+## (scripts/02_aggregate.R), under outputs/<design>/; then fits every unit
+## of the two data applications and writes their tables and figures
+## (scripts/03_application.R), under outputs/application/. Every unit is cached
 ## as it finishes, so an interrupted run is resumed by running this file
 ## again. The full study takes days of processor time; README.md gives the
 ## cost and how to spread it over workers.
@@ -20,4 +23,12 @@ for (d in designs) {
   run_study(cfg, out, workers = run_workers(list(), cfg))
   aggregate_study(cfg, out)
 }
-message("\nDone. Tables under outputs/<design>/tables/.")
+## The data applications (config/application.yaml).
+acfg <- application_config(file.path("config", "application.yaml"), study)
+message("\n>>> applications")
+load_wafc_code(acfg)
+run_application(acfg, file.path("outputs", "application"),
+                workers = run_workers(list(), acfg))
+application_report(acfg, file.path("outputs", "application"))
+
+message("\nDone. Tables under outputs/<design>/tables/ and outputs/application/.")

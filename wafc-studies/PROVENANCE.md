@@ -40,6 +40,13 @@ pinned in `renv.lock`:
 | commit | `e494b0eb64a605c9ed8d0a50f2552aea650321eb` |
 | version | 2.6-0 |
 
+## Data
+
+The data of the applications are in `data/`, built by `data-raw/` from
+the files listed in `data-raw/sources.yaml`, whose SHA-256 digests are
+those of the files the data were built from; `data/README.md` gives the
+sources and their licences.
+
 ## R and the other packages
 
 R 4.6.1 and the versions recorded in `renv.lock` (`glmnet` 5.1, `grpreg`

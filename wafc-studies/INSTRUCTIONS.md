@@ -6,7 +6,8 @@ reproducible.
 
 ## Purpose
 
-The compendium reproduces the simulation study reported in the article
+The compendium reproduces the simulation study and the data applications
+reported in the article
 and its supplementary material, and nothing else. A configuration, a
 method or a table that does not appear there does not belong here. The
 technical reason behind a constant (a cost that bounds a grid, a failure a

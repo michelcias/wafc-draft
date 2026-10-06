@@ -1,0 +1,89 @@
+# ============================================================
+# application.yaml -- the two data applications
+# ============================================================
+# Read with config/study.yaml, which supplies `code` (the WAFC code),
+# `workers` and the master seed, unless this file sets them. The
+# applications themselves (data file, response, covariates, modulators,
+# blocks) are defined in R/application_data.R; the data are in data/,
+# built from the sources by data-raw/ (see data/README.md).
+# ------------------------------------------------------------
+
+design: application
+
+# marylebone.ukair: Marylebone Road, London, the structure of the
+# coefficients (the article); beijing.heat: Beijing, Dongsi, the
+# prediction (the supplementary material).
+bases: [marylebone.ukair, beijing.heat]
+data_dir: data
+
+# Seeds: master and radix from config/study.yaml; one key per
+# application, append-only (the position enters every seed; see
+# application_seed() in R/application.R).
+seeds:
+  keys: [marylebone.ukair, beijing.heat]
+
+# The splits: split 0 is the whole sample; splits 1, ..., `partitions` are
+# random partitions by block (a week), with `test_fraction` of the blocks
+# held out.
+partitions: 20
+test_fraction: 0.3
+
+# The methods, in the order of the tables; `wafc` gives two rows.
+methods: [wafc, gam.reml, gam.gcv, linear]
+
+# Arguments passed to the fitter of a method on top of the data, the folds
+# and the tuning grids.
+method_options:
+  gam.reml: {k.select: reml, engine: bam}
+  gam.gcv:  {k.select: gcv, engine: bam}
+
+# Tuning, shared by every split: the folds of the training sample (blocked,
+# by week), the grid of resolution levels J of the WAFC, the grid of basis
+# dimensions k of mgcv, and the wavelet basis, evaluated by table.
+tuning:
+  nfolds: 10
+  J: [2, 3, 4, 5, 6, 7, 8]
+  k: [5, 10, 20, 40, 80]
+  basis: {family: Daublets, filter_size: 8, prec_wavelet: 30}
+
+# The grid on which the components are read: `grid_size` points between
+# these quantiles of each modulator (a periodic modulator is read over its
+# whole period; R/application_data.R).
+grid_size: 256
+grid_quantiles: [0.005, 0.995]
+
+report:
+  # the rows of the comparison: the prediction table reads every row
+  # against the better of these two in each partition
+  splines: [gam.reml, gam.gcv]
+  figure:
+    labels: [wafc.cv1se, wafc.cv, gam.reml]
+    band: wafc.cv1se
+    colours: [black, "#1f5fa8", "#b2182b"]
+    names:
+      wafc.cv1se: WAFC
+      wafc.cv: WAFC (cv threshold)
+      gam.reml: GAM (REML)
+    # The first and the last 60 days of the date are not drawn: the
+    # periodized basis joins the end of the series to its start, and the
+    # components bend there towards each other's level.
+    trim:
+      day: [60, 60]
+  readings:
+    marylebone.ukair:
+      step:
+        block: [nox, day]
+        wind: [nox, ws]
+        before: "2002-01-01"
+        after: "2004-01-01"
+        margin: 60
+        from: "2001-01-01"
+        at: ["2001-07-01", "2002-01-01", "2002-07-01", "2003-01-01",
+             "2003-04-01", "2003-07-01", "2003-10-01", "2004-01-01",
+             "2005-01-01"]
+    beijing.heat:
+      # the heating season at its nominal dates, 15 November (day 318) to
+      # 15 March (day 73)
+      season:
+        modulator: doy
+        inside: [318, 73]

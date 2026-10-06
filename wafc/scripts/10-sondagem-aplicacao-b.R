@@ -350,9 +350,10 @@ prep_beijing <- function() {
 ## The same site with the day of the year as the first modulator (step
 ## E6.1b (ii)). The winter heating season of Beijing and the North China
 ## Plain runs usually from 15 November to 15 March (Liang et al., 2015,
-## Proc. R. Soc. A 471: 20150257), an administrative date at which the
-## emissions, and so the level of PM2.5 and its response to temperature,
-## change; the day of the year is periodic, which the periodized basis
+## Proc. R. Soc. A 471: 20150257, section 7), a nominal date (the effective
+## dates move with the temperature; ibid., p. 16) at which the emissions,
+## and so the level of PM2.5 and its response to temperature, change; the
+## day of the year is periodic, which the periodized basis
 ## matches. Day of the year 1 is 1 January; 15 November is day 319 (320 in
 ## a leap year) and 15 March day 74 (75).
 prep_beijing_heat <- function() {
@@ -398,14 +399,20 @@ prep_housing <- function() {
 
 ## Marylebone Road, London, hourly, 1998-01-01 to 2005-06-23 (the mydata of
 ## openair). The model is the oxidant relation of Clapp and Jenkin (2001):
-## the total oxidant OX = NO2 + O3 at a roadside site is linear in NOx,
-## with intercept the regional background of oxidant and slope the
-## fraction of NOx emitted directly as NO2. Carslaw (2005, Atmospheric
-## Environment 39: 4793-4802) estimated that fraction at about 5 to 6
-## percent in 1997 and about 17 percent in 2003, a change he links to the
-## particle filters fitted to the London buses; so beta_nox(u) is the
-## primary NO2 fraction, modulated by the date (the documented change) and
-## by the wind speed (dispersion and the mixing of ozone into the street).
+## the total oxidant OX = NO2 + O3 at a roadside site is close to linear in
+## NOx, with intercept the regional background of oxidant and slope the
+## local contribution to it, an estimate of the fraction of NOx emitted
+## directly as NO2 (Carslaw and Beevers, 2005, section 2.4) that also
+## carries the NO2 formed by 2NO + O2 and from HONO and is lower at night
+## (Clapp and Jenkin, 2001, section 2.3). At Marylebone Road, Carslaw (2005,
+## Atmospheric Environment 39: 4793-4802, sections 3.1 and 3.2, Fig. 3(a))
+## estimated that fraction at about 10 percent by volume from 1997 to 2002,
+## rising through 2002 and 2003 to about 23 percent at the end of 2003, a
+## change he links to the particle filters fitted to the London buses (his
+## 5 to 6 percent in 1997 and 17 percent in 2003 are the mean of the London
+## sites, not this one); so beta_nox(u) estimates the primary NO2 fraction,
+## modulated by the date (the documented change) and by the wind speed
+## (dispersion and the mixing of ozone into the street).
 ## The wind direction is not a modulator: it is recorded in steps of 10
 ## degrees (38 values), the discrete case section 5 of the .md rules out.
 prep_marylebone <- function() {

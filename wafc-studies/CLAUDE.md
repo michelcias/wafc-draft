@@ -1,6 +1,7 @@
 # wafc-studies
 
-Reproducibility compendium of the simulation study of the WAFC article.
+Reproducibility compendium of the simulation study and the data
+applications of the WAFC article.
 Read `README.md` (what it reproduces, how to run it) and `INSTRUCTIONS.md`
 (how it is kept reproducible) before changing anything.
 

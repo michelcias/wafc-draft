@@ -1,6 +1,7 @@
 # wafc-studies
 
-Reproducibility compendium for the simulation study of the article on
+Reproducibility compendium for the simulation study and the data
+applications of the article on
 regression with additive functional coefficients estimated by a block
 lasso on wavelet bases (WAFC):
 
@@ -8,8 +9,9 @@ $$Y = \sum_{\ell=1}^{p} \beta_\ell(U) X_\ell + \varepsilon, \qquad
 \beta_\ell(u) = c_\ell + \sum_{m=1}^{q} g_{\ell m}(u_m).$$
 
 One command, run from the root of this folder in the locked environment,
-fits every replicate of every design and writes every table the article
-and its supplementary material report.
+fits every replicate of every design and the two data applications, and
+writes every table and figure the article and its supplementary material
+report.
 
 ## 1. Requirements
 
@@ -19,7 +21,7 @@ and its supplementary material report.
 - [`renv`](https://rstudio.github.io/renv/). `renv.lock` pins every
   package, `WaveBased` at a commit of `michelcias/WaveBased` on GitHub.
 - The WAFC code (the estimator and the competitors), which this
-  compendium loads and does not reimplement: see section 6 and
+  compendium loads and does not reimplement: see section 7 and
   `PROVENANCE.md`.
 
 ## 2. Setup
@@ -122,7 +124,45 @@ the circle, so at n = 250 the level 8 is built at 7 and the grid of `J` is
 grids.
 The definitions are in `R/metrics.R`.
 
-## 5. Outputs
+## 5. The data applications
+
+Two hourly air-quality series, in `data/` (sources, licences and the
+attribution each one asks for in `data/README.md`; `data-raw/` rebuilds
+them from the sources):
+
+| Application | Data | Response | Linear covariates | Modulators | Reported in |
+|---|---|---|---|---|---|
+| `marylebone.ukair` | Marylebone Road, London, 1998-01 to 2005-06, 61 280 hours (UK-AIR; ERA5 wind) | NO2 + O3 (ppb) | 1, NOx (100 ppb) | date, wind speed | the article |
+| `beijing.heat` | Beijing, site Dongsi, 2013-03 to 2017-02, 34 287 hours (UCI) | log PM2.5 | 1, wind speed, temperature, pressure − 1000 hPa | day of the year, relative humidity | the supplementary material |
+
+```bash
+Rscript scripts/03_application.R --workers=3
+```
+
+fits the WAFC (rows `wafc.cv1se` and `wafc.cv`), `gam.reml`, `gam.gcv` and
+`linear` on the whole sample (split 0, the figures) and on 20 random
+partitions by week (splits 1 to 20: 30% of the weeks held out, and the
+folds of the training sample blocked by week, since the errors of an
+hourly series are correlated over days), and writes the tables and figures
+under `outputs/application/`. Every method is tuned in its own terms: the
+WAFC by cross-validation on the blocked folds, mgcv by REML or GCV; none
+models the dependence of the errors. A unit is one method on one split,
+cached as in the simulation study; `--bases`, `--splits` (0 is the whole
+sample), `--methods` restrict the run, `--parts=fit` or `--parts=report`
+does one half. The applications take about 70 processor-hours, almost
+all of it in the WAFC search on `beijing.heat`; a unit of the WAFC needs up
+to about 5 GB.
+
+Outputs, under `outputs/application/tables/`: `prediction-<app>.csv` (the
+error on the held-out weeks, its ratio to the better spline of each
+partition, and the paired difference to the spline with the smaller mean
+error, with the standard error corrected for the overlap of the training
+samples by Nadeau and Bengio, 2003), `structure-<app>.csv` (how often each
+block is kept), `choices-<app>.csv`, `readings-<app>.csv` (the quantities
+the text reads off the figures); and the figures
+`outputs/application/figures/<app>.pdf`.
+
+## 6. Outputs
 
 `outputs/<design>/` (not versioned):
 
@@ -138,7 +178,7 @@ The definitions are in `R/metrics.R`.
   `convergence.csv`, `threshold.csv`, `curves.csv`; `missing.csv` lists
   the units not yet fitted.
 
-## 6. Layout
+## 7. Layout
 
 ```
 wafc-studies/
@@ -148,12 +188,13 @@ wafc-studies/
 ├── PROVENANCE.md      where the WAFC code and WaveBased come from
 ├── DESCRIPTION        the dependencies, for renv
 ├── renv.lock          the locked environment
-├── run_all.R          the whole study
+├── run_all.R          the whole study and the applications
 ├── config/
 │   ├── study.yaml     seeds, methods, tuning grids by sample size, labels
 │   ├── core.yaml      the main design
 │   ├── arms.yaml      one factor at a time at n = 1000
-│   └── scale.yaml     the larger model
+│   ├── scale.yaml     the larger model
+│   └── application.yaml the two data applications
 ├── R/
 │   ├── config.R       reading and checking the configuration
 │   ├── seeds.R        one seed per cell, sample size, replicate and stream
@@ -162,18 +203,24 @@ wafc-studies/
 │   ├── metrics.R      what is measured on every fit
 │   ├── run.R          units, cache and the parallel driver
 │   ├── aggregate.R    from the units to the tables
-│   └── cli.R          the command line
+│   ├── cli.R          the command line
+│   ├── application_data.R   the data of the applications
+│   ├── application.R        partitions, fits and cache of the applications
+│   └── application_report.R tables and figures of the applications
 └── scripts/
     ├── 00_setup.R     checks the environment and sources R/
     ├── 01_simulate.R  fits the units of a design
-    └── 02_aggregate.R writes the tables of a design
+    ├── 02_aggregate.R writes the tables of a design
+    └── 03_application.R the data applications
+├── data/              the data of the applications (README.md: sources, licences)
+└── data-raw/          rebuilds data/ from the public sources
 ```
 
 The estimator and its competitors are loaded from the WAFC code named by
 `code` in `config/study.yaml` (the path of its loader, or a package that
 exports it); `PROVENANCE.md` records the version.
 
-## 7. Protocol
+## 8. Protocol
 
 - **Randomness.** A single master seed (`seeds$master` of
   `config/study.yaml`). The seeds of the training sample, the test sample
@@ -191,7 +238,9 @@ exports it); `PROVENANCE.md` records the version.
   determine it; a run whose configuration no longer matches a cached unit
   stops instead of mixing the two, unless told to refit (`--refresh`).
 
-## 8. License
+## 9. License
 
 The code of the compendium is released under the GNU General Public
-License, version 3 or later (see `DESCRIPTION`).
+License, version 3 or later (see `DESCRIPTION`). The data in `data/` keep
+the licences of their sources (Open Government Licence and CC BY 4.0; see
+`data/README.md`).
