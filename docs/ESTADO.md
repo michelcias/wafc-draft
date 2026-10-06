@@ -4046,12 +4046,13 @@ páginas com a marcação, 45 e 89 sem o removido), sem as Seções 5 a 7.
 
 **Em paralelo ao E4:**
 
-- **E6.2**, a aplicação: marylebone (`marylebone.ukair`) e beijing.heat com
-  uma partição cada, contra os dois splines de D46, com as leituras de D59
-  (o degrau e o ciclo anual; o vento numa frase; a borda da data cortada na
-  figura; os ressaltos de 2002 e 2003 descritos sem interpretação até a
-  L12 ler Carslaw 2005). A primeira no corpo, a segunda com tabela e figura
-  no supp (D57).
+- **E6.2**, a aplicação no compêndio, **catalogada em 2026-10-06**:
+  marylebone (`marylebone.ukair`) e beijing.heat com as 20 partições por
+  bloco da E6.1b e da E6.1c (a nota antiga dizia "uma partição cada", sem
+  decisão por trás) e o ajuste na amostra inteira para a figura, contra os
+  dois splines de D46 e o linear, com as leituras de D59 e D64. A primeira
+  no corpo, a segunda com tabela e figura no supp (D57). A rodada das 20
+  partições espera o aviso do autor.
 - **E3.3** decidida (D61): `wafc/` fica onde está e vai ao `WaveBased` só
   no fim, antes da E7 e da extração do compêndio.
 
@@ -4074,6 +4075,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E6.2 (a aplicação no compêndio) catalogada, em paralelo à E4.1c, com as 20 partições por bloco e a junção exata contra a E6.1b e a E6.1c |
 | 2026-10-06 | Pergunta 57 decidida (D64): os ressaltos numa frase, com o mergulho de 2002 em Carslaw; o degrau contra Marylebone Road; ERA5 e Open-Meteo como estão |
 | 2026-10-06 | L12 fechada e integrada (97 entradas no verificado, cinco artigos lidos no PDF): o "~5–6% a ~17%" é a média de Londres, e Marylebone Road vai de ~10 a ~23 vol%; o mergulho de 2002 está em Carslaw, o pico de 2003 fica depois da série dele; pergunta 57 |
 | 2026-10-06 | Pergunta 56 decidida (D63): o oráculo em blocos, `snr` 1 contra 3, a escala por `structure`, as duas linhas do lasso, `GPL (>= 3)`; E4.1c catalogada |
