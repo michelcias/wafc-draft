@@ -540,7 +540,7 @@ original e fica como registro.
   réplicas, ~290 h de processador, ~37 h em 8 núcleos; com 50, a metade.
 - **Braços**, um fator por vez em `n = 1000` nas células não homogênea e
   `mixed`, 100 réplicas, ~3 h cada: ruído alto (razão sinal-ruído 1 contra o
-  padrão 4); moduladoras correlacionadas (`u_rho = 0,5`, que exercita o termo
+  padrão 3 das duas células, D63); moduladoras correlacionadas (`u_rho = 0,5`, que exercita o termo
   cruzado); `X` dependente de `U` (D13; pede uma opção nova no `dgp.R`); e,
   opcional, escala `(p, q) = (6, 4)` com 6 blocos ativos e a grade `2:7`, com
   o custo medido na E4.3 (o `(10, 5)` original tem 12 750 colunas em `J = 8`
