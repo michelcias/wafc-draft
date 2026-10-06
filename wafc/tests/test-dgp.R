@@ -325,3 +325,118 @@ test_that("the signal to noise ratio is read on the regression function of the s
   expect_equal(wafc_beta(d, d[["u"]]), d[["beta"]])
   expect_equal(d[["x_u_rho"]], 0.5)
 })
+
+## ---------------------------------------------------------------------------
+## A structure of its own (step E4.1c)
+## ---------------------------------------------------------------------------
+
+test_that("the default draws the samples drawn before 'structure' existed", {
+  ## Fingerprints printed by the code of commit 901fac7, before the
+  ## argument existed, as in the test of 'x_u_rho' above; the fifth draw
+  ## has 'x_u_rho' and the sixth no intercept and the copula.
+  cfgs <- list(
+    list(n = 200L, p = 3L, q = 2L, scenario = "smooth", seed = 1L),
+    list(n = 300L, p = 3L, q = 2L, scenario = "uneven", seed = 7L),
+    list(n = 250L, p = 4L, q = 4L, scenario = "inhomogeneous", seed = 2026L,
+         snr = 3),
+    list(n = 200L, p = 3L, q = 2L, scenario = "null", seed = 11L,
+         sigma = 0.62),
+    list(n = 250L, p = 6L, q = 4L, scenario = "inhomogeneous", seed = 31L,
+         snr = 3, x_u_rho = 0.5),
+    list(n = 150L, p = 3L, q = 2L, scenario = "inhomogeneous", seed = 5L,
+         intercept = FALSE, amplitude = 2, u_rho = 0.4)
+  )
+  want <- rbind(c(24006.790944074142, 8562.0987401374896, 38808.819022007519),
+                c(37534.638510872632, 29338.894679189467, 90081.430520175258),
+                c(22989.429750043091, 15373.521886492303, 252506.25148645299),
+                c(20932.220559466303, 32083.591502384064, 40518.953004339244),
+                c(34277.880721259746, 18597.019907742815, 254045.81913873018),
+                c(-9184.3354015473051, 6750.654140973762, 22455.129269914039))
+  fp <- function(d) {
+    c(sum(d[["y"]] * seq_along(d[["y"]])), sum(d[["x"]] * seq_along(d[["x"]])),
+      sum(d[["u"]] * seq_along(d[["u"]])))
+  }
+  keep <- setdiff(names(simulate_wafc(10L, seed = 1L)), c("call", "g"))
+  for (i in seq_along(cfgs)) {
+    d <- do.call(simulate_wafc, cfgs[[i]])
+    expect_equal(fp(d), want[i, ], tolerance = 1e-10, label = paste("cfg", i))
+    r_default <- .Random.seed
+    d0 <- do.call(simulate_wafc, c(cfgs[[i]], list(structure = NULL)))
+    expect_identical(d0[keep], d[keep])
+    expect_identical(.Random.seed, r_default)
+  }
+})
+
+test_that("the structure of a scenario, given, draws the sample of the scenario", {
+  for (sc in c("smooth", "uneven", "inhomogeneous", "null")) {
+    for (pq in list(c(3L, 2L), c(4L, 4L))) {
+      a <- list(n = 200L, p = pq[1L], q = pq[2L], scenario = sc, seed = 17L)
+      if (sc == "null") a[["sigma"]] <- 0.5
+      d <- do.call(simulate_wafc, a)
+      r <- .Random.seed
+      s <- wafc_scenario(sc, pq[1L], pq[2L])
+      ## a zero block may also be named "zero"
+      s0 <- s
+      s0[!nzchar(s0)] <- "zero"
+      for (st in list(s, s0)) {
+        e <- do.call(simulate_wafc, c(a, list(structure = st)))
+        expect_identical(.Random.seed, r)
+        for (nm in c("y", "x", "u", "f", "beta", "sigma", "cc", "x_u")) {
+          expect_identical(e[[nm]], d[[nm]], label = paste(sc, nm))
+        }
+        expect_identical(as.vector(e[["structure"]]),
+                         as.vector(d[["structure"]]))
+        expect_identical(e[["scenario"]], sc)
+        expect_true(is.na(e[["sprime"]]))
+        expect_identical(attr(e[["structure"]], "regime"), "periodic")
+      }
+    }
+  }
+})
+
+test_that("a structure of its own is drawn on the covariates and errors of the seed", {
+  ## the larger model of decision D63: the inhomogeneous structure twice
+  s <- matrix("", 6L, 4L)
+  s[1L, 1:2] <- c("bumps", "blocks")
+  s[2L, 1L] <- "heavisine"
+  s[3L, 3:4] <- c("bumps", "blocks")
+  s[4L, 3L] <- "heavisine"
+  for (xu in c(0, 0.5)) {
+    a <- list(n = 300L, p = 6L, q = 4L, seed = 23L, x_u_rho = xu)
+    d <- do.call(simulate_wafc, c(a, list(scenario = "inhomogeneous", snr = 3,
+                                          structure = s)))
+    ## the null scenario with unit errors draws the same u, x and errors
+    d0 <- do.call(simulate_wafc, c(a, list(scenario = "null", sigma = 1)))
+    expect_identical(d[["u"]], d0[["u"]])
+    expect_identical(d[["x"]], d0[["x"]])
+    expect_equal((d[["y"]] - d[["f"]]) / d[["sigma"]], d0[["y"]] - d0[["f"]],
+                 tolerance = 1e-12)
+    ## the coefficients are the components named, block by block
+    beta <- matrix(rep(d[["cc"]], each = 300L), 300L, 6L)
+    for (l in 1:6) for (m in 1:4) {
+      if (nzchar(s[l, m])) {
+        beta[, l] <- beta[, l] + wafc_component(s[l, m])(d[["u"]][, m])
+      }
+    }
+    expect_equal(unname(d[["beta"]]), beta, tolerance = 1e-14)
+    expect_identical(d[["sigma"]], stats::sd(d[["f"]]) / 3)
+    expect_identical(!vapply(d[["g"]], is.null, NA), as.vector(nzchar(s)))
+    expect_identical(as.vector(d[["structure"]]), as.vector(s))
+    expect_true(is.na(d[["sprime"]]))
+  }
+})
+
+test_that("an ill-formed 'structure' is an informative error", {
+  s <- wafc_scenario("smooth", 3L, 2L)
+  sim <- function(st) simulate_wafc(50L, p = 3L, q = 2L, seed = 1L,
+                                    structure = st)
+  expect_error(sim(as.vector(s)), "character matrix of component names")
+  expect_error(sim(matrix(0, 3L, 2L)), "character matrix of component names")
+  expect_error(sim(matrix("", 2L, 3L)), "must be 3 by 2 \\(p by q\\); it is 2 by 3")
+  s_na <- s
+  s_na[3L, 2L] <- NA
+  expect_error(sim(s_na), "must not contain NA")
+  s_bad <- s
+  s_bad[3L, 2L] <- "doppler"
+  expect_error(sim(s_bad), "unknown component\\(s\\) in 'structure': \"doppler\"")
+})

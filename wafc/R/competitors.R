@@ -43,6 +43,8 @@
 ##              cross-validated over lambda at fixed J. It is not a
 ##              competitor but a reference: the price of not knowing the
 ##              structure is the distance from the WAFC to this column.
+##              The LASSO by default; since step E4.1c, penalty = "block"
+##              makes it the block LASSO of decision D44 (decision D63).
 ##
 ## Every fitter returns an object of class "wafc_competitor" with the same
 ## four accessors, so the pilot loops over methods and not over special
@@ -1311,41 +1313,72 @@ wafc_fit_linear <- function(x, u, y) {
 #' over the same grid of \eqn{J}, so the only thing this fit knows and
 #' \code{\link{wafc}} does not is which blocks are zero.
 #'
+#' With \code{penalty = "block"} (step E4.1c, decision D63) the estimator
+#' is the block LASSO of \code{\link{wafc}} with the same name: the
+#' balanced chunks of size \code{block.size} inside each active block, the
+#' weights of \pkg{grpreg} and its tolerance \code{thresh}, with
+#' \eqn{(J, \lambda)} chosen as \code{\link{cv.wafc}} chooses them, by the
+#' cross-validated error of \code{grpreg::cv.grpreg()} on the folds, and
+#' read at \code{lambda.min} without threshold. It is then the oracle of
+#' the estimator of decision D44, which the default is not: the default
+#' stays \code{"lasso"}, the oracle of the coordinatewise LASSO of decision
+#' D3, and fits what it fitted before the option existed. A candidate of
+#' the grid of \eqn{J} whose levels, once \code{\link{wafc_design}} has
+#' capped them, are those of a candidate already fitted is the same design
+#' on the same folds and is not refitted, as in \code{\link{cv.wafc}}; the
+#' first of the two is kept, as it was when both were fitted.
+#'
 #' @param x,u,y The data.
-#' @param active Logical \eqn{p} by \eqn{q} matrix of the active blocks.
+#' @param active Logical \eqn{p} by \eqn{q} matrix of the active blocks,
+#'   or a vector of length \eqn{pq} read by column. With no active block the
+#'   fit is the least squares of \code{\link{wafc_fit_linear}}.
 #' @param J Resolution level or grid of candidates; \code{NULL} uses the
 #'   grid of \code{\link{cv.wafc}}.
-#' @param penalty \code{"lasso"} or \code{"sglasso"}.
+#' @param penalty \code{"lasso"} (the default), \code{"sglasso"} or
+#'   \code{"block"}.
 #' @param lambda,nlambda,lambda.min.ratio The penalty path, as in
 #'   \code{\link{wafc}}. Giving \code{lambda} explicitly is how the test of
 #'   exact recovery reaches the unpenalized end: with a noiseless response
 #'   \pkg{glmnet} stops its own path early, because the deviance has stopped
 #'   moving.
 #' @param nfolds,foldid Folds of the cross-validation.
+#' @param block.size The chunk size of \code{penalty = "block"}, as in
+#'   \code{\link{wafc}}; \code{NULL} is \code{ceiling(log(n))}. Ignored by
+#'   the other penalties.
+#' @param thresh Convergence tolerance of the engine, as in
+#'   \code{\link{wafc}}; \code{NULL} is the default of \code{\link{wafc}}
+#'   for the penalty.
 #' @param ... Passed to \code{\link{wafc_design}}.
 #'
-#' @return An object of class \code{"wafc_competitor"}.
+#' @return An object of class \code{"wafc_competitor"}. Its \code{extra}
+#'   has the selected \code{J}, \code{lambda} and \code{cvm} and the
+#'   \code{penalty}; with \code{penalty = "block"} also the
+#'   \code{block.size}, the number \code{nzero} of nonzero penalized
+#'   coefficients, and \code{conv}, the path of \pkg{grpreg} at every
+#'   \eqn{J} of the grid as \code{\link{wafc_fit_klopp}} records it, and
+#'   the object keeps in \code{intercept} the intercept of \pkg{grpreg}
+#'   when no constant covariate carries it.
 #'
 #' @examples
 #' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
 #' wafc_fit_oracle(d$x, d$u, d$y, active = nzchar(d$structure), J = 3)$blocks
+#' wafc_fit_oracle(d$x, d$u, d$y, active = nzchar(d$structure), J = 3,
+#'                 penalty = "block")$extra$nzero
 #'
 #' @export
 wafc_fit_oracle <- function(x, u, y, active = NULL, J = NULL,
-                            penalty = c("lasso", "sglasso"), lambda = NULL,
-                            nlambda = 100L, lambda.min.ratio = NULL,
-                            nfolds = 10L, foldid = NULL, ...) {
+                            penalty = c("lasso", "sglasso", "block"),
+                            lambda = NULL, nlambda = 100L,
+                            lambda.min.ratio = NULL, nfolds = 10L,
+                            foldid = NULL, block.size = NULL, thresh = NULL,
+                            ...) {
   penalty <- match.arg(penalty)
   n <- nrow(x)
   p <- ncol(x)
   q <- ncol(u)
   xn <- wafc_names(x, p, "x")
   un <- wafc_names(u, q, "u")
-  if (is.null(active)) {
-    stop("method = \"oracle\" needs 'active', the p by q matrix of the ",
-         "blocks that are really active.", call. = FALSE)
-  }
-  active <- matrix(as.logical(active), p, q)
+  active <- wafc_oracle_active(active, p, q)
   foldid <- wafc_foldid(foldid, n, nfolds)
   J <- wafc_J_grid(J, n)
   if (!any(active)) {
@@ -1354,22 +1387,58 @@ wafc_fit_oracle <- function(x, u, y, active = NULL, J = NULL,
                            note = "no active block: least squares on x")
     return(out)
   }
+  block <- penalty == "block"
+  ## the default tolerance is the one wafc() has for the penalty, read from
+  ## its formals so that the two cannot drift apart
+  thr <- if (is.null(thresh)) {
+    eval(formals(wafc)[["thresh"]], list(penalty = penalty))
+  } else thresh
+  fit_args <- list(thresh = thr)
+  if (!is.null(block.size)) fit_args[["block.size"]] <- block.size
   best <- NULL
-  for (Ji in J) {
+  seen <- character(0)
+  conv <- vector("list", length(J))
+  for (i in seq_along(J)) {
+    Ji <- J[i]
     des <- wafc_design(x, u, J = Ji, ...)
+    key <- paste(des[["J"]], collapse = ",")
+    prev <- match(key, seen)
+    seen[i] <- key
+    if (!is.na(prev)) {
+      if (block) {
+        conv[[i]] <- conv[[prev]]
+        conv[[i]][["J"]] <- Ji
+      }
+      next
+    }
     sub <- wafc_design_keep(des, active)
-    full <- wafc(design = sub, y = y, penalty = penalty, lambda = lambda,
-                 nlambda = nlambda, lambda.min.ratio = lambda.min.ratio)
-    z <- wafc_cv_design(sub, y, full, foldid, function(e) e^2, penalty)
+    if (block) {
+      zz <- wafc_cv_block(sub, y, foldid, lambda, nlambda, lambda.min.ratio,
+                          "mse", fit_args, Ji)
+      full <- zz[["fit"]]
+      z <- zz[["cv"]]
+      conv[[i]] <- z[["conv"]]
+    } else {
+      full <- wafc(design = sub, y = y, penalty = penalty, lambda = lambda,
+                   nlambda = nlambda, lambda.min.ratio = lambda.min.ratio,
+                   thresh = thr)
+      z <- wafc_cv_design(sub, y, full, foldid, function(e) e^2, penalty)
+    }
     if (is.null(best) || z[["cvm.min"]] < best[["cvm"]]) {
       best <- list(cvm = z[["cvm.min"]], J = Ji, fit = full,
-                   lambda = z[["lambda.min"]], design = sub)
+                   lambda = z[["lambda.min"]], design = sub,
+                   nzero = z[["nzero.min"]])
     }
   }
   fit <- best[["fit"]]
   des <- best[["design"]]
   lam <- best[["lambda"]]
-  b <- coef.wafc(fit, s = lam)[-1L, 1L]
+  cf <- coef.wafc(fit, s = lam)
+  b <- cf[-1L, 1L]
+  ## the block LASSO always has the intercept of grpreg, which coef.wafc()
+  ## has already read into the constant covariate when there is one; the
+  ## LASSO fits one only then (wafc()), so it has none to keep
+  a0 <- if (block) as.numeric(cf[1L, 1L]) else 0
   cc <- b[des[["unpenalized"]]]
   names(cc) <- xn
   nz <- matrix(FALSE, p, q, dimnames = list(xn, un))
@@ -1409,10 +1478,19 @@ wafc_fit_oracle <- function(x, u, y, active = NULL, J = NULL,
     }
     out
   }
+  extra <- list(J = best[["J"]], lambda = lam, cvm = best[["cvm"]],
+                penalty = penalty)
+  if (!block) {
+    return(list(fit = fit, cc = cc, beta = beta_fun, g = g_of, blocks = nz,
+                fitted = as.numeric(rowSums(x * beta_fun(u))), xnames = xn,
+                unames = un, extra = extra))
+  }
+  extra[["block.size"]] <- fit[["group"]][["block.size"]]
+  extra[["nzero"]] <- as.integer(best[["nzero"]])
+  extra[["conv"]] <- wafc_kp_conv_table(conv, best[["J"]])
   list(fit = fit, cc = cc, beta = beta_fun, g = g_of, blocks = nz,
-       fitted = as.numeric(rowSums(x * beta_fun(u))), xnames = xn, unames = un,
-       extra = list(J = best[["J"]], lambda = lam, cvm = best[["cvm"]],
-                    penalty = penalty))
+       fitted = as.numeric(a0 + rowSums(x * beta_fun(u))), intercept = a0,
+       xnames = xn, unames = un, extra = extra)
 }
 
 ## ---------------------------------------------------------------------------
@@ -1667,6 +1745,29 @@ wafc_kp_groups <- function(design, block.size, penalize.levels,
     }
   }
   grp
+}
+
+## The 'active' of wafc_fit_oracle(): a p by q logical matrix, or a vector of
+## length pq read by column, with no NA. An empty or absent one is an error
+## and not "no active block", which is the matrix of FALSE.
+wafc_oracle_active <- function(active, p, q) {
+  if (is.null(active) || length(active) == 0L) {
+    stop("method = \"oracle\" needs 'active', the p by q matrix of the ",
+         "blocks that are really active.", call. = FALSE)
+  }
+  if (!(is.logical(active) || is.numeric(active))) {
+    stop("'active' must be a logical p by q matrix.", call. = FALSE)
+  }
+  if (is.matrix(active) && !identical(dim(active), c(p, q))) {
+    stop("'active' must be ", p, " by ", q, " (p by q); it is ",
+         nrow(active), " by ", ncol(active), ".", call. = FALSE)
+  }
+  if (length(active) != p * q) {
+    stop("'active' must have p q = ", p * q, " entries; it has ",
+         length(active), ".", call. = FALSE)
+  }
+  if (anyNA(active)) stop("'active' must not contain NA.", call. = FALSE)
+  matrix(as.logical(active), p, q)
 }
 
 ## A design with the columns of the inactive blocks removed, used by the

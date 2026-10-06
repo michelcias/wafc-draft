@@ -22,6 +22,10 @@
 ## of a resolution with nothing to penalize against lm() and against the
 ## scale of cv.grpreg, and the four earlier forms against a frozen copy of
 ## the grouping of step E2.5e, the same way.
+## Since step E4.1c the oracle of the structure has the block LASSO too,
+## tested as the coordinatewise one is (exact recovery), against
+## cv.wafc() with every block active, and on the candidates of J that the
+## cap of the levels makes equal.
 ## The fourth checks the quantile
 ## universal threshold against its own definition: it is the quantile of
 ## the smallest penalty level that kills the penalized part under the null,
@@ -99,6 +103,121 @@ test_that("the oracle of the structure recovers a sparse truth in the basis", {
   expect_lt(sqrt(mean((predict(fit, x0, u0) - y_exact)^2)), 1e-4)
   ## it cannot have used a block it was told is zero
   expect_false(any(fit[["blocks"]][!act]))
+  expect_identical(fit[["extra"]][["penalty"]], "lasso")
+})
+
+test_that("the block oracle recovers a sparse truth in the basis", {
+  skip_if_not(has("grpreg"))
+  ## the truth of the test above; the tolerance of grpreg is lowered from
+  ## its 1e-4, which stops the path at an error of 4.5e-6
+  d0 <- wafc_design(x0, u0, J = 3L, rescale = FALSE)
+  theta <- numeric(d0[["nvars"]])
+  theta[d0[["unpenalized"]]] <- c(1, 2, -1.5)
+  theta[c(d0[["blocks"]][["x1:u1"]][c(1L, 4L)],
+          d0[["blocks"]][["x2:u1"]][2L])] <- c(1.5, -1, 0.8)
+  y_exact <- as.numeric(d0[["Z"]] %*% theta)
+  act <- matrix(FALSE, p, q)
+  act[1L, 1L] <- TRUE
+  act[2L, 1L] <- TRUE
+  fit <- wafc_competitor("oracle", x0, u0, y_exact, active = act,
+                         foldid = folds, J = 3L, rescale = FALSE,
+                         penalty = "block", thresh = 1e-8,
+                         lambda = c(1e-1, 1e-3, 1e-6, 1e-9))
+  expect_lt(sqrt(mean((predict(fit, x0, u0) - y_exact)^2)), 1e-6)
+  cf <- coef.wafc(fit[["fit"]], s = fit[["extra"]][["lambda"]])[-1L, 1L]
+  expect_lt(max(abs(cf - theta[fit[["fit"]][["design"]][["keep"]]])), 1e-6)
+  expect_equal(unname(fit[["cc"]]), c(1, 2, -1.5), tolerance = 1e-6)
+  expect_identical(unname(fit[["blocks"]]), act)
+  ## the constant covariate carries the intercept of grpreg
+  expect_identical(fit[["intercept"]], 0)
+  expect_identical(fit[["extra"]][["penalty"]], "block")
+  expect_identical(fit[["fit"]][["penalty"]], "block")
+  expect_identical(fit[["extra"]][["block.size"]],
+                   as.integer(ceiling(log(n))))
+})
+
+test_that("with every block active the block oracle is cv.wafc without threshold", {
+  skip_if_not(has("grpreg"))
+  fit <- wafc_fit_oracle(x0, u0, y0, active = matrix(TRUE, p, q), J = 2:4,
+                         foldid = folds, penalty = "block")
+  cv <- cv.wafc(x0, u0, y0, J = 2:4, foldid = folds, penalty = "block",
+                threshold = "none")
+  expect_identical(fit[["extra"]][["J"]], cv[["J.min"]])
+  expect_identical(fit[["extra"]][["lambda"]], cv[["lambda.min"]])
+  expect_identical(unname(fit[["cc"]]), unname(coef(cv)[1L + seq_len(p)]))
+  expect_equal(fit[["fitted"]], as.numeric(predict(cv, x0, u0)),
+               tolerance = 1e-12)
+  expect_identical(unname(fit[["blocks"]]),
+                   unname(wafc_blocks(cv)[["nonzero"]] > 0L))
+  expect_identical(fit[["extra"]][["nzero"]],
+                   as.integer(sum(wafc_blocks(cv)[["nonzero"]])))
+  ## one row of the path of grpreg per candidate, the selected one marked
+  conv <- fit[["extra"]][["conv"]]
+  expect_s3_class(conv, "data.frame")
+  expect_identical(conv[["J"]], 2:4)
+  expect_identical(conv[["J"]][conv[["chosen"]]], cv[["J.min"]])
+})
+
+test_that("a candidate J capped to one already fitted is not refitted", {
+  skip_if_not(has("grpreg"))
+  ## modulators with 16 values have 15 distinct points on the circle, so
+  ## J = 4 is built at 3 (step E3.4) and is the candidate J = 3 again, as
+  ## J = 8 is the candidate J = 7 at n = 250 with continuous modulators
+  u1 <- round(u0 * 15) / 15
+  expect_identical(wafc_design(x0, u1, J = 4L)[["J"]],
+                   wafc_design(x0, u1, J = 3L)[["J"]])
+  for (pen in c("lasso", "block")) {
+    a <- wafc_fit_oracle(x0, u1, y0, active = active0, J = 3L,
+                         foldid = folds, penalty = pen)
+    b <- wafc_fit_oracle(x0, u1, y0, active = active0, J = 3:4,
+                         foldid = folds, penalty = pen)
+    expect_identical(b[["extra"]][["J"]], 3L)
+    expect_identical(b[["extra"]][["lambda"]], a[["extra"]][["lambda"]])
+    expect_identical(b[["fitted"]], a[["fitted"]])
+    if (pen == "block") {
+      conv <- b[["extra"]][["conv"]]
+      expect_identical(conv[["J"]], 3:4)
+      expect_identical(conv[["chosen"]], c(TRUE, FALSE))
+      same <- setdiff(names(conv), c("J", "chosen"))
+      expect_identical(unlist(conv[2L, same]), unlist(conv[1L, same]))
+    }
+  }
+})
+
+test_that("the block oracle keeps the intercept of grpreg when no covariate is constant", {
+  skip_if_not(has("grpreg"))
+  d1 <- simulate_wafc(n, p = 3L, q = 2L, scenario = "smooth", seed = 3L,
+                      intercept = FALSE)
+  fit <- wafc_competitor("oracle", d1[["x"]], d1[["u"]], d1[["y"]],
+                         active = nzchar(d1[["structure"]]), J = 2:4,
+                         foldid = folds, penalty = "block")
+  a0 <- fit[["intercept"]]
+  expect_true(is.numeric(a0) && length(a0) == 1L && a0 != 0)
+  expect_equal(predict(fit, d1[["x"]], d1[["u"]]),
+               a0 + rowSums(d1[["x"]] * fit[["beta"]](d1[["u"]])),
+               tolerance = 1e-12)
+  expect_equal(predict(fit, d1[["x"]], d1[["u"]]), fit[["fitted"]],
+               tolerance = 1e-12)
+})
+
+test_that("an absent, empty or ill-formed 'active' is an error, and no active block is least squares", {
+  for (pen in c("lasso", "block")) {
+    ora <- function(a) wafc_fit_oracle(x0, u0, y0, active = a, J = 3L,
+                                       foldid = folds, penalty = pen)
+    expect_error(ora(NULL), "needs 'active'")
+    expect_error(ora(logical(0)), "needs 'active'")
+    expect_error(ora(matrix(logical(0), 0L, 0L)), "needs 'active'")
+    expect_error(ora(matrix(TRUE, q, p)), "must be 3 by 2 \\(p by q\\); it is 2 by 3")
+    expect_error(ora(TRUE), "must have p q = 6 entries; it has 1")
+    expect_error(ora(c(TRUE, NA, FALSE, FALSE, FALSE, FALSE)), "must not contain NA")
+    expect_error(ora(matrix("a", p, q)), "logical p by q matrix")
+    ## a matrix of FALSE is the null cell, where the oracle is the linear fit
+    fit <- ora(matrix(FALSE, p, q))
+    lin <- wafc_fit_linear(x0, u0, y0)
+    expect_identical(fit[["fitted"]], lin[["fitted"]])
+    expect_identical(fit[["extra"]][["note"]],
+                     "no active block: least squares on x")
+  }
 })
 
 ## ---------------------------------------------------------------------------
@@ -106,13 +225,17 @@ test_that("the oracle of the structure recovers a sparse truth in the basis", {
 ## ---------------------------------------------------------------------------
 
 test_that("every competitor answers in the coordinates of the model", {
-  mths <- c("gam", "bsgl", "klopp", "aspline", "linear", "oracle")
+  mths <- c("gam", "bsgl", "klopp", "aspline", "linear", "oracle",
+            "oracle.block")
   if (has("VCBART")) mths <- c(mths, "vcbart")
   for (mth in mths) {
-    if (mth %in% c("bsgl", "klopp") && !has("grpreg")) next
+    if (mth %in% c("bsgl", "klopp", "oracle.block") && !has("grpreg")) next
     if (mth == "gam" && !has("mgcv")) next
-    fit <- wafc_competitor(mth, x0, u0, y0, active = active0, foldid = folds,
-                           J = 3L, df = 8L, burn = 100L, nd = 100L)
+    ## the oracle in blocks of step E4.1c is the oracle with penalty = "block"
+    args <- list(sub("\\.block$", "", mth), x0, u0, y0, active = active0,
+                 foldid = folds, J = 3L, df = 8L, burn = 100L, nd = 100L)
+    if (mth == "oracle.block") args[["penalty"]] <- "block"
+    fit <- do.call(wafc_competitor, args)
     expect_s3_class(fit, "wafc_competitor")
     ## beta(u) has one column per linear covariate, in the order of the design
     b <- fit[["beta"]](u0)

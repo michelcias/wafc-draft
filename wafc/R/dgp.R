@@ -32,7 +32,10 @@
 ##
 ## The active structure is the same in the first three: beta_1 depends on
 ## two modulating covariates (the additive structure that is the point of
-## the model), beta_2 on one, and beta_l is constant for l >= 3.
+## the model), beta_2 on one, and beta_l is constant for l >= 3. Since step
+## E4.1c, simulate_wafc() also takes a structure of its own, a p by q matrix
+## of component names in place of the one of the scenario, which is how the
+## larger model of decision D63 activates six blocks.
 ##
 ## Each scenario also declares the effective regularity s' of decision D27,
 ## through wafc_sprime(); see the note on that function for why the number
@@ -371,6 +374,23 @@ wafc_sprime <- function(scenario = c("smooth", "uneven", "inhomogeneous",
 #'   \code{x_u_rho}. With \code{x_dist = "uniform"} the variance of
 #'   \eqn{X_\ell} is \eqn{1/3} at zero, kept for reproducibility, and
 #'   \eqn{1} at any positive value.
+#' @param structure Optional \eqn{p \times q} character matrix of
+#'   component names, in the form \code{\link{wafc_scenario}} returns:
+#'   entry \eqn{(\ell, m)} names the component \eqn{g_{\ell m}} among
+#'   those of \code{\link{wafc_component}}, and \code{""} or
+#'   \code{"zero"} marks a zero block. Given, it replaces the structure of
+#'   the scenario, which then only labels the sample. \code{NULL} (the
+#'   default) uses the structure of \code{scenario} and draws exactly the
+#'   sample drawn before the argument existed. No structure adds a call to
+#'   the random number generator, so draws with the same \code{seed} share
+#'   \code{u}, \code{x} and the standardised errors whatever the
+#'   structure, and a structure equal to the one of a scenario draws the
+#'   sample of that scenario. With a structure given, \code{sprime} is
+#'   \code{NA}: the regularities of \code{\link{wafc_sprime}} are declared
+#'   per scenario, from measurements of whole scenarios, and not per
+#'   component, so the minimum over the components a structure activates is
+#'   not a number this function can declare. The structure returned has
+#'   \code{""} in every zero block.
 #'
 #' @return An object of class \code{"wafc_dgp"}: a list with the response
 #'   \code{y}, the covariates \code{x} and \code{u}, the regression function
@@ -378,7 +398,8 @@ wafc_sprime <- function(scenario = c("smooth", "uneven", "inhomogeneous",
 #'   evaluated at the sample, the true \code{cc}, the \eqn{p \times q} list
 #'   \code{g} of components (\code{NULL} where the block is zero), the
 #'   \code{structure} matrix of names, the declared effective regularity
-#'   \code{sprime} of \code{\link{wafc_sprime}} with its \code{regime},
+#'   \code{sprime} of \code{\link{wafc_sprime}} with its \code{regime}
+#'   (\code{NA} when \code{structure} is given),
 #'   \code{x_u_rho} with the named integer vector \code{x_u} of the
 #'   modulating covariate each linear covariate is paired with (\code{NA}
 #'   for the constant one), and \code{sigma}, \code{scenario}, \code{seed}
@@ -388,6 +409,10 @@ wafc_sprime <- function(scenario = c("smooth", "uneven", "inhomogeneous",
 #' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
 #' str(d$y)
 #' colMeans(d$beta)
+#' s <- matrix("", 4, 3)
+#' s[1, 1] <- "bumps"
+#' s[3, 2] <- "blocks"
+#' simulate_wafc(200, p = 4, q = 3, structure = s, seed = 1)$structure
 #'
 #' @export
 simulate_wafc <- function(n, p = 3L, q = 2L,
@@ -399,7 +424,7 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
                           u_dist = c("uniform", "beta"), u_rho = 0,
                           cc = NULL, amplitude = 1,
                           regime = c("periodic", "margin", "interval"),
-                          x_u_rho = 0) {
+                          x_u_rho = 0, structure = NULL) {
 
   this_call <- wafc_compact_call(match.call(), "simulate_wafc")
   scenario <- match.arg(scenario)
@@ -464,8 +489,13 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
     x[, free] <- sqrt(1 - x_u_rho^2) * z + x_u_rho * h
   }
 
-  ## Functional coefficients.
-  struct <- wafc_scenario(scenario, p, q, regime = regime)
+  ## Functional coefficients, from the structure of the scenario or the one
+  ## given. Nothing is drawn from here to the errors.
+  struct <- if (is.null(structure)) {
+    wafc_scenario(scenario, p, q, regime = regime)
+  } else {
+    wafc_structure_check(structure, p, q, regime)
+  }
   g <- vector("list", p * q)
   dim(g) <- c(p, q)
   beta <- matrix(rep(cc, each = n), n, p)
@@ -507,6 +537,39 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
               seed = seed, n = as.integer(n), p = p, q = q,
               x_u_rho = x_u_rho, x_u = x_u, call = this_call)
   class(out) <- "wafc_dgp"
+  out
+}
+
+## The structure given to simulate_wafc(): a p by q character matrix of names
+## of wafc_component(), with "" or "zero" for a zero block. It is returned in
+## the form of wafc_scenario(): no dimnames, "" in the zero blocks, and the
+## attributes "sprime", NA here (see the note on the argument), and
+## "regime".
+wafc_structure_check <- function(structure, p, q, regime) {
+  zero <- "\"\" or \"zero\" for a zero block"
+  if (!is.matrix(structure) || !is.character(structure)) {
+    stop("'structure' must be a character matrix of component names, with ",
+         zero, ".", call. = FALSE)
+  }
+  if (!identical(dim(structure), c(p, q))) {
+    stop("'structure' must be ", p, " by ", q, " (p by q); it is ",
+         nrow(structure), " by ", ncol(structure), ".", call. = FALSE)
+  }
+  if (anyNA(structure)) {
+    stop("'structure' must not contain NA; mark a zero block with ", zero,
+         ".", call. = FALSE)
+  }
+  known <- setdiff(eval(formals(wafc_component)[["name"]]), "zero")
+  bad <- setdiff(unique(as.vector(structure)), c("", "zero", known))
+  if (length(bad) > 0L) {
+    stop("unknown component(s) in 'structure': ",
+         paste0("\"", bad, "\"", collapse = ", "), ". Known: ",
+         paste(known, collapse = ", "), ", and ", zero, ".", call. = FALSE)
+  }
+  out <- matrix(as.vector(structure), p, q)
+  out[out == "zero"] <- ""
+  attr(out, "sprime") <- NA_real_
+  attr(out, "regime") <- regime
   out
 }
 
