@@ -950,7 +950,8 @@ escolha continua do autor (pergunta 2 do `ESTADO.md`).
   beijing.heat, o Dongsi; marylebone, um sítio.
 - **As datas efetivas da temporada de aquecimento** de cada ano de
   2013–2017 não foram conferidas; as marcas são 15 de novembro e 15 de março
-  em todo ano.
+  em todo ano. **Nota da L13 (2026-10-06):** Liang et al. (2015, p. 16) dão
+  só o fim de 17 de março de 2013 nesse período; as marcas são nominais.
 
 ---
 

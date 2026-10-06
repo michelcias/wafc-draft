@@ -2084,6 +2084,54 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: L13 fechada, Liang et al. (2015) e Opsomer, Wang & Yang (2001)
+
+- **O que entrou:** `referencias-verificadas.bib` de 97 a **99 entradas**
+  (`Liang-Zou-Guo-Li-Zhang-Zhang-Huang-Chen-2015`, `Opsomer-Wang-Yang-2001`,
+  na seção da aplicação, com as localizações), compilado sem aviso; as duas
+  linhas do `literatura.md` verificadas. Seguem `[VERIFICAR]` só Carslaw &
+  Ropkins (2012), Lee et al. (2015) e Plumley (2022), de bases que saíram.
+- **Liang et al. (2015):** a temporada "runs usually from 15 November to
+  15 March" (§7, p. 14); o aumento de PM2.5 é significativo em toda
+  temporada de 2010 a 2014 (`p ≤ 0,015`), e **o intervalo de 31% a 72% em
+  março confere** (p. 16; Fig. 6). **As datas efetivas mudam com a
+  temperatura** (início em 3 de novembro de 2012; fins em 22, 18 e 17 de
+  março de 2010, 2012 e 2013, p. 16); do período do Dongsi, só o fim de
+  2013 tem fonte. As marcas da `beijing.heat` (dias 318 e 73) são as
+  nominais. A série deles é a da embaixada dos EUA, não a do Dongsi.
+- **Opsomer, Wang & Yang (2001):** *Statist. Sci.* 16(2), **134–153**
+  (as páginas de memória conferem; o Crossref grafa "Regressin"). Os
+  seletores que supõem independência suavizam de menos sob correlação
+  positiva: §2 (pp. 134–135, Tabela 1), §3.1 (p. 139, CV, GCV e Cp) e §3.2
+  (p. 141, nos splines: "CV, GCV, GML [...] tend to underestimate smoothing
+  parameters"); **o GML é o REML** (§4.2, p. 150), o que cobre o
+  `gam.reml`; a palavra certa é GML/REML, não "máxima verossimilhança". A
+  validação cruzada que deixa blocos de vizinhos de fora (Chu & Marron
+  1991) está no §3.1, pp. 139–140, e é a ideia das dobras por semana.
+  Delineamento fixo e univariado, sem teorema na frase da p. 141.
+- **Frases para a E5b** (rascunho do chat de tarefa; "neighbouring" passa a
+  "neighboring" no artigo):
+
+```text
+The winter heating season of Beijing and the North China Plain usually
+runs from 15 November to 15 March, and the weather-adjusted PM2.5 level
+rises significantly at its start and falls at its end in every season
+from 2010 to 2014 (Liang et al., 2015, Section 7); the effective dates
+move with the temperature (for instance, the season started on 3 November
+in 2012), so the marks at 15 November and 15 March are nominal.
+
+Smoothing-parameter selectors that assume independent errors, such as GCV
+and generalized maximum likelihood, which coincides with REML, tend to
+undersmooth when the errors are correlated (Opsomer, Wang and Yang, 2001,
+Sections 2, 3.2 and 4.2); cross-validation that leaves out whole blocks of
+neighboring observations, as the folds here do, follows the modified
+cross-validation reviewed in their Section 3.1.
+```
+
+- **Lição:** o título de um registro do Crossref pode ter erro de
+  digitação; a folha de rosto manda, como D39 já diz para os nomes.
+- Pendências na pergunta 58.
+
 ### 2026-10-06: L12 fechada, as fontes da aplicação lidas no PDF
 
 - **O que entrou:** `referencias-verificadas.bib` de 88 a **97 entradas**,
@@ -4013,6 +4061,24 @@ Ordenadas pelo que bloqueia mais.
    - (d) **O ano do Open-Meteo:** 2024, o do registro no DataCite, como no
      `Wood-mgcv-2025`. **Recomendação:** manter.
 
+58. **Pendências de L13** (2026-10-06). Recomendação do chat principal:
+   - (a) **O Opsomer na aplicação:** na `beijing.heat`, a vantagem de ~9%
+     do WAFC sobre os splines de D46 some contra o `gam.cv` em blocos
+     (E6.1b, §13), e Opsomer et al. dão a razão (o seletor do spline sob
+     erro dependente, não a base). **Recomendação:** a segunda frase acima
+     entra na aplicação, junto da tabela da `beijing.heat`, para que a
+     vantagem seja lida como de sintonia em dado dependente antes que o
+     referee a descubra; o `gamm` com erro autorregressivo fica para a
+     resposta ao referee (risco de D56). É coerente com D56: o artigo diz
+     que nenhum dos métodos modela a dependência e diz o que isso faz com
+     o seletor do spline.
+   - (b) **As marcas da `beijing.heat`:** ficam nos dias nominais (318 e
+     73), com "nominal" na legenda e nos comentários do código (o
+     `wafc-studies/R/application_data.R`, linhas 70–74, e o script 10,
+     linhas 351–357, dizem "administrative" sem a ressalva).
+     **Recomendação:** ficar no nominal; datas efetivas pediriam fonte
+     para 2013 a 2016 que nenhum artigo lido dá.
+
 ---
 
 ## 5. Próximos passos
@@ -4075,6 +4141,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | L13 fechada e integrada (99 entradas): a temporada de Liang et al. e o 31% a 72% conferem, as datas são nominais; Opsomer et al. em 134–153, com o GML igual ao REML; pergunta 58 |
 | 2026-10-06 | L13 catalogada: Liang et al. (2015) e Opsomer, Wang & Yang (2001), as duas fontes da aplicação ainda `[VERIFICAR]` |
 | 2026-10-06 | E6.2 (a aplicação no compêndio) catalogada, em paralelo à E4.1c, com as 20 partições por bloco e a junção exata contra a E6.1b e a E6.1c |
 | 2026-10-06 | Pergunta 57 decidida (D64): os ressaltos numa frase, com o mergulho de 2002 em Carslaw; o degrau contra Marylebone Road; ERA5 e Open-Meteo como estão |

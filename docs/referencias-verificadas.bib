@@ -7,6 +7,12 @@
 % redigitar; nelas só se acrescentou a linha `doi`, conferida no Crossref.
 % Nada daqui leva mais a nota "[L1: confirmar]".
 %
+% Nona rodada (L13, 2026-10-06): as duas fontes da aplicação que L12
+% deixou, lidas no PDF (refs/), no fim da seção da aplicação: Liang et al.
+% (2015), a temporada de aquecimento da base beijing.heat, e Opsomer, Wang
+% & Yang (2001), por que o REML e o GCV suavizam de menos com resíduo
+% correlacionado.
+%
 % Oitava rodada (L12, 2026-10-06): as fontes da aplicação marylebone. Numa
 % seção nova antes do software, os cinco artigos (Carslaw 2005; Carslaw &
 % Beevers 2005; Clapp & Jenkin 2001; Hersbach et al. 2020; Nadeau &
@@ -1347,6 +1353,64 @@
   number  = {3},
   pages   = {239--281},
   doi     = {10.1023/A:1024068626366}
+}
+
+% Aplicação: a segunda base (beijing.heat) e a sintonia dos splines (L13)
+
+% L13 (2026-10-06), lido no PDF da editora (refs/liang2015.pdf, 20
+% páginas). O Crossref confere título, oito autores, 471(2182), o número
+% de artigo 20150257 (no `pages`, como Montoril, Morettin & Chiann 2018),
+% DOI e `published-print` 2015-10 (on-line 2015-10-08); grafa o título
+% com "<sub>2.5</sub>". Nomes como na linha de autoria (D39), iguais aos
+% do Crossref. Os dados são os da embaixada dos EUA, 2010--2014 (p. 2),
+% não os do Dongsi. Localizações: a temporada de aquecimento "runs
+% usually from 15 November to 15 March in Beijing and the NCP" (§7,
+% p. 14; "from November to March" no §6, p. 12); as datas efetivas mudam
+% com a temperatura, "it was started on 3 November in 2012; and ended on
+% 22, 18, 17 March in 2010, 2012 and 2013" (§7, p. 16), e o texto não dá
+% as outras; o efeito é medido nas médias ajustadas ao tempo (§5) em
+% janelas de duas semanas antes e depois do início e do fim (p. 16), com
+% aumento significativo em toda temporada (valores-p ≤ 0,015), de 31%
+% (2013) a 183% (2010) em novembro, 157% em 2014 em parte pela APEC, e de
+% 31% a 72% em março, conta inversa da queda de 24% a 42% com o fim do
+% aquecimento (p. 16; Fig. 6b,c, p. 15); "a more than 50% increase (on
+% average)" nos meses de inverno desde 2010 (§9, p. 18).
+@article{Liang-Zou-Guo-Li-Zhang-Zhang-Huang-Chen-2015,
+  author  = {Liang, Xuan and Zou, Tao and Guo, Bin and Li, Shuo and Zhang, Haozhe and Zhang, Shuyi and Huang, Hui and Chen, Song Xi},
+  title   = {Assessing {B}eijing's {PM$_{2.5}$} pollution: severity, weather impact, {APEC} and winter heating},
+  journal = {Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences},
+  year    = {2015},
+  volume  = {471},
+  number  = {2182},
+  pages   = {20150257},
+  doi     = {10.1098/rspa.2015.0257}
+}
+
+% L13 (2026-10-06), lido no PDF (refs/opsomer2001.pdf). O cabeçalho da
+% p. 134 dá "Statistical Science 2001, Vol. 16, No. 2, 134--153"; o
+% Crossref confere volume, número, DOI e `published-print` 2001-05-01, mas
+% não traz páginas e grafa o título "Nonparametric Regressin with
+% Correlated Errors"; o título é o da folha de rosto. Nomes como na linha
+% de autoria ("Jean Opsomer, Yuedong Wang and Yuhong Yang", D39; o mesmo
+% autor é "Jean D." em Kauermann-Opsomer-2011). Localizações: com erros
+% correlacionados, os seletores automáticos "break down" (§2, p. 134) e,
+% sob correlação positiva, escolhem janela menor (Tabela 1 e Fig. 1,
+% p. 135; §3.1, p. 139, com o mesmo para o GCV e o Cp de Mallows, via
+% Chiu 1989); nos splines, "CV, GCV, GML (generalized maximum likelihood)
+% and UBR [...] tend to underestimate smoothing parameters when data are
+% correlated" (§3.2, p. 141); "the GML estimates of parameters are also
+% REML estimates" (§4.2, p. 150). A validação cruzada que deixa de fora
+% as 2l + 1 observações vizinhas (MCV de Chu & Marron 1991) e a
+% particionada estão no §3.1, pp. 139--140.
+@article{Opsomer-Wang-Yang-2001,
+  author  = {Opsomer, Jean and Wang, Yuedong and Yang, Yuhong},
+  title   = {Nonparametric regression with correlated errors},
+  journal = {Statistical Science},
+  year    = {2001},
+  volume  = {16},
+  number  = {2},
+  pages   = {134--153},
+  doi     = {10.1214/ss/1009213287}
 }
 
 % ---------------------------------------------------------------------
