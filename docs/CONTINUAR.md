@@ -115,6 +115,9 @@ NC=4 setsid nohup wafc/cache/e61b/run.sh > wafc/cache/e61b/run.out 2>&1 &   # E6
 E61B_EXTRA=gam.cv Rscript wafc/scripts/10-sondagem-aplicacao-b.R all extra 2 20 0   # E6.1b, o gam.cv em dobras por bloco: ~1 h
 Rscript wafc/scripts/10-sondagem-aplicacao-b.R all report 1 20 0                   # E6.1b, as tabelas de aplicacao-candidatas.md §11 a §14
 Rscript derivations/check/09-cota-inferior.R                                       # E1.9: ~90 s
+Rscript wafc/scripts/10-sondagem-aplicacao-b.R marylebone.ukair fit 3 20 0         # E6.1c, marylebone com dados do UK-AIR e do ERA5: 5 h 27 min em 3 processos, pico de 4,4 GB; os dados em wafc/cache/data/marylebone.ukair/ (fontes e SHA-256 no script e em aplicacao-candidatas.md §17)
+E61B_EXTRA=gam.cv Rscript wafc/scripts/10-sondagem-aplicacao-b.R marylebone.ukair extra 3 20 0   # E6.1c, o gam.cv: ~3 min
+Rscript wafc/scripts/10-sondagem-aplicacao-b.R marylebone.ukair report 1 20 0      # E6.1c, as tabelas da §17
 ```
 
 ## 3. Onde o trabalho está (resumo de 2026-10-05; o `ESTADO.md` manda)

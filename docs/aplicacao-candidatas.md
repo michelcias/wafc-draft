@@ -973,3 +973,273 @@ Rscript wafc/scripts/10-sondagem-aplicacao-b.R all report 1 20 0
   `extra-call.log` e `mem.log`.
 - **Dados:** as somas SHA-256 dos arquivos estão no script; os de E6.1a,
   também na §2.
+
+---
+
+## 17. E6.1c: marylebone com dados de licença declarada
+
+**Atualização de 2026-10-05.** D57 escolheu marylebone como aplicação
+principal, com a condição de a base sair de dados de licença declarada e de
+o degrau de 2002–2003 se repetir com eles. Esta seção refaz a base com a
+especificação da E6.1b (§9) e o mesmo retrato do código (`b0ea096`), como a
+base `marylebone.ukair` do `wafc/scripts/10-sondagem-aplicacao-b.R`. As
+outras seis bases não mudaram; o `all` do script continua sendo as seis da
+E6.1b, e a base nova é chamada pelo nome.
+
+### 17.1 Os dados
+
+| arquivo | fonte | licença | tamanho | SHA-256 |
+|---|---|---|---|---|
+| `MY1_1998.RData` | UK-AIR (Defra), `https://uk-air.defra.gov.uk/openair/R_data/MY1_1998.RData` | OGL | 820 147 B | `503ee40cef24944022f7f78424d2092c81934753b8a429d83cc91cc74fa85412` |
+| `MY1_1999.RData` | idem, `MY1_1999.RData` | OGL | 796 287 B | `4007f98e51d3efdcdc39ef1b97e0119b36d25e04a6bcf65eec4a5ae0c45e085b` |
+| `MY1_2000.RData` | idem, `MY1_2000.RData` | OGL | 843 201 B | `f157a23b0a2e6221c2da10603c5a325fd35fea8e29dcd3428b27f9c4eb915715` |
+| `MY1_2001.RData` | idem, `MY1_2001.RData` | OGL | 817 763 B | `63b8283f629327bc36fb1fc34693b84f0b9989331d516867940217926e6a48fd` |
+| `MY1_2002.RData` | idem, `MY1_2002.RData` | OGL | 853 690 B | `6db6ebae8d683d69879c27f6102e267df38d800bb926a47756102d37b3589c7f` |
+| `MY1_2003.RData` | idem, `MY1_2003.RData` | OGL | 819 339 B | `2b32e149445b83d49125c3b8f3046ba8a1efb95a22fbfe09ef5a0b993a37ec6b` |
+| `MY1_2004.RData` | idem, `MY1_2004.RData` | OGL | 805 052 B | `fe88b12e189772938251e5a1031ffc0f6a7ecf33236f90c3913bb663591c3651` |
+| `MY1_2005.RData` | idem, `MY1_2005.RData` | OGL | 793 328 B | `a3ed2c09c8feee9085bf54863e4757ed13a8220693634a30da9f281787e91324` |
+| `era5-wind-my1-1998-2005.csv` | ERA5 pela API histórica do Open-Meteo, `https://archive-api.open-meteo.com/v1/archive?latitude=51.5225&longitude=-0.1546&start_date=1998-01-01&end_date=2005-12-31&hourly=wind_speed_10m,wind_direction_10m&models=era5&wind_speed_unit=ms&timezone=GMT&format=csv` | CC BY 4.0 (Open-Meteo e ERA5) | 1 808 708 B | `e026ea3fa1ca311e599e87b52b9415499f419d7f87d05983974d5f9d64f25641` |
+
+Baixados em 2026-10-05, com a permissão do autor, para
+`wafc/cache/data/marylebone.ukair/` (não versionado). As somas também estão
+no script.
+
+**Os poluentes.**
+- São as séries horárias da rede AURN em Marylebone Road (sítio MY1), nos
+  arquivos anuais que o `openair::importAURN()` lê.
+- Cada arquivo traz `date`, `NOXasNO2`, `NO2`, `O3` e outras 30 colunas, em
+  µg/m³ a 20 °C e 1013 mb, com o NOx expresso como NO2.
+- Antes de ~2010 eles não trazem vento (a documentação do `importUKAQ`: o
+  vento modelado pelo WRF existe "generally from around 2010").
+- **A licença.** A página de dados do UK-AIR
+  (`https://uk-air.defra.gov.uk/data/`) diz que a informação é publicada
+  sob a Open Government Licence e aponta o link da **versão 2**; o rodapé do
+  site diz "All content is available under the Open Government Licence
+  v3.0". As duas versões permitem copiar, adaptar e redistribuir com
+  atribuição. A atribuição pedida é: "© Crown 2026 copyright Defra via
+  uk-air.defra.gov.uk, licenced under the Open Government Licence (OGL)."
+- **A conversão para ppb.** O oxidante `OX = NO2 + O3` é uma soma molar, e o
+  `mydata` está em ppb. Os três foram convertidos com os fatores da Defra
+  para o arquivo do UK-AIR a 20 °C e 1013 mb: 1 ppb de NO2 (e de NOx como
+  NO2) = 1,9125 µg/m³; 1 ppb de O3 = 1,9957 µg/m³ ("Conversion Factors
+  Between ppb and µg m-3 and ppm and mgm-3", relatório cat06 0502160851 do
+  UK-AIR, lido).
+
+**O vento.**
+- É o vento a 10 m da reanálise ERA5 (Hersbach et al. 2020), horário e
+  instantâneo, no ponto de grade mais próximo da MY1.
+- A API respondeu com 51,5° N, 0,25° W e 35 m de altitude, a ~7 km a oeste
+  do sítio, numa grade de 0,25°.
+- O Open-Meteo serve o ERA5 sob CC BY 4.0; o conjunto do ERA5 no Climate
+  Data Store está sob CC-BY (DOI 10.24381/cds.adbb2d47).
+- Sem conta e sem chave, para uso não comercial.
+- O arquivo é gerado a cada pedido: um download novo pode mudar a soma sem
+  mudar os valores (o script avisa, como faz com os outros).
+- **Por que não uma estação.** A alternativa era o MIDAS Open do Met Office
+  em Heathrow (OGL v3, ~22 km), que pede conta no CEDA. Ela grava a
+  velocidade em nós inteiros, com ~30 valores, o que cai no caso da
+  moduladora discreta da lição 3 da E6.1b com `J ≥ 5`.
+
+**O alinhamento e a janela.**
+- A `date` do UK-AIR é o início da hora da média (a primeira hora de cada
+  ano é 00:00), a mesma convenção do `mydata`: a primeira linha das duas
+  bate.
+- O vento do ERA5 é instantâneo, então cada hora recebe a velocidade do seu
+  meio, por interpolação linear entre `t` e `t + 1 h`.
+- A janela é a do `mydata`, de 1998-01-01 00:00 a 2005-06-23 12:00 GMT, para
+  os números serem comparáveis aos da E6.1b; os arquivos cobrem 1998 a
+  2005.
+- O mapeamento é o de `marylebone`: `Y = NO2 + O3`, `X = (1, NOx/100)`,
+  `U = (data em dias, velocidade do vento)`, bloco = semana.
+- A direção do vento é lida e não usada, como em `marylebone`.
+
+**O que mudou em relação ao `mydata`** (as 65 533 horas da janela,
+casadas pela `date`):
+
+| | horas com as duas | só no `mydata` | só no UK-AIR | correlação | diferença média (UK-AIR − `mydata`) | a menos de 1 ppb, arredondado |
+|---|---|---|---|---|---|---|
+| NOx | 62 959 | 151 | 6 | 0,9995 | +0,26 ppb | 94,5% |
+| NO2 | 62 945 | 150 | 20 | 0,9958 | +0,25 ppb | 97,5% |
+| O3 | 62 762 | 182 | 56 | 0,9879 | +0,13 ppb | 98,4% |
+| vento | 65 533 | | | 0,847 | −0,43 m/s (4,06 contra 4,49) | |
+
+- Os poluentes são, na prática, as mesmas medidas, em µg/m³ inteiros em vez
+  de ppb inteiros. O `mydata` parece truncar na conversão (a diferença média
+  fica em ~+0,25 ppb).
+- O vento é outro: o do `mydata`, de fonte não declarada, correlaciona 0,85
+  com o ERA5, e a correlação é máxima com defasagem de 0 a −1 h.
+- O ERA5 tem 1 111 valores distintos de velocidade no arquivo; a moduladora
+  é contínua.
+- O O3 do UK-AIR tem 13 horas negativas (até −1 ppb) na janela e 1 989
+  zeros; ficaram como estão.
+
+**A base.**
+- 61 280 horas completas, contra 60 780 do `mydata`.
+- 383 semanas, contra 382, então as partições não são as mesmas da E6.1b
+  (a semente é a da base nova, sétima na ordem): a comparação entre as duas
+  é de médias, não pareada.
+- Os poluentes vêm 2 568 a 2 715 horas faltando na janela; o vento, nenhuma.
+
+### 17.2 A rodada
+
+- **A especificação é a da E6.1b**, com as mesmas chamadas e o mesmo retrato
+  `b0ea096` (extraído em `wafc/cache/e61c/snap/` e conferido arquivo a
+  arquivo): o block LASSO balanceado com `J = 2:8` e 10 dobras por semana,
+  o limiar `+cv1se` e `+cv`, `gam.reml` e `gam.gcv` (D46), o linear, e o
+  `gam.cv` nas mesmas dobras, só para os documentos de trabalho (D56).
+- **As partições:** 20, cada uma com 115 das 383 semanas no teste (17 974 a
+  18 622 horas).
+- **O custo:** lançada em 2026-10-05 às 21h37 com 3 processos, com a
+  permissão do autor; a parte `fit` terminou às 03h04 (5 h 27 min) e o
+  `gam.cv` levou 2,6 min.
+  - Mediana por unidade: 2 655 s, máximo 3 567 s.
+  - Por método: o WAFC 2 483 s, o `gam.reml` 6 s, o `gam.gcv` 149 s e o
+    `gam.cv` 22 s.
+  - Pico de 4,4 GB por processo e 11,1 GB somados, sem swap nova.
+- **Escolhas:** `J = 5` em 16 partições e 6 em 4 (na E6.1b, 17 e 3). O
+  `gam.reml` e o `gam.gcv` foram ao topo da grade (`k = 80`) em 20 de 20,
+  como na E6.1b. O `gam.cv` ficou em `k = 20` em 7 e `k = 40` em 13.
+
+### 17.3 Predição
+
+RMSE no teste, média de 20 partições (ppb), e a diferença pareada do WAFC a
+cada spline, com o erro-padrão ingênuo e o corrigido por Nadeau & Bengio
+(fator 3,09). "Vence" conta as partições em que o WAFC fica abaixo do spline.
+
+| método | `marylebone.ukair` (E6.1c) | `marylebone` (E6.1b) |
+|---|---|---|
+| WAFC `+cv1se` | 11,73 ± 0,11 | 12,02 ± 0,10 |
+| WAFC `+cv` | 11,39 ± 0,10 | 11,79 ± 0,10 |
+| `gam.reml` | 11,39 ± 0,10 | 11,77 ± 0,10 |
+| `gam.gcv` | 11,40 ± 0,10 | 11,80 ± 0,11 |
+| `gam.cv` | 11,18 ± 0,10 | 11,58 ± 0,10 |
+| linear | 15,46 ± 0,10 | 15,69 ± 0,11 |
+
+| diferença | E6.1c | vence | E6.1b | vence |
+|---|---|---|---|---|
+| `+cv` − `gam.reml` | −0,001 ± 0,045 (0,140) | 8/20 | +0,018 ± 0,043 (0,133) | 8/20 |
+| `+cv` − `gam.gcv` | −0,011 ± 0,040 (0,123) | 9/20 | −0,013 ± 0,045 (0,139) | 11/20 |
+| `+cv1se` − `gam.reml` | +0,344 ± 0,083 (0,255), razão 1,030 | 4/20 | +0,251 ± 0,070 (0,217), razão 1,022 | 4/20 |
+| `+cv1se` − `gam.gcv` | +0,334 ± 0,077 (0,238), razão 1,030 | 4/20 | +0,219 ± 0,072 (0,222), razão 1,019 | 5/20 |
+| `+cv` − `gam.cv` | +0,204 ± 0,039 (0,121), razão 1,018 | 0/20 | +0,212 ± 0,040 (0,125), razão 1,018 | 1/20 |
+| `+cv1se` − `gam.cv` | +0,549 ± 0,078 (0,242), razão 1,049 | 0/20 | +0,444 ± 0,062 (0,192), razão 1,039 | 1/20 |
+
+Três leituras:
+- **Contra os dois splines de D46, o `+cv` empata** nas duas bases, com
+  diferença de um centésimo de ppb e menos de meio erro-padrão ingênuo.
+- **O `+cv1se` fica 3,0% atrás** deles (2,2% na E6.1b), a mais de quatro
+  erros-padrão ingênuos e a ~1,4 corrigidos.
+- **Contra o `gam.cv`**, que fica nos documentos de trabalho (D56), o
+  quadro da E6.1b se repete: o `+cv` fica 1,8% atrás em 20 de 20 partições.
+
+Todos os métodos predizem ~0,2 a 0,4 ppb melhor com os dados novos (`R²`
+de 0,70 contra 0,68 no `+cv`). A comparação não é pareada e o vento mudou,
+então não se separa o efeito da fonte do vento do efeito dos poluentes.
+
+### 17.4 Estrutura
+
+Fração das 20 partições em que o bloco fica, com o `edf` mediano dos
+splines e, entre colchetes, a amplitude mediana da componente sobre a grade
+da moduladora (ppb, por 100 ppb de NOx nos blocos de NOx).
+
+| bloco | `+cv1se` | `+cv` | `gam.reml` (`edf`) | `gam.cv` (`edf`) | E6.1b: `+cv1se` / `+cv` / `gam.cv` (`edf`) |
+|---|---|---|---|---|---|
+| one × data | 1 [20,4] | 1 [20,4] | 1 (71) | 1 (37) | 1 / 1 / 1 (37) |
+| one × vento | 0,45 [0] | 1 [5,5] | 1 (9,6) | 1 (8,9) | 0,60 / 1 / 1 (4,9) |
+| NOx × data | 1 [15,9] | 1 [15,9] | 1 (71) | 1 (36) | 1 / 1 / 1 (36) |
+| NOx × vento | 0 | 1 [1,65] | 1 (3,4) [1,32] | 1 (3,4) [1,50] | 0 / 1 [2,53] / 1 (10) [2,70] |
+
+**O degrau de `NOx × data` se repete**, na posição, no tamanho e em toda
+partição. A tabela dá a fração da subida atingida em cada data, definida
+partição a partição como `(g(data) − antes)/(depois − antes)`, onde "antes"
+é a média da componente até 2001-12-31 e "depois" a média de 2004-01-01 até
+60 dias antes do fim da grade (longe da borda):
+
+| data | E6.1c, WAFC | E6.1c, `gam.cv` | E6.1b, WAFC | E6.1b, `gam.cv` |
+|---|---|---|---|---|
+| 2001-07-01 | 0,11 [0,02; 0,16] | 0,11 | 0,06 [−0,04; 0,12] | 0,03 |
+| 2002-01-01 | −0,19 [−0,24; −0,13] | −0,12 | −0,16 [−0,21; −0,11] | −0,08 |
+| 2002-07-01 | −0,02 [−0,21; 0,11] | −0,05 | −0,04 [−0,30; 0,11] | −0,00 |
+| 2003-01-01 | 0,25 [0,14; 0,33] | 0,24 | 0,24 [0,13; 0,30] | 0,25 |
+| 2003-04-01 | 0,59 [0,43; 0,75] | 0,61 | 0,59 [0,53; 0,80] | 0,59 |
+| 2003-07-01 | 0,90 [0,77; 1,07] | 0,88 | 0,86 [0,73; 0,96] | 0,85 |
+| 2003-10-01 | 1,25 [1,02; 1,42] | 1,26 | 1,24 [0,97; 1,37] | 1,26 |
+| 2004-01-01 | 1,18 [1,08; 1,28] | 1,23 | 1,19 [1,09; 1,32] | 1,22 |
+| 2005-01-01 | 0,94 [0,89; 1,01] | 0,98 | 0,86 [0,78; 0,90] | 0,90 |
+
+(WAFC é o `+cv1se`, que nesse bloco coincide com o `+cv`: o limiar não muda
+o bloco que fica. Mediana e, entre colchetes, mínimo e máximo das 20
+partições; no `gam.cv`, só a mediana.)
+
+- **A posição:** plana até julho de 2002, um quarto da subida em janeiro de
+  2003, 90% em julho de 2003. O ponto de 90% cai entre 2003-06-21 e
+  2003-08-02 em toda partição (na E6.1b, entre 2003-06-21 e 2003-09-13).
+- **O tamanho:** 9,65 por 100 ppb de NOx (de 8,83 a 10,08 nas 20 partições),
+  contra 10,03 (9,27 a 10,87) na E6.1b com a mesma definição. São ~10 pontos
+  percentuais de fração primária, como na E6.1b e em Carslaw (2005).
+  - A §12 deu 10,3 (9,7 a 11,2) para a E6.1b com uma definição que não ficou
+    registrada; a desta seção vale para as duas bases.
+  - O `gam.cv` dá 10,15 (9,86 a 10,55), contra 10,61 na E6.1b.
+- **O que a tabela mostra além do degrau:**
+  - um mergulho no começo de 2002 (−0,19 da subida), que o `gam.cv` também
+    tem;
+  - um pico no fim de 2003, a 1,25 da subida, que volta a ~1 em 2005 nos
+    dois métodos e nas duas bases.
+
+  Estão nos dados, não na base de wavelets, e não foram interpretados.
+- **A borda:** a queda da componente no último mês continua (a data não é
+  periódica).
+- **O índice do "10% da subida"** mudou de março–outubro de 2002 (E6.1b,
+  §12) para 2001-03 a 2002-12. É um artefato da definição: a componente
+  passa de 0,1 com o ressalto de meados de 2001 (0,11), antes do mergulho
+  de 2002. A tabela por data é a leitura que vale.
+
+**`NOx × vento` não é zerado pelo `+cv`**, nem aqui nem na E6.1b.
+- O `+cv1se` zera o bloco em 20 de 20 partições nas duas bases.
+- O `+cv` o mantém em 20 de 20 nas duas, e os splines também.
+- Pela regra de D57, a aplicação não afirma ausência de modulação da fração
+  primária pelo vento.
+- Com o vento do ERA5 o efeito é menor: o `edf` do `gam.cv` cai de 10 para
+  3,4, e a amplitude do `+cv` cai de 2,53 para 1,65 por 100 ppb de NOx sobre
+  a grade de 0,6 a 10,4 m/s, ~17% do degrau.
+- A forma, no spline, é monótona, de −0,4 em vento fraco a +0,9 em vento
+  forte (figura `wafc/cache/e61c/e61b-marylebone.ukair.png`).
+
+**`one × vento`:** o `+cv1se` o mantém em 9 de 20 (12 de 20 na E6.1b); a
+decisão é instável nas duas bases.
+
+### 17.5 Veredito
+
+- **A licença fecha.** Os poluentes saem do UK-AIR (OGL) e o vento do ERA5
+  pelo Open-Meteo (CC BY 4.0), os dois sem conta.
+- **O degrau se repete**, com a mesma posição, ~4% a menos de tamanho e as
+  mesmas 20 de 20 partições.
+- **Pela condição de D57, marylebone fica como a aplicação principal.**
+- **O que não se sustenta é o "zero no vento"** de D57: com os dados novos,
+  como com os antigos, o `+cv` mantém `NOx × vento`. A estrutura que a
+  aplicação pode afirmar é o degrau de 2002–2003 e o ciclo anual do fundo.
+  A modulação pelo vento é pequena (~17% do degrau), o `+cv1se` a descarta,
+  e o `+cv` e o spline a mantêm.
+- **Na predição, contra os splines de D46,** o `+cv` empata e o `+cv1se`
+  fica 3% atrás.
+
+### 17.6 Reprodução
+
+Da raiz do repositório:
+
+```
+NC=3 setsid nohup wafc/cache/e61c/run.sh > wafc/cache/e61c/run.out 2>&1 &
+```
+
+- **O que o `run.sh` roda** (não versionado):
+  - as partes `fit` e `extra` (`E61B_EXTRA=gam.cv`) e o `report` do script
+    10, para a base `marylebone.ukair`, com `E61B_OUT=wafc/cache/e61c`;
+  - a leitura `wafc/cache/e61c/read-e61c.R`, que aplica as mesmas
+    definições às unidades da E6.1b e da E6.1c.
+- **O fim** é marcado por `run end` no `call1.log`.
+- **A tabela por data** sai de `wafc/cache/e61c/shape-e61c.R`.
+- **Saídas,** em `wafc/cache/e61c/`, não versionadas: `units/`,
+  `units-extra/`, `e61b-summary.rds` (o nome do relatório é o do script),
+  `e61b-marylebone.ukair.png`, `e61c-reading.rds`, `report.log`,
+  `reading.log`, `call1.log` e `mem.log`.
+- **Custo:** ~5 h 30 min de relógio em 3 processos.

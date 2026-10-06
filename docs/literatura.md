@@ -171,3 +171,20 @@ Linha nova de E1.9, conferida no Crossref e no PDF da editora
 | Referência | O que resolve | O que não cobre | Status |
 |---|---|---|---|
 | Tsybakov (2009), *Introduction to Nonparametric Estimation*, Springer Series in Statistics, Springer, New York (DOI 10.1007/b13794) | a ferramenta da cota inferior de `derivations/09-cota-inferior.tex`: o lema de Assouad (Lema 2.12, p. 117) na versão de Kullback–Leibler (Teorema 2.12(iv), pp. 118–119), com a redução de um estimador a um vértice do hipercubo numa regressão em `L_2` (Exemplo 2.2, pp. 119–120, eq. (2.85)); a condição (2.29) sobre a lei do erro (Hipótese (B), pp. 91–92), que diz o que muda sem ruído gaussiano; o Teorema 2.5 (Fano, p. 99) e o Lema 2.9 (Varshamov–Gilbert, p. 104), que são a rota de Klopp & Pensky (2015, §5.1) e a da construção esparsa | desenho fixo e uma só função (`Y = f(X_i) + ξ_i`, `X_i ∈ [0,1]`); classes de Hölder e Sobolev, não de Besov em `π < 2`; os suportes disjuntos do Exemplo 2.2 pedem a hipótese (LP2) de desenho; sem coeficientes funcionais, sem desenho aleatório dependente | `verificado` (`Tsybakov-2009`; lido no PDF; o DOI impresso na página de direitos, `10.1007/978-0-387-79052-7`, não está registrado, e fica o do registro do livro no Crossref) |
+
+## Aplicação com licença declarada (E6.1c, 2026-10-05)
+
+Linhas novas de E6.1c, todas com status `[VERIFICAR]` até a rodada
+bibliográfica. Título, autores, ano, veículo e DOI foram conferidos no
+Crossref (artigo) ou no DataCite (dados e software) em 2026-10-05; nenhum
+PDF foi lido, fora o relatório de conversão da Defra. As três últimas são
+dados ou software e, se a base for usada, vão ao `.bib` como os conjuntos
+do UCI. Os detalhes estão em
+[`aplicacao-candidatas.md`](aplicacao-candidatas.md) §17.
+
+| Referência | O que resolve | O que não cobre | Status |
+|---|---|---|---|
+| Hersbach, Bell, Berrisford, Hirahara, Horányi, Muñoz‐Sabater et al. (2020), *Q. J. R. Meteorol. Soc.* 146(730) 1999–2049, "The ERA5 global reanalysis" (DOI 10.1002/qj.3803) | a reanálise de onde vem o vento horário da base `marylebone.ukair`, com licença declarada | a resolução (0,25°) e o viés do vento a 10 m sobre área urbana não foram conferidos no texto | `[VERIFICAR]` (Crossref: 43 autores, título, volume, número e páginas; PDF não lido) |
+| Copernicus Climate Change Service (2018), "ERA5 hourly data on single levels from 1940 to present", Climate Data Store (DOI 10.24381/cds.adbb2d47), CC-BY | o conjunto de dados do ERA5 e a sua licença | o Open-Meteo cita o mesmo DOI como Hersbach et al. (2023); o DataCite registra o criador "C3S" e o ano 2018; a forma da citação fica para a rodada | `[VERIFICAR]` (DataCite; a licença CC-BY lida na página do CDS) |
+| Zippenfenig (2024), "Open-Meteo.com Weather API", Zenodo (DOI 10.5281/zenodo.7970649), CC BY 4.0 | o serviço pelo qual o vento do ERA5 foi baixado, sem conta, com a licença CC BY 4.0 declarada na página de licença do Open-Meteo | é software; o ano do registro é o do DataCite | `[VERIFICAR]` (DataCite: título, autor, ano, licença) |
+| Defra, UK-AIR, dados horários da rede AURN em Marylebone Road (MY1), 1998–2005, `uk-air.defra.gov.uk`, Open Government Licence; e o relatório "Conversion Factors Between ppb and µg m-3 and ppm and mgm-3" (cat06 0502160851) | os poluentes da base `marylebone.ukair` com licença declarada, e os fatores 1,9125 (NO2, NOx como NO2) e 1,9957 (O3) a 20 °C e 1013 mb | a página de dados aponta a OGL v2 e o rodapé do site, a v3; a forma da citação de um conjunto do UK-AIR não foi conferida | `[VERIFICAR]` (a página de dados e o relatório lidos; sem DOI) |

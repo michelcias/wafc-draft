@@ -575,8 +575,8 @@ de adaptação (`aplicacao-candidatas.md`). **E6.1b (catalogada em
 predição competitiva, nas três e em até três candidatas novas com salto
 documentado; a escolha continua do autor (pergunta 2 do `ESTADO.md`).
 
-**E6.1c (catalogada em 2026-10-05):** marylebone com dados de licença
-declarada (UK-AIR e vento de fonte declarada); **D57 escolheu duas
+**E6.1c (fechada em 2026-10-06):** marylebone com dados de licença
+declarada, que fica como a aplicação principal (UK-AIR e vento de fonte declarada); **D57 escolheu duas
 aplicações**, marylebone (estrutura) e beijing.heat (predição).
 
 ### E6.2 Ajustar e comparar

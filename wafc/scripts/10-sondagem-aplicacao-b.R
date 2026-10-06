@@ -7,7 +7,8 @@
 ## (parts: "fit", "extra" and "report"; see the part "extra" below),
 ## n_max = 0 (no subsampling). 'bases' is a comma separated list of the
 ## keys of wafc_bases below; "all" is every base whose data are already in
-## wafc/cache/data/ or can be fetched from a source recorded here.
+## wafc/cache/data/ or can be fetched from a source recorded here, except
+## the base "marylebone.ukair" of step E6.1c, which is named explicitly.
 ##
 ## Environment: E61B_OUT (the folder of the outputs, default
 ## wafc/cache/e61b), E61B_REF (the commit the code is taken from when the
@@ -224,6 +225,66 @@ wafc_fetch <- function(key) {
   list(path = member, sha256 = got, url = src[["url"]])
 }
 
+## Step E6.1c (decision D57): the base "marylebone" again, from sources
+## with a declared licence, as the base "marylebone.ukair"; several files,
+## so it has its own list and fetch. The pollutants are the hourly series of
+## the Automatic Urban and Rural Network at Marylebone Road (site MY1), in
+## the yearly files that openair::importAURN() reads, published by Defra on
+## uk-air.defra.gov.uk under the Open Government Licence (the data page of
+## UK-AIR links version 2, the footer of the site states version 3); they
+## carry no wind before about 2010. The wind is the 10 m wind of the ERA5
+## reanalysis (Hersbach et al., 2020, QJRMS 146: 1999-2049; Copernicus
+## Climate Change Service, CC BY 4.0, doi:10.24381/cds.adbb2d47), hourly
+## and instantaneous, at the grid point nearest MY1 (51.5225 N, 0.1546 W;
+## the API answers 51.5 N, 0.25 W, 35 m), served by the historical API of
+## Open-Meteo (CC BY 4.0). Downloaded on 2026-10-05 with the permission of
+## the author. The file of Open-Meteo is generated at each request, so a
+## new download may differ in its digest without differing in its values.
+ukair_sources <- list(
+  dir = "marylebone.ukair",
+  files = c(
+    stats::setNames(lapply(1998:2005, function(y) {
+      list(url = sprintf("https://uk-air.defra.gov.uk/openair/R_data/MY1_%d.RData", y))
+    }), sprintf("MY1_%d.RData", 1998:2005)),
+    list("era5-wind-my1-1998-2005.csv" = list(
+      url = paste0("https://archive-api.open-meteo.com/v1/archive?",
+                   "latitude=51.5225&longitude=-0.1546&start_date=1998-01-01&",
+                   "end_date=2005-12-31&hourly=wind_speed_10m,wind_direction_10m&",
+                   "models=era5&wind_speed_unit=ms&timezone=GMT&format=csv")))),
+  sha256 = c(
+    MY1_1998.RData = "503ee40cef24944022f7f78424d2092c81934753b8a429d83cc91cc74fa85412",
+    MY1_1999.RData = "4007f98e51d3efdcdc39ef1b97e0119b36d25e04a6bcf65eec4a5ae0c45e085b",
+    MY1_2000.RData = "f157a23b0a2e6221c2da10603c5a325fd35fea8e29dcd3428b27f9c4eb915715",
+    MY1_2001.RData = "63b8283f629327bc36fb1fc34693b84f0b9989331d516867940217926e6a48fd",
+    MY1_2002.RData = "6db6ebae8d683d69879c27f6102e267df38d800bb926a47756102d37b3589c7f",
+    MY1_2003.RData = "2b32e149445b83d49125c3b8f3046ba8a1efb95a22fbfe09ef5a0b993a37ec6b",
+    MY1_2004.RData = "fe88b12e189772938251e5a1031ffc0f6a7ecf33236f90c3913bb663591c3651",
+    MY1_2005.RData = "a3ed2c09c8feee9085bf54863e4757ed13a8220693634a30da9f281787e91324",
+    "era5-wind-my1-1998-2005.csv" =
+      "e026ea3fa1ca311e599e87b52b9415499f419d7f87d05983974d5f9d64f25641"))
+
+wafc_fetch_ukair <- function() {
+  dir <- file.path(data_dir, ukair_sources[["dir"]])
+  dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+  fs <- names(ukair_sources[["files"]])
+  got <- vapply(fs, function(f) {
+    p <- file.path(dir, f)
+    if (!file.exists(p)) {
+      cat(sprintf("  downloading %s\n", ukair_sources[["files"]][[f]][["url"]]))
+      utils::download.file(ukair_sources[["files"]][[f]][["url"]], p,
+                           mode = "wb", quiet = TRUE)
+    }
+    h <- wafc_sha256(p)
+    if (!identical(h, ukair_sources[["sha256"]][[f]])) {
+      warning("SHA-256 of ", f, " is ", h, ", not the ",
+              ukair_sources[["sha256"]][[f]], " recorded here.", call. = FALSE)
+    }
+    h
+  }, "")
+  list(path = dir, sha256 = got,
+       url = vapply(ukair_sources[["files"]], `[[`, "", "url"))
+}
+
 ## ---------------------------------------------------------------------------
 ## The bases
 ## ---------------------------------------------------------------------------
@@ -409,14 +470,63 @@ prep_kelmarsh <- function() {
        marks = list(ws = c(cut.in = 3, rated = 12.5)))
 }
 
+## Marylebone Road from UK-AIR and ERA5 (step E6.1c; sources above), with
+## the mapping of prep_marylebone(): Y = NO2 + O3, X = (1, NOx / 100),
+## U = (days since 1998-01-01, wind speed), the block the week. UK-AIR
+## reports ug/m3 at 20 C and 1013 mb, NOx as NO2; the oxidant relation is
+## molar, so the three are converted to ppb, the unit of the mydata of
+## openair, with the factors of Defra for the UK Air Quality Archive (1 ppb
+## of NO2, and of NOx as NO2, is 1.9125 ug/m3; of O3, 1.9957; "Conversion
+## Factors Between ppb and ug m-3 and ppm and mgm-3", uk-air.defra.gov.uk,
+## report cat06 0502160851). The date of UK-AIR is the beginning of the
+## hour of the mean (the first hour of a year is 00:00); the wind of ERA5
+## is instantaneous, so the hour gets the speed at its middle, by linear
+## interpolation between t and t + 1 h. The window is the one of the mydata
+## of openair, 1998-01-01 00:00 to 2005-06-23 12:00 GMT, so that the
+## numbers compare with those of the base "marylebone" of step E6.1b; the
+## files cover 1998 to 2005. The wind direction of ERA5 is read and not
+## used, as in "marylebone".
+prep_marylebone_ukair <- function() {
+  f <- wafc_fetch_ukair()
+  a <- do.call(rbind, lapply(1998:2005, function(yr) {
+    e <- new.env()
+    load(file.path(f[["path"]], sprintf("MY1_%d.RData", yr)), envir = e)
+    as.data.frame(e[[sprintf("MY1_%d", yr)]])[, c("date", "NOXasNO2", "NO2",
+                                                  "O3")]
+  }))
+  w <- utils::read.csv(file.path(f[["path"]], "era5-wind-my1-1998-2005.csv"),
+                       skip = 3L, check.names = FALSE)
+  wt <- as.POSIXct(w[[1L]], format = "%Y-%m-%dT%H:%M", tz = "GMT")
+  ws <- stats::approx(as.numeric(wt), w[[2L]],
+                      xout = as.numeric(a[["date"]]) + 1800)[["y"]]
+  t0 <- as.POSIXct("1998-01-01 00:00:00", tz = "GMT")
+  t1 <- as.POSIXct("2005-06-23 12:00:00", tz = "GMT")
+  keep <- a[["date"]] >= t0 & a[["date"]] <= t1 &
+    stats::complete.cases(ws, a[["NOXasNO2"]], a[["NO2"]], a[["O3"]])
+  a <- a[keep, ]
+  ws <- ws[keep]
+  day <- as.numeric(difftime(a[["date"]], t0, units = "days"))
+  y <- a[["NO2"]] / 1.9125 + a[["O3"]] / 1.9957
+  x <- cbind(one = 1, nox = a[["NOXasNO2"]] / 1.9125 / 100)
+  u <- cbind(day = day, ws = ws)
+  list(key = "marylebone.ukair",
+       label = "Marylebone Road, London, UK-AIR and ERA5 (hourly oxidant)",
+       y = y, x = x, u = u, block = as.integer(floor(day)) %/% 7L,
+       block.unit = "week", source = f, yname = "NO2 + O3 (ppb)",
+       ## 2003-01-01, the year of the step Carslaw (2005) reports
+       marks = list(day = 1826))
+}
+
 preps <- list(bike = prep_bike, beijing = prep_beijing,
               housing = prep_housing, beijing.heat = prep_beijing_heat,
-              marylebone = prep_marylebone, kelmarsh = prep_kelmarsh)
+              marylebone = prep_marylebone, kelmarsh = prep_kelmarsh,
+              marylebone.ukair = prep_marylebone_ukair)
 
 ## The order fixes the seeds: the index of a base in this vector, and not
 ## its position in the command line, enters the seed of its partitions.
+## A new base goes at the end, so that the seeds of the others do not move.
 base_order <- c("bike", "beijing", "housing", "beijing.heat", "marylebone",
-                "kelmarsh")
+                "kelmarsh", "marylebone.ukair")
 
 ## One preparation per process, kept for the units of the same base.
 data_cache <- new.env()
@@ -627,7 +737,9 @@ run_unit <- function(key, s) {
 ## Bases to run
 ## ---------------------------------------------------------------------------
 
-keys <- if (identical(which_bases, "all")) names(preps) else
+## "all" stays the six bases of step E6.1b, so that its reproduction does
+## not move; the base of step E6.1c is named on the command line.
+keys <- if (identical(which_bases, "all")) setdiff(names(preps), "marylebone.ukair") else
   strsplit(which_bases, ",")[[1L]]
 bad <- setdiff(keys, names(preps))
 if (length(bad) > 0L) stop("Unknown base(s): ", paste(bad, collapse = ", "))
@@ -639,7 +751,7 @@ if (length(bad) > 0L) stop("Unknown base(s): ", paste(bad, collapse = ", "))
 if ("fit" %in% parts) {
   ## The heaviest bases first, so that the last units to finish are short.
   weight <- c(beijing = 4, beijing.heat = 4, marylebone = 4, kelmarsh = 4,
-              housing = 2, bike = 1)
+              housing = 2, bike = 1, marylebone.ukair = 4)
   todo <- expand.grid(s = seq_len(nsplit), key = keys,
                       stringsAsFactors = FALSE)
   todo <- todo[order(-weight[todo[["key"]]], todo[["s"]]), ]

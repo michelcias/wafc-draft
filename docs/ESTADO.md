@@ -2103,6 +2103,42 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: E6.1c fechada, marylebone com dados de licença declarada
+
+Chat de tarefa, integrado aqui. Conferido nesta máquina: os erros médios de
+`wafc/cache/e61c/e61b-summary.rds` reproduzem a tabela abaixo, e o `+cv`
+empata com o `gam.reml` (−0,001, vence 8 de 20 partições); a mudança no
+script 10 só acrescenta a base `marylebone.ukair`, e o `all` continua sendo
+as seis bases da E6.1b; `aplicacao-candidatas.md` ganhou a §17 e
+`literatura.md` quatro linhas `[VERIFICAR]`. Rodada: 5 h 27 min em 3
+processos, pico de 4,4 GB, sem falha.
+
+- **Os dados:** a série da MY1 do UK-AIR (Defra, OGL) e o vento do ERA5
+  pela API do Open-Meteo (CC BY 4.0), os dois sem conta; `n = 61 280` horas.
+  Os poluentes são as mesmas medidas do `mydata` (correlação de 0,988 a
+  0,9995); o vento é outro (correlação 0,85).
+- **Predição** (RMSE em ppb; E6.1b entre parênteses): `+cv1se` 11,73
+  (12,02), `+cv` 11,39 (11,79), `gam.reml` 11,39 (11,77), `gam.gcv` 11,40
+  (11,80). **Contra os splines de D46 o `+cv` empata**; o `+cv1se` fica 3,0%
+  atrás. (O `gam.cv`, só nos documentos por D56, fica 1,8% à frente do
+  `+cv`.)
+- **O degrau de `NOx × data` se repete:** em 20 de 20 partições nas duas
+  regras, plano até julho de 2002, 0,25 em janeiro de 2003, 0,90 em julho de
+  2003 (o ponto de 90% entre 21/06 e 02/08/2003 em toda partição), tamanho
+  9,65 por 100 ppb de NOx contra 10,03 na E6.1b. O `gam` dá a mesma curva.
+- **O "zero no vento" de D57 cai:** o `+cv1se` zera `NOx × vento` em 20 de 20
+  nas duas bases, mas o `+cv` o mantém em 20 de 20, e os splines também; pela
+  regra de D57 (só afirmar ausência onde os dois zeram), não há zero. Com o
+  ERA5 o efeito encolhe (amplitude de 2,53 a 1,65 por 100 ppb, ~17% do
+  degrau).
+- **Veredito: marylebone fica como a aplicação principal**, com os dados do
+  UK-AIR e do ERA5 (`marylebone.ukair`); a estrutura afirmável é o degrau e
+  o ciclo anual do fundo.
+- **Lições:** a fração da subida por data é a leitura estável do degrau (o
+  "10% da subida" se move um ano com um ressalto de 0,11); o efeito do vento
+  depende da fonte do vento, e o degrau não; o Open-Meteo devolve o ponto de
+  grade do ERA5 mais próximo, não o pedido.
+
 ### 2026-10-05: E3.4 e E5g fechadas, `J` por moduladora e a cota inferior na `k = 4`
 
 Dois chats de tarefa, integrados aqui. Conferido nesta máquina: a suíte
@@ -2689,6 +2725,7 @@ entrou sem os itens de E1.14** (pergunta 47(a)).
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
 | D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
+| D59 | 10-06 | **A aplicação marylebone (pergunta 53):** a base é a `marylebone.ukair` (UK-AIR e ERA5); a tese da aplicação é o degrau de 2003 e o ciclo anual; o vento entra numa frase, como modulação pequena (~17% do degrau) que o `cv1se` descarta e o `+cv` e o spline mantêm; na figura, a grade da data é cortada antes da borda, com uma nota, e `boundary = "interval"` só se um referee pedir; o mergulho do começo de 2002 e o pico do fim de 2003 são descritos numa frase, sem interpretação, até a leitura de Carslaw (2005); catalogada a L12 (as fontes da aplicação) | recomendações do chat principal, aceitas pelo autor |
 | D58 | 10-05 | **Pergunta 52, aceita e aplicada no chat principal:** a interface de E3.4 ratificada (`cap.J = TRUE` padrão, `J` efetivo e `J.requested`, `J.eff`, o candidato repetido, a contagem no círculo) e o aviso para a moduladora de um ponto; na `k = 4`, "makes ~~it~~ the rate optimal" na introdução, a cota inferior na primeira contribuição (", together with a minimax lower bound, for any number of modulators, that makes these rates optimal when `π ≥ 2` (Theorem S6.1)") e no resumo (", which is minimax optimal", emendando D53), a condição `s ≥ 1/π` de Cai (1999) no parágrafo depois do Theorem S6.1, e o espaço depois de "Lemma 3." na segunda leitura do Theorem 1 (tipografia, sem marca); a nota de `\|𝒦\|` e `\|𝒞\|` no `notacao.md` §10. A moduladora periódica discreta e o `ω` ficam como estão. `ms_4` e `supp_4` em 52 e 90 páginas, sem referência indefinida | recomendações do chat principal, aceitas pelo autor |
 | D57 | 10-05 | **Duas aplicações e as pendências de E6.1b e E1.9 (perguntas 2, 50 e 51):** marylebone como aplicação principal (a estrutura: o degrau de 2003, o zero no vento) e beijing.heat como segunda (a predição: ~9% sobre os splines de D46, a modulação sazonal densa), a principal no corpo e a segunda em um parágrafo no corpo com tabela e figura no supp, com a divisão final na decisão do teto (D21); se marylebone não fechar a licença limpa ou o degrau não se repetir com os dados limpos, beijing.heat sobe a principal. O limiar padrão continua o `cv1se`, a aplicação relata a predição do `+cv` e só afirma ausência de efeito onde os dois zeram. Catalogadas E6.1c (marylebone com dados de licença declarada), E3.4 (`J` por moduladora limitado pelos valores distintos) e E5g (a E1.9 na `k = 4`, com as recomendações da pergunta 51) | recomendações do chat principal, aceitas pelo autor: as duas bases respondem a perguntas diferentes de um referee, e a segunda no supp poupa o teto de páginas |
 | D56 | 10-05 | **Na aplicação, cada método nos seus próprios termos:** o WAFC com a sintonia dele (validação cruzada, aqui nas dobras por bloco) contra o `gam` como ele é usado, com REML e GCV (as duas colunas de D46); **o `gam.cv` em blocos não entra como concorrente** no artigo, porque escolher `k` do `gam` por validação cruzada não é o uso dele, como não é usual sintonizar o WAFC por REML. A medição do `gam.cv` fica nos documentos de trabalho (D43). O texto da aplicação diz que os dois métodos foram sintonizados nos critérios usuais e que nenhum modela a dependência do erro | decisão do autor, no princípio de D30 e da E2.5h (o concorrente sintonizado nos termos dele): o objetivo é mostrar que o WAFC é uma boa opção, não que vence sempre. Risco registrado: com erro dependente, o uso de referência do `mgcv` é o `gamm` com erro autorregressivo, que um referee pode pedir |
@@ -3702,11 +3739,34 @@ Ordenadas pelo que bloqueia mais.
      leitura do Theorem 1 (E5d): corrigir, sem marca, por ser tipografia.
    - (i) Uma nota no `notacao.md` §10 sobre `|𝒦|` e `|𝒞|` no supp.
 
+53. **~~Pendências de E6.1c~~ decididas em 2026-10-06 (D59); L12
+   catalogada.** Texto original: (2026-10-06). Recomendação do chat principal:
+   - (a) **O vento na aplicação:** relatar o efeito do vento sobre a fração
+     primária como modulação pequena (~17% do degrau), que o `cv1se`
+     descarta e o `+cv` e o spline mantêm, numa frase; é a regra de D57 em
+     uso. A tese da aplicação fica com o degrau e o ciclo anual.
+   - (b) **A borda da data:** a base periodizada cola o fim da série no
+     começo, e a componente cai no último mês. Para a figura, cortar a grade
+     antes da borda, com uma nota; medir `boundary = "interval"` só se um
+     referee pedir (a rota está em `07-rota-intervalo.tex`).
+   - (c) **O mergulho do começo de 2002 e o pico do fim de 2003**, que o
+     WAFC e o spline mostram nas duas bases: descrever em uma frase, sem
+     interpretar, até ler Carslaw (2005) no PDF.
+   - (d) **Uma rodada bibliográfica (L12)** com as fontes da aplicação:
+     Carslaw (2005), Carslaw & Beevers (2005), Clapp & Jenkin (2001),
+     Hersbach et al. (2020), o conjunto ERA5 do C3S, o Open-Meteo, o UK-AIR
+     com o relatório de conversão da Defra, e, se o artigo os usar, Nadeau &
+     Bengio (2003) e Opsomer, Wang & Yang (2001); Carslaw (2005) lido no PDF
+     para conferir o degrau e os dois ressaltos.
+
 ---
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-05).** **E3.4 e E5g fechadas e integradas**, e a
+**Onde parou (2026-10-06).** **E6.1c fechada e integrada:** marylebone fica
+como a aplicação principal, com os dados do UK-AIR e do ERA5; o degrau de
+2003 se repete, e o zero no vento cai pela regra de D57. Pendências na
+pergunta 53; **catálogo vazio**. **E3.4 e E5g fechadas e integradas**, e a
 pergunta 52 aplicada (D58). A E6.1c segue no catálogo. **D57: duas
 aplicações** (marylebone e beijing.heat). **E1.9 e E6.1b fechadas e integradas**: a cota
 inferior faz o Theorem 1 ótimo em `π ≥ 2` para todo `q`, e nenhuma base da
@@ -3796,6 +3856,8 @@ de reprodutibilidade, 32(f)); E7 (submissão, com o teto de D21 e os itens
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | Pergunta 53 decidida (D59): o vento numa frase, a borda da data cortada na figura, os ressaltos descritos sem interpretação; L12 catalogada |
+| 2026-10-06 | E6.1c fechada e integrada (5 h 27 min em 3 processos): marylebone com UK-AIR e ERA5, o degrau de 2003 em 20 de 20 partições, o `+cv` empatado com os splines de D46, o zero no vento derrubado pelo `+cv`; marylebone fica como principal; pergunta 53 |
 | 2026-10-05 | Pergunta 52 aplicada (D58): interface de E3.4 ratificada; a cota inferior no resumo e na primeira contribuição da `k = 4`; a condição de Cai no supp |
 | 2026-10-05 | E3.4 fechada e integrada (1 304 testes em 55 s, nona junção exata): o nível de cada moduladora limitado pelos pontos distintos no círculo. E5g fechada e integrada (52 e 90 páginas, 45 entradas): o Theorem S6.1 no supp, a otimalidade em `π ≥ 2` na introdução e na terceira leitura. Pergunta 52 |
 | 2026-10-05 | D57: duas aplicações, marylebone (estrutura) e beijing.heat (predição); perguntas 2, 50 e 51 decididas; E6.1c, E3.4 e E5g catalogadas; o texto da terceira leitura do Theorem 1 guardado na pergunta 51 |
