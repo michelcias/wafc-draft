@@ -4292,6 +4292,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E6.2 rodando desde 18h46 (a junção da `beijing.heat` e as 168 unidades, 3 processos; marylebone primeiro depois da junção). E4.3a (preparar o piloto, sem rodar) e E5h (as Seções 5 e 6 sem números, abrindo a `k = 5` a pedido do autor) catalogadas |
 | 2026-10-06 | Pergunta 59 decidida (D67): as rodadas da E6.2 antes da E4.3, que roda sozinha; partições independentes; a figura com `β_ℓ` remontado |
 | 2026-10-06 | E6.2 integrada com o código pronto (dados idênticos ao script 10, versionados; junção exata da partição 1 fora o WAFC da `beijing.heat`); as rodadas (~70 h de processador) esperam o aviso; o chat principal aplicou o que o handoff deixou nos arquivos comuns do compêndio; pergunta 59 |
 | 2026-10-06 | Pergunta 58(b) decidida (D66): as marcas da `beijing.heat` ficam nominais, com a palavra na legenda |
