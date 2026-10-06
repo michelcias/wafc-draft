@@ -228,7 +228,7 @@ as copia em `k = 4`.
 | `β̄ = (c̄, θ̄)`, `b̄`, `v̄`, `𝒢̄ = 𝒢_0(θ̄)`, `𝒲̄ = 𝒲(𝒢̄)` | o comparador do oráculo em blocos, o seu viés, o seu erro e os seus pedaços ativos | Teorema 3 do `08`, Theorem 2 do `ms_4` (D52) |
 | `M_1`, `Σ̂_{GG}` | o centrador da variante branca; a Gram empírica do pedaço | Observação 2 do `08`, Remark S5.2 (D52) |
 | `ℛ_1(θ; t)`, `ℛ_{𝒢,w}(θ; λ)`, `ℛ_{𝒢,1}(θ; t)` | `Σ_a min(t\|θ_a\|, θ_a²)` e os pares em norma de grupos, `Σ_G min(λw_G‖θ_G‖_2, ‖θ_G‖_2²)` e com pesos 1 | Proposição 8 do `05` e Corolário 15 do `08` (E1.15; D54); `\mathcal{R}`, sem uso anterior; não confundir com o risco ideal `R_𝒢(θ; η)` do Lema 15 |
-| `ρ̲_n`, `𝒦`, `K = \|𝒦\|`, `c_A` | a taxa da cota inferior, `C_g^{2/(2s+1)}{σ²/(nB_X²C_U)}^{2s/(2s+1)}`, da família de `ρ_n` (§9); o conjunto de blocos do hipercubo e o seu tamanho; a constante de Assouad, `(1 − 2^{−1/2})/2` | Teorema 5 do `09` (E1.9; D57); os demais símbolos do `09` ficam locais |
+| `ρ̲_n`, `𝒦`, `K = \|𝒦\|`, `c_A` | a taxa da cota inferior, `C_g^{2/(2s+1)}{σ²/(nB_X²C_U)}^{2s/(2s+1)}`, da família de `ρ_n` (§9); o conjunto de blocos do hipercubo e o seu tamanho; a constante de Assouad, `(1 − 2^{−1/2})/2` | Teorema 5 do `09` (E1.9; D57); os demais símbolos do `09` ficam locais. **No supp** (E5g, D58), `K = \|𝒦\|` fica escrito `\|𝒦\|`, porque `K` já é a dimensão de `Ψ(u)` em S4, e o `M = \|𝒞\|` do `09` fica `\|𝒞\|` (colide com `M_ε` e com o `M` da S8) |
 | `ϑ_π` | expoente da contagem, `min(1 − 1/π, 1/2)`: nos níveis finos, `‖θ*‖_{𝒢,1}` fica abaixo de `‖θ*‖_1` por `b_n^{−ϑ_π}` | Corolário 14 (E1.13; D49); `\vartheta_{\pi}`, sem uso no `ms_3` nem no `supp_3` |
 
 No LaTeX: `\mathcal{G}`, `b_{n}`, `w_{G}`, `\varrho`, `\bar\varrho`,

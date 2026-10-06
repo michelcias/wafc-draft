@@ -392,7 +392,7 @@ wafc_thr_base_wafc <- function(object, s, y, foldid) {
     list(a0 = v[[1L]], b = unname(v[-1L]))
   }
   list(design = des, y = y, a0 = cf[[1L]], b = unname(cf[-1L]), s = s,
-       J = des[["J"]][1L], foldid = foldid,
+       J = wafc_J_requested(des)[1L], foldid = foldid,
        intercept = isTRUE(object[["intercept"]]),
        method = paste0("wafc.", pen), fold_fit = fold_fit)
 }

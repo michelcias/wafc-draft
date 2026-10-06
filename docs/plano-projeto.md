@@ -445,7 +445,7 @@ limpo em menos de 60 s.
 verdade) e o caminho das normas por par; `plot.cv.wafc`; cabeçalhos roxygen
 completos; exemplo reproduzível em `wafc/README.md`.
 
-### E3.4 `J` por moduladora (catalogada em 2026-10-05)
+### E3.4 `J` por moduladora (fechada em 2026-10-05)
 
 O nível de cada moduladora limitado pelo número de valores distintos, para
 que um bloco de moduladora discreta fique identificado (lição da E6.1b,
@@ -540,7 +540,7 @@ interface de D48 na §4, e a teoria do LASSO numa seção do supp (D51). As
 remoções inteiras ficam em blocos cinza sem tachado (D51). Sem as Seções 5
 a 7, que são da E5b.
 
-### E5g. A cota inferior na `k = 4` (catalogada em 2026-10-05)
+### E5g. A cota inferior na `k = 4` (fechada em 2026-10-05)
 
 A introdução e a terceira leitura do Theorem 1 passam à otimalidade em
 `π ≥ 2` para todo `q`, e o Teorema 5 entra no supp no lugar da Remark S6.1

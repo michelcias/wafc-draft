@@ -100,6 +100,12 @@
 #'   error of the components by 32\% in the inhomogeneous scenario at
 #'   \eqn{n = 1000}. The grid starts at 2 because step E2.4 measured that
 #'   \eqn{J = 1} is never selected; passing \code{J = 1:8} is allowed.
+#'   Each candidate is the level asked of \code{\link{wafc_design}}, which
+#'   caps the level of a modulating covariate at what its distinct values
+#'   identify (\code{cap.J}, step E3.4): two candidates whose designs have
+#'   the same levels are the same design, and the second one takes the
+#'   cross-validation of the first instead of refitting it, so the tie goes
+#'   to the smaller \eqn{J}, as every tie does.
 #' @param penalty \code{"block"} (the default), \code{"lasso"} or
 #'   \code{"sglasso"}, as in \code{\link{wafc}}.
 #' @param nfolds Number of folds, at least 3.
@@ -133,6 +139,9 @@
 #'   \code{lambda.min}, \code{lambda.1se} and the values attained at
 #'   \code{lambda.min}), the summary \code{cvtab}, the selected
 #'   \code{J.min}, \code{lambda.min} and \code{lambda.1se}, the
+#'   matrix \code{J.eff} of the levels each candidate was built at (one row
+#'   per candidate, one column per modulating covariate; equal to \code{J}
+#'   wherever the cap of \code{\link{wafc_design}} did not act), the
 #'   \code{foldid} used, the \code{penalty}, \code{wafc.fit}, the fit on
 #'   the whole sample at \code{J.min}, which is the fit the selected pair
 #'   refers to, and \code{threshold}, \code{NULL} with
@@ -189,9 +198,23 @@ cv.wafc <- function(x, u, y, J = NULL,
   run_one <- function(Ji) {
     design <- do.call(wafc_design,
                       c(list(x = x, u = u, J = Ji), dots[["design"]]))
+    ## a candidate whose levels, after the cap of wafc_design(), are the
+    ## ones of a candidate already run is the same design on the same folds:
+    ## its cross-validation is that one, and refitting it would only repeat
+    ## it (step E3.4)
+    prev <- match(paste(design[["J"]], collapse = ","), J_seen)
+    if (!is.na(prev)) {
+      z <- cvlist[[prev]]
+      z[["J"]] <- Ji
+      ## the convergence table of the block LASSO names its J
+      if (is.data.frame(z[["conv"]])) z[["conv"]][["J"]] <- Ji
+      return(list(cv = z, fit = NULL, J.eff = design[["J"]], same = prev))
+    }
     if (penalty == "block") {
-      return(wafc_cv_block(design, y, foldid, lambda, nlambda,
-                           lambda.min.ratio, type.measure, dots[["fit"]], Ji))
+      return(c(wafc_cv_block(design, y, foldid, lambda, nlambda,
+                             lambda.min.ratio, type.measure, dots[["fit"]],
+                             Ji),
+               list(J.eff = design[["J"]], same = NA_integer_)))
     }
     full <- do.call(wafc, c(list(design = design, y = y, penalty = penalty,
                                  lambda = lambda, nlambda = nlambda,
@@ -202,7 +225,7 @@ cv.wafc <- function(x, u, y, J = NULL,
                    dots[["fit"]]))
     z[["J"]] <- Ji
     z[["conv"]] <- full[["conv"]]
-    list(cv = z, fit = full)
+    list(cv = z, fit = full, J.eff = design[["J"]], same = NA_integer_)
   }
 
   ## Only the fit of the best candidate so far is kept: every fit carries its
@@ -211,17 +234,28 @@ cv.wafc <- function(x, u, y, J = NULL,
   ## one which.min() over the whole grid selects, since which.min() over the
   ## first i values points at i exactly when i is a new first minimum.
   cvlist <- vector("list", length(J))
+  J_seen <- character(length(J))
+  J.eff <- matrix(NA_integer_, length(J), ncol(u),
+                  dimnames = list(J, wafc_names(u, ncol(u), "u")))
   best_fit <- NULL
+  npen <- NA_integer_
   for (i in seq_along(J)) {
     run <- run_one(J[i])
     cvlist[[i]] <- run[["cv"]]
+    J.eff[i, ] <- run[["J.eff"]]
+    J_seen[i] <- paste(run[["J.eff"]], collapse = ",")
+    ## a repeated design ties with its first occurrence, which which.min()
+    ## keeps, so its fit (NULL here) is never the one kept
     cvm_sofar <- vapply(cvlist[seq_len(i)], `[[`, 0, "cvm.min")
     if (identical(which.min(cvm_sofar), i)) best_fit <- run[["fit"]]
+    if (!is.null(run[["fit"]])) npen <- run[["fit"]][["npen"]]
     if (trace) {
       z <- run[["cv"]]
-      cat(sprintf("J = %d: %s = %.5f at lambda = %.5g (%d nonzero of %d)\n",
+      cat(sprintf("J = %d: %s = %.5f at lambda = %.5g (%d nonzero of %d)%s\n",
                   J[i], type.measure, z[["cvm.min"]], z[["lambda.min"]],
-                  z[["nzero.min"]], run[["fit"]][["npen"]]))
+                  z[["nzero.min"]], npen,
+                  if (is.na(run[["same"]])) "" else
+                    sprintf(", the design of J = %d", J[run[["same"]]])))
     }
     rm(run)
   }
@@ -242,7 +276,7 @@ cv.wafc <- function(x, u, y, J = NULL,
   names(cvtab)[3L] <- type.measure
 
   out <- list(call = this_call, J = J, cv = cvlist, cvtab = cvtab,
-              J.min = J[best], lambda.min = z[["lambda.min"]],
+              J.min = J[best], J.eff = J.eff, lambda.min = z[["lambda.min"]],
               lambda.1se = z[["lambda.1se"]], cvm.min = z[["cvm.min"]],
               cvsd.min = z[["cvsd.min"]], nzero.min = z[["nzero.min"]],
               type.measure = type.measure, nfolds = nfolds, foldid = foldid,
@@ -278,6 +312,8 @@ print.cv.wafc <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
   cat("\nSelected: J =", x[["J.min"]],
       "with lambda.min =", signif(x[["lambda.min"]], digits),
       "( lambda.1se =", signif(x[["lambda.1se"]], digits), ")\n")
+  cap <- wafc_cv_cap_text(x)
+  if (!is.null(cap)) cat(cap, "\n")
   th <- x[["threshold"]]
   if (is.null(th)) {
     cat("No threshold on the blocks.\n")
@@ -1159,6 +1195,25 @@ wafc_split_dots <- function(dots) {
   }
   list(design = dots[names(dots) %in% dnames],
        fit = dots[names(dots) %in% fnames])
+}
+
+## The line print.cv.wafc() adds when the cap of wafc_design() lowered the
+## level of some modulating covariate in some candidate (step E3.4): which
+## covariate, to what, its number of distinct points, and the candidates it
+## acted on. NULL when it acted on none, or the object predates E3.4.
+wafc_cv_cap_text <- function(x) {
+  Je <- x[["J.eff"]]
+  if (is.null(Je)) return(NULL)
+  J <- x[["J"]]
+  low <- which(colSums(Je < J) > 0L)
+  if (length(low) == 0L) return(NULL)
+  nd <- x[["wafc.fit"]][["design"]][["ndistinct"]]
+  parts <- vapply(low, function(m) {
+    sprintf("%s at %d (%d points) for J = %s", colnames(Je)[m],
+            max(Je[, m]), nd[m], paste(J[Je[, m] < J], collapse = ", "))
+  }, "")
+  paste0("Levels capped by the distinct values: ",
+         paste(parts, collapse = "; "))
 }
 
 ## Grid of candidate resolution levels, 2:8 by default (decision D34,

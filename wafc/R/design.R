@@ -15,6 +15,14 @@
 ## phi_{00} of each block is discarded, which is what imposes the
 ## identifiability constraint at the level of the basis (Lemma 1 of
 ## derivations/01-identificabilidade.md).
+##
+## Since step E3.4 the level of each modulating covariate is capped by the
+## number of distinct points at which its basis is evaluated (decision D57,
+## lesson 3 of step E6.1b): a block of 2^J - 1 wavelet columns next to the
+## level column X_l spans at most as many functions of U_m as U_m has
+## distinct points, so with the hour of the day (24 values) any J above 4
+## leaves directions of the block that no observation sees, and the norm
+## the threshold reads depends on how the engine resolves them.
 
 #' Rescale modulating covariates to the unit interval
 #'
@@ -122,7 +130,9 @@ wafc_rescale <- function(u, eps = 0, location = NULL, scale = NULL,
 #'   \eqn{n} rows and \eqn{q} columns.
 #' @param J Resolution level of the sieve: a single integer used for every
 #'   modulating covariate, or one entry per covariate. It must satisfy
-#'   \code{J > j0}.
+#'   \code{J > j0}. With \code{cap.J = TRUE} (the default) it is the level
+#'   asked for, and the level of each covariate is lowered to what its
+#'   distinct values identify.
 #' @param j0 Coarsest resolution level of the basis. Default \code{0}, the
 #'   case in which the periodized basis discards a single constant column
 #'   per block.
@@ -167,7 +177,32 @@ wafc_rescale <- function(u, eps = 0, location = NULL, scale = NULL,
 #'   of the training sample. When supplied, every argument describing the
 #'   basis and the rescaling is taken from it, and the rescaled modulating
 #'   covariates are truncated to the interval used there, so that the two
-#'   designs have the same columns in the same order.
+#'   designs have the same columns in the same order. The levels are the
+#'   ones of \code{spec}, capped or not, whatever the new data.
+#' @param cap.J Logical. If \code{TRUE} (the default, step E3.4), the level
+#'   of the modulating covariate \eqn{U_m} is
+#'   \eqn{J_m = \min(J, \lfloor\log_2 d_m\rfloor)}, where \eqn{d_m} is the
+#'   number of distinct points at which its basis is evaluated. A block has
+#'   \eqn{2^{J} - 1} wavelet columns and sits next to the level column
+#'   \eqn{X_\ell}, and the \eqn{2^J} functions together can be told apart
+#'   on the sample only if \eqn{U_m} has at least \eqn{2^J} distinct points:
+#'   above that, the block has directions that no observation sees, the
+#'   coefficients along them are fixed by the engine and not by the data,
+#'   and the norm \eqn{\hat\nu_{\ell m}} that \code{\link{wafc_threshold}}
+#'   reads depends on them. The count is taken on the rescaled covariate
+#'   and on the circle, because the periodized basis takes the same values
+#'   at 0 and at 1: with \code{eps = 0}, the default, the smallest and the
+#'   largest value of \eqn{U_m} are one point, and \eqn{d_m} is the number
+#'   of distinct values minus one (the hour of the day, with 24 values,
+#'   has \eqn{d_m = 23} and \eqn{J_m = 4}; a covariate with 16 values has
+#'   \eqn{d_m = 15} and \eqn{J_m = 3}, where 16 would leave one direction
+#'   without data). A continuous covariate has \eqn{d_m = n - 1}, and the
+#'   cap changes nothing as long as \eqn{2^J < n}. It is the rule
+#'   \code{\link{wafc_k_matched}} applies to the dimension of a spline.
+#'   \code{FALSE} builds every block at \eqn{J}, as before step E3.4. The
+#'   count is necessary for the block to be identified, not sufficient: the
+#'   distinct points still have to be spread over the supports of the
+#'   wavelets of level \eqn{J_m - 1}, which equally spaced values are.
 #'
 #' @return An object of class \code{"wafc_design"}: a list with the design
 #'   matrix \code{Z} (dense or sparse, \eqn{n \times (p + pqN_J)}), the
@@ -178,7 +213,11 @@ wafc_rescale <- function(u, eps = 0, location = NULL, scale = NULL,
 #'   vary (whose level is carried by the intercept of \pkg{glmnet}, which
 #'   drops constant columns from the fit), the basis and rescaling
 #'   specification, and the dimensions
-#'   \code{n}, \code{p}, \code{q}, \code{NJ} and \code{nvars}.
+#'   \code{n}, \code{p}, \code{q}, \code{NJ} and \code{nvars}. The levels
+#'   are \code{J}, one per modulating covariate, the ones the basis is
+#'   built at (\eqn{J_m}, after the cap), \code{J.requested}, the
+#'   \code{J} asked for, recycled to one per covariate, \code{ndistinct},
+#'   the \eqn{d_m} of \code{cap.J}, and \code{cap.J} itself.
 #'
 #' @examples
 #' n <- 200
@@ -187,6 +226,10 @@ wafc_rescale <- function(u, eps = 0, location = NULL, scale = NULL,
 #' d <- wafc_design(x, u, J = 3)
 #' dim(d$Z)
 #' head(colnames(d$Z))
+#' ## the hour of the day identifies a block up to J = 4
+#' h <- wafc_design(x, cbind(u[, 1], rep(0:23, length.out = n)), J = 6)
+#' h$J
+#' h$ndistinct
 #'
 #' @export
 wafc_design <- function(x, u, J, j0 = 0L, family = "Daublets",
@@ -197,7 +240,7 @@ wafc_design <- function(x, u, J, j0 = 0L, family = "Daublets",
                         use.table = c("auto", "always", "never"),
                         wavelet.table = NULL,
                         sparse = c("auto", "always", "never"),
-                        spec = NULL) {
+                        spec = NULL, cap.J = TRUE) {
 
   this_call <- wafc_compact_call(match.call(), "wafc_design")
   x <- wafc_as_matrix(x, "x")
@@ -239,11 +282,18 @@ wafc_design <- function(x, u, J, j0 = 0L, family = "Daublets",
                 call. = FALSE)
       }
     }
+    if (!is.logical(cap.J) || length(cap.J) != 1L || is.na(cap.J)) {
+      stop("'cap.J' must be TRUE or FALSE.", call. = FALSE)
+    }
+    ndist <- wafc_ndistinct(rs[["u"]], boundary)
+    J.requested <- J
+    if (cap.J) J <- wafc_cap_J(J, j0, ndist, wafc_names(u, q, "u"))
     wtab <- wafc_table(use.table, wavelet.table, workload = n * q,
                        family = family, filter.size = filter.size,
                        prec.wavelet = prec.wavelet,
                        wavelet.filter = wavelet.filter)
-    obj <- list(J = J, j0 = j0, boundary = boundary, family = family,
+    obj <- list(J = J, J.requested = J.requested, ndistinct = ndist,
+                cap.J = cap.J, j0 = j0, boundary = boundary, family = family,
                 filter.size = filter.size, prec.wavelet = prec.wavelet,
                 wavelet.filter = wavelet.filter, wavelet.table = wtab,
                 rescale = rescale, location = rs[["location"]],
@@ -269,6 +319,12 @@ wafc_design <- function(x, u, J, j0 = 0L, family = "Daublets",
                   "prec.wavelet", "wavelet.filter", "wavelet.table",
                   "rescale", "location", "scale", "eps", "xnames", "unames",
                   "sparse")]
+    ## the levels of the training sample, capped or not, and the counts
+    ## that capped them; a spec built before step E3.4 has no cap
+    obj[["J.requested"]] <- wafc_J_requested(spec)
+    obj[["ndistinct"]] <- if (is.null(spec[["ndistinct"]]))
+      rep_len(NA_integer_, length(spec[["J"]])) else spec[["ndistinct"]]
+    obj[["cap.J"]] <- isTRUE(spec[["cap.J"]])
     u_eval <- if (obj[["rescale"]]) {
       wafc_rescale(u, eps = obj[["eps"]], location = obj[["location"]],
                    scale = obj[["scale"]], clip = TRUE)[["u"]]
@@ -412,6 +468,71 @@ wafc_check_J <- function(J, j0, q) {
     stop("'J' must be larger than 'j0' (= ", j0, ").", call. = FALSE)
   }
   rep_len(as.integer(J), q)
+}
+
+## Number of distinct points at which the basis of each (rescaled)
+## modulating covariate is evaluated. The periodized basis is 1-periodic, so
+## a point and its translate by one are the same point: with eps = 0 the
+## smallest and the largest observation are mapped to 0 and to 1, and the
+## basis takes the same row at both (checked on WaveBased::wbasis, exact and
+## by table, in step E3.4). The interval basis, when it exists, will not
+## identify them.
+wafc_ndistinct <- function(u, boundary = "periodic") {
+  vapply(seq_len(ncol(u)), function(m) {
+    v <- u[, m]
+    if (boundary == "periodic") v <- v %% 1
+    length(unique(v))
+  }, 0L)
+}
+
+## The level of each modulating covariate capped by what its distinct
+## points identify (step E3.4): a block of 2^J - 1 wavelet columns plus the
+## level column X_l asks for 2^J functions of U_m, which d distinct points
+## tell apart only when 2^J <= d, so J_m = min(J, floor(log2(d))). The
+## level cannot go below j0 + 1, the coarsest block there is; a covariate
+## with a single point on the circle (a constant one, which rescale = FALSE
+## lets through, or two values with eps = 0) identifies no wavelet column at
+## all, and is reported rather than silently kept.
+wafc_cap_J <- function(J, j0, ndist, unames) {
+  cap <- as.integer(floor(log2(pmax(ndist, 1L))))
+  low <- which(cap < j0 + 1L)
+  if (length(low) > 0L) {
+    warning("The modulating covariate(s) ", paste(unames[low], collapse = ", "),
+            " take a single point of the periodized basis (a constant, or ",
+            "two values, which eps = 0 maps to 0 and 1, the same point), ",
+            "so their blocks are not identified at any level; they are kept ",
+            "at J = ", j0 + 1L, ". A positive 'eps' separates two values.",
+            call. = FALSE)
+    cap[low] <- j0 + 1L
+  }
+  as.integer(pmin(J, cap))
+}
+
+## The level asked for, one per modulating covariate, of a design built
+## before step E3.4 too, which has only the levels it was built at.
+wafc_J_requested <- function(design) {
+  if (is.null(design[["J.requested"]])) design[["J"]] else
+    design[["J.requested"]]
+}
+
+## Which modulating covariates the cap lowered, to what level and with how
+## many distinct points, as text ("u2 at 4 (23 points)"); NULL when it
+## lowered none.
+wafc_J_cap <- function(design) {
+  low <- which(design[["J"]] < wafc_J_requested(design))
+  if (length(low) == 0L) return(NULL)
+  paste(sprintf("%s at %d (%d points)", design[["unames"]][low],
+                design[["J"]][low], design[["ndistinct"]][low]),
+        collapse = ", ")
+}
+
+## The levels of a design as text, for the titles of the plots: the levels
+## asked for, as before step E3.4, and the cap when it lowered some.
+wafc_J_text <- function(design, unique = FALSE) {
+  Jr <- wafc_J_requested(design)
+  out <- paste(if (unique) base::unique(Jr) else Jr, collapse = ", ")
+  cap <- wafc_J_cap(design)
+  if (is.null(cap)) out else sprintf("%s (capped: %s)", out, cap)
 }
 
 ## Default margin of the periodized case: zero, by decision D35 (proposal P2

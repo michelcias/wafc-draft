@@ -11,6 +11,10 @@
 % E5f (E1.15, L10; D54): a Proposition S6.2 (Corolario 15 do 08) no fim de S6, a
 % Proposition S8.2 (Proposicao 8 do 05) em S8, com as provas; cada insercao em
 % grupo ja azul leva o comentario % E5f.
+% E5g (E1.9; D57): o Teorema 5 e o Lema 17 de derivations/09-cota-inferior.tex
+% (Theorem S6.1, thm:lower; Lemma S6.3, lem:hypercube), com a prova, no lugar
+% da Remark S6.1 (rem:lower), que fica em cinza (D51(b)) e vira uma frase; a
+% uniformidade na prova do Theorem 1; cada insercao leva o comentario % E5g.
 \documentclass[10pt]{book}
 \usepackage[sectionbib]{natbib}
 \usepackage{array,epsfig,fancyheadings,rotating}
@@ -44,6 +48,7 @@
 \newtheorem{definition}{Definition}[section]
 \newtheorem{example}{Example}[section]
 \newtheorem{remark}{Remark}[section]
+\newtheorem*{remarkold}{Remark}   % E5g: a Remark S6.1 removida (D51(b))
 \pagestyle{fancy}
 
 % --- macros: as mesmas de ms_3.tex (docs/notacao.md) ---------------------
@@ -142,6 +147,16 @@
 \newcommand{\Rone}{\mathcal{R}_{1}}
 \newcommand{\RGw}{\mathcal{R}_{\mathcal{G},w}}
 \newcommand{\RGone}{\mathcal{R}_{\mathcal{G},1}}
+% E5g (E1.9; D57): os simbolos da cota inferior que chegam ao manuscrito
+% (docs/notacao.md, S10). O K = |K| do notacao.md fica escrito |\Kcal|, porque
+% K ja e a dimensao de Psi(u) em S4 e uma constante em S6; os demais simbolos
+% de derivations/09-cota-inferior.tex ficam locais, escritos no texto.
+\newcommand{\Kcal}{\mathcal{K}}
+\newcommand{\rlow}{\underline{\rho}_{n}}
+\newcommand{\cA}{c_{\mathrm{A}}}
+% E5g (D51(b)): a Remark S6.1 removida inteira fica no lugar, em cinza e sem
+% numero, como os enunciados removidos do ms_4.tex.
+\newcommand{\removedk}{\par\noindent[removed in k = 4]\par}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \pagestyle{fancy}
@@ -186,7 +201,8 @@ the auxiliary lemmas they use. Section S1 fixes the notation and the objects.
 Section S2 proves the identification results of Section 2 of the paper,
 Section S3 the approximation lemma, Section S4 the bounds for the Gram matrix
 of the product design, Section S5 the oracle inequality, \textcolor{gray}{\sout{and}} Section S6 the
-rates\textcolor{colR1}{, \textcolor{gray}{\sout{and}} Section S7 the recovery of the block structure by
+% E5g (D57): a S6 passa a ter a cota inferior (Theorem S6.1).
+rates \textcolor{colR1}{and a minimax lower bound}\textcolor{colR1}{, \textcolor{gray}{\sout{and}} Section S7 the recovery of the block structure by
 thresholding} \textcolor{colR1}{and the risk of the thresholded estimator, and
 Section S8 gives the theory of the coordinatewise lasso, the option of the
 software that replaces the penalty of equation (2.5) by the $\ell_1$ norm}. References to numbered results without a section prefix are to the
@@ -1606,6 +1622,24 @@ $2c\seff \ge 2s/(2s+1)$ by the window; the term $\sigma^{2}p/n$ is of smaller
 order. For the components, the second bound of Corollary~\ref{cor:ideal} and
 Lemma~2 give the same rate, as in the proof of Corollary~1.
 
+% E5g (pergunta 51(c), D57): a uniformidade do O_p, lida na prova do
+% Corolario 16 de derivations/09-cota-inferior.tex; sem ela, "minimax optimal"
+% no corpo fica no sentido ponto a ponto.
+\emph{Uniformity over the class.} The events $\Acal$ and $\Ecal$ and the
+event for $\normn{\PA\bveps}^{2}$ do not depend on $f$; the event for
+$\normn{\bb}^{2}$ does, but its probability is at least $1-\alpha'$ for every
+$f$ whose components satisfy Assumption~5, because the bound
+$\mathcal{B}_{J_n}^{2}$ on $\E\normn{\bb}^{2}$ of Lemma~2 depends on $f$ only
+through $C_g$. On the event, the bound depends on $f$ only through $C_g$, by
+Lemmas~2 and~3, and not on the levels $\bc$, since $\bb = f - f_{J_n}$ does
+not involve them. Hence
+$\sup_{f}\Prob_{f}\{\normn{\widehat{f}-f}^{2} > M_\epsilon r_n\} < \epsilon$
+for $n$ large, with $\Prob_{f}$ the law of the sample when the regression
+function is $f$ and the supremum over the functions of Assumption~5 with any
+levels, and the same holds for the components: the bound of Theorem~1 is
+uniform over the class, which is the form that Theorem~\ref{thm:lower} below
+is compared with.
+
 \emph{Two readings.} The constant grows with the weights at most as
 $\bar\varrho^{\,4s/(2s+1)}$ in the leading term, through
 $\kappa^{2s/(2s+1)}$. The gain over the rate $(\log n/n)^{2s/(2s+1)}$ of the
@@ -1617,8 +1651,10 @@ the size of the chunks, which is why they must have at least of the order of
 $\log|\Gcal_{n}|$ coefficients. \qed
 
 % derivations/08-blocos.tex, Observacao rem:inferior.
-\begin{remark}[The lower bound of Klopp and Pensky with one modulator]
-\label{rem:lower}
+% E5g (D57): removida inteira e substituida pelo Theorem S6.1 abaixo; fica no
+% lugar em cinza e sem numero (D51(b)), sem o rotulo rem:lower, que nada cita.
+{\color{gray}\removedk
+\begin{remarkold}[The lower bound of Klopp and Pensky with one modulator]
 For $q = 1$, $\bX$ independent of $U_1$ and Gaussian errors,
 \citet[Theorem~1, eqs.~3.6 and 3.7]{Klopp-Pensky-2015}, with the number of
 covariates fixed, give the minimax lower bound $n^{-2r/(2r+1)}$ over their
@@ -1637,7 +1673,374 @@ condition $\seff > s/(2s+1)$ of Theorem~1 is implied by $s \ge 1/\pi$, since
 then $\seff \ge 1/2 > s/(2s+1)$, and is strictly weaker. That this factor is
 necessary for the estimator is proved neither here nor by Klopp and Pensky,
 and for $q \ge 2$ no lower bound is available.
-\end{remark}
+\end{remarkold}
+}
+
+% E5g (E1.9; D57): derivations/09-cota-inferior.tex, Teorema 5 e Lema 17
+% (numeracao global), nas tres perdas, com as provas; dentro do grupo azul de
+% k = 4. Os simbolos locais do 09 (o hipercubo C, Omega, zeta, d_H, a funcao
+% de limiar) ficam escritos no texto; |C| no lugar do M do 09, que colide com
+% M_epsilon e com o M da S8; L_n e L_P escritos por extenso, porque L_n e o
+% logaritmo da S8.
+\subsection*{A minimax lower bound}
+
+The rates of this section are upper bounds. For a lower bound, fix any law
+$P$ of $(\bX,\bU)$ that satisfies Assumptions~2 and~3, with $\bX$ allowed to
+depend on $\bU$, and let the errors be Gaussian,
+\begin{equation}
+  \label{eq:gauss}
+  \varepsilon_i \sim N(0,\sigma^{2}),\ \text{independent of } (\bX_i,\bU_i),
+\end{equation}
+which satisfy Assumption~1. Write $\Prob_f$ and $\E_f$ for the law and the
+expectation of the sample when the regression function is $f$, and
+$\mathcal{F} = \mathcal{F}(s,\pi,C_g)$ for the set of the functions
+$f(x,u) = \sum_{\cv}x_{\cv}\{\lvl{\cv} + \sum_{\md}\gcomp{\cv}{\md}(u_{\md})\}$
+with $\bc \in \R^{p}$ arbitrary and every component satisfying the centering
+and the bound of Assumption~5; by Proposition~1, $f$ determines its levels and
+its components. An estimator is any measurable function of the sample: for
+prediction, $\widehat{f}$ with values in $L_2(P)$, or only its values
+$\widehat{f}(\bX_i,\bU_i)$, and for the components,
+$\widehat{g} = (\widehat{g}_{\cv\md})$ with $\widehat{g}_{\cv\md} \in
+L_2[0,1]$. For a nonempty set $\Kcal$ of blocks $(\cv,\md)$, the loss for the
+components in $\Kcal$ is
+\[
+  L_{\Kcal}(\widehat{g},f) \;=\; \sum_{(\cv,\md)\in\Kcal}
+  \lVert\widehat{g}_{\cv\md} - \gcomp{\cv}{\md}\rVert_{L_2[0,1]}^{2} .
+\]
+With $\gamma = \kappa_1c_U$ as in Section~S1 and
+$\cA = (1-2^{-1/2})/2 \approx 0.146$, put, for
+$n \ge n_{0} = \lceil 2\sigma^{2}/(C_g^{2}B_X^{2}C_U)\rceil$,
+\begin{equation}
+  \label{eq:lower-choices}
+  \begin{gathered}
+  \zeta_n^{2} = \frac{2\sigma^{2}}{nB_X^{2}C_U},
+  \qquad
+  \lev_n = \max\Bigl\{\lev \ge 0 : 2^{\lev(2s+1)} \le \frac{C_g^{2}}{\zeta_n^{2}}\Bigr\},
+  \\
+  \rlow^{2} = C_g^{2/(2s+1)}\Bigl(\frac{\sigma^{2}}{nB_X^{2}C_U}\Bigr)^{2s/(2s+1)} ;
+  \end{gathered}
+\end{equation}
+$\lev_n$ exists because $C_g^{2}/\zeta_n^{2} \ge 1$ when $n \ge n_{0}$, and
+$\rlow^{2}$, of order $n^{-2s/(2s+1)}$, is the rate of the lower bound.
+
+\begin{theorem}[Minimax lower bound]
+\label{thm:lower}
+Let $P$ be any law of $(\bX,\bU)$ that satisfies Assumptions~2 and~3, with
+$q \ge 1$ and $\bX$ possibly dependent on $\bU$, let the basis satisfy
+Assumption~4, and let the errors be Gaussian, as in \eqref{eq:gauss}. For
+every $s > 0$, every $1 \le \pi \le \infty$, every nonempty set $\Kcal$ of
+blocks and every $n \ge n_{0}$, with $\rlow$ as in \eqref{eq:lower-choices}:
+\begin{enumerate}
+\item[(i)] (components)
+\begin{gather*}
+  \inf_{\widehat{g}}\sup_{f\in\mathcal{F}}\E_{f}L_{\Kcal}(\widehat{g},f)
+  \;\ge\; \frac{\cA}{8}\,|\Kcal|\,\rlow^{2},
+  \\
+  \inf_{\widehat{g}}\sup_{f\in\mathcal{F}}\Prob_{f}\Bigl\{L_{\Kcal}(\widehat{g},f)
+  \ge \frac{\cA}{16}\,|\Kcal|\,\rlow^{2}\Bigr\} \;\ge\; \frac{\cA}{2} ;
+\end{gather*}
+\item[(ii)] (prediction, population norm) the same holds for
+$\norm{\widehat{f}-f}_{L_2(P)}^{2}$, with $\gamma|\Kcal|\rlow^{2}$ in place of
+$|\Kcal|\rlow^{2}$;
+\item[(iii)] (prediction, empirical norm) if moreover $n \ge n_{1}$, the
+smallest integer from which on
+$2D\exp[-n\gamma^{2}/\{8R_{J}(\kappa_2C_U + \gamma/3)\}] \le \cA/4$, with
+$J = \lev_n + 1$ and $D = p + pq\NJ$ and $R_J$ as in Proposition~2(ii), then
+\begin{gather*}
+  \inf_{\widehat{f}}\sup_{f\in\mathcal{F}}\E_{f}\normn{\widehat{f}-f}^{2}
+  \;\ge\; \frac{\cA}{32}\,\gamma|\Kcal|\,\rlow^{2},
+  \\
+  \inf_{\widehat{f}}\sup_{f\in\mathcal{F}}\Prob_{f}\Bigl\{\normn{\widehat{f}-f}^{2}
+  \ge \frac{\cA}{32}\,\gamma|\Kcal|\,\rlow^{2}\Bigr\} \;\ge\; \frac{\cA}{4} .
+\end{gather*}
+\end{enumerate}
+The constants depend neither on $\pi$, $r$, $p$ or $q$, nor on $P$ beyond
+$(B_X,C_U)$ in $\rlow$ and $\gamma = \kappa_1c_U$; $n_{0}$ depends only on
+$(\sigma,C_g,B_X,C_U)$, and $n_{1}$, which is finite, also on
+$(p,q,s,\kappa_1,\kappa_2,c_U)$ and the wavelet family. In particular, with
+$\Kcal$ a single block, every component and the prediction have minimax risk
+of order at least $n^{-2s/(2s+1)}$, and with $\Kcal$ all the blocks, so that
+$|\Kcal| = pq$, the bound is proportional to $pq$.
+\end{theorem}
+
+The bound is not asymptotic, and it holds for every pair $(s,\pi)$, in
+particular for every pair that Assumption~5 allows. It has the form of the
+lower bound of \citet[Theorem~5]{Donoho-Johnstone-1998} for Besov bodies in
+the Gaussian sequence model, with radius $C_g$ and noise level
+$\sigma(nB_X^{2}C_U)^{-1/2}$ per coordinate. Since Gaussian errors satisfy
+Assumption~1, it holds a fortiori over the models of Assumptions~1 to~5, and
+the form in probability is the one to compare with the upper bounds, which are
+stated in $O_p$ and are uniform over the class (proof of Theorem~1 above).
+Hence, when $\pi \ge 2$, $n^{-2s/(2s+1)}$ is the minimax rate in the
+prediction norm and for the components, for every $q$ and with covariates
+that depend on the modulators, and the estimator of Theorem~1 attains it
+uniformly over the class; when $\pi < 2$ and $\seff > s/(2s+1)$ it attains it
+up to the factor $(\log n)^{(2/\pi-1)/(2s+1)}$, which the lower bound does not
+carry
+% D58 (pergunta 52(f)): a condicao de Cai (1999), que saiu com a Remark S6.1.
+(the same factor as in the rate of block thresholding in the sequence model,
+\citealp[Theorem~4]{Cai-1999}, which holds for $s \ge 1/\pi$, a condition
+strictly stronger than $\seff > s/(2s+1)$), and the coordinatewise lasso, at the rate $(\log n/n)^{2s/(2s+1)}$ of
+Theorem~\ref{thm:lasso-main}, stays above it by the factor
+$(\log n)^{2s/(2s+1)}$ for every $\pi$. When $q = 1$ and $\bX$ is independent
+of $U_1$, part (i) with $\Kcal$ all the blocks is, up to the constants, the
+nonparametric term of the lower bound of
+\citet[Theorem~1, eqs.~3.6 and~3.7]{Klopp-Pensky-2015} with a fixed number of
+covariates.
+
+The proof applies Assouad's lemma to a hypercube of wavelets at a single
+level. Fix $\Kcal$, a level $\lev \ge 0$ and a height $\zeta > 0$; let
+\[
+  \mathcal{C} = \bigl\{(\cv,\md,\tsl) : (\cv,\md)\in\Kcal,\ 0 \le \tsl < 2^{\lev}\bigr\},
+  \qquad |\mathcal{C}| = |\Kcal|\,2^{\lev},
+\]
+and $\Omega = \{0,1\}^{\mathcal{C}}$. For $\omega \in \Omega$ the components
+are $\gcomp{\cv}{\md}^{\omega} =
+\zeta\sum_{\tsl}\omega_{\cv\md,\tsl}\wav{\lev}{\tsl}$ for
+$(\cv,\md) \in \Kcal$ and zero otherwise, the levels are zero, and
+\[
+  f_{\omega}(x,u) \;=\; \zeta\,z_{\mathcal{C}}(x,u)\T\omega,
+  \qquad
+  z_{\mathcal{C}}(x,u) = \bigl(x_{\cv}\wav{\lev}{\tsl}(u_{\md})\bigr)_{(\cv,\md,\tsl)\in\mathcal{C}} ,
+\]
+whose entries are columns of the design at resolution $J = \lev + 1$. Write
+$\Gram_{\mathcal{C}\mathcal{C}}$ and $\Gramhat_{\mathcal{C}\mathcal{C}}$ for
+the principal submatrices of $\Gram$ and $\Gramhat$ at that resolution on the
+columns in $\mathcal{C}$, $\bZ_{\mathcal{C}}$ for those columns of $\bZ$,
+$d_{H}(\omega,\omega') = \sum_{(\cv,\md,\tsl)\in\mathcal{C}}
+\mathbf{1}\{\omega_{\cv\md,\tsl} \ne \omega'_{\cv\md,\tsl}\}$ for the Hamming
+distance, and $\Prob_{\omega}$ and $\E_{\omega}$ for $\Prob_{f_{\omega}}$ and
+$\E_{f_{\omega}}$. The form of Assouad's lemma that we use is
+\citet[Theorem~2.12(iv)]{Tsybakov-2009} with the Kullback--Leibler divergence
+bounded by one: if $\operatorname{KL}(\Prob_{\omega},\Prob_{\omega'}) \le 1$
+whenever $d_{H}(\omega,\omega') = 1$, then
+\begin{equation}
+  \label{eq:assouad}
+  \inf_{\widehat\omega}\max_{\omega\in\Omega}\E_{\omega}d_{H}(\widehat\omega,\omega)
+  \;\ge\; \frac{|\mathcal{C}|}{2}\max\Bigl(\frac{e^{-1}}{2},\,1-2^{-1/2}\Bigr)
+  \;=\; \cA|\mathcal{C}| ,
+\end{equation}
+the infimum being over all the estimators with values in $\Omega$.
+
+\begin{lemma}[A hypercube of wavelets]
+\label{lem:hypercube}
+In the setting of Theorem~\ref{thm:lower}, for every nonempty $\Kcal$, every
+$\lev \ge 0$ and every $\zeta > 0$:
+\begin{enumerate}
+\item[(i)] $f_{\omega} \in \mathcal{F}$ for every $\omega \in \Omega$ if and
+only if $\zeta2^{\lev(s+1/2)} \le C_g$, for every $s > 0$ and every
+$1 \le \pi \le \infty$;
+\item[(ii)] for every pair,
+$\operatorname{KL}(\Prob_{\omega},\Prob_{\omega'}) =
+\{n\zeta^{2}/(2\sigma^{2})\}(\omega-\omega')\T\Gram_{\mathcal{C}\mathcal{C}}(\omega-\omega')$,
+and, if $\omega$ and $\omega'$ differ only in the coordinate $(\cv,\md,\tsl)$,
+\[
+  \operatorname{KL}(\Prob_{\omega},\Prob_{\omega'})
+  \;=\; \frac{n\zeta^{2}}{2\sigma^{2}}\,\E\bigl\{X_{\cv}^{2}\wav{\lev}{\tsl}(U_{\md})^{2}\bigr\}
+  \;\le\; \frac{n\zeta^{2}}{2\sigma^{2}}\,\min(B_X^{2},\kappa_2)\,C_U ;
+\]
+\item[(iii)] $\lmin(\Gram_{\mathcal{C}\mathcal{C}}) \ge \gamma$, so that
+\begin{gather*}
+  \norm{f_{\omega}-f_{\omega'}}_{L_2(P)}^{2} \ge \gamma\zeta^{2}d_{H}(\omega,\omega'),
+  \\
+  \sum_{(\cv,\md)\in\Kcal}\lVert\gcomp{\cv}{\md}^{\omega} -
+  \gcomp{\cv}{\md}^{\omega'}\rVert_{L_2[0,1]}^{2} = \zeta^{2}d_{H}(\omega,\omega') ;
+\end{gather*}
+with a single block $(\cv,\md)$, the first statement uses only
+$\E(X_{\cv}^{2}\mid\bU) \ge \kappa_1$ and the lower bound $c_U$ on the
+density of $U_{\md}$;
+\item[(iv)] for each of the three losses and every estimator there is a
+measurable function $\widehat\omega$ of the sample with values in $\Omega$
+such that, for every $\omega \in \Omega$,
+\begin{enumerate}
+\item[(a)] $L_{\Kcal}(\widehat{g},f_{\omega}) \ge (\zeta^{2}/4)\,d_{H}(\widehat\omega,\omega)$,
+\item[(b)] $\norm{\widehat{f}-f_{\omega}}_{L_2(P)}^{2} \ge (\gamma\zeta^{2}/4)\,d_{H}(\widehat\omega,\omega)$,
+\item[(c)] $\normn{\widehat{f}-f_{\omega}}^{2} \ge (\gamma\zeta^{2}/8)\,
+d_{H}(\widehat\omega,\omega)\,\mathbf{1}_{\mathcal{E}_{\mathcal{C}}}$, where
+$\mathcal{E}_{\mathcal{C}} = \{\lmin(\Gramhat_{\mathcal{C}\mathcal{C}}) \ge \gamma/2\}$
+depends only on the $(\bX_i,\bU_i)$ and has, with $J = \lev+1$ and $D$ and
+$R_J$ as in Theorem~\ref{thm:lower}(iii),
+\[
+  \Prob(\mathcal{E}_{\mathcal{C}}^{c}) \;\le\;
+  2D\exp\Bigl\{-\frac{n\gamma^{2}}{8R_{J}(\kappa_2C_U + \gamma/3)}\Bigr\} .
+\]
+\end{enumerate}
+\end{enumerate}
+\end{lemma}
+
+The Kullback--Leibler divergence uses only upper bounds on the design, and
+through the conditional second moment $\E(X_{\cv}^{2}\mid\bU)$, which is why
+the covariates may depend on the modulators at no cost. The separation of the
+components uses no property of the design; that of the prediction uses the
+smallest eigenvalue, and it is there that the cross terms between modulators
+and between covariates enter, through Proposition~2(i).
+
+\subsection*{Proof of Lemma~\ref{lem:hypercube}}
+
+\emph{Part (i).} By the orthonormality of $\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$
+in $L_2[0,1]$ (Section~S2), the coefficients of $\gcomp{\cv}{\md}^{\omega}$
+are $\theta_{\cv\md,\lev'\tsl} = \zeta\omega_{\cv\md,\tsl}\mathbf{1}\{\lev' =
+\lev\}$, and $\int_0^1\gcomp{\cv}{\md}^{\omega} = 0$ because
+$\int_0^1\wav{\lev}{\tsl} = 0$. Only the level $\lev$ is nonzero, so the bound
+of Assumption~5 reduces to that level, whatever the index $r$. For
+$\pi < \infty$, $\norm{\theta_{\cv\md,\lev\cdot}}_{\pi} =
+\zeta(\sum_{\tsl}\omega_{\cv\md,\tsl})^{1/\pi} \le \zeta2^{\lev/\pi}$, with
+equality at $\omega \equiv 1$; for $\pi = \infty$ it is $\zeta$ if
+$\omega_{\cv\md,\cdot} \ne 0$. In both cases the maximum over $\Omega$ of
+$2^{\lev(s+1/2-1/\pi)}\norm{\theta_{\cv\md,\lev\cdot}}_{\pi}$ is
+$\zeta2^{\lev(s+1/2)}$. The components outside $\Kcal$ and the levels are
+zero.
+
+\emph{Part (ii).} Under $\Prob_{\omega}$ the pairs $(\bX_i,\bU_i)$ have the
+law $P$, the same for every $\omega$, and, given them, the $Y_i$ are
+independent with $Y_i \sim N\{f_{\omega}(\bX_i,\bU_i),\sigma^{2}\}$. The
+divergence between product laws is the sum of the divergences, and that
+between two laws with the same marginal is the mean of the divergence between
+the conditionals, so that
+$\operatorname{KL}(\Prob_{\omega},\Prob_{\omega'}) =
+n\E\{(f_{\omega}-f_{\omega'})^{2}(\bX,\bU)\}/(2\sigma^{2})$, and
+$f_{\omega}-f_{\omega'} = \zeta z_{\mathcal{C}}\T(\omega-\omega')$ gives the
+quadratic form. For a neighbor, $\E\{(f_{\omega}-f_{\omega'})^{2}\} =
+\zeta^{2}\E\{\E(X_{\cv}^{2}\mid\bU)\wav{\lev}{\tsl}(U_{\md})^{2}\}$, with
+$\E(X_{\cv}^{2}\mid\bU) \le B_X^{2}$ and $\E(X_{\cv}^{2}\mid\bU) =
+e_{\cv}\T\E(\bX\bX\T\mid\bU)e_{\cv} \le \kappa_2$ by Assumption~2, and
+$\E\{\wav{\lev}{\tsl}(U_{\md})^{2}\} \le C_U\int_0^1\wav{\lev}{\tsl}^{2} = C_U$,
+because the density of $U_{\md}$ inherits the bound $C_U$ of Assumption~3.
+
+\emph{Part (iii).} For $v \in \R^{\mathcal{C}}$ and $\tilde v$ its completion
+with zeros, $v\T\Gram_{\mathcal{C}\mathcal{C}}v = \tilde v\T\Gram\tilde v \ge
+\lmin(\Gram)\norm{v}_{2}^{2} \ge \gamma\norm{v}_{2}^{2}$, by
+Proposition~2(i). Since $\omega-\omega' \in \{-1,0,1\}^{\mathcal{C}}$,
+$\norm{\omega-\omega'}_{2}^{2} = d_{H}(\omega,\omega')$, and
+$\norm{f_{\omega}-f_{\omega'}}_{L_2(P)}^{2} =
+\zeta^{2}(\omega-\omega')\T\Gram_{\mathcal{C}\mathcal{C}}(\omega-\omega') \ge
+\gamma\zeta^{2}d_{H}(\omega,\omega')$. The identity for the components is
+Parseval's. With a single block,
+\begin{align*}
+  v\T\Gram_{\mathcal{C}\mathcal{C}}v &=
+  \E\Bigl[\E(X_{\cv}^{2}\mid\bU)\Bigl\{\sum_{\tsl}v_{\tsl}\wav{\lev}{\tsl}(U_{\md})\Bigr\}^{2}\Bigr]
+  \\
+  &\ge \kappa_1c_U\int_0^1\Bigl(\sum_{\tsl}v_{\tsl}\wav{\lev}{\tsl}\Bigr)^{2} =
+  \gamma\norm{v}_{2}^{2} .
+\end{align*}
+
+\emph{Part (iv).} Let $\varpi(y) = \mathbf{1}\{y \ge \zeta/2\}$ for real $y$.
+For $\omega_{\cv\md,\tsl} \in \{0,1\}$,
+\begin{equation}
+  \label{eq:hypercube-threshold}
+  |y - \zeta\omega_{\cv\md,\tsl}| \;\ge\; \frac{\zeta}{2}\,
+  |\varpi(y) - \omega_{\cv\md,\tsl}| ,
+\end{equation}
+because if $\varpi(y) \ne \omega_{\cv\md,\tsl}$ then $y$ and
+$\zeta\omega_{\cv\md,\tsl}$ lie on opposite sides of $\zeta/2$. Applied
+coordinatewise to a vector $a \in \R^{\mathcal{C}}$, it gives
+\[
+  \norm{a-\zeta\omega}_{2}^{2} \;\ge\; \frac{\zeta^{2}}{4}\,d_{H}(\varpi(a),\omega) .
+\]
+For
+(a), take $a_{\cv\md,\tsl} = \inner{\widehat{g}_{\cv\md}}{\wav{\lev}{\tsl}}$
+and $\widehat\omega = \varpi(a)$: by Bessel's inequality,
+$\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}^{\omega}\rVert_{L_2[0,1]}^{2} \ge
+\sum_{\tsl}(a_{\cv\md,\tsl}-\zeta\omega_{\cv\md,\tsl})^{2}$ for each
+$(\cv,\md) \in \Kcal$, and it remains to sum over $\Kcal$. For (b), let
+$\Pi_{\mathcal{C}}$ be the orthogonal projection of $L_2(P)$ onto the span of
+the entries of $z_{\mathcal{C}}$, of dimension $|\mathcal{C}|$ because
+$\Gram_{\mathcal{C}\mathcal{C}}$ is positive definite by (iii):
+$\Pi_{\mathcal{C}}\widehat{f} = z_{\mathcal{C}}\T a$ with
+$a = \Gram_{\mathcal{C}\mathcal{C}}^{-1}\E\{z_{\mathcal{C}}(\bX,\bU)\widehat{f}(\bX,\bU)\}$,
+the expectation being over a new $(\bX,\bU)$ with $\widehat{f}$ fixed, so that
+$a$ is a measurable function of the sample, $P$ being fixed. Since $f_{\omega}$
+lies in the span, Pythagoras' theorem gives
+$\norm{\widehat{f}-f_{\omega}}_{L_2(P)}^{2} \ge
+\norm{\Pi_{\mathcal{C}}\widehat{f}-f_{\omega}}_{L_2(P)}^{2} =
+(a-\zeta\omega)\T\Gram_{\mathcal{C}\mathcal{C}}(a-\zeta\omega) \ge
+\gamma\norm{a-\zeta\omega}_{2}^{2}$; take $\widehat\omega = \varpi(a)$. For
+(c), write $\widehat{\mathbf{F}} = (\widehat{f}(\bX_i,\bU_i))_{i\le n}$. On
+$\mathcal{E}_{\mathcal{C}}$, $\bZ_{\mathcal{C}}$ has rank $|\mathcal{C}|$; take
+$a = (\bZ_{\mathcal{C}}\T\bZ_{\mathcal{C}})^{-1}\bZ_{\mathcal{C}}\T\widehat{\mathbf{F}}$
+and $\widehat\omega = \varpi(a)$ there, and $\widehat\omega = 0$ off it. On
+$\mathcal{E}_{\mathcal{C}}$, since $\zeta\bZ_{\mathcal{C}}\omega$ is the vector
+of the values of $f_{\omega}$ and lies in the column space of
+$\bZ_{\mathcal{C}}$,
+$n\normn{\widehat{f}-f_{\omega}}^{2} =
+\norm{\widehat{\mathbf{F}}-\zeta\bZ_{\mathcal{C}}\omega}_{2}^{2} \ge
+\norm{\bZ_{\mathcal{C}}(a-\zeta\omega)}_{2}^{2} =
+n(a-\zeta\omega)\T\Gramhat_{\mathcal{C}\mathcal{C}}(a-\zeta\omega) \ge
+n(\gamma/2)\norm{a-\zeta\omega}_{2}^{2}$; off it the right side of (c) is
+zero. Finally $\Gramhat_{\mathcal{C}\mathcal{C}}$ is a principal submatrix of
+$\Gramhat$ at resolution $J = \lev+1$, so that
+$\lmin(\Gramhat_{\mathcal{C}\mathcal{C}}) \ge \lmin(\Gramhat)$, and
+$\mathcal{E}_{\mathcal{C}}$ contains the event of Proposition~2(ii), which
+gives the bound on its complement. \qed
+
+\subsection*{Proof of Theorem~\ref{thm:lower}}
+
+\emph{The hypercube.} Take $\zeta = \zeta_n$ and $\lev = \lev_n$ of
+\eqref{eq:lower-choices}. Since $2^{\lev_n(2s+1)} \le C_g^{2}/\zeta_n^{2}$,
+$\zeta_n2^{\lev_n(s+1/2)} \le C_g$, and Lemma~\ref{lem:hypercube}(i) gives
+$f_{\omega} \in \mathcal{F}$ for every $\omega$. By
+Lemma~\ref{lem:hypercube}(ii), the divergence between neighbors is at most one,
+because $n\zeta_n^{2}B_X^{2}C_U = 2\sigma^{2}$, and
+\eqref{eq:assouad} gives, for every $\widehat\omega$ with values in $\Omega$,
+\begin{equation}
+  \label{eq:assouad-n}
+  \max_{\omega\in\Omega}\E_{\omega}d_{H}(\widehat\omega,\omega)
+  \;\ge\; \cA|\mathcal{C}|,
+  \qquad |\mathcal{C}| = |\Kcal|\,2^{\lev_n} .
+\end{equation}
+
+\emph{The scale.} By the maximality of $\lev_n$,
+$2^{(\lev_n+1)(2s+1)} > C_g^{2}/\zeta_n^{2}$, so that
+$2^{\lev_n} > (C_g/\zeta_n)^{2/(2s+1)}/2$ and
+\begin{align*}
+  2^{\lev_n}\zeta_n^{2} \;&>\; \frac12\,C_g^{2/(2s+1)}(\zeta_n^{2})^{2s/(2s+1)}
+  = \frac12\,C_g^{2/(2s+1)}\Bigl(\frac{2\sigma^{2}}{nB_X^{2}C_U}\Bigr)^{2s/(2s+1)}
+  \\
+  &= 2^{-1/(2s+1)}\rlow^{2} \;\ge\; \frac12\,\rlow^{2},
+\end{align*}
+that is, $\zeta_n^{2}|\mathcal{C}| \ge |\Kcal|\rlow^{2}/2$.
+
+\emph{Expectation.} The supremum over $\mathcal{F}$ is at least the maximum
+over the hypercube. With the $\widehat\omega$ of
+Lemma~\ref{lem:hypercube}(iv)(a) and \eqref{eq:assouad-n},
+\[
+  \max_{\omega}\E_{\omega}L_{\Kcal}(\widehat{g},f_{\omega}) \;\ge\;
+  \frac{\zeta_n^{2}}{4}\,\cA|\mathcal{C}| \;\ge\; \frac{\cA}{8}\,|\Kcal|\,\rlow^{2} ;
+\]
+with that of (iv)(b), the same with the factor $\gamma$. For (iii), since
+$d_{H} \le |\mathcal{C}|$ and the law of the $(\bX_i,\bU_i)$ does not depend
+on $\omega$, $\E_{\omega}\{d_{H}(\widehat\omega,\omega)\mathbf{1}_{\mathcal{E}_{\mathcal{C}}}\}
+\ge \E_{\omega}d_{H}(\widehat\omega,\omega) -
+|\mathcal{C}|\Prob(\mathcal{E}_{\mathcal{C}}^{c})$, and for $n \ge n_{1}$
+\[
+  \max_{\omega}\E_{\omega}\normn{\widehat{f}-f_{\omega}}^{2}
+  \;\ge\; \frac{\gamma\zeta_n^{2}}{8}\Bigl(\cA|\mathcal{C}| -
+  \frac{\cA}{4}|\mathcal{C}|\Bigr)
+  = \frac{3\cA}{32}\,\gamma\zeta_n^{2}|\mathcal{C}|
+  \;\ge\; \frac{\cA}{32}\,\gamma|\Kcal|\,\rlow^{2} .
+\]
+
+\emph{Probability.} Let $\omega^{*}$ attain the maximum in
+\eqref{eq:assouad-n}, which exists because $\Omega$ is finite. Since
+$0 \le d_{H} \le |\mathcal{C}|$,
+$\cA|\mathcal{C}| \le \E_{\omega^{*}}d_{H} \le \cA|\mathcal{C}|/2 +
+|\mathcal{C}|\Prob_{\omega^{*}}(d_{H} \ge \cA|\mathcal{C}|/2)$, so that
+$\Prob_{\omega^{*}}(d_{H} \ge \cA|\mathcal{C}|/2) \ge \cA/2$. On that event,
+(iv)(a) gives $L_{\Kcal} \ge (\zeta_n^{2}/4)\cA|\mathcal{C}|/2 \ge
+(\cA/16)|\Kcal|\rlow^{2}$, and (iv)(b) the same with the factor $\gamma$; on
+its intersection with $\mathcal{E}_{\mathcal{C}}$, of probability at least
+$\cA/2 - \cA/4$ when $n \ge n_{1}$, (iv)(c) gives
+$\normn{\widehat{f}-f_{\omega^{*}}}^{2} \ge
+(\gamma\zeta_n^{2}/8)\cA|\mathcal{C}|/2 \ge (\cA/32)\gamma|\Kcal|\rlow^{2}$.
+The estimator being arbitrary, the infima follow.
+
+\emph{The integer $n_{1}$ is finite.} Since $2^{\lev_n+1} \le
+2(C_g/\zeta_n)^{2/(2s+1)}$, of order $n^{1/(2s+1)}$, $D$ and $R_J$ with
+$J = \lev_n + 1$ are of order $n^{1/(2s+1)}$, and the bound of
+Lemma~\ref{lem:hypercube}(iv)(c) is of order
+$n^{1/(2s+1)}\exp(-cn^{2s/(2s+1)})$ for a constant $c > 0$, which tends to
+zero. The two particular cases are $\Kcal$ a single block and $\Kcal$ all the
+blocks. \qed
 
 % E5f (E1.15; D54): derivations/08-blocos.tex, Corolario 15 (numeracao global;
 % cor:truncada-blocos) e a sua prova, dentro do grupo azul de k = 4.

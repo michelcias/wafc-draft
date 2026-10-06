@@ -26,6 +26,13 @@
 %                              (prop:slow-ceiling; E5e, D52)
 %   Corolario 15            -> Proposition S6.2 do supp (prop:truncated; E5f, D54),
 %                              citada numa frase depois da Proposition 3
+%   Teorema 5 e Lema 17     -> Theorem S6.1 (thm:lower) e Lemma S6.3 (lem:hypercube)
+%                              do supp (E5g, D57), no lugar da Remark S6.1
+%                              (rem:lower, em cinza); citado na terceira leitura
+%                              do Theorem 1 e na introducao. O Corolario 16 nao
+%                              entra como enunciado: e a leitura depois do
+%                              Theorem S6.1, com a uniformidade lida na prova do
+%                              Theorem 1 no supp
 %   Lema 15                -> Lemma 3        (lem:weak; o rotulo ficou com o nome antigo)
 %   Corolario 12, Hipotese S com rho_n^G
 %                           -> Corollary 2 (cor:threshold), Assumption 6 (ass:sep);
@@ -242,7 +249,7 @@ that holds for any weights of bounded ratio}; and, at a
 resolution level chosen inside an explicit window, the prediction error and
 the componentwise error attain the rate of nonlinear wavelet approximation\textcolor{gray}{\sout{ up
 to a logarithmic factor}}\textcolor{colR1}{, with no logarithmic factor when the Besov
-integrability index is at least two}, under the same Besov condition that governs
+integrability index is at least two}\textcolor{colR1}{, which is minimax optimal}, under the same Besov condition that governs
 \textcolor{colR1}{linear approximation}. The last result rests on \textcolor{gray}{\sout{the observation that the Besov
 condition already implies compressibility of the}} \textcolor{gray}{\sout{wavelet}} \textcolor{gray}{\sout{coefficients}}\textcolor{colR1}{a
 bound on the ideal risk over chunks that the Besov condition already implies},
@@ -334,14 +341,21 @@ attains the rate of \textcolor{gray}{\sout{nonlinear wavelet approximation up to
 factor, under the same Besov assumption that governs}} \textcolor{gray}{\sout{linear approximation}}\textcolor{gray}{\sout{, and it
 reduces to the rate of Klopp and Pensky when a single modulator is present.}}
 \textcolor{colR1}{Klopp and Pensky, with no logarithmic factor when the Besov integrability
-index is at least two, so that with a single modulator independent of the
-covariates it is minimax optimal there. It holds under weaker conditions than
+index is at least two, \textcolor{gray}{\sout{so that with a single modulator independent of the
+covariates it is minimax optimal there}}
+% E5g (D57): "where it is minimax optimal", pela cota inferior do Theorem S6.1.
+where it is minimax optimal. It holds under weaker conditions than
 theirs: the number of covariates is fixed, a regime their high dimensional
 condition excludes, and the effective smoothness of the components need only
 exceed $s/(2s+1)$, which is below one half, where theirs must exceed one half.
 Components with effective smoothness one half, such as the inhomogeneous
-functions of Section~5, are covered here and not there. A lower bound for
-several modulators remains open.}
+functions of Section~5, are covered here and not there. \textcolor{gray}{\sout{A lower bound for
+several modulators remains open.}}
+% E5g (D57): a frase de D50 sobre a cota inferior, trocada (Theorem S6.1 do supp).
+% D58 (pergunta 52(d)): "it" trocado por "the rate".
+The lower bound that makes \textcolor{gray}{\sout{it}} the rate optimal is proved here for any number of
+modulators and for covariates that depend on them; Klopp and Pensky have it
+with a single modulator independent of the covariates.}
 % E5b: "Section~5" e a Secao 5 (Simulation), que ainda nao existe; trocar pelo
 % \ref quando ela entrar (D50).
 
@@ -357,7 +371,9 @@ that computes the estimator}
 (Theorem~\ref{thm:oracle}); and rates \textcolor{gray}{\sout{obtained by compressibility}}
 \textcolor{colR1}{that follow from the Besov assumption alone, through a bound on the
 ideal risk over chunks}
-(Theorem~\ref{thm:main}). \textcolor{gray}{\sout{The second is the reading that compressibility costs
+(Theorem~\ref{thm:main})\textcolor{colR1}{, together with a minimax lower bound, for any number
+of modulators, that makes these rates optimal when $\pi \ge 2$ (Theorem~S6.1 in
+the Supplementary Material)}. \textcolor{gray}{\sout{The second is the reading that compressibility costs
 no assumption: the Besov condition on the components already implies that
 their wavelet coefficients lie in a weak $\ell_\tau$ ball with
 $\tau = (s+1/2)^{-1}$ (Lemma~\mbox{\ref{lem:weak}}, a form with explicit constants
@@ -756,7 +772,7 @@ agree when $\pi \ge 2$ and separate when $\pi < 2$, which is where the
 \textcolor{gray}{\sout{$\ell_1$}} penalty pays for itself. Second, the rate is attained under
 Assumption~\ref{ass:besov} alone: \textcolor{gray}{\sout{no compressibility is assumed on top of it,
 because the Besov condition already implies it, with
-$\tau = (s+1/2)^{-1}$, by Lemma~\mbox{\ref{lem:weak}}.}}\textcolor{colR1}{no condition is imposed
+$\tau = (s+1/2)^{-1}$, by Lemma~\mbox{\ref{lem:weak}}.}} \textcolor{colR1}{no condition is imposed
 on the coefficients on top of it, because the Besov condition already bounds
 the ideal risk over chunks that governs the estimation error
 (Lemma~\ref{lem:weak}).} \textcolor{gray}{\sout{Third, the rate
@@ -769,18 +785,33 @@ over the $d_n$ columns. No lower bound is proved here for $q \ge 2$: the
 comparison is with the reference of the sequence model, and the minimax lower
 bound of \mbox{\citet{Klopp-Pensky-2015}} covers the case of a single modulator with
 covariates independent of it.}}
-\textcolor{colR1}{Third, $n^{-2s/(2s+1)}$ is the minimax rate over Besov bodies
+% E5g (D57, pergunta 51(b)): a terceira leitura passa a citar a cota inferior
+% do Theorem S6.1 do supp (Teorema 5 de derivations/09-cota-inferior.tex).
+\textcolor{colR1}{Third, \textcolor{gray}{\sout{$n^{-2s/(2s+1)}$ is the minimax rate over Besov bodies
 in the Gaussian sequence model with noise level of order $n^{-1/2}$
-\citep[Theorems~4 and~5]{Donoho-Johnstone-1998}, and with a single modulator,
+(\mbox{\citeauthor{Donoho-Johnstone-1998}}, \mbox{\citeyear{Donoho-Johnstone-1998}}, Theorems~4 and~5), and with a single modulator,
 independent of the covariates, and Gaussian errors, the minimax lower bound of
-\citet[Theorem~1]{Klopp-Pensky-2015} holds over the class of
-Assumption~\ref{ass:besov} (Remark~S6.1 in the Supplementary Material), so that
-in that case Theorem~\ref{thm:main} is minimax optimal when $\pi \ge 2$. When
+\mbox{\citeauthor{Klopp-Pensky-2015}} (\mbox{\citeyear{Klopp-Pensky-2015}}, Theorem~1) holds over the class of
+\mbox{Assumption~\ref{ass:besov}} (Remark~S6.1 in the Supplementary Material), so that
+in that case \mbox{Theorem~\ref{thm:main}} is minimax optimal when $\pi \ge 2$.}} the rate
+cannot be improved. With Gaussian errors and any law of $(\bX,\bU)$ that
+satisfies Assumptions~\ref{ass:X} and~\ref{ass:U}, the minimax risk over the
+class of Assumption~\ref{ass:besov}, in the prediction norm and for the
+components, is at least a constant multiple of $pq\,n^{-2s/(2s+1)}$, for every
+$\pi$ (Theorem~S6.1 in the Supplementary Material). This is the regression
+counterpart of the lower bound of \citet[Theorem~5]{Donoho-Johnstone-1998} for
+Besov bodies in the Gaussian sequence model, and with a fixed number of
+covariates it extends that of \citet[Theorem~1]{Klopp-Pensky-2015}, who have a
+single modulator independent of the covariates. Theorem~\ref{thm:main} is
+therefore minimax optimal when $\pi \ge 2$, with any number of modulators and
+with covariates that depend on them. When
 $\pi < 2$ the remaining factor $(\log n)^{(2/\pi-1)/(2s+1)}$ is the one in the
 rate of \citet[eq.~3.19]{Klopp-Pensky-2015} with a fixed number of covariates,
 and in that of block thresholding in the sequence model
-\citep[Theorem~4]{Cai-1999}; whether it is necessary for this estimator is not
-known, and no lower bound is proved here for $q \ge 2$. Compared with the
+\citep[Theorem~4]{Cai-1999}; \textcolor{gray}{\sout{whether it is necessary for this estimator is not
+known, and no lower bound is proved here for $q \ge 2$.}} the lower bound carries
+no such factor, and whether the factor is necessary for this estimator is not
+known. Compared with the
 coordinatewise lasso, whose rate under the same conditions is
 $(\log n/n)^{2s/(2s+1)}$ (Theorem~S8.3 in the Supplementary Material), the
 chunks remove a factor $(\log n)^{2\seff/(2s+1)}$.

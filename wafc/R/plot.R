@@ -122,14 +122,14 @@ plot.wafc <- function(x, which = "components", s = NULL, truth = NULL,
         fn, zero = zero, norm = fn[["norm"]],
         truth = wafc_plot_truth(truth, fn),
         title = wafc_plot_title(fn[["s"]], th, note, !is.null(truth),
-                                J = x[["design"]][["J"]]),
+                                J = wafc_J_text(x[["design"]], unique = TRUE)),
         t = if (is.null(th)) NULL else th[["t"]], dots = dots)
     } else {
       marked <- if (is.null(s)) NULL else c(s = wafc_single_s(x, s))
       out[["path"]] <- wafc_plot_path(
         x, marked = marked, t = NULL, dots = dots,
         main = sprintf("Block norms along the path, J = %s",
-                       paste(unique(x[["design"]][["J"]]), collapse = ", ")))
+                       wafc_J_text(x[["design"]], unique = TRUE)))
     }
   }
   invisible(out)
@@ -252,7 +252,9 @@ plot.cv.wafc <- function(x, which = NULL, s = "lambda.min",
       out[["components"]] <- wafc_plot_components(
         fn, zero = zero, norm = norm, truth = wafc_plot_truth(truth, fn),
         title = wafc_plot_title(fn[["s"]], if (thr_used) th, note,
-                                !is.null(truth), J = x[["J.min"]]),
+                                !is.null(truth),
+                                J = wafc_J_text(x[["wafc.fit"]][["design"]],
+                                                unique = TRUE)),
         t = if (thr_used) th[["t"]] else NULL, dots = dots)
     } else {
       out[["path"]] <- wafc_plot_path(
@@ -260,7 +262,9 @@ plot.cv.wafc <- function(x, which = NULL, s = "lambda.min",
         marked = c(lambda.min = x[["lambda.min"]],
                    lambda.1se = x[["lambda.1se"]]),
         t = if (is.null(th)) NULL else th[["t"]], dots = dots,
-        main = sprintf("Block norms along the path, J = %d", x[["J.min"]]))
+        main = sprintf("Block norms along the path, J = %s",
+                       wafc_J_text(x[["wafc.fit"]][["design"]],
+                                   unique = TRUE)))
     }
   }
   invisible(out)

@@ -468,8 +468,14 @@ print.wafc <- function(x, digits = max(3L, getOption("digits") - 3L), ...) {
                                           x[["group"]][["block.size"]])),
       "\n")
   cat(sprintf("  n = %d, p = %d, q = %d, J = %s, %d columns (%d penalized, %d level term(s))\n",
-              x[["n"]], x[["p"]], x[["q"]], paste(d[["J"]], collapse = ", "),
+              x[["n"]], x[["p"]], x[["q"]],
+              paste(wafc_J_requested(d), collapse = ", "),
               x[["nvars"]], x[["npen"]], length(d[["unpenalized"]])))
+  cap <- wafc_J_cap(d)
+  if (!is.null(cap)) {
+    cat(sprintf("  levels capped by the distinct values of the modulators: %s\n",
+                cap))
+  }
   cat(sprintf("  %d penalty level(s), lambda from %s down to %s\n",
               length(x[["lambda"]]), format(max(x[["lambda"]]), digits = digits),
               format(min(x[["lambda"]]), digits = digits)))

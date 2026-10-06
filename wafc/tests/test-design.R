@@ -74,8 +74,10 @@ test_that("wafc_rescale maps onto [eps, 1 - eps] and reuses the transformation",
   expect_true(all(r2[["u"]] >= 0.05 - 1e-12 & r2[["u"]] <= 0.95 + 1e-12))
   expect_error(wafc_rescale(u0, eps = 0.6), "\\[0, 0.5\\)")
   expect_error(wafc_rescale(cbind(rep(1, 5)), eps = 0), "constant")
-  ## rescale = FALSE does not rescale, and accepts a constant column
-  d <- wafc_design(x0, cbind(u0[, 1L], rep(0.5, n)), J = J, rescale = FALSE)
+  ## rescale = FALSE does not rescale, and accepts a constant column, which
+  ## since step E3.4 is said to identify no block
+  expect_warning(d <- wafc_design(x0, cbind(u0[, 1L], rep(0.5, n)), J = J,
+                                  rescale = FALSE), "single point")
   expect_equal(d[["location"]], rep(0, q))
   expect_equal(d[["scale"]], rep(1, q))
   expect_warning(wafc_design(x0, u0 + 2, J = J, rescale = FALSE), "outside")
