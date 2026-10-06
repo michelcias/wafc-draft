@@ -2084,6 +2084,83 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: E6.2 com o código pronto, as rodadas à espera do aviso
+
+- **O que existe no compêndio:** `config/application.yaml`,
+  `R/application_data.R`, `R/application.R`, `R/application_report.R`,
+  `scripts/03_application.R`, `data-raw/` (`sources.yaml` com URL, SHA-256
+  e licença; `fetch.R`, que baixa ou copia com `--from`; `prepare.R`, que
+  monta `data/` e compara com `--check`) e `data/` (`marylebone.rds`,
+  351 608 B, e `beijing-dongsi.rds`, 332 800 B, **versionados**, com o
+  `README.md` das fontes, licenças e atribuições, incluída uma para a UCI).
+  O dado processado vai versionado porque o arquivo do Open-Meteo muda de
+  soma a cada pedido. A unidade é um método numa divisão: `split00` é a
+  amostra inteira (a figura), `split01` a `split20` as partições por
+  semana (30% no teste). Métodos: `wafc` (linhas `wafc.cv1se` e `wafc.cv`),
+  `gam.reml`, `gam.gcv` (com `k.check()`), `linear`. O relatório dá
+  `prediction-`, `structure-`, `choices-` e `readings-<app>.csv` e a
+  figura, que mostra **`β_ℓ` remontado** (`c_ℓ` + componente + as outras
+  na média), com o painel `NOx × data` em % do NOx, comparável a Carslaw,
+  e a data cortada 60 dias em cada ponta. O chat principal aplicou o que o
+  handoff deixou para os arquivos comuns (a seção 5 do `README.md`, a
+  árvore, as frases de `INSTRUCTIONS.md`, `CLAUDE.md` e `DESCRIPTION`, a
+  seção "Data" do `PROVENANCE.md`, a aplicação no `run_all.R`) e a palavra
+  "nominal" no comentário do script 10 (D66); `03_application.R --list` dá
+  168 unidades.
+- **Conferência:** os dados idênticos bit a bit aos do script 10 nas duas
+  bases (e o `prepare.R --check` reconstrói os `.rds` idênticos; SHA-256
+  conferidos, incluídos os do `.zip` interno e do CSV do Dongsi); nenhum
+  download. Fumaça: 24 unidades, 0 falhas, 5,9 min. **Junção da partição 1
+  contra a E6.1c e a E6.1b** (regra de sementes do script 10 injetada,
+  código num retrato do `HEAD`): na `marylebone.ukair`, `gam.reml`,
+  `gam.gcv`, `linear` e a partição idênticos, e o WAFC idêntico em RMSE
+  (11,1496 no `+cv1se`), blocos, `J`, `λ`, normas e componentes, com `t`,
+  `t/max` e os candidatos do limiar a ~1e-14 (o limiar aplicado sobre um
+  `cv.wafc` em vez de um `wafc_competitor("klopp")`, reproduzido com o
+  mesmo código em dado simulado; o estimador não muda); na `beijing.heat`,
+  splines, linear e partição idênticos, e **o WAFC não rodado** (~2,6 h).
+- **Custo por partição:** marylebone ~34 min (o WAFC 1 842 s), beijing.heat
+  ~2,7 h (o WAFC ~9 200 s); pico de ~5 GB por processo. **A rodada
+  inteira: 168 unidades, ~70 h de processador, ~24 h em 3 processos.**
+- **Sinais:** na fumaça (`J = 2:3`), a inclinação fica em ~9,6% antes de
+  2002 e ~20% em 2004. Na `beijing.heat`, a linha `one` é o intercepto a
+  0 °C e 1000 hPa e não se lê sozinha; a umidade e o vento mostram a borda
+  da base periodizada.
+- **Lições:** (1) `wafc_grid_components()` centra cada componente; o nível
+  de `β_ℓ` pede `c_ℓ`, o deslocamento da centragem e a média das outras
+  (a primeira fumaça saiu com o nível errado). (2) O limiar sobre um
+  `cv.wafc` e sobre um `wafc_competitor("klopp")` difere na 15ª casa:
+  junção que compara `t` deve esperar isso; a da E4.1 não comparava `t`.
+  (3) O arquivo do Open-Meteo muda de soma a cada pedido.
+- **A legenda da figura de marylebone**, rascunho para a E5b (números da
+  E6.1c entre colchetes, a trocar pelos do `readings-marylebone.ukair.csv`):
+
+```tex
+Marylebone Road, London, hourly, 1998--2005: total oxidant
+$\mathrm{NO_2} + \mathrm{O_3}$ regressed on NOx with coefficients modulated by
+the date and the wind speed. Each panel shows $\hat\beta_\ell$ along one
+modulating covariate, with the component of the other at its sample mean:
+the oxidant background (top, ppb) and the slope on NOx (bottom, percent of
+NOx), along the date (left) and the wind speed (right). Solid: the WAFC
+fitted to the whole sample; dashed: the WAFC with the threshold of the
+smallest cross-validated error; dot-dashed: \texttt{mgcv} with REML;
+grey: the range of the WAFC over 20 fits on 70\% of the weeks. The
+background follows the annual cycle. The slope, an estimate of the fraction
+of NOx emitted directly as $\mathrm{NO_2}$
+\citep{Clapp-Jenkin-2001,Carslaw-Beevers-2005}, rises by [9.7] percentage
+points from 2002 to 2004, [a quarter] of the rise by January 2003 and [90\%]
+by July 2003 in every partition, as does the rise from about 10 to about 23
+percent by volume that \citet[Fig.~3(a)]{Carslaw-2005} estimated at this
+site. The dip at the beginning of 2002 also appears in his monthly
+estimates, whose series ends before the peak at the end of 2003. The wind
+speed modulates the slope by about [17\%] of the step; the WAFC drops that
+block, and the threshold of the smallest cross-validated error and the
+spline keep it. The first and the last 60 days are not shown: there the
+periodized basis joins the end of the series to its start.
+```
+
+- Pendências na pergunta 59.
+
 ### 2026-10-06: E4.1c fechada, o oráculo em blocos e o `structure`
 
 - **Assinaturas:** `simulate_wafc(..., x_u_rho = 0, structure = NULL)` e
@@ -4125,6 +4202,33 @@ Ordenadas pelo que bloqueia mais.
      **Recomendação:** ficar no nominal; datas efetivas pediriam fonte
      para 2013 a 2016 que nenhum artigo lido dá.
 
+59. **Pendências de E6.2** (2026-10-06). Recomendação do chat principal:
+   - (a) **As rodadas** (esperam o aviso do autor): (i) a junção do WAFC da
+     `beijing.heat`, ~2,6 h num processo, no retrato; (ii) as 20 partições
+     e a amostra inteira, 168 unidades, ~70 h de processador, ~24 h em 3
+     processos de até ~5 GB, **na árvore limpa** (unidade com mudança não
+     commitada não vai ao artigo). **Recomendação:** (i) e (ii) juntas
+     agora, 4 processos; a E4.3 depois, sozinha na máquina, porque mede
+     tempo e o tempo é métrica do estudo; a E4.4 depois da E4.3.
+   - (b) **As partições** do compêndio vêm do mestre do estudo e não são as
+     da E6.1b e da E6.1c (o catálogo dizia "as mesmas"); os números do
+     artigo vão diferir um pouco dos da §17. **Recomendação:** manter as
+     independentes, pela razão da E4.1: marylebone e o `+cv` foram
+     escolhidos olhando aquelas partições.
+   - (c) **A junção do WAFC** a ~1e-14 em `t` e nos candidatos do limiar,
+     exata em toda estimativa e predição. **Recomendação:** aceitar como
+     exata.
+   - (d) **A figura** com `β_ℓ` remontado e o corte de 60 dias nas duas
+     pontas da data (também nas leituras). **Recomendação:** manter.
+   - (e) **A borda nas outras moduladoras** (a umidade da `beijing.heat`, o
+     vento fraco de marylebone). **Recomendação:** decidir depois da
+     rodada, cortando com a mesma nota se a dobra aparecer com o `J`
+     escolhido (uma linha em `figure$trim`).
+   - (f) **A linha `one` da `beijing.heat`** (o intercepto a 0 °C e 1000
+     hPa, que vai de 0 a 5,6 em log PM2.5 ao longo do ano). **Recomendação:**
+     decisão de apresentação da E5b; o supp mostra vento, temperatura e
+     pressão, e a do nível sai ou vai com uma frase.
+
 ---
 
 ## 5. Próximos passos
@@ -4187,6 +4291,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E6.2 integrada com o código pronto (dados idênticos ao script 10, versionados; junção exata da partição 1 fora o WAFC da `beijing.heat`); as rodadas (~70 h de processador) esperam o aviso; o chat principal aplicou o que o handoff deixou nos arquivos comuns do compêndio; pergunta 59 |
 | 2026-10-06 | Pergunta 58(b) decidida (D66): as marcas da `beijing.heat` ficam nominais, com a palavra na legenda |
 | 2026-10-06 | Pergunta 58(a) decidida (D65): a frase de Opsomer não entra, porque o spline por validação cruzada não está em questão; 58(b) segue aberta |
 | 2026-10-06 | E4.1c fechada e integrada (1 730 testes; décima primeira junção exata): o oráculo em blocos e o `structure`; `cell_reserved` corrigido no compêndio; `PROVENANCE.md` em `f14e6f2`. A E4.3 pode ser catalogada |

@@ -130,7 +130,10 @@ Rscript -e 'renv::restore()'                                                    
 Rscript scripts/01_simulate.R --sizes=250 --reps=2 --workers=8 --out=../wafc/cache/e41/smoke-core   # fumaça, ~4,6 min, 0 falhas
 Rscript scripts/02_aggregate.R --sizes=250 --reps=2 --out=../wafc/cache/e41/smoke-core             # as tabelas da fumaça
 Rscript ../wafc/cache/e41/check-junction.R 6                                                        # décima junção exata, ~5 min; o script não é versionado
-Rscript run_all.R                                                                                   # o estudo inteiro: centenas de horas de CPU, só com o aviso do autor
+Rscript data-raw/fetch.R --from=../wafc/cache/data                                                  # as fontes da aplicação, conferidas pelo SHA-256 (sem --from, baixa; só com permissão)
+Rscript data-raw/prepare.R --check                                                                  # reconstrói data/*.rds e compara com os versionados
+Rscript scripts/03_application.R --workers=3                                                        # as duas aplicações: 168 unidades, ~70 h de CPU, ~24 h em 3 processos de até 5 GB; só com o aviso do autor
+Rscript run_all.R                                                                                   # o estudo inteiro e as aplicações: centenas de horas de CPU, só com o aviso do autor
 ```
 
 ## 3. Onde o trabalho está (resumo de 2026-10-06; o `ESTADO.md` manda)
