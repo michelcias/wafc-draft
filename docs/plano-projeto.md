@@ -70,7 +70,7 @@ decisões para a hora errada.
 | método | WAFC, *wavelet additive functional coefficients* | ratificado (D8, 2026-09-19) |
 | funções | `wafc()`, `cv.wafc()`, classe `"wafc"`, na pasta `wafc/` | D4 fechada: pasta dedicada, não o `WaveBased` |
 | repositório de rascunho | `michelcias/wafc-draft` (este) | publicado (privado) em 2026-09-18 |
-| compêndio | `michelcias/wafc-studies` | a criar em E4.1; conferir que está livre |
+| compêndio | pasta `wafc-studies/` deste repositório; `michelcias/wafc-studies` no fim | nasce em E4.1 como pasta (D60); o repositório é criado pelo autor no fim, por cópia |
 
 ### E0.2 Onde o código vive em cada momento
 
@@ -78,7 +78,7 @@ decisões para a hora errada.
 |---|---|---|
 | conferência numérica de um resultado (`n ≤ 200`, denso) | `derivations/check/` aqui | é parte da prova, viaja com ela |
 | o método: `wafc()`, `cv.wafc()`, métodos, testes, scripts | `wafc/` aqui (`R/`, `tests/`, `scripts/`) | decisão do autor (D4): pasta dedicada dentro do `wafc-draft`; o `WaveBased` instalado é só dependência para as bases; empacotar (pacote próprio ou `WaveBased`) decide-se depois de E2.5 |
-| estudo de simulação e aplicação | `michelcias/wafc-studies`, repositório próprio | pipeline pesado com cache; o `wall` é o molde; fixa `wafc/` por commit deste repositório |
+| estudo de simulação e aplicação | pasta `wafc-studies/` aqui; repositório próprio só no fim (D60) | pipeline pesado com cache; o `wall` é o molde; o repositório final reproduz só o que está no manuscrito e no supp |
 
 ### E0.3 Template e instruções da revista
 
@@ -475,6 +475,18 @@ fixando o `WaveBased` por commit e o código de `wafc/` pelo commit do
 cache por unidade retomável, semente mestra única, `INSTRUCTIONS.md` e
 `CLAUDE.md` desde o primeiro commit.
 
+**Emenda de D60 (2026-10-06):** o compêndio nasce como a pasta
+`wafc-studies/` deste repositório, não como repositório próprio. Enquanto
+for pasta, lê o código de `../wafc/` diretamente; na extração, o código vai
+junto (cópia de `wafc/` ou o pacote de E3.3) com o hash do `wafc-draft` no
+`PROVENANCE.md`. O repositório é criado pelo autor no fim, **por cópia, sem
+o histórico** (um `git subtree split` levaria as tentativas), e reproduz só
+o que está no manuscrito e no supp. Por isso: a documentação da pasta é
+escrita desde o início como a do estudo final, sem narrar o caminho; o
+piloto (E4.3), as medições e as configurações descartadas ficam fora da
+pasta (`wafc/scripts/` e os documentos de trabalho), ou saem dela antes da
+cópia; o cache e os produtos pesados não são versionados.
+
 ### E4.2 Desenho
 
 | Fator | Níveis |
@@ -497,8 +509,9 @@ tabela principal do artigo é regularidade × método em `n = 1000`; a figura
 principal é `ĝ_{ℓm}` sobreposta à verdade em bumps e blocks, WAFC contra
 `mgcv`.
 
-**Proposta revista de 2026-10-06** (chat principal, depois de D44 a D59; à
-espera do autor, pergunta 54 do `ESTADO.md`). A tabela acima é o desenho
+**Proposta revista de 2026-10-06** (chat principal, depois de D44 a D59;
+**ratificada pelo autor como D60**, com 100 réplicas, os três braços e a
+escala sob a condição de custo abaixo). A tabela acima é o desenho
 original e fica como registro.
 
 - **Princípio:** o corpo do artigo leva uma tabela (regularidade × método em
@@ -527,6 +540,12 @@ original e fica como registro.
   opcional, escala `(p, q) = (6, 4)` com 6 blocos ativos e a grade `2:7`, com
   o custo medido na E4.3 (o `(10, 5)` original tem 12 750 colunas em `J = 8`
   e não cabe).
+- **O topo das grades em `n = 2000`** (D60(e)): a E4.3 mede a fração das
+  réplicas no topo com as grades de D34 e D41; acima de 20% (o gatilho de
+  D34), a grade daquele método sobe só em `n = 2000` (`J` em `2:9` no WAFC,
+  `k = 120` acrescentado no `gam`, com o custo do `gam.gcv` medido). A
+  regra é por `n`, não por célula (D41). A escala entra se custar menos de
+  ~10 h.
 - **Fora:** erro dependente (D56; a aplicação cobre o caso) e a dimensão
   casada (E6.1a).
 - **Métricas:** erro de predição e ISE em separado, o ISE dividido em blocos

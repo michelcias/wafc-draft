@@ -54,6 +54,7 @@ wafc-draft/
 ├── derivations/                 # rascunhos matemáticos, um resultado por arquivo
 │   └── check/                   #   conferência numérica em R (n pequeno, forma densa)
 ├── wafc/                        # o código do método em R (E2): R/, tests/, scripts/
+├── wafc-studies/                # compêndio de simulação e aplicação (E4, E6); vira repositório no fim (D60)
 └── results/                     # cópia de referência de figuras e tabelas (origem: wafc-studies)
 ```
 
@@ -91,4 +92,4 @@ Regra completa em [`docs/instrucoes.md`](docs/instrucoes.md).
 | [`wall-manuscript`](https://github.com/michelcias/wall-manuscript) | artigos do WALL; o teórico é o molde da prova |
 | `wall` (local) | compêndio de benchmark do WALL; molde do `wafc-studies` |
 | [`bdm-draft`](https://github.com/michelcias/bdm-draft) | projeto irmão, origem destas convenções |
-| `wafc-studies` | compêndio de simulação e aplicação; a criar em E4.1 |
+| `wafc-studies` | compêndio de simulação e aplicação; hoje a pasta `wafc-studies/` deste repositório, repositório próprio no fim (D60) |

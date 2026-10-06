@@ -86,4 +86,4 @@ documento normativo: fluxo, escrita, marcação, git). Em caso de conflito, o
 | `../../wall` | compêndio de benchmark do WALL; molde do `wafc-studies` |
 | `../bdm-draft` | projeto irmão; a origem destas convenções de trabalho |
 | `wafc-draft` (este) | manuscrito, documentos de trabalho, derivações, o código do método (`wafc/`) e o plano |
-| `wafc-studies` (a criar em E4.1) | compêndio de simulação e aplicação, repositório próprio |
+| `wafc-studies/` (pasta deste repositório, D60) | compêndio de simulação e aplicação; vira repositório próprio só no fim, por cópia, com só o que reproduz o manuscrito e o supp |

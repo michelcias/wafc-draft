@@ -12,9 +12,9 @@ Theorem 1 em `s < 1/2` (E1.13 a E1.15), e a cota inferior que o faz ótimo em
 ratificada (D48, D58). A aplicação tem duas bases (D57): **marylebone** com
 dados do UK-AIR e do ERA5 (o degrau de 2003, E6.1c; D59) como principal e
 **beijing.heat** como segunda; cada método é sintonizado nos seus termos
-(D56). **O próximo passo é o estudo de simulação (E4)**, com a proposta de
-desenho na pergunta 54, à espera do autor; a **L12** (as fontes da
-aplicação) está no catálogo. O teto de páginas fica para o fim (D21).
+(D56). **O próximo passo é o estudo de simulação (E4)**, com o desenho
+decidido (D60) e o compêndio nascendo na pasta `wafc-studies/` deste
+repositório; a **L12** (as fontes da aplicação) está no catálogo. O teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 4` (`manuscript/ms_4.tex`,
 `supp_4.tex`, `references_4.bib`), aberta pela E5d em 2026-10-04 com a
 teoria em blocos (D44 a D51); as versões `k = 1` a `k = 3` ficam intactas.
@@ -2706,6 +2706,7 @@ entrou sem os itens de E1.14** (pergunta 47(a)).
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
 | D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
+| D60 | 10-06 | **O desenho da E4.2 (pergunta 54) e o lugar do compêndio:** (a) **100 réplicas** no núcleo (as cinco células × `n ∈ {250, 500, 1000, 2000}`); (b) **os três braços** em `n = 1000` nas células não homogênea e `mixed`: razão sinal-ruído 1, `u_rho = 0,5` e `X` dependente de `U` (este com uma opção nova no `dgp.R`); (c) o braço de escala `(p, q) = (6, 4)` entra se a E4.3 o medir abaixo de ~10 h; (d) o VCBART por curiosidade, com a decisão de usá-lo no artigo depois; (e) **o topo das grades em `n = 2000`:** a E4.3 mede a fração das réplicas no topo, e se passar de 20% (o gatilho de D34) a grade daquele método sobe só em `n = 2000` (`J` em `2:9` no WAFC; o `k = 120` acrescentado à grade do `gam`), regra por `n` e não por célula (D41); (f) **o compêndio nasce como a pasta `wafc-studies/` dentro do `wafc-draft`**, o que emenda D7: o repositório próprio é criado pelo autor só no fim, **por cópia, sem o histórico do `wafc-draft`**, e reproduz apenas o que está no manuscrito e no supp; o que só serviu para chegar ao desenho final (o piloto da E4.3, medições, configurações descartadas) fica fora da pasta ou sai dela antes da cópia, e a documentação da pasta é escrita como a do estudo final, sem narrar o caminho | (a) a (e): recomendações do chat principal, aceitas pelo autor; em (e), a grade `2:8` já põe o `J` no topo em 10 de 50 réplicas do não homogêneo em `n = 1000`, e o `k = 80` já custa 1,0% a 1,4% ali (E2.5h), então em `n = 2000` a comparação mediria a grade; (f) é decisão do autor: o compêndio público reproduz o artigo, não o caminho até ele |
 | D59 | 10-06 | **A aplicação marylebone (pergunta 53):** a base é a `marylebone.ukair` (UK-AIR e ERA5); a tese da aplicação é o degrau de 2003 e o ciclo anual; o vento entra numa frase, como modulação pequena (~17% do degrau) que o `cv1se` descarta e o `+cv` e o spline mantêm; na figura, a grade da data é cortada antes da borda, com uma nota, e `boundary = "interval"` só se um referee pedir; o mergulho do começo de 2002 e o pico do fim de 2003 são descritos numa frase, sem interpretação, até a leitura de Carslaw (2005); catalogada a L12 (as fontes da aplicação) | recomendações do chat principal, aceitas pelo autor |
 | D58 | 10-05 | **Pergunta 52, aceita e aplicada no chat principal:** a interface de E3.4 ratificada (`cap.J = TRUE` padrão, `J` efetivo e `J.requested`, `J.eff`, o candidato repetido, a contagem no círculo) e o aviso para a moduladora de um ponto; na `k = 4`, "makes ~~it~~ the rate optimal" na introdução, a cota inferior na primeira contribuição (", together with a minimax lower bound, for any number of modulators, that makes these rates optimal when `π ≥ 2` (Theorem S6.1)") e no resumo (", which is minimax optimal", emendando D53), a condição `s ≥ 1/π` de Cai (1999) no parágrafo depois do Theorem S6.1, e o espaço depois de "Lemma 3." na segunda leitura do Theorem 1 (tipografia, sem marca); a nota de `\|𝒦\|` e `\|𝒞\|` no `notacao.md` §10. A moduladora periódica discreta e o `ω` ficam como estão. `ms_4` e `supp_4` em 52 e 90 páginas, sem referência indefinida | recomendações do chat principal, aceitas pelo autor |
 | D57 | 10-05 | **Duas aplicações e as pendências de E6.1b e E1.9 (perguntas 2, 50 e 51):** marylebone como aplicação principal (a estrutura: o degrau de 2003, o zero no vento) e beijing.heat como segunda (a predição: ~9% sobre os splines de D46, a modulação sazonal densa), a principal no corpo e a segunda em um parágrafo no corpo com tabela e figura no supp, com a divisão final na decisão do teto (D21); se marylebone não fechar a licença limpa ou o degrau não se repetir com os dados limpos, beijing.heat sobe a principal. O limiar padrão continua o `cv1se`, a aplicação relata a predição do `+cv` e só afirma ausência de efeito onde os dois zeram. Catalogadas E6.1c (marylebone com dados de licença declarada), E3.4 (`J` por moduladora limitado pelos valores distintos) e E5g (a E1.9 na `k = 4`, com as recomendações da pergunta 51) | recomendações do chat principal, aceitas pelo autor: as duas bases respondem a perguntas diferentes de um referee, e a segunda no supp poupa o teto de páginas |
@@ -2734,7 +2735,7 @@ entrou sem os itens de E1.14** (pergunta 47(a)).
 | D19 | 09-19 | **Interface de `cv.wafc()` e `wafc_tune()`** (E2.3): dobras fixas para toda a grade de `J`, expostas em `foldid`; desenho e caminho de `λ` por candidato construídos na amostra inteira, com as dobras reaproveitando as colunas; empate resolvido pelo menor `J`; `df` do BIC e do EBIC igual a não nulos mais os `p` níveis; `wafc_tune(rule)` como entrada única das cinco regras | segue o `cv.wall()` e é o que torna duas regras comparáveis na mesma réplica; ratificada pelo autor em 09-19 |
 | D20 | 09-19 | **O padrão de sintonia do WAFC é `cv.min`**, com `lambda.1se` como variante de estrutura e o BIC como alternativa barata; o EBIC não serve para escolher resolução neste desenho | custo de 1.00 a 1.04 sobre o oráculo da grade contra 1.05 a 1.67 das demais; ratificada pelo autor em 09-19 |
 | D6 | 09-18 | Documentos de trabalho em português; manuscrito em inglês americano; convenções de git, marcação e continuidade herdadas do `bdm-draft` | pedido do autor ("em linha com o bdm-draft") |
-| D7 | 09-18 | Compêndio de simulação e aplicação em repositório próprio, `wafc-studies`, nos moldes do `wall` | o `wall` já resolveu cache, `renv` por commit e proveniência |
+| D7 | 09-18 | **(Emendada por D60 em 2026-10-06: o compêndio nasce como a pasta `wafc-studies/` dentro do `wafc-draft` e vira repositório só no fim.)** Compêndio de simulação e aplicação em repositório próprio, `wafc-studies`, nos moldes do `wall` | o `wall` já resolveu cache, `renv` por commit e proveniência |
 
 **Propostas de L2.** L2a a L2e foram ratificadas e cumpridas em 2026-09-19;
 L2f continua em aberto e é a única que muda o escopo do artigo.
@@ -3740,7 +3741,9 @@ Ordenadas pelo que bloqueia mais.
      Bengio (2003) e Opsomer, Wang & Yang (2001); Carslaw (2005) lido no PDF
      para conferir o degrau e os dois ressaltos.
 
-54. **O desenho do estudo de simulação (E4.2)** (2026-10-06), proposta do
+54. **~~O desenho do estudo de simulação (E4.2)~~ decidido em 2026-10-06
+   (D60), com o topo das grades em `n = 2000` acrescentado e o compêndio
+   numa pasta do `wafc-draft`.** Texto original: (2026-10-06), proposta do
    chat principal, à espera do autor; o texto completo está no
    `plano-projeto.md`, E4.2 ("Proposta revista de 2026-10-06"). Os pontos a
    decidir:
@@ -3765,25 +3768,27 @@ Ordenadas pelo que bloqueia mais.
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-06).** Tudo commitado. **Catálogo: só a L12** (as
+**Onde parou (2026-10-06).** Pergunta 54 decidida (D60); a pasta
+`wafc-studies/` criada, só com o `README.md`. **Catálogo: só a L12** (as
 fontes da aplicação; `TAREFA.md` §3), que pede ao autor os PDFs que não
 abrirem. Nenhum handoff pendente. O manuscrito está em `k = 4` (52 e 90
 páginas com a marcação, 45 e 89 sem o removido), sem as Seções 5 a 7.
 
 **O próximo passo é o estudo de simulação (E4)**, na ordem:
 
-1. **O autor decide o desenho** (pergunta 54): réplicas, braços, escala; o
-   VCBART fica por curiosidade, com a decisão de usá-lo depois.
-2. **O autor cria o repositório `wafc-studies`** (privado) no GitHub.
-3. **E4.1**, o nascimento do compêndio nos moldes do `wall` (`R/`,
-   `scripts/`, `config/*.yaml`, `renv`, o código de `wafc/` fixado pelo hash
-   do commit do `wafc-draft`, `PROVENANCE.md`, `INSTRUCTIONS.md`,
-   `CLAUDE.md`), e, em paralelo, **a opção de `X` dependente de `U` no
-   `dgp.R`** (se o braço for aceito).
-4. **E4.3**, o piloto reduzido: os tempos em `n = 2000` e nos braços, e o
-   custo do braço de escala. A grade de `J` (D34), as 10 dobras e a tabela
-   da base (D31) já estão fixadas pela E2.5.
-5. **E4.4**, a produção, com a rodada longa esperando o aviso do autor.
+1. **E4.1**, o nascimento do compêndio na pasta `wafc-studies/` (D60),
+   nos moldes do `wall` (`R/`, `scripts/`, `config/*.yaml`, `renv`,
+   `PROVENANCE.md`, `INSTRUCTIONS.md`, `CLAUDE.md`), com a documentação
+   escrita como a do estudo final; e, em paralelo, **a opção de `X`
+   dependente de `U` no `dgp.R`**.
+2. **E4.3**, o piloto reduzido, fora da pasta do compêndio: os tempos em
+   `n = 2000` e nos braços, o custo do braço de escala (entra abaixo de
+   ~10 h) e **a fração no topo das grades em `n = 2000`** (acima de 20%, a
+   grade daquele método sobe só ali, D60(e)). A grade de `J` (D34), as 10
+   dobras e a tabela da base (D31) já estão fixadas pela E2.5.
+3. **E4.4**, a produção, com a rodada longa esperando o aviso do autor.
+4. **No fim do projeto**, o autor cria o repositório a partir da pasta, por
+   cópia sem o histórico, com só o que reproduz o manuscrito e o supp.
 
 **Em paralelo ao E4:**
 
@@ -3815,6 +3820,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | Pergunta 54 decidida (D60): 100 réplicas, os três braços, a escala sob condição de custo, a regra do topo das grades em `n = 2000`; o compêndio nasce como a pasta `wafc-studies/` do `wafc-draft` e vira repositório só no fim, por cópia, com só o que reproduz o artigo (emenda D7) |
 | 2026-10-06 | Proposta de desenho da E4.2 registrada (pergunta 54, `plano-projeto.md` E4.2); o VCBART fica por curiosidade, com a decisão depois; cabeçalho e §5 reescritos para um orquestrador novo começar de um quadro limpo |
 | 2026-10-06 | Pergunta 53 decidida (D59): o vento numa frase, a borda da data cortada na figura, os ressaltos descritos sem interpretação; L12 catalogada |
 | 2026-10-06 | E6.1c fechada e integrada (5 h 27 min em 3 processos): marylebone com UK-AIR e ERA5, o degrau de 2003 em 20 de 20 partições, o `+cv` empatado com os splines de D46, o zero no vento derrubado pelo `+cv`; marylebone fica como principal; pergunta 53 |

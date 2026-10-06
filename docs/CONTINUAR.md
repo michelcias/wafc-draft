@@ -22,7 +22,7 @@ relativos não dependem disso):
 ```
 ~/Documents/
 ├── repo/
-│   ├── wafc-draft/       # este repositório (docs, derivations, wafc/ com o código, manuscript)
+│   ├── wafc-draft/       # este repositório (docs, derivations, wafc/ com o código, wafc-studies/ com o compêndio, manuscript)
 │   └── bdm-draft/        # projeto irmão, só consulta (origem das convenções)
 ├── WaveBased/            # o pacote (michelcias/WaveBased); só dependência para as bases (D4)
 ├── wall-manuscript/      # artigos do WALL (michelcias/wall-manuscript), só leitura; molde da prova

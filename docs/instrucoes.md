@@ -240,7 +240,7 @@ recebe código por enquanto: o pacote instalado é uma dependência, como o
 | funções do método: desenho, ajuste, sintonia, reconstrução, predição, gráficos | `wafc/R/`, um arquivo por tema, carregados por `source()` via `wafc/R/load.R` |
 | testes | `wafc/tests/`, `testthat` rodado com `testthat::test_dir("wafc/tests")` |
 | scripts de fumaça, piloto e comparação | `wafc/scripts/`, numerados |
-| estudo de simulação e aplicações | `michelcias/wafc-studies`, compêndio nos moldes do `wall`, que fixa o código de `wafc/` por commit deste repositório |
+| estudo de simulação e aplicações | a pasta `wafc-studies/` deste repositório, compêndio nos moldes do `wall`; vira o repositório `michelcias/wafc-studies` só no fim, por cópia sem histórico, com só o que reproduz o manuscrito e o supp (D60) |
 
 Neste repositório ficam também:
 
