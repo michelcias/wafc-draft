@@ -4075,6 +4075,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | L13 catalogada: Liang et al. (2015) e Opsomer, Wang & Yang (2001), as duas fontes da aplicação ainda `[VERIFICAR]` |
 | 2026-10-06 | E6.2 (a aplicação no compêndio) catalogada, em paralelo à E4.1c, com as 20 partições por bloco e a junção exata contra a E6.1b e a E6.1c |
 | 2026-10-06 | Pergunta 57 decidida (D64): os ressaltos numa frase, com o mergulho de 2002 em Carslaw; o degrau contra Marylebone Road; ERA5 e Open-Meteo como estão |
 | 2026-10-06 | L12 fechada e integrada (97 entradas no verificado, cinco artigos lidos no PDF): o "~5–6% a ~17%" é a média de Londres, e Marylebone Road vai de ~10 a ~23 vol%; o mergulho de 2002 está em Carslaw, o pico de 2003 fica depois da série dele; pergunta 57 |
