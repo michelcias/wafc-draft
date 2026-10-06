@@ -342,6 +342,35 @@ wafc_sprime <- function(scenario = c("smooth", "uneven", "inhomogeneous",
 #'   \eqn{p \times q}. Since the components are normalised to unit
 #'   \eqn{L_2[0,1]} norm, it is the standard deviation each one contributes
 #'   to its functional coefficient.
+#' @param x_u_rho Dependence of the linear covariates on the modulating
+#'   ones, a single value \eqn{\rho \in [0, 1)}. Each non-constant
+#'   \eqn{X_\ell} is drawn as \eqn{\sqrt{1-\rho^2}\,Z_\ell +
+#'   \rho\,h(U_{m(\ell)})}, where \eqn{Z_\ell} is the draw of
+#'   \code{x_dist} scaled to unit variance, \eqn{h} is the standard score
+#'   of a modulating covariate under its marginal law
+#'   (\eqn{\sqrt{12}(u - 1/2)} for the uniform, \eqn{(u - 0.4)/0.2} for
+#'   the Beta(2,3)), and the \eqn{k}-th non-constant linear covariate is
+#'   paired with \eqn{U_m}, \eqn{m = 1 + (k - 1) \bmod q}. With the
+#'   intercept this pairs \eqn{X_2} with \eqn{U_1}, the modulating
+#'   covariate of its own coefficient in every scenario, and the pairing
+#'   does not depend on the scenario, so neither does the law of
+#'   \eqn{(X, U)}. Each such \eqn{X_\ell} has unit variance and
+#'   correlation \eqn{\rho} with \eqn{U_{m(\ell)}}. Given \eqn{U}, the
+#'   non-constant covariates are uncorrelated with variance
+#'   \eqn{1-\rho^2}, which is the Schur complement of the intercept in
+#'   \eqn{E(XX^\top \mid U)}: once the intercept is removed, the smallest
+#'   eigenvalue of \eqn{E(XX^\top \mid U)} is at least \eqn{1-\rho^2}, and
+#'   with it at least \eqn{(1-\rho^2)/(2-\rho^2+\rho^2\|h(U)\|_2^2)},
+#'   where \eqn{h(U)} collects the scores of the paired covariates. Since
+#'   \eqn{h} is bounded, both stay away from zero, which is the design
+#'   hypothesis of decision D13 with the Gram matrix of the products no
+#'   longer a Kronecker product. Zero (the default) draws exactly the
+#'   sample drawn before the argument existed; no value adds a call to the
+#'   random number generator, so draws with the same \code{seed} share
+#'   \code{u}, \eqn{Z} and the standardised errors across values of
+#'   \code{x_u_rho}. With \code{x_dist = "uniform"} the variance of
+#'   \eqn{X_\ell} is \eqn{1/3} at zero, kept for reproducibility, and
+#'   \eqn{1} at any positive value.
 #'
 #' @return An object of class \code{"wafc_dgp"}: a list with the response
 #'   \code{y}, the covariates \code{x} and \code{u}, the regression function
@@ -350,7 +379,10 @@ wafc_sprime <- function(scenario = c("smooth", "uneven", "inhomogeneous",
 #'   \code{g} of components (\code{NULL} where the block is zero), the
 #'   \code{structure} matrix of names, the declared effective regularity
 #'   \code{sprime} of \code{\link{wafc_sprime}} with its \code{regime},
-#'   and \code{sigma}, \code{scenario}, \code{seed} and \code{call}.
+#'   \code{x_u_rho} with the named integer vector \code{x_u} of the
+#'   modulating covariate each linear covariate is paired with (\code{NA}
+#'   for the constant one), and \code{sigma}, \code{scenario}, \code{seed}
+#'   and \code{call}.
 #'
 #' @examples
 #' d <- simulate_wafc(200, p = 3, q = 2, scenario = "smooth", seed = 1)
@@ -366,7 +398,8 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
                           intercept = TRUE,
                           u_dist = c("uniform", "beta"), u_rho = 0,
                           cc = NULL, amplitude = 1,
-                          regime = c("periodic", "margin", "interval")) {
+                          regime = c("periodic", "margin", "interval"),
+                          x_u_rho = 0) {
 
   this_call <- wafc_compact_call(match.call(), "simulate_wafc")
   scenario <- match.arg(scenario)
@@ -390,6 +423,10 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
   if (length(u_rho) != 1L || !is.finite(u_rho) || abs(u_rho) >= 1) {
     stop("'u_rho' must be a single value in (-1, 1).", call. = FALSE)
   }
+  if (length(x_u_rho) != 1L || !is.numeric(x_u_rho) || !is.finite(x_u_rho) ||
+      x_u_rho < 0 || x_u_rho >= 1) {
+    stop("'x_u_rho' must be a single value in [0, 1).", call. = FALSE)
+  }
   if (u_rho == 0 || q == 1L) {
     w <- matrix(stats::runif(n * q), n, q)
   } else {
@@ -411,6 +448,21 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
               uniform = matrix(stats::runif(n * p, -1, 1), n, p))
   if (intercept) x[, 1L] <- 1
   colnames(x) <- paste0("x", seq_len(p))
+
+  ## Dependence of X on U. The k-th non-constant covariate is paired with
+  ## U_m, m = 1 + (k - 1) mod q, whatever the scenario, and mixed with the
+  ## standard score of U_m. Nothing is drawn here, so the default is the
+  ## sample drawn before the argument existed.
+  free <- if (intercept) seq_len(p)[-1L] else seq_len(p)
+  x_u <- rep(NA_integer_, p)
+  x_u[free] <- (seq_along(free) - 1L) %% q + 1L
+  names(x_u) <- colnames(x)
+  if (x_u_rho > 0 && length(free) > 0L) {
+    z <- x[, free, drop = FALSE]
+    if (x_dist == "uniform") z <- sqrt(3) * z
+    h <- wafc_u_score(u[, x_u[free], drop = FALSE], x_u[free], u_dist)
+    x[, free] <- sqrt(1 - x_u_rho^2) * z + x_u_rho * h
+  }
 
   ## Functional coefficients.
   struct <- wafc_scenario(scenario, p, q, regime = regime)
@@ -452,9 +504,22 @@ simulate_wafc <- function(n, p = 3L, q = 2L,
   out <- list(y = y, x = x, u = u, f = f, beta = beta, cc = cc, g = g,
               structure = struct, sprime = as.numeric(attr(struct, "sprime")),
               regime = regime, sigma = sigma, scenario = scenario,
-              seed = seed, n = as.integer(n), p = p, q = q, call = this_call)
+              seed = seed, n = as.integer(n), p = p, q = q,
+              x_u_rho = x_u_rho, x_u = x_u, call = this_call)
   class(out) <- "wafc_dgp"
   out
+}
+
+## Standard score of modulating covariates under their marginal laws: column
+## j of 'v' is a draw of U_{m[j]}. The Beta(2,3) of the even coordinates has
+## mean 2/5 and variance 6/150, so standard deviation 1/5. The score is
+## linear, so the correlation of a paired X_l with U_m itself is rho, and
+## bounded, by sqrt(3) under the uniform and by 3 under the Beta(2,3).
+wafc_u_score <- function(v, m, u_dist) {
+  beta_col <- u_dist == "beta" & m %% 2L == 0L
+  mu <- ifelse(beta_col, 2 / 5, 1 / 2)
+  s <- ifelse(beta_col, 1 / 5, sqrt(1 / 12))
+  sweep(sweep(v, 2L, mu, "-"), 2L, s, "/")
 }
 
 #' Functional coefficients of a simulated model

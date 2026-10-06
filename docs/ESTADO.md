@@ -2084,6 +2084,55 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: E4.1b fechada, `X` dependente de `U` no gerador
+
+- **O que entrou:** `simulate_wafc(..., x_u_rho = 0)`, no fim da
+  assinatura. Com `ρ > 0`, cada `X_ℓ` não constante é
+  `sqrt(1 − ρ²) Z_ℓ + ρ h(U_{m(ℓ)})`, com `Z_ℓ` o sorteio atual (no
+  `uniform`, vezes `sqrt(3)`) e `h` o escore padronizado **linear** da
+  moduladora pela lei marginal (`sqrt(12)(u − 1/2)` na uniforme), função
+  interna `wafc_u_score()`. A saída ganha `x_u_rho` e `x_u` (a moduladora
+  pareada). Pareamento fixo: a `k`-ésima não constante vai com
+  `U_{1 + (k − 1) mod q}`; com intercepto, `X_2` com `U_1`, a moduladora de
+  `β_2` em todo cenário não nulo.
+- **Por que `h` linear e limitada:** mantém `λ_min(E(XX'|U))` com o
+  intercepto longe de zero (D13, `κ_1` uniforme); o escore normal
+  (`Φ^{-1}(F(U))`) deixaria `X` gaussiana mas levaria esse autovalor a zero
+  na cauda. É a dependência da conferência de E1.4 (cenário B).
+- **Autovalores:** o complemento de Schur do intercepto é exatamente
+  `(1 − ρ²)I`; com o intercepto, `λ_min ≥ (1 − ρ²)/(2 − ρ² + ρ²‖h(U)‖²)`,
+  justa (mínimo da razão 1,00005 em 20 000 sorteios).
+- **Nenhum sorteio novo em `ρ` nenhum:** o padrão reproduz o `HEAD`
+  (`35b1ac3`) em **900 de 900** amostras e no `.Random.seed` final (4
+  cenários × 9 opções × 25 sementes); com `ρ = 0,6`, 75 de 75 com o mesmo
+  `u` e o mesmo erro padronizado. **O braço sai pareado com a célula de
+  base pela semente** (números aleatórios comuns), o que a E4.4 pode usar.
+- **Números:** `cor(X_ℓ, U_m)` entre 0,297 e 0,304 em `ρ = 0,3` e entre
+  0,699 e 0,702 em `ρ = 0,7` (`n = 10⁵`, as quatro combinações de
+  `x_dist` e `u_dist`); variância entre 0,994 e 1,003; na não homogênea em
+  `n = 1000`, `ρ = 0,5` quase não move `sd(f)` (3,106 contra 3,107).
+- **Testes:** `test-dgp.R` de 77 a 195 expectativas; a suíte inteira com
+  **1 422, 0 falhas, 17 puladas, 54 s** (eram 1 304); `test-dgp.R`
+  reconferido no chat principal (195, 0 falhas).
+- **Para a E4.1:** o braço passa `x_u_rho = 0.5` também à amostra de teste
+  (no `04-pilot.R`, o `test_for()` chama o mesmo `draw_cell()`, então basta
+  o argumento na célula).
+- **A frase do braço para a Seção 5**, rascunho do chat de tarefa para a
+  E5b (pendências na pergunta 55):
+
+```tex
+In the third arm the linear covariates depend on the modulating ones: each
+non-constant covariate is drawn as
+$X_\ell = (1-\rho^2)^{1/2} Z_\ell + \rho\, h(U_{m(\ell)})$ with $\rho = 0.5$,
+where $Z_\ell$ is standard normal and $h(u) = \sqrt{12}\,(u - 1/2)$ is the
+standard score of a uniform modulating covariate, and $X_2$ is paired with
+$U_1$, the modulating covariate of its own coefficient, and $X_3$ with $U_2$.
+Each $X_\ell$ keeps unit variance and has correlation $\rho$ with its pair,
+and given $\bU$ the non-constant covariates have covariance $(1-\rho^2)I$, so
+the eigenvalue condition of Assumption~\ref{ass:X} holds while the Gram
+matrix of the products is no longer a Kronecker product.
+```
+
 ### 2026-10-06: E6.1c fechada, marylebone com dados de licença declarada
 
 Chat de tarefa, integrado aqui. Conferido nesta máquina: os erros médios de
@@ -3765,13 +3814,27 @@ Ordenadas pelo que bloqueia mais.
    - (e) **O repositório `wafc-studies`:** o autor o cria no GitHub
      (privado) antes da E4.1.
 
+55. **Pendências de E4.1b** (2026-10-06). Recomendação do chat principal:
+   - (a) **A variância no `x_dist = "uniform"`** salta de 1/3 em `ρ = 0`
+     (mantida pela reprodução bit a bit) para 1 em `ρ > 0`. O estudo usa o
+     gaussiano, então não pesa: **manter**, com o salto registrado no
+     roxygen, como já está.
+   - (b) **`B_X`:** a hipótese sobre `X` pede `X` limitada, e o `Z`
+     gaussiano não é limitado em célula nenhuma do estudo, não só no braço.
+     **Recomendação:** a Seção 5 diz numa frase que as covariáveis
+     gaussianas ficam fora da limitação suposta pela teoria e que o braço
+     exercita a parte dos autovalores, que é a que D13 generaliza; não
+     trocar o gerador.
+   - (c) `ρ` negativo fica fora (só inverte `h`).
+
 ---
 
 ## 5. Próximos passos
 
 **Onde parou (2026-10-06).** Pergunta 54 decidida (D60); a pasta
-`wafc-studies/` criada, só com o `README.md`. **Catálogo: L12, E4.1 e
-E4.1b** (`TAREFA.md` §3), as três sem arquivo em comum. **Catálogo: só a L12** (as
+`wafc-studies/` criada; E3.3 decidida (D61); **E4.1b fechada e
+integrada** (`x_u_rho`, pergunta 55). **Catálogo: L12 e E4.1** (`TAREFA.md`
+§3), em andamento. **Catálogo: só a L12** (as
 fontes da aplicação; `TAREFA.md` §3), que pede ao autor os PDFs que não
 abrirem. Nenhum handoff pendente. O manuscrito está em `k = 4` (52 e 90
 páginas com a marcação, 45 e 89 sem o removido), sem as Seções 5 a 7.
@@ -3822,6 +3885,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E4.1b fechada e integrada (1 422 testes em 54 s; o padrão reproduz o `HEAD` em 900 de 900): `x_u_rho` no `simulate_wafc()`, `h` linear e limitada, pareamento fixo, nenhum sorteio novo; pergunta 55 |
 | 2026-10-06 | E3.3 decidida (D61): `wafc/` fica no `wafc-draft` até o fim e vai então ao `WaveBased`; o compêndio extraído dependerá dessa versão |
 | 2026-10-06 | E4.1 (o compêndio na pasta `wafc-studies/`, com junção exata contra o `e25j`) e E4.1b (`x_u_rho` no `simulate_wafc()`) catalogadas |
 | 2026-10-06 | Pergunta 54 decidida (D60): 100 réplicas, os três braços, a escala sob condição de custo, a regra do topo das grades em `n = 2000`; o compêndio nasce como a pasta `wafc-studies/` do `wafc-draft` e vira repositório só no fim, por cópia, com só o que reproduz o artigo (emenda D7) |

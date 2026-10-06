@@ -175,3 +175,153 @@ test_that("the reproducibility of a draw does not depend on the scenario", {
   expect_equal(a[["y"]], b[["y"]])
   expect_equal(a[["u"]], b[["u"]])
 })
+
+## ---------------------------------------------------------------------------
+## Linear covariates dependent on the modulating ones (step E4.1b)
+## ---------------------------------------------------------------------------
+
+test_that("the default draws the samples drawn before 'x_u_rho' existed", {
+  ## Fingerprints printed by the code of commit 35b1ac3, before the
+  ## argument existed: a weighted sum of y, of x and of u, so that a change
+  ## in the order of the draws, and not only in their values, moves them.
+  cfgs <- list(
+    list(n = 200L, p = 3L, q = 2L, scenario = "smooth", seed = 1L),
+    list(n = 300L, p = 3L, q = 2L, scenario = "uneven", seed = 7L),
+    list(n = 250L, p = 4L, q = 4L, scenario = "inhomogeneous", seed = 2026L,
+         snr = 3),
+    list(n = 200L, p = 3L, q = 2L, scenario = "null", seed = 11L,
+         sigma = 0.62),
+    list(n = 200L, p = 3L, q = 3L, scenario = "smooth", seed = 3L,
+         x_dist = "uniform", u_dist = "beta", u_rho = 0.4),
+    list(n = 150L, p = 3L, q = 2L, scenario = "inhomogeneous", seed = 5L,
+         intercept = FALSE, amplitude = 2)
+  )
+  want <- rbind(c(24006.790944074142, 8562.0987401374896, 38808.819022007519),
+                c(37534.638510872632, 29338.894679189467, 90081.430520175258),
+                c(22989.429750043091, 15373.521886492303, 252506.25148645299),
+                c(20932.220559466303, 32083.591502384064, 40518.953004339244),
+                c(21967.580523552428, 25896.257231129333, 84249.95270883858),
+                c(5425.1663801643826, 770.37371897757487, 21732.94920101529))
+  fp <- function(d) {
+    c(sum(d[["y"]] * seq_along(d[["y"]])), sum(d[["x"]] * seq_along(d[["x"]])),
+      sum(d[["u"]] * seq_along(d[["u"]])))
+  }
+  ## every element but the call, which records the argument, and the
+  ## components, which are closures with an environment of their own
+  keep <- setdiff(names(simulate_wafc(10L, seed = 1L)), c("call", "g"))
+  for (i in seq_along(cfgs)) {
+    d <- do.call(simulate_wafc, cfgs[[i]])
+    expect_equal(fp(d), want[i, ], tolerance = 1e-10, label = paste("cfg", i))
+    ## the explicit zero is the default, down to the state of the generator
+    r_default <- .Random.seed
+    d0 <- do.call(simulate_wafc, c(cfgs[[i]], list(x_u_rho = 0)))
+    expect_identical(d0[keep], d[keep])
+    expect_identical(.Random.seed, r_default)
+  }
+})
+
+test_that("a positive 'x_u_rho' adds no draw and keeps u, Z and the errors", {
+  for (xd in c("gaussian", "uniform")) {
+    a <- list(n = 300L, p = 4L, q = 2L, scenario = "inhomogeneous",
+              seed = 13L, x_dist = xd)
+    d0 <- do.call(simulate_wafc, a)
+    r0 <- .Random.seed
+    d1 <- do.call(simulate_wafc, c(a, list(x_u_rho = 0.6)))
+    expect_identical(.Random.seed, r0)
+    expect_identical(d1[["u"]], d0[["u"]])
+    expect_equal((d1[["y"]] - d1[["f"]]) / d1[["sigma"]],
+                 (d0[["y"]] - d0[["f"]]) / d0[["sigma"]], tolerance = 1e-12)
+    ## the constant column is untouched, and Z is the old draw at unit
+    ## variance once the score of the paired modulating covariate is removed
+    expect_identical(d1[["x"]][, 1L], rep(1, 300L))
+    expect_equal(unname(d1[["x_u"]]), c(NA, 1L, 2L, 1L))
+    h <- sqrt(12) * (d1[["u"]][, c(1L, 2L, 1L)] - 0.5)
+    z <- (d1[["x"]][, 2:4] - 0.6 * h) / sqrt(1 - 0.6^2)
+    s <- if (xd == "uniform") sqrt(3) else 1
+    expect_equal(z, s * d0[["x"]][, 2:4], tolerance = 1e-12,
+                 ignore_attr = TRUE)
+  }
+  ## without the intercept the first covariate is paired too, and with no
+  ## non-constant covariate nothing moves
+  d <- simulate_wafc(50L, p = 3L, q = 2L, intercept = FALSE, seed = 1L,
+                     x_u_rho = 0.5)
+  expect_equal(unname(d[["x_u"]]), c(1L, 2L, 1L))
+  expect_equal(names(d[["x_u"]]), c("x1", "x2", "x3"))
+  d <- simulate_wafc(50L, p = 1L, q = 2L, scenario = "smooth", seed = 1L,
+                     x_u_rho = 0.5)
+  expect_identical(d[["x"]][, 1L], rep(1, 50L))
+  expect_true(all(is.na(d[["x_u"]])))
+})
+
+test_that("a paired covariate has unit variance and correlation rho with its modulating covariate", {
+  ## n = 1e5, so the standard error of a correlation is at most 0.0032 and
+  ## that of a variance about 0.005; the cuts are five of them or more.
+  ## u_dist = "beta" makes U_2 a Beta(2,3), which the score has to centre.
+  for (xd in c("gaussian", "uniform")) for (ud in c("uniform", "beta")) {
+    for (rho in c(0.3, 0.7)) {
+      d <- simulate_wafc(1e5L, p = 3L, q = 2L, scenario = "smooth",
+                         seed = 99L, x_dist = xd, u_dist = ud,
+                         x_u_rho = rho)
+      x <- d[["x"]]
+      u <- d[["u"]]
+      lab <- paste(xd, ud, rho)
+      for (l in 2:3) {
+        expect_lt(abs(mean(x[, l])), 0.02, label = lab)
+        expect_lt(abs(stats::var(x[, l]) - 1), 0.03, label = lab)
+        expect_lt(abs(stats::cor(x[, l], u[, l - 1L]) - rho), 0.015,
+                  label = lab)
+      }
+      ## the pairing is one modulating covariate each
+      expect_lt(abs(stats::cor(x[, 2L], u[, 2L])), 0.015, label = lab)
+      expect_lt(abs(stats::cor(x[, 3L], u[, 1L])), 0.015, label = lab)
+    }
+  }
+})
+
+test_that("E(XX'|U) keeps its smallest eigenvalue at 1 - rho^2 once the intercept is removed", {
+  ## Estimated on a 4 by 4 grid of cells of (U_1, U_2), about 12 500 points
+  ## each. Inside a cell the covariance of (X_2, X_3) is (1 - rho^2) I plus
+  ## rho^2 times the covariance of the scores over the cell, rho^2/16 on the
+  ## diagonal, so its smallest eigenvalue sits just above 1 - rho^2: it is
+  ## bounded below by it, and close to it, which says that the dependence
+  ## is there. With the intercept, the second moment matrix stays above
+  ## (1 - rho^2)/(2 - rho^2 + 6 rho^2), the bound of the roxygen at the
+  ## largest scores, |h| <= sqrt(3) for each of the two.
+  for (rho in c(0, 0.5, 0.8)) {
+    d <- simulate_wafc(2e5L, p = 3L, q = 2L, scenario = "smooth",
+                       seed = 2026L, x_u_rho = rho)
+    x <- d[["x"]]
+    cell <- interaction(cut(d[["u"]][, 1L], 0:4 / 4, include.lowest = TRUE),
+                        cut(d[["u"]][, 2L], 0:4 / 4, include.lowest = TRUE))
+    lo <- 1 - rho^2
+    bound <- lo / (2 - rho^2 + 6 * rho^2)
+    ev <- vapply(levels(cell), function(k) {
+      xs <- x[cell == k, , drop = FALSE]
+      lmin <- function(a) {
+        min(eigen(a, symmetric = TRUE, only.values = TRUE)[["values"]])
+      }
+      c(schur = lmin(stats::cov(xs[, 2:3])),
+        full = lmin(crossprod(xs) / nrow(xs)))
+    }, numeric(2L))
+    expect_gt(min(ev["schur", ]), lo - 0.05, label = paste("rho", rho))
+    expect_lt(max(ev["schur", ]), lo + rho^2 / 16 + 0.05,
+              label = paste("rho", rho))
+    expect_gt(min(ev["full", ]), bound - 0.02, label = paste("rho", rho))
+  }
+})
+
+test_that("'x_u_rho' outside [0, 1) is an informative error", {
+  for (bad in list(1, -0.1, NA_real_, Inf, c(0.1, 0.2), "0.5", TRUE)) {
+    expect_error(simulate_wafc(50L, seed = 1L, x_u_rho = bad),
+                 "'x_u_rho' must be a single value in \\[0, 1\\)")
+  }
+})
+
+test_that("the signal to noise ratio is read on the regression function of the sample", {
+  d <- simulate_wafc(400L, p = 3L, q = 2L, scenario = "uneven", seed = 4L,
+                     snr = 2, x_u_rho = 0.5)
+  expect_identical(d[["sigma"]], stats::sd(d[["f"]]) / 2)
+  expect_equal(d[["f"]], as.numeric(rowSums(d[["x"]] * d[["beta"]])))
+  expect_equal(wafc_beta(d, d[["u"]]), d[["beta"]])
+  expect_equal(d[["x_u_rho"]], 0.5)
+})
