@@ -3769,7 +3769,8 @@ Ordenadas pelo que bloqueia mais.
 ## 5. Próximos passos
 
 **Onde parou (2026-10-06).** Pergunta 54 decidida (D60); a pasta
-`wafc-studies/` criada, só com o `README.md`. **Catálogo: só a L12** (as
+`wafc-studies/` criada, só com o `README.md`. **Catálogo: L12, E4.1 e
+E4.1b** (`TAREFA.md` §3), as três sem arquivo em comum. **Catálogo: só a L12** (as
 fontes da aplicação; `TAREFA.md` §3), que pede ao autor os PDFs que não
 abrirem. Nenhum handoff pendente. O manuscrito está em `k = 4` (52 e 90
 páginas com a marcação, 45 e 89 sem o removido), sem as Seções 5 a 7.
@@ -3820,6 +3821,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E4.1 (o compêndio na pasta `wafc-studies/`, com junção exata contra o `e25j`) e E4.1b (`x_u_rho` no `simulate_wafc()`) catalogadas |
 | 2026-10-06 | Pergunta 54 decidida (D60): 100 réplicas, os três braços, a escala sob condição de custo, a regra do topo das grades em `n = 2000`; o compêndio nasce como a pasta `wafc-studies/` do `wafc-draft` e vira repositório só no fim, por cópia, com só o que reproduz o artigo (emenda D7) |
 | 2026-10-06 | Proposta de desenho da E4.2 registrada (pergunta 54, `plano-projeto.md` E4.2); o VCBART fica por curiosidade, com a decisão depois; cabeçalho e §5 reescritos para um orquestrador novo começar de um quadro limpo |
 | 2026-10-06 | Pergunta 53 decidida (D59): o vento numa frase, a borda da data cortada na figura, os ressaltos descritos sem interpretação; L12 catalogada |
