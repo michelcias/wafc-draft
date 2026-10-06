@@ -1,0 +1,28 @@
+Package: wafcstudies
+Type: Compendium
+Title: Reproducible Simulation Study for Wavelet Additive Functional
+    Coefficients
+Version: 0.0.0.9000
+Authors@R: person("Michel H.", "Montoril", role = c("aut", "cre"),
+    email = "michel@ufscar.br")
+Description: Research compendium for the simulation study of the article on
+    regression with additive functional coefficients estimated by a block
+    lasso on wavelet bases (WAFC). It simulates the study designs, fits the
+    WAFC estimator and its competitors, and writes the tables reported in
+    the article and its supplementary material. This DESCRIPTION declares
+    the dependencies for 'renv'; the compendium is not a package to be
+    installed.
+License: GPL (>= 3)
+Encoding: UTF-8
+Depends:
+    R (>= 4.6)
+Imports:
+    WaveBased,
+    glmnet,
+    Matrix,
+    grpreg,
+    mgcv,
+    VCBART,
+    yaml
+Remotes:
+    github::michelcias/WaveBased

@@ -1,0 +1,68 @@
+# ============================================================
+# arms.yaml -- one factor at a time, at n = 1000
+# ============================================================
+# Each arm changes one factor of a core cell (core.yaml), in the two cells
+# with inhomogeneous components:
+#
+#   *.snr1  the signal to noise ratio lowered to 1;
+#   *.urho  the modulating covariates coupled by a Gaussian copula of
+#           correlation 0.5 (marginals unchanged);
+#   *.xu    the linear covariates made dependent on the modulating ones,
+#           with correlation 0.5 between each non-constant X_l and a fixed
+#           function of the modulators.
+#
+# An arm takes the seed key of the core cell it varies, so its replicate r
+# is drawn from the seeds of replicate r of that cell at n = 1000. With
+# snr = 1 the covariates and the standardized errors are the ones of the
+# core replicate; the copula draws the modulators differently, so the
+# pairing there is in the seeds only.
+# ------------------------------------------------------------
+
+design: arms
+replicates: 100
+sample_sizes: [1000]
+
+cells:
+  inhomogeneous.snr1:
+    seed_key: inhomogeneous
+    scenario: inhomogeneous
+    p: 3
+    q: 2
+    snr: 1
+  mixed.snr1:
+    seed_key: mixed
+    scenario: inhomogeneous
+    p: 4
+    q: 4
+    snr: 1
+    exclude: [gam.gcv]
+  inhomogeneous.urho:
+    seed_key: inhomogeneous
+    scenario: inhomogeneous
+    p: 3
+    q: 2
+    snr: 3
+    u_rho: 0.5
+  mixed.urho:
+    seed_key: mixed
+    scenario: inhomogeneous
+    p: 4
+    q: 4
+    snr: 3
+    u_rho: 0.5
+    exclude: [gam.gcv]
+  inhomogeneous.xu:
+    seed_key: inhomogeneous
+    scenario: inhomogeneous
+    p: 3
+    q: 2
+    snr: 3
+    x_u_rho: 0.5
+  mixed.xu:
+    seed_key: mixed
+    scenario: inhomogeneous
+    p: 4
+    q: 4
+    snr: 3
+    x_u_rho: 0.5
+    exclude: [gam.gcv]

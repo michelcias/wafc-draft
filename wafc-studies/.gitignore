@@ -1,0 +1,24 @@
+# R session artefacts
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+
+# secrets (a GITHUB_PAT for renv::restore() lives in .Renviron)
+.Renviron
+.Renviron.local
+
+# renv library and caches (restored from renv.lock; renv/.gitignore
+# covers the rest of renv/)
+renv/library/
+renv/staging/
+
+# everything a run writes: unit caches, tables, session records
+outputs/
+
+# logs and process ids of runs in flight
+*.log
+*.pid
+
+# stray graphics device output
+Rplots.pdf

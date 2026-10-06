@@ -1,0 +1,99 @@
+# ============================================================
+# study.yaml -- what every design of the simulation study shares
+# ============================================================
+# Read together with one design file (core.yaml, arms.yaml, scale.yaml),
+# which may override any entry here: a design's `tuning` and `methods`
+# are merged over these, entry by entry. Keys avoid bare `n`, `y`, `yes`,
+# `no`, `on`, `off` and `null`, which YAML 1.1 reads as booleans or as a
+# missing value; a scenario called "null" is always quoted.
+# ------------------------------------------------------------
+
+# The code of the estimator and of its competitors, loaded before any
+# fit: the path of its loader, relative to the root of the compendium, or
+# "package:<name>" for a package that exports it (see PROVENANCE.md).
+code: ../wafc/R/load.R
+
+# The designs run_all.R runs, in order.
+designs: [core, arms]
+
+# Single source of randomness. Every seed is derived from `master` by the
+# injective encoding of R/seeds.R, from the position of the cell's seed key
+# in `keys`, the position of the sample size in `sample_sizes`, the
+# replicate and the stream. Both lists are append-only: moving an entry
+# changes the data of every replicate after it.
+seeds:
+  master: 20261006
+  keys: [smooth, inhomogeneous, mixed, "null", uneven, scale]
+  sample_sizes: [250, 500, 1000, 2000]
+  rep_radix: 1000
+
+# The test sample of a replicate, drawn from the same law as the training
+# sample, and the grid on which the components are compared.
+test_size: 2000
+grid_size: 256
+
+# The methods, in the order of the tables. Each one is a fit; `wafc` and
+# `lasso` produce two rows each (see R/methods.R and `labels` below).
+methods: [wafc, lasso, gam.reml, gam.gcv, bsgl, aspline, klopp, oracle,
+          linear, vcbart]
+
+# Arguments passed to the fitter of a method on top of the data, the
+# folds and the tuning grids of its sample size.
+method_options:
+  gam.reml: {k.select: reml, engine: bam}
+  gam.gcv:  {k.select: gcv, engine: bam}
+  vcbart:   {burn: 500, nd: 500, M: 50}
+
+# Tuning, declared per sample size so that a grid can change at one size
+# without touching the others. `J` is the grid of resolution levels of the
+# methods fitted on the wavelet design (wafc, lasso, klopp, oracle) and the
+# grid of dimensions 2^J of bsgl; `k` is the grid of basis dimensions of
+# the gam methods; `nfolds` is the number of folds of the partition every
+# method of a replicate shares; `basis` is the wavelet basis, evaluated by
+# table. A grid can be changed for one method at one size with a `methods`
+# entry, for instance
+#   "2000":
+#     <<: *tuning
+#     methods:
+#       wafc:     {J: [2, 3, 4, 5, 6, 7, 8, 9]}
+#       gam.reml: {k: [5, 10, 20, 40, 80, 120]}
+# `nfolds` and `basis` are per sample size only.
+tuning:
+  "250": &tuning
+    nfolds: 10
+    J: [2, 3, 4, 5, 6, 7, 8]
+    k: [5, 10, 20, 40, 80]
+    basis: {family: Daublets, filter_size: 8, prec_wavelet: 30}
+  "500": *tuning
+  "1000": *tuning
+  "2000": *tuning
+
+# The fitted components kept on the grid, for the figures, by row label
+# and sample size. The integrated squared error of every component is kept
+# for every row.
+curves:
+  methods: [wafc.cv1se, gam.reml]
+  sample_sizes: [1000]
+
+# Labels the tables print. The row labels are the keys of every table and
+# never change.
+labels:
+  wafc.cv1se:  WAFC
+  wafc.cv:     WAFC (cv)
+  lasso:       Lasso
+  lasso.cv1se: Lasso + threshold
+  gam.reml:    GAM (REML)
+  gam.gcv:     GAM (GCV)
+  bsgl:        B-spline group lasso
+  aspline:     Adaptive spline
+  klopp:       Block lasso (KP)
+  oracle:      Oracle support
+  linear:      Constant coefficients
+  vcbart:      VCBART
+
+# The row the paired comparisons are read against.
+reference: wafc.cv1se
+
+# Parallel workers when the command line does not say (fork; Unix only).
+# Results do not depend on it.
+workers: 6

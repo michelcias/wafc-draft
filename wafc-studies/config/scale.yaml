@@ -1,0 +1,38 @@
+# ============================================================
+# scale.yaml -- a larger model, at n = 1000
+# ============================================================
+# (p, q) = (6, 4), 24 blocks, 6 of them active: the active structure of
+# the inhomogeneous cell twice, once on (x1, x2) x (u1, u2) and once on
+# (x3, x4) x (u3, u4), so that beta_1 and beta_3 are additive in two
+# modulators, beta_2 and beta_4 in one, and beta_5 and beta_6 are
+# constant. `structure` lists the component of every block by row (the
+# linear covariate) and column (the modulator), with "" for a zero block.
+#
+# The grid of J stops at 7 here: at J = 8 the design has 6 x 4 x 255 =
+# 6120 penalized columns for 1000 observations. gam.gcv is not run, for
+# the reason given in core.yaml for the cell "mixed".
+# ------------------------------------------------------------
+
+design: scale
+replicates: 100
+sample_sizes: [1000]
+
+cells:
+  scale:
+    seed_key: scale
+    scenario: inhomogeneous
+    p: 6
+    q: 4
+    snr: 3
+    structure:
+      - [bumps, blocks, "", ""]
+      - [heavisine, "", "", ""]
+      - ["", "", bumps, blocks]
+      - ["", "", heavisine, ""]
+      - ["", "", "", ""]
+      - ["", "", "", ""]
+    exclude: [gam.gcv]
+
+tuning:
+  "1000":
+    J: [2, 3, 4, 5, 6, 7]

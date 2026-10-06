@@ -1,0 +1,54 @@
+# ============================================================
+# core.yaml -- the main design
+# ============================================================
+# Five cells, four sample sizes, 100 replicates. A cell's entries other
+# than `seed_key`, `exclude` and `structure` are arguments of
+# simulate_wafc(); `snr` sets the error standard deviation to sd(f)/snr on
+# the realised regression function of each sample, and `sigma` fixes it.
+#
+#   smooth         three smooth components (sine, cubic, cosine)
+#   inhomogeneous  three spatially inhomogeneous components (bumps,
+#                  blocks, heavisine)
+#   mixed          the inhomogeneous components in a larger model, with
+#                  3 of its 16 blocks active
+#   null           every functional coefficient constant
+#   uneven         three infinitely smooth components, two of whose
+#                  scales change along the domain (a wide and a narrow
+#                  gaussian, a chirp, a cosine)
+#
+# gam.gcv is not run in the cell "mixed": with 16 smooths a fit at the top
+# of its grid of k takes more than an hour, and its search has shown local
+# minima there.
+# ------------------------------------------------------------
+
+design: core
+replicates: 100
+sample_sizes: [250, 500, 1000, 2000]
+
+cells:
+  smooth:
+    scenario: smooth
+    p: 3
+    q: 2
+    snr: 4
+  inhomogeneous:
+    scenario: inhomogeneous
+    p: 3
+    q: 2
+    snr: 3
+  mixed:
+    scenario: inhomogeneous
+    p: 4
+    q: 4
+    snr: 3
+    exclude: [gam.gcv]
+  "null":
+    scenario: "null"
+    p: 3
+    q: 2
+    sigma: 0.62
+  uneven:
+    scenario: uneven
+    p: 3
+    q: 2
+    snr: 4
