@@ -22,12 +22,14 @@
 ##                         range of the component in the fit on the whole
 ##                         sample; the effective degrees of freedom of the
 ##                         splines; where the largest increment of the
-##                         component is;
+##                         component is (the range and the increment on the
+##                         points of the grid the figure draws);
 ##   choices-<app>.csv     J, lambda and the threshold of the WAFC, k of the
 ##                         splines, split by split, with the k.check() of
 ##                         the splines;
 ##   readings-<app>.csv    the quantities the text of the article reads off
-##                         the figure (see application_readings below);
+##                         the figure, on the points of the grid it draws
+##                         (see application_readings below);
 ##   partitions-<app>.csv  one row per method and split;
 ##   <app>.pdf, <app>.png  beta_l along each modulator: the fits on the
 ##                         whole sample and the range of the WAFC over the
@@ -87,11 +89,47 @@ data_gaps <- function(u, width) {
   cbind(start = s[i], end = s[i + 1L])
 }
 
-## Where the largest increment of a curve on the grid is.
-largest_increment <- function(g, v) {
+## Where the largest increment of a curve on the grid is, among the
+## increments between two consecutive points both drawn (`drawn`, by default
+## every point): an increment across a gap is not on the figure.
+largest_increment <- function(g, v, drawn = rep(TRUE, length(v))) {
   if (is.null(g) || all(g == g[1L])) return(NA_real_)
-  k <- which.max(abs(diff(g)))
+  d <- abs(diff(g))
+  d[!(drawn[-1L] & drawn[-length(drawn)])] <- -Inf
+  if (all(d == -Inf)) return(NA_real_)
+  k <- which.max(d)
   (v[k] + v[k + 1L]) / 2
+}
+
+#' The points of the grid the figure draws
+#'
+#' For each modulator, a logical vector over its grid: FALSE at the ends cut
+#' by `figure$trim` and, along a modulator of `figure$gaps`, inside the gaps
+#' in its observed values longer than the spacing of the finest level of the
+#' WAFC fitted on the whole sample (`figure$band`), 2^-J of its range (see
+#' application_figure()). The structure table and the readings are computed
+#' on these points, so that the numbers and the figure say the same.
+#'
+#' @return A list of logical vectors, one per modulator, named.
+drawn_grid <- function(col, data, fig) {
+  un <- colnames(data[["u"]])
+  grid <- col[["grid"]]
+  J <- pick_row(col, fig[["band"]], 0L)[["J"]]
+  out <- lapply(seq_along(un), function(m) {
+    v <- grid[, m]
+    tr <- unlist(fig[["trim"]][[un[m]]])
+    show <- if (is.null(tr)) rep(TRUE, length(v)) else
+      v >= min(v) + tr[1L] & v <= max(v) - tr[2L]
+    if (un[m] %in% unlist(fig[["gaps"]]) && length(J) > 0L) {
+      um <- data[["u"]][, m]
+      gp <- data_gaps(um, diff(range(um)) / 2^J[min(m, length(J))])
+      for (i in seq_len(nrow(gp))) {
+        show <- show & !(v > gp[i, "start"] & v < gp[i, "end"])
+      }
+    }
+    show
+  })
+  stats::setNames(out, un)
 }
 
 #' The prediction table
@@ -132,7 +170,10 @@ application_prediction <- function(col, labels, splines) {
 }
 
 #' The structure table
-application_structure <- function(col, labels, data) {
+#'
+#' @param drawn The points of the grid the figure draws (drawn_grid()); the
+#'   range and the largest increment of a component are read there.
+application_structure <- function(col, labels, data, drawn) {
   xn <- colnames(data[["x"]])
   un <- colnames(data[["u"]])
   splits <- sort(unique(vapply(col[["rows"]], `[[`, 0, "split")))
@@ -156,7 +197,8 @@ application_structure <- function(col, labels, data) {
       full[["blocks"]][at]
     tab[[paste0("range_", lab)]] <- vapply(seq_len(nrow(at)), function(i) {
       g <- full[["components"]]
-      if (is.null(g)) NA_real_ else diff(range(g[[at[i, 1L], at[i, 2L]]]))
+      if (is.null(g)) NA_real_ else
+        diff(range(g[[at[i, 1L], at[i, 2L]]][drawn[[at[i, 2L]]]]))
     }, 0)
     if (!is.null(full[["edf"]])) {
       tab[[paste0("edf_", lab)]] <- full[["edf"]][at]
@@ -172,7 +214,8 @@ application_structure <- function(col, labels, data) {
     tab[[paste0("jump_", lab)]] <- vapply(seq_len(nrow(at)), function(i) {
       g <- full[["components"]]
       if (is.null(g)) NA_real_ else
-        largest_increment(g[[at[i, 1L], at[i, 2L]]], grid[, at[i, 2L]])
+        largest_increment(g[[at[i, 1L], at[i, 2L]]], grid[, at[i, 2L]],
+                          drawn[[at[i, 2L]]])
     }, 0)
   }
   tab
@@ -212,16 +255,22 @@ application_choices <- function(col) {
 #' start up to `before`; the level after, from `after` to `margin` days
 #' before the end of the grid (the ends are left out because there the
 #' periodized basis joins the end of the series to its start); the rise is
-#' their difference, read as percentage points of the primary fraction. For every date of `at`, the fraction of the rise the
-#' curve has reached there; the first date after `from` at which it reaches
-#' 90 percent; the peak between `after` minus six months and `after` plus
-#' six months. Beside it, the range of the wind component of the slope,
+#' their difference, read as percentage points of the primary fraction. For
+#' every date of `at`, the fraction of the rise the curve has reached there
+#' (none for a date inside a gap); the first date after `from` at which it
+#' reaches 90 percent; the peak between `after` minus six months and `after`
+#' plus six months. Beside it, the range of the wind component of the slope,
 #' absolute and as a fraction of the rise. Each quantity for the fit on the
 #' whole sample and as median, minimum and maximum over the partitions.
 #'
 #' Beijing ("season"): for every component along the day of the year, the
 #' mean of the curve inside the heating season minus the mean outside it.
-application_readings <- function(col, labels, data, spec) {
+#'
+#' Every quantity is read on the points of the grid the figure draws
+#' (`drawn`, from drawn_grid()): not at the ends it cuts, and not inside the
+#' gaps of the data, where the fit is set by the penalty and not by the
+#' data.
+application_readings <- function(col, labels, data, spec, drawn) {
   if (is.null(spec)) return(NULL)
   splits <- sort(unique(vapply(col[["rows"]], `[[`, 0, "split")))
   grid <- col[["grid"]]
@@ -245,10 +294,16 @@ application_readings <- function(col, labels, data, spec) {
     m <- match(st[["block"]][[2L]], colnames(data[["u"]]))
     o <- data[["def"]][["origin"]][[colnames(data[["u"]])[m]]]
     v <- grid[, m]
+    dr <- drawn[[m]]
     day <- function(s) as.numeric(as.Date(s) - o)
-    pre <- v >= min(v) + st[["margin"]] & v < day(st[["before"]])
-    post <- v >= day(st[["after"]]) & v <= max(v) - st[["margin"]]
-    pk <- v >= day(st[["after"]]) - 183 & v <= day(st[["after"]]) + 183
+    pre <- dr & v >= min(v) + st[["margin"]] & v < day(st[["before"]])
+    post <- dr & v >= day(st[["after"]]) & v <= max(v) - st[["margin"]]
+    pk <- dr & v >= day(st[["after"]]) - 183 & v <= day(st[["after"]]) + 183
+    ## a date between two grid points is read when both are drawn
+    readable <- function(x) {
+      i <- findInterval(x, v)
+      i >= 1L && i < length(v) && dr[i] && dr[i + 1L]
+    }
     lev <- function(r) {
       g <- partial_curve(r, l, m)
       c(pre = mean(g[pre]), post = mean(g[post]))
@@ -265,6 +320,7 @@ application_readings <- function(col, labels, data, spec) {
       for (a in unlist(st[["at"]])) {
         out[[length(out) + 1L]] <- summarise(
           paste0("fraction_at_", a), lab, function(r) {
+            if (!readable(day(a))) return(NA_real_)
             g <- partial_curve(r, l, m)
             lv <- lev(r)
             (stats::approx(v, g, xout = day(a))[["y"]] - lv[["pre"]]) /
@@ -274,7 +330,8 @@ application_readings <- function(col, labels, data, spec) {
       out[[length(out) + 1L]] <- summarise("date_90", lab, function(r) {
         g <- partial_curve(r, l, m)
         lv <- lev(r)
-        i <- which(v >= day(st[["from"]]) & g >= lv[["pre"]] + 0.9 * diff(lv))[1L]
+        i <- which(dr & v >= day(st[["from"]]) &
+                     g >= lv[["pre"]] + 0.9 * diff(lv))[1L]
         if (is.na(i)) NA_real_ else v[i]
       })
       out[[length(out) + 1L]] <- summarise("peak_above_before", lab,
@@ -286,17 +343,17 @@ application_readings <- function(col, labels, data, spec) {
         g <- partial_curve(r, l, m)
         v[pk][which.max(g[pk])]
       })
-      out[[length(out) + 1L]] <- summarise("wind_range", lab, function(r)
-        diff(range(r[["components"]][[wl, wm]])))
+      wr <- function(r) diff(range(r[["components"]][[wl, wm]][drawn[[wm]]]))
+      out[[length(out) + 1L]] <- summarise("wind_range", lab, wr)
       out[[length(out) + 1L]] <- summarise("wind_range_over_rise", lab,
-                                           function(r)
-        diff(range(r[["components"]][[wl, wm]])) / diff(lev(r)))
+                                           function(r) wr(r) / diff(lev(r)))
     }
   }
   se <- spec[["season"]]
   if (!is.null(se)) {
     m <- match(se[["modulator"]], colnames(data[["u"]]))
     v <- grid[, m]
+    dr <- drawn[[m]]
     on <- unlist(se[["inside"]])
     inside <- if (on[1L] > on[2L]) v >= on[1L] | v < on[2L] else
       v >= on[1L] & v < on[2L]
@@ -306,11 +363,11 @@ application_readings <- function(col, labels, data, spec) {
           paste0("season_contrast_", colnames(data[["x"]])[l]), lab,
           function(r) {
             g <- r[["components"]][[l, m]]
-            mean(g[inside]) - mean(g[!inside])
+            mean(g[inside & dr]) - mean(g[!inside & dr])
           })
         out[[length(out) + 1L]] <- summarise(
           paste0("largest_increment_", colnames(data[["x"]])[l]), lab,
-          function(r) largest_increment(r[["components"]][[l, m]], v))
+          function(r) largest_increment(r[["components"]][[l, m]], v, dr))
       }
     }
   }
@@ -339,6 +396,7 @@ application_figure <- function(col, data, fig, path) {
   un <- colnames(data[["u"]])
   def <- data[["def"]]
   grid <- col[["grid"]]
+  drawn <- drawn_grid(col, data, fig)
   splits <- sort(unique(vapply(col[["rows"]], `[[`, 0, "split")))
   labs <- unlist(fig[["labels"]])
   lty <- c(1, 2, 4, 3)[seq_along(labs)]
@@ -355,14 +413,7 @@ application_figure <- function(col, data, fig, path) {
         show <- if (is.null(tr)) rep(TRUE, length(v)) else
           v >= min(v) + tr[1L] & v <= max(v) - tr[2L]
         um <- data[["u"]][, m]
-        hole <- rep(FALSE, length(v))
-        J <- pick_row(col, fig[["band"]], 0L)[["J"]]
-        if (un[m] %in% unlist(fig[["gaps"]]) && length(J) > 0L) {
-          gp <- data_gaps(um, diff(range(um)) / 2^J[min(m, length(J))])
-          for (i in seq_len(nrow(gp))) {
-            hole <- hole | (v > gp[i, "start"] & v < gp[i, "end"])
-          }
-        }
+        hole <- show & !drawn[[m]]
         band <- do.call(cbind, lapply(splits[splits > 0], function(s)
           partial_curve(pick_row(col, fig[["band"]], s), l, m)))
         if (!is.null(band)) band[hole, ] <- NA
@@ -455,16 +506,17 @@ application_report <- function(cfg, out, bases = NULL) {
       next
     }
     data <- application_data(cfg, b)
+    drawn <- drawn_grid(col, data, rp[["figure"]])
     pred <- application_prediction(col, labels, unlist(rp[["splines"]]))
     write(pred, sprintf("prediction-%s.csv", b))
-    write(application_structure(col, labels, data),
+    write(application_structure(col, labels, data, drawn),
           sprintf("structure-%s.csv", b))
     ch <- application_choices(col)
     write(ch, sprintf("choices-%s.csv", b))
     ## the linear model has constant coefficients: nothing to read along a
     ## modulator
     rd <- application_readings(col, setdiff(labels, "linear"), data,
-                               rp[["readings"]][[b]])
+                               rp[["readings"]][[b]], drawn)
     write(rd, sprintf("readings-%s.csv", b))
     if (any(ch[["split"]] == 0L)) {
       application_figure(col, data, rp[["figure"]], file.path(fdir, b))
