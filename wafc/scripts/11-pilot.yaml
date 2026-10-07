@@ -1,0 +1,140 @@
+## ============================================================
+## wafc/scripts/11-pilot.yaml -- the pilot of the simulation study (E4.3)
+## ============================================================
+## A design file of the compendium wafc-studies/, kept outside it: the
+## pilot is part of the way to the final design, not of what the compendium
+## reproduces (decision D60(f)). It is read by the compendium's own
+## pipeline, merged over config/study.yaml like any design file, so every
+## method, grid, option and seed rule is the study's; only the entries
+## below differ.
+##
+## The round is four runs, one after the other, alone on the machine
+## because the time is what it measures, each under /usr/bin/time -v for
+## the peak memory; from the root of the compendium, with
+## P=../wafc/scripts/11-pilot.yaml and E=../wafc/cache/e43:
+##
+##   core2000   the five core cells at n = 2000, replicates 1 to 10: the
+##              time of every method, and the fraction of the replicates at
+##              the top of each grid (the rule of D60(e));
+##                Rscript scripts/01_simulate.R --config=$P --out=$E/pilot
+##                  --workers=8 --sizes=2000
+##                  --cells=smooth,inhomogeneous,mixed,null,uneven --reps=10
+##   scale      config/scale.yaml at n = 1000, replicates 991 to 993 (see
+##              below): the cost of the scale arm against ~10 h (D60(c));
+##                Rscript scripts/01_simulate.R --config=config/scale.yaml
+##                  --out=$E/scale --workers=8 --reps=991:993
+##   arms       the six arms at n = 1000, replicates 1 to 3;
+##                Rscript scripts/01_simulate.R --config=$P --out=$E/pilot
+##                  --workers=8 --sizes=1000 --reps=3
+##                  --cells=inhomogeneous.snr1,mixed.snr1,inhomogeneous.urho,mixed.urho,inhomogeneous.xu,mixed.xu
+##   coresmall  the five core cells at n = 250, 500 and 1000, replicates 1
+##              to 3: with the other three, every unit of the production
+##              has a measured time at its own n, and the projection of its
+##              cost needs no extrapolation in n.
+##                Rscript scripts/01_simulate.R --config=$P --out=$E/pilot
+##                  --workers=8 --sizes=250,500,1000
+##                  --cells=smooth,inhomogeneous,mixed,null,uneven --reps=3
+##
+## wafc/scripts/11-pilot-read.R reads the units and gives what E4.3
+## decides; its header says where it expects the logs of each run.
+##
+## Seeds. `seeds$master` replaces the study's (20261006) and nothing else:
+## the keys, the sample sizes and the radix stay the study's, so every cell,
+## arm and pairing is drawn as in the study, from other seeds. A seed of
+## the study is its master plus an index below 72 000 (6 keys, 4 sample
+## sizes, radix 1000, 3 streams; R/seeds.R), and this master is 22.7
+## million above it, so no seed of the pilot is a seed of the study: the
+## rule on the top of the grids is not decided on the data of the
+## production.
+##
+## The cell "scale" is not here. Its grid of J stops at 7 at n = 1000
+## (config/scale.yaml), and a grid is set per sample size, not per cell, so
+## in this file it would cut the arms to 2:7 as well. It runs from
+## config/scale.yaml itself, with the study's master and replicates 991 to
+## 993, which a study of fewer than 991 replicates never draws: the seed
+## index is injective in the replicate, so these are data the production
+## does not see, from the very file the production will run.
+##
+## The cells are copies of config/core.yaml and config/arms.yaml; the
+## reading script checks that they have not drifted from them.
+## ------------------------------------------------------------
+
+design: pilot
+replicates: 10
+sample_sizes: [250, 500, 1000, 2000]
+
+seeds:
+  master: 43000000
+
+cells:
+  ## config/core.yaml
+  smooth:
+    scenario: smooth
+    p: 3
+    q: 2
+    snr: 4
+  inhomogeneous:
+    scenario: inhomogeneous
+    p: 3
+    q: 2
+    snr: 3
+  mixed:
+    scenario: inhomogeneous
+    p: 4
+    q: 4
+    snr: 3
+    exclude: [gam.gcv]
+  "null":
+    scenario: "null"
+    p: 3
+    q: 2
+    sigma: 0.62
+  uneven:
+    scenario: uneven
+    p: 3
+    q: 2
+    snr: 4
+  ## config/arms.yaml
+  inhomogeneous.snr1:
+    seed_key: inhomogeneous
+    scenario: inhomogeneous
+    p: 3
+    q: 2
+    snr: 1
+  mixed.snr1:
+    seed_key: mixed
+    scenario: inhomogeneous
+    p: 4
+    q: 4
+    snr: 1
+    exclude: [gam.gcv]
+  inhomogeneous.urho:
+    seed_key: inhomogeneous
+    scenario: inhomogeneous
+    p: 3
+    q: 2
+    snr: 3
+    u_rho: 0.5
+  mixed.urho:
+    seed_key: mixed
+    scenario: inhomogeneous
+    p: 4
+    q: 4
+    snr: 3
+    u_rho: 0.5
+    exclude: [gam.gcv]
+  inhomogeneous.xu:
+    seed_key: inhomogeneous
+    scenario: inhomogeneous
+    p: 3
+    q: 2
+    snr: 3
+    x_u_rho: 0.5
+  mixed.xu:
+    seed_key: mixed
+    scenario: inhomogeneous
+    p: 4
+    q: 4
+    snr: 3
+    x_u_rho: 0.5
+    exclude: [gam.gcv]
