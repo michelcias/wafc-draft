@@ -2159,6 +2159,18 @@ spline keep it. The first and the last 60 days are not shown: there the
 periodized basis joins the end of the series to its start.
 ```
 
+- **A junção do WAFC da `beijing.heat`** (rodada no chat principal, 18h46
+  a 21h02, 8 139 s contra 9 327 s na E6.1b): idêntico em RMSE no teste e
+  no treino, blocos, `J`, `λ`, normas e componentes; `t` e `t/max` a
+  ~1e-16, e os candidatos do limiar diferentes pela mesma causa. O script
+  imprime "JUNCTION FAILED" porque compara `t` bit a bit; por D67(c),
+  conta como exata. **A junção da E6.2 está completa nas duas bases.**
+- **As rodadas:** as 168 unidades começaram às 18h46 com 2 trabalhadores;
+  às 21h31, com as duas primeiras unidades do WAFC da `beijing.heat`
+  gravadas (`split00` 8 830 s, `split01` 7 459 s), a rodada foi parada e
+  relançada **só com marylebone, 3 trabalhadores** (~5 h); a
+  `beijing.heat` vem depois, com 3, retomando do cache (~19 h). Logs em
+  `wafc/cache/e62/run-1.log` e `run-mary.log`.
 - Pendências na pergunta 59.
 
 ### 2026-10-06: E4.1c fechada, o oráculo em blocos e o `structure`
