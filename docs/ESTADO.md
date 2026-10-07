@@ -2085,6 +2085,94 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-07: E5j fechada, marylebone na `k = 5`; a D74 aplicada
+
+- **Compêndio (D73):** `data_gaps()` e, no `application_figure()`, as
+  curvas e a faixa das partições interrompidas nos buracos mais longos que
+  `2^{-J}` da amplitude da moduladora (com o `J` do ajuste inteiro, 8) e
+  um rug dos valores observados, pelas chaves `gaps: [day]` e
+  `rug: {day: 1, ws: 0.1}` do `application.yaml` (a figura da
+  `beijing.heat` não muda). As tabelas refeitas são idênticas bit a bit às
+  da rodada de 02h35, e o `.png` é idêntico ao do esboço. Os buracos: 43,2
+  dias em 1998, 13,0 em 2001 e 18,5 em 2003 (7 dos 256 pontos da grade).
+- **`results/`:** a figura e as quatro tabelas de marylebone, com origem
+  e SHA-256 no `results/README.md`.
+- **`k = 5`:** a figura no lugar da caixa, com a **legenda mínima** (os
+  tipos de linha saem, porque a legenda do PDF os nomeia; o achado fica no
+  §6.3; "band" no lugar de "grey"); D72 (a), (b) e (c); a frase de D73 no
+  §6.1, com **"spacing" no lugar de "support"** (o suporte do nível 8 é
+  `7·2^{-8}` do período, ~75 dias; `2^{-8}`, ~11 dias, é o espaçamento);
+  os marcadores de marylebone no §6.3, cada número conferido contra o CSV
+  (25 de 25): subida de **8,9 pontos** no ajuste inteiro e 9,3 a 10,3 nas
+  partições; um quarto em janeiro de 2003 (0,16 a 0,36); 90% até o fim de
+  julho de 2003 em todo ajuste; o spline REML com 10,3; pico de **13,4**
+  pontos (11,7 a 13,8) **na segunda metade de 2003, dentro da série de
+  Carslaw**, que vai até dezembro de 2003 (emenda de D64(a) pelo autor:
+  "whose series ends in December 2003, before the slope falls back from
+  the peak"); o vento de 0,8 a 1,8 pontos (9% a 17% do degrau) onde o
+  bloco fica, descartado pelo `cv1se` em todo ajuste e mantido pelo `+cv`
+  em 19 de 20 partições e pelos splines em 18 e 19; a predição do `+cv`
+  em 11,52 contra 11,47 do `gam.reml` (razão 1,005, diferença 0,05 com
+  erro-padrão 0,11, negativa em 8 de 20), e o `cv1se` 2,5% atrás.
+- **D74 aplicada no chat principal:** o §2.2 do `ms_5` (`φ` em `[0, L−1]`,
+  `ψ` em `[1 − L/2, L/2]`, com `\citep[Chapter~7]{hardle1998wavelets}`; o
+  capítulo e não a Observação 7.1, porque a numeração do PDF em `refs/` é
+  a da versão do seminário, não conferida na impressão) e a prova do lema
+  de aproximação no `supp_5`, marcados; `hardle1998wavelets` copiado do
+  verificado para o `references_5.bib` (**65 entradas**).
+- **Compilação:** os dois sem indefinida; **73 e 97 páginas**, 65 e 96
+  sem o removido (contagem da E5j).
+- **Leituras que o texto não usa** (para a E5b e o supp): no ajuste
+  inteiro o WAFC escolhe `J = 8`, o topo da grade, e nas partições 5 ou 6;
+  **os dois splines escolhem `k = 80`, o topo, nos 21 ajustes, e o
+  `k.check()` marca as duas suavizações em todos**; o spline sobe mais
+  (pico 16,2 no REML contra 13,4); o linear tem erro 15,48 (os
+  coeficientes variáveis reduzem o erro em ~26%); `R²` no teste 0,69.
+- **Lições:** (1) legenda de figura alta em espaço duplo: medir o excesso
+  com variantes numa cópia antes de escrever; (2) trocar espaço por hífen
+  se marca só com o hífen em `colR1` (o `\sout` não hifeniza e estoura a
+  margem); (3) float dentro de um grupo `{\color{colR1} ...}` sai preto;
+  (4) matemática com marcação: fechar o `$` antes do `\textcolor` (a D74
+  aninhou `$` e parou a compilação do `supp_5`); (5) a contagem de páginas
+  sem o removido usa o script abaixo, numa pasta nova:
+
+```python
+## Drop the removed text of a marked .tex: \textcolor{gray}{...} and
+## {\color{gray} ...} groups, with balanced braces; comments are kept as is.
+import sys
+def match(s, i):
+    d = 0; j = i
+    while j < len(s):
+        c = s[j]
+        if c == '\\': j += 2; continue
+        if c == '%':
+            k = s.find('\n', j); j = len(s) if k < 0 else k; continue
+        if c == '{': d += 1
+        elif c == '}':
+            d -= 1
+            if d == 0: return j
+        j += 1
+    raise ValueError('unbalanced at %d' % i)
+def strip(s):
+    out = []; i = 0; n = 0
+    while i < len(s):
+        if s.startswith('%', i) and (i == 0 or s[i-1] != '\\'):
+            k = s.find('\n', i); k = len(s) if k < 0 else k
+            out.append(s[i:k]); i = k; continue
+        if s.startswith(r'\textcolor{gray}{', i):
+            j = match(s, i + len(r'\textcolor{gray}')); i = j + 1; n += 1; continue
+        if s.startswith(r'{\color{gray}', i):
+            j = match(s, i); i = j + 1; n += 1; continue
+        out.append(s[i]); i += 1
+    return ''.join(out), n
+src, dst = sys.argv[1], sys.argv[2]
+t, n = strip(open(src).read())
+open(dst, 'w').write(t)
+print(src, 'removed groups:', n)
+```
+
+- Pendências na pergunta 65.
+
 ### 2026-10-06: E5i fechada, as decisões de texto na `k = 5`
 
 - **Aplicadas na `k = 5`** (sem `k = 6`): D68(a), a frase das quatro
@@ -3345,7 +3433,7 @@ entrou sem os itens de E1.14** (pergunta 47(a)).
 | D40 | 10-01 | **Notação da seleção de estrutura:** `ν_{ℓm}` e `ν̂_{ℓm}` para as normas dos blocos, `𝒮` e `𝒮̂(t)` para a estrutura, `ν_min` e `ν_{min,n}` para a separação, `Δ̄` e `Δ̄_n` para a cota do erro por bloco (`notacao.md` §9); aplicada no `06` e na `k = 3` sem marcação, por lista fechada de padrões | as quatro antigas colidiam com `N` e `N_J`, com o suporte `S`, com o vetor `δ` e com `D = p + d` (pergunta 32(a)); aprovada pelo autor, que pediu a `k = 3` |
 | D41 | 10-01 | **Escopo da E2.5h:** uma grade só, `k ∈ {5, 10, 20, 40, 80}`, comum aos suavizadores, para as três buscas do `gam` (REML, GCV e validação cruzada nas dobras do WAFC); 50 réplicas em todas as células; o `gam.gcv` fora da `mixed`, com a razão na tabela; a E2.5i volta a ser parte da E2.5h | grades diferentes entre os critérios do `gam` deixariam a comparação aberta à pergunta "por que esta grade para este critério?" (objeção do autor); Ruppert (2002, §6) usa `K` comum até 40 no aditivo, e E2.5d viu `k = 64` apertar; o 120 custava de 3 a 4 vezes o resto; o `gam.gcv` na `mixed` custa mais de uma hora por ajuste em `k = 80`, sem discretização, e o GCV mostrou mínimo local ali (medição de uma réplica da E2.5h); a exceção inteira, um método ausente numa célula, é mais limpa que uma grade cortada só ali; decisão do autor |
 | D42 | 10-01 | **Quatro convenções bibliográficas de L1** (pergunta 28): citar Amato et al. (2022) e Haris, Simon & Shojaie (2018), que são trabalhos distintos; Hastie & Tibshirani (1993) com as páginas 757–779, sem a discussão; de Daubechies & Lagarias, só a parte I (1991), a do algoritmo de avaliação, e a parte II fica no `.bib` verificado sem ir ao manuscrito; manter as chaves herdadas do WALL (`cohen1993wavelets` e afins) | propostas de L1, ratificadas pelo autor; o `.bib` e o `references_3.bib` já seguiam as quatro |
-| D74 | 10-07 | **O suporte de `ψ`:** o manuscrito e as derivações diziam `supp ψ ⊆ [0, L−1]`, que é o suporte de `φ`; com `supp φ ⊆ [0, L−1]`, o de `ψ` é `[1 − L/2, L/2]` (Härdle et al. 1998, Observação 7.1, eqs. (7.7) e (7.8), com `L = 2N`), conferido no código do `WaveBased` (`wav_utilities.c`: os limites de `ψ` são `−(L/2 − 1)` e `L/2`). Só a posição muda; todo argumento usa o comprimento `L − 1` (no máximo `L − 1` translações não nulas num ponto, o diâmetro `(L − 1)2^{−j}`), que fica. Corrigido sem marcação nas derivações `02` (três lugares) e `07` (três), recompiladas; **na `k = 5`**, o §2.2 do `ms_5` ("the support of $\psi$ is contained in $[0,L-1]$") e a prova do Lemma S2.1 do `supp_5` ("$2^{\lev}u-\tsl \in (0,L-1)$"), marcados, **depois que a E5j fechar** (ela edita o `ms_5`). As `k = 1` a `k = 4` ficam como estão | apontado pelo autor |
+| D74 | 10-07 | **O suporte de `ψ`:** o manuscrito e as derivações diziam `supp ψ ⊆ [0, L−1]`, que é o suporte de `φ`; com `supp φ ⊆ [0, L−1]`, o de `ψ` é `[1 − L/2, L/2]` (Härdle et al. 1998, Observação 7.1, eqs. (7.7) e (7.8), com `L = 2N`), conferido no código do `WaveBased` (`wav_utilities.c`: os limites de `ψ` são `−(L/2 − 1)` e `L/2`). Só a posição muda; todo argumento usa o comprimento `L − 1` (no máximo `L − 1` translações não nulas num ponto, o diâmetro `(L − 1)2^{−j}`), que fica. Corrigido sem marcação nas derivações `02` (três lugares) e `07` (três), recompiladas; **na `k = 5`**, o §2.2 do `ms_5` ("the support of $\psi$ is contained in $[0,L-1]$") e a prova do Lemma S2.1 do `supp_5` ("$2^{\lev}u-\tsl \in (0,L-1)$"), marcados, **aplicados em 2026-10-07 na integração da E5j**. As `k = 1` a `k = 4` ficam como estão | apontado pelo autor |
 | D73 | 10-07 | **Os buracos da série de marylebone (pergunta 64, aberta e fechada no chat):** a série tem intervalos sem medida de 43 dias (29 de junho a 11 de agosto de 1998), 18,5 dias (a partir de 21 de julho de 2003), 13 dias (agosto de 2001) e menores; com `J = 8`, as wavelets mais finas da data têm suporte de ~10 dias, e as que caem num buraco são determinadas pela penalidade e pelas bordas, não pelos dados (o pico espúrio de −20 a +40% em 1998 na figura do ajuste inteiro). A predição e as leituras do degrau não mudam (nenhuma observação de teste nem data lida cai num buraco). **Na figura** (emendado em 2026-10-07, a pedido do autor, depois de um esboço): as curvas e a faixa das partições são **interrompidas** nos intervalos sem dados da data mais longos que o suporte do nível mais fino escolhido (`2^{-8}` do período, ~10,7 dias: os de 43, 13 e 18,5 dias), **sem sombreamento** (o cinza já é a faixa das partições), e cada painel ganha um **rug** no eixo da moduladora, como o `plot.gam()` do `mgcv` (`rug = TRUE`), em que os buracos aparecem como falhas; a legenda diz "Ticks on the axes mark the observed values; curves are not drawn over gaps in the data longer than the support of the finest wavelet level." O esboço é o `wafc/cache/e62/mock-figure.R` (não versionado); **no §6.1**, uma frase diz que a série tem intervalos sem medidas, o mais longo de 43 dias em 1998, onde a estimativa não é determinada pelos dados e não é mostrada. O estimador não muda (é a mesma natureza da borda da base periodizada, D59, D67(d)). A `beijing.heat` não tem o problema: suas moduladoras (dia do ano, umidade) não têm buraco no domínio. Vai à E5j | recomendação do chat principal, aceita pelo autor |
 | D72 | 10-06 | **Pendências de E5i (pergunta 63), para a E5b:** (a) no §4.3, a frase da diferença "worth measuring" passa a "Its interest is as a reference for what the cross-validated choice ought to approach."; (b) "$K$ fold" passa a "$K$-fold", marcado; (c) no fim do §5.1, "the grids below were settled" passa a "the grids below up to $n = 1000$" | recomendações do chat principal, aceitas pelo autor |
 | D71 | 10-06 | **Pendências de L14 (pergunta 62):** (a) a troca de estação meteorológica do Dongsi em 1 de março de 2015 vai à S10, na oração da frase guardada no bloco da L14, só no supp (a E5b aplica, com as duas entradas no `references_5.bib`); (b) "described by" vira "introductory paper:" no `wafc-studies/data-raw/sources.yaml`, na próxima vez que alguém tocar o arquivo | recomendações do chat principal, aceitas pelo autor |
@@ -4595,6 +4683,34 @@ Ordenadas pelo que bloqueia mais.
    - (c) **"the grids below were settled"** no fim do §5.1 generaliza
      depois de D69. **Recomendação:** "the grids below up to $n = 1000$".
 
+65. **Pendências de E5j** (2026-10-07). Recomendação do chat principal:
+   - (a) **Os topos das grades na aplicação:** os dois splines escolhem
+     `k = 80`, o topo, nos 21 ajustes de marylebone, e o `k.check()` os
+     marca; o WAFC do ajuste inteiro escolhe `J = 8`, o topo. A comparação
+     de predição é contra splines presos na grade. Com `n` entre 34 000 e
+     61 000, muito acima dos 2 000 em que D69 já estendeu a grade do
+     estudo, a grade da aplicação tem o mesmo problema. **Recomendação:**
+     uma sondagem curta fora do compêndio (`k = 120` e `160` nos dois
+     splines e `J = 9` no WAFC, no ajuste inteiro e em poucas partições das
+     duas bases) antes de decidir; se o erro ou a estrutura mudarem, a
+     grade da aplicação cresce e as 168 unidades rodam de novo (~1 dia); se
+     não mudarem, fica, com uma frase.
+   - (b) **As colunas `range_` e `jump_` de (nox, day)** no ajuste inteiro
+     do WAFC saem do buraco de 1998 (57,2 contra 20,8 no spline).
+     **Recomendação:** o relatório as calcula na grade desenhada, sem
+     pontas e sem buracos (muda só o `structure-`).
+   - (c) **As leituras incluem os pontos da grade nos buracos;** tirá-los
+     muda a subida do ajuste inteiro de 8,88 para 8,96 (o texto passaria a
+     9,0). **Recomendação:** excluir também nas leituras, para a figura e
+     os números dizerem o mesmo.
+   - (d) **As legendas dos floats novos saem pretas** na versão marcada.
+     **Recomendação:** `\color{colR1}` dentro de cada `figure` e `table`
+     novos da `k = 5`, na E5b.
+   - (e) **A Figura S1 sem rug.** **Recomendação:** `rug: {doy: 1, rh: 1}`
+     para o mesmo aspecto, na E5b.
+   - (f) O comentário no topo do `app-marylebone.tex` ainda tem colchetes
+     `[E6.2: ...]` do rascunho. **Recomendação:** limpar na E5b.
+
 ---
 
 ## 5. Próximos passos
@@ -4657,6 +4773,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-07 | E5j fechada e integrada: a figura de marylebone com os buracos interrompidos e o rug; os números de marylebone na `k = 5` (25 de 25 conferidos); D72 aplicada; D74 aplicada no `ms_5` e no `supp_5`; 73 e 97 páginas; pergunta 65 (os splines no topo da grade `k = 80` em todos os ajustes) |
 | 2026-10-07 | D74: o suporte de `ψ` é `[1 − L/2, L/2]` (Härdle et al. 1998, (7.8); o `WaveBased` confere), não `[0, L−1]`; corrigido nas derivações `02` e `07`; o `ms_5` e o `supp_5` depois da E5j |
 | 2026-10-07 | O roxygen de `u_rho` corrigido (a cópula fica fora da hipótese de densidade limitada; só documentação, `8667472`, árvore `037a75f`) e o "introductory paper:" no `sources.yaml` (D71(b)); `PROVENANCE.md` aponta a árvore nova. **Para a E7:** as unidades da aplicação gravam a árvore `e262faa`, que difere da nova só nesse comentário do `dgp.R`; o `PROVENANCE.md` da extração lista a árvore de cada rodada |
 | 2026-10-07 | D73 emendada: curvas interrompidas nos buracos e rug nos eixos, sem sombreamento (esboço aprovado pelo autor); a E5j emendada |
