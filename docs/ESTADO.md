@@ -2085,6 +2085,21 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: E5i fechada, as decisões de texto na `k = 5`
+
+- **Aplicadas na `k = 5`** (sem `k = 6`): D68(a), a frase das quatro
+  regras tachada no §4.3; D68(d), `Z_ℓ` → `ζ_ℓ` nas três ocorrências do
+  §5.1; D68(i), "cross-validation" e "cross-validated" com hífen nas seis
+  ocorrências do `ms_5` (o `supp_5` já usava; sem a exceção de
+  uniformização); D69, a regra do gatilho e o marcador `[E4.3]` do §5.2
+  trocados pelo texto da grade estendida em `n = 2000`, com a razão
+  (`\eqref{eq:Jn}`); D71, as duas citações da UCI no §6.4 e a frase da S10
+  com a troca de estação. `references_5.bib` com **64 entradas**.
+- **Conferência:** os dois compilam sem indefinida; **72 e 97 páginas**,
+  64 e 96 sem o removido (as mesmas da E5h). Os símbolos locais do §5.1
+  foram ao `notacao.md` §11.
+- Pendências na pergunta 63.
+
 ### 2026-10-06: L14 fechada, Zhang et al. (2017) e o conjunto da UCI
 
 - **O que entrou:** `referencias-verificadas.bib` de 99 a **101 entradas**:
@@ -4552,6 +4567,17 @@ Ordenadas pelo que bloqueia mais.
      **Recomendação:** passar a "introductory paper:" na próxima vez que
      alguém tocar o arquivo.
 
+63. **Pendências de E5i** (2026-10-06), todas para a E5b. Recomendação do
+   chat principal:
+   - (a) **A frase que sobra no §4.3** ("the difference between the two is
+     a finite sample quantity worth measuring") fica sem quem a meça.
+     **Recomendação:** encurtar para "Its interest is as a reference for
+     what the cross-validated choice ought to approach."
+   - (b) **"$K$ fold"** sem hífen, ao lado de "10-fold". **Recomendação:**
+     "$K$-fold", marcado.
+   - (c) **"the grids below were settled"** no fim do §5.1 generaliza
+     depois de D69. **Recomendação:** "the grids below up to $n = 1000$".
+
 ---
 
 ## 5. Próximos passos
@@ -4614,6 +4640,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E5i fechada e integrada: D68(a), (d), (i), D69 e D71 na `k = 5` (72 e 97 páginas; 64 entradas); `notacao.md` §11; pergunta 63 |
 | 2026-10-06 | Cadeia lançada às 22h29 com o aviso do autor: marylebone, depois a `beijing.heat` com 3 trabalhadores, o relatório das duas, e o piloto da E4.3 sozinho na máquina |
 | 2026-10-06 | E5i catalogada: as decisões de texto D68(a), (d), (i), D69 e D71 aplicadas na `k = 5`, sem abrir `k = 6` (decisão do autor) |
 | 2026-10-06 | Pergunta 62 decidida (D71): a troca de estação do Dongsi numa oração da S10 |

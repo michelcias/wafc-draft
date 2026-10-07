@@ -235,3 +235,19 @@ No LaTeX: `\mathcal{G}`, `b_{n}`, `w_{G}`, `\varrho`, `\bar\varrho`,
 `\lVert\theta\rVert_{\mathcal{G},w}`, `\mathcal{G}_{0}`, `\mathcal{W}`,
 `\widetilde{\Psi}_{G}`, `R_{\mathcal{G}}`, `\lambda^{\mathcal{G}}_{n}`,
 `\rho^{\mathcal{G}}_{n}`.
+
+## 11. Emenda de 2026-10-06 (D68(d), E5i): os símbolos locais do §5.1
+
+Locais à frase do terceiro braço do estudo de simulação (`ms_5`, §5.1),
+sem uso fora dela:
+
+| Símbolo | O quê | Onde |
+|---|---|---|
+| `ζ_ℓ` (`\zeta_\cv`) | o sorteio normal padrão, independente de `U`, que forma `X_ℓ = (1 − ρ²)^{1/2} ζ_ℓ + ρ h(U_{m(ℓ)})` | §5.1 do `ms_5`; trocado de `Z_ℓ`, que colidia com a matriz de desenho `\bZ` e as entradas `Z_{ia}` (D68(d)) |
+| `ρ` | a correlação de `X_ℓ` com o seu par, `0.5` no braço | §5.1 do `ms_5` |
+| `h(u) = √12 (u − 1/2)` | o escore padronizado de uma moduladora uniforme | §5.1 do `ms_5` |
+
+Colisões conhecidas, aceitas por serem locais e distantes: `ζ` e `ζ_n` são
+a altura do hipercubo da cota inferior (S6 do supp); `ρ` sem índice não é a
+taxa `ρ_n` (§9) nem `\rhoG`, `\rhoGt` (S7).
+
