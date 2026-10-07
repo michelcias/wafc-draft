@@ -7,6 +7,13 @@
 % redigitar; nelas só se acrescentou a linha `doi`, conferida no Crossref.
 % Nada daqui leva mais a nota "[L1: confirmar]".
 %
+% Décima rodada (L14, 2026-10-06): a citação que a página do conjunto da
+% UCI pede, Zhang et al. (2017), lida no PDF (refs/zhang2017.pdf) e no
+% material suplementar (refs/zhang2017-supp.pdf, baixado com a permissão
+% do autor), no fim da seção da segunda base; e o próprio conjunto, Chen
+% (2017), na seção dos dados. O Dongsi da beijing.heat é um dos 12 sítios
+% Guokong do artigo (Tabela S1 do suplementar, p. 7).
+%
 % Nona rodada (L13, 2026-10-06): as duas fontes da aplicação que L12
 % deixou, lidas no PDF (refs/), no fim da seção da aplicação: Liang et al.
 % (2015), a temporada de aquecimento da base beijing.heat, e Opsomer, Wang
@@ -1355,7 +1362,7 @@
   doi     = {10.1023/A:1024068626366}
 }
 
-% Aplicação: a segunda base (beijing.heat) e a sintonia dos splines (L13)
+% Aplicação: a segunda base (beijing.heat) e a sintonia dos splines (L13, L14)
 
 % L13 (2026-10-06), lido no PDF da editora (refs/liang2015.pdf, 20
 % páginas). O Crossref confere título, oito autores, 471(2182), o número
@@ -1411,6 +1418,39 @@
   number  = {2},
   pages   = {134--153},
   doi     = {10.1214/ss/1009213287}
+}
+
+% L14 (2026-10-06), lido no PDF da editora (refs/zhang2017.pdf, 14 páginas)
+% e no material suplementar (refs/zhang2017-supp.pdf, 9 páginas, figshare
+% 10.6084/m9.figshare.5353735, CC BY, MD5 1caa1dc610e2f8d9556dd9b561b94d47
+% conferido com o da API). O Crossref confere título, seis autores, 473,
+% fascículo 2205, o número de artigo 20170457 (no `pages`, como Liang et
+% al. 2015), DOI e `published-print` 2017-09 (on-line 2017-09-20). O PDF
+% não imprime o fascículo ("Proc. R. Soc. A 473: 20170457" no "Cite this
+% article", p. 1); o 2205 vem do Crossref e da antiga página da UCI. Nomes
+% como na linha de autoria (D39), iguais aos do Crossref; o suplementar
+% grafa "Anlang Dong". É a "Citation Request" da antiga página do conjunto
+% (Wayback, 2022-02-08) e o "Introductory Paper" da atual. Localizações:
+% PM2.5 horário de 36 sítios (35 do BMEMC e a embaixada dos EUA), de
+% março de 2013 a fevereiro de 2017, e o tempo de 15 estações da CMA, de
+% março de 2010 a fevereiro de 2017 (§2, p. 2); o Dongsi é sítio Guokong
+% (GK) da região central, casado com a estação 54433 antes de fevereiro de
+% 2015 e com a 54511 depois (Tabela S1, suplementar, p. 7); o ponto de
+% orvalho é a variável que abre toda árvore de classificação (§3, p. 6,
+% Tabela 1); a média ajustada ao tempo por regressão por núcleo, sítio a
+% sítio e estação a estação (§4, pp. 6--8); o inverno (dezembro a
+% fevereiro) fica de 97 a 103 µg/m³, mais de 50% acima do verão (§5,
+% p. 9). Os dados do artigo são de https://wat.epmap.org/ e
+% http://weather.nocrew.org, sob pedido (p. 13), não os da UCI.
+@article{Zhang-Guo-Dong-He-Xu-Chen-2017,
+  author  = {Zhang, Shuyi and Guo, Bin and Dong, Anlan and He, Jing and Xu, Ziping and Chen, Song Xi},
+  title   = {Cautionary tales on air-quality improvement in {B}eijing},
+  journal = {Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences},
+  year    = {2017},
+  volume  = {473},
+  number  = {2205},
+  pages   = {20170457},
+  doi     = {10.1098/rspa.2017.0457}
 }
 
 % ---------------------------------------------------------------------
@@ -1741,4 +1781,30 @@
   year         = {2005},
   howpublished = {UK-AIR report 0502160851, \url{https://uk-air.defra.gov.uk/library/reports?report_id=306}},
   url          = {https://uk-air.defra.gov.uk/assets/documents/reports/cat06/0502160851_Conversion_Factors_Between_ppb_and.pdf}
+}
+
+% L14 (2026-10-06). O conjunto da base `beijing.heat` (o arquivo do Dongsi,
+% PRSA_Data_Dongsi_20130301-20170228.csv; as somas SHA-256 em
+% wafc-studies/data-raw/sources.yaml). O DataCite registra o DOI com o
+% título "Beijing Multi-Site Air Quality", criador pessoal "Chen, Song",
+% editora "UCI Machine Learning Repository", ano 2017, tipo Dataset, sem
+% licença no registro. A página do conjunto (lida em 2026-10-06) dá a mesma
+% forma, "Chen, S. (2017). Beijing Multi-Site Air Quality [Dataset]. UCI
+% Machine Learning Repository. https://doi.org/10.24432/C5RK5G.", o criador
+% "Song Chen", a licença CC BY 4.0 e a doação em 2019; a antiga página
+% (Wayback, 2022-02-08) dava como fonte "Song Xi Chen", da Universidade de
+% Pequim, que é o último autor de Zhang et al. (2017). O nome fica como o
+% registro do conjunto o imprime (D39). A descrição: 12 sítios de controle
+% nacional, poluentes do BMEMC, o tempo da estação da CMA mais próxima de
+% cada sítio, de 1 de março de 2013 a 28 de fevereiro de 2017. O
+% `howpublished` leva o DOI, que o chicago.bst não imprime num `misc`, e a
+% data do primeiro download (2026-09-20; o do compêndio, em 2026-10-06, tem
+% a mesma soma).
+@misc{Chen-UCI-2017,
+  author       = {Chen, Song},
+  title        = {{B}eijing {M}ulti-{S}ite {A}ir {Q}uality},
+  year         = {2017},
+  howpublished = {UCI Machine Learning Repository, \url{https://doi.org/10.24432/C5RK5G}, accessed 20 September 2026},
+  doi          = {10.24432/C5RK5G},
+  url          = {https://doi.org/10.24432/C5RK5G}
 }

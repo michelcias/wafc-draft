@@ -2085,6 +2085,56 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: L14 fechada, Zhang et al. (2017) e o conjunto da UCI
+
+- **O que entrou:** `referencias-verificadas.bib` de 99 a **101 entradas**:
+  `Zhang-Guo-Dong-He-Xu-Chen-2017` (lido no PDF e no suplementar; a
+  citação de memória confere inteira; o fascículo 2205 vem do Crossref,
+  porque o PDF não o imprime) e `Chen-UCI-2017` (o conjunto, criador
+  "Chen, Song" pelo DataCite, como a UCI imprime; acesso em 2026-09-20,
+  mesma SHA-256 no download do compêndio); compilado sem aviso. Duas
+  linhas no `literatura.md`; o suplementar em `refs/zhang2017-supp.pdf`
+  (baixado com permissão do autor, CC BY).
+- **A página da UCI** hoje pede citar o conjunto e lista o artigo como
+  "Introductory Paper"; a antiga pedia o artigo. As duas entradas cobrem
+  as duas.
+- **O Dongsi é um dos 12 sítios Guokong** da Tabela S1 do suplementar de
+  Zhang et al., os mesmos 12 arquivos do conjunto; o artigo só analisa o
+  PM2.5 e nunca o Dongsi sozinho.
+- **As covariáveis meteorológicas do Dongsi mudam de estação em 1 de março
+  de 2015** (54433 → 54511, Tabela S1; nos arquivos, a troca é parcial de 23
+  a 28 de fevereiro). Não se vê degrau no vento nem na pressão além do que
+  os sítios sem troca mostram (a queda das calmarias é da rede inteira);
+  nada a mudar no código.
+- **Lição:** quando a pergunta é qual sítio, o texto principal pode não
+  nomear nenhum; a lista está no suplementar, e foi ela que mostrou a troca
+  de estação, que só os arquivos confirmaram.
+- **As frases para a E5b** (as duas entradas vão ao `references_5.bib`).
+  §6.4 do `ms_5`, troca de uma linha:
+
+```tex
+Beijing Multi-Site Air Quality data of the UCI Machine Learning Repository
+\citep{Chen-UCI-2017, Zhang-Guo-Dong-He-Xu-Chen-2017}:
+```
+
+  S10 do `supp_5` (a oração sobre a troca de estação depende da pergunta
+  62(a)):
+
+```tex
+The data are the hourly observations at the site Dongsi of the Beijing
+Multi-Site Air Quality data of the UCI Machine Learning Repository
+\citep{Chen-UCI-2017}, from 1 March 2013 to 28 February 2017, under the
+attribution given in the Acknowledgements of the paper. Dongsi is one of
+the 12 nationally controlled sites of the data set, which are among the 36
+sites whose PM2.5 series \citet{Zhang-Guo-Dong-He-Xu-Chen-2017} analyze;
+the meteorological variables of a site are those of the nearest station of
+the China Meteorological Administration, which for Dongsi changes in
+February 2015 \citep[Table~S1 of their Supplementary
+Material]{Zhang-Guo-Dong-He-Xu-Chen-2017}. The 34,287 hours with PM2.5,
+```
+
+- Pendências na pergunta 62.
+
 ### 2026-10-06: E4.3a fechada, o piloto pronto sem rodar
 
 - **Arquivos:** `wafc/scripts/11-pilot.yaml` (o desenho, lido pelo
@@ -4482,6 +4532,16 @@ Ordenadas pelo que bloqueia mais.
      **Recomendação:** aceitar; a decisão dela é de custo, e os dados ficam
      fora da produção.
 
+62. **Pendências de L14** (2026-10-06). Recomendação do chat principal:
+   - (a) **A troca de estação do Dongsi vai à S10**, na oração da frase
+     acima, só no supp: custa uma linha, não pesa no teto, e antecipa o
+     referee que abrir a Tabela S1 de Zhang et al. **Recomendação:**
+     aceitar.
+   - (b) **"described by" no `wafc-studies/data-raw/sources.yaml`** (a
+     frase de licença): a UCI chama o artigo de "Introductory Paper".
+     **Recomendação:** passar a "introductory paper:" na próxima vez que
+     alguém tocar o arquivo.
+
 ---
 
 ## 5. Próximos passos
@@ -4544,6 +4604,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | L14 fechada e integrada (101 entradas): Zhang et al. (2017) e o conjunto da UCI; o Dongsi é um dos 12 sítios Guokong, e as covariáveis mudam de estação em 1 de março de 2015, sem degrau visível; pergunta 62 |
 | 2026-10-06 | Pergunta 61 fechada (D70): os 10 h da escala são de relógio em 8 núcleos; a escala do piloto nas réplicas 991 a 993 do mestre da produção |
 | 2026-10-06 | D69: a grade de `n = 2000` fixada de antemão (`J` em `2:9`, `k = 120`) no `study.yaml`; o piloto mede só tempo e custo, com 5 réplicas em `n = 2000`; 61(a), (c) e (d) sem objeto |
 | 2026-10-06 | E4.3a fechada e integrada: o piloto pronto (1 129 unidades, ~19 a 23 h de processador, ~3 h em 8), fumaça sem falha, sementes fora da produção; a rodada espera o fim da E6.2 e o aviso; pergunta 61 |
