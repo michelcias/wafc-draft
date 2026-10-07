@@ -4656,6 +4656,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-07 | O roxygen de `u_rho` corrigido (a cópula fica fora da hipótese de densidade limitada; só documentação, `8667472`, árvore `037a75f`) e o "introductory paper:" no `sources.yaml` (D71(b)); `PROVENANCE.md` aponta a árvore nova. **Para a E7:** as unidades da aplicação gravam a árvore `e262faa`, que difere da nova só nesse comentário do `dgp.R`; o `PROVENANCE.md` da extração lista a árvore de cada rodada |
 | 2026-10-07 | D73 emendada: curvas interrompidas nos buracos e rug nos eixos, sem sombreamento (esboço aprovado pelo autor); a E5j emendada |
 | 2026-10-07 | D73: os buracos da série de marylebone sombreados na figura e numa frase do §6.1 (o pico espúrio de 1998); E5j catalogada (marylebone na `k = 5`) |
 | 2026-10-06 | Pergunta 63 decidida (D72): três ajustes de texto para a E5b |
