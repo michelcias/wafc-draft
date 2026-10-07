@@ -498,7 +498,7 @@ Section~\ref{sec:theory}.
 Let $\phi$ and $\psi$ be the scaling function and the mother wavelet of an
 orthonormal multiresolution analysis of $L_2(\R)$, compactly supported, with
 $\psi$ bounded and with $N$ vanishing moments, and let $L$ be the length of
-the filter, so that the support of $\psi$ is contained in $[0,L-1]$. Write
+the filter, so that the support of \textcolor{gray}{\sout{$\psi$ is contained in $[0,L-1]$}}\textcolor{colR1}{$\phi$ is contained in $[0,L-1]$ and that of $\psi$ in $[1-L/2,\,L/2]$, an interval of length $L-1$} \citep[\textcolor{colR1}{Chapter~7}]{hardle1998wavelets}. Write
 \begin{equation}
   \label{eq:periodized}
   \wav{\lev}{\tsl}(u) \;=\; \sum_{\iota \in \mathbb{Z}}
@@ -1619,7 +1619,7 @@ offer the interval basis as an option.
 \subsection{Choosing the resolution and the penalty}
 \label{sec:tuning}
 
-The pair $(J,\pen)$ is chosen jointly. The default is $K$ fold \textcolor{gray}{\sout{cross
+The pair $(J,\pen)$ is chosen jointly. The default is $K$\textcolor{colR1}{-}fold \textcolor{gray}{\sout{cross
 validation}}\textcolor{colR1}{cross-validation} on a grid of resolutions, with the folds drawn once and reused for
 every $J$, one design and one penalty path per resolution, and the usual two
 readings of the curve: the minimizer of the \textcolor{gray}{\sout{cross validated}}\textcolor{colR1}{cross-validated} error and the
@@ -1650,11 +1650,14 @@ or below according to $\seff$}.
 % custa 2% e 18%, lambda_n sozinho 30% e 54%; J_n dois niveis abaixo com
 % s' = 3/2, dois acima com s' = 1/4 em E1.6).
 Its interest is as a reference for
-what the \textcolor{gray}{\sout{cross validated}}\textcolor{colR1}{cross-validated} choice ought to approach, and the difference between
-the two is a finite sample quantity worth measuring.\textcolor{gray}{\sout{ The four rules are
+what the \textcolor{gray}{\sout{cross validated}}\textcolor{colR1}{cross-validated} choice ought to approach\textcolor{gray}{\sout{, and the difference between
+the two is a finite sample quantity worth measuring}}.\textcolor{gray}{\sout{ The four rules are
 compared in the simulation study.}}
 % E5i (D68(a)): a frase das quatro regras saiu, porque o estudo da Secao 5 (D60)
 % roda so a validacao cruzada do WAFC; o comentario E5b logo acima segue com a E5b.
+% E5j (D72(a)): a oracao "worth measuring" saiu pelo mesmo motivo.
+% E5j (D72(b)): o "$K$-fold" do 4.3 marca so o hifen em colR1; com "fold" tachado e
+% "-fold" inserido, a linha passava 17 pt da margem na versao marcada.
 
 A remark on the \textcolor{gray}{\sout{structural variant}}\textcolor{colR1}{other penalties}. \textcolor{colR1}{The lasso option, with
 $\norm{\btheta}_1$ in place of $\nGw{\btheta}$, is fit by \texttt{glmnet}; its
@@ -1794,7 +1797,7 @@ and $\beta_6$ constant and signal to noise ratio 3.
 Every sample is derived from a single master seed, through an injective
 encoding of the cell, the sample size, the replicate and the stream. The seeds
 are independent of those of the pilot runs on which the estimator, its tuning
-rules and the grids below were settled, so that the study does not evaluate
+rules and the grids below up to $n = 1000$ were settled, so that the study does not evaluate
 the method on the samples on which it was chosen.
 
 \subsection{Methods and tuning}
@@ -1922,7 +1925,11 @@ the study.]
 % (wafc-studies/config/application.yaml, R/application_data.R, R/application.R,
 % R/application_report.R, data/README.md); as fontes sao as de L12 e L13. Os
 % numeros ficam como [E6.2: ...], a trocar pelos de readings-, prediction- e
-% structure-marylebone.ukair.csv da rodada. A frase de Opsomer, Wang e Yang (2001)
+% structure-marylebone.ukair.csv da rodada. E5j (2026-10-07): os de marylebone
+% trocados pelos de results/tables/ (handoff-E5j.md, cada numero e a sua
+% coluna); a frase dos buracos no 6.1 (D73, "spacing" no lugar de "support"),
+% o pico na segunda metade de 2003 e a serie de Carslaw ate dezembro de 2003
+% (respostas do autor na E5j). Os da beijing.heat (6.4) ficam. A frase de Opsomer, Wang e Yang (2001)
 % nao entra (D65). As atribuicoes que as licencas pedem estao nos
 % Acknowledgements.
 {\color{colR1}
@@ -1969,7 +1976,10 @@ coefficients, so that $p = q = 2$ and the model has four blocks. Both
 modulators are mapped to $[0,1]$ by their range. The date is not periodic, and
 the periodized basis joins the end of the series to its start
 (Section~\ref{sec:boundary}), so that the fits are read away from the first
-and the last 60 days.
+and the last 60 days. The series also has intervals without measurements,
+the longest of 43 days in the summer of 1998; over those longer than the
+spacing of the wavelets of the finest level chosen, about 11 days, the
+estimate is not determined by the data and is not shown.
 
 \subsection{Fitting and evaluation}
 \label{sec:app-fit}
@@ -1998,29 +2008,44 @@ training samples of different partitions.
 
 Figure~\ref{fig:marylebone} shows each coefficient along each modulator, with
 the component of the other modulator at its sample mean. The background of
-oxidant follows the annual cycle [E6.2: its range]. The slope on NOx is flat
-until [E6.2: mid] 2002 and rises through 2002 and 2003, by [E6.2: 9.7]
-percentage points from its level before 2002 to its level after 2004; it has
-completed [E6.2: a quarter] of the rise by January 2003 and [E6.2: 90\%] by
-July 2003, [E6.2: in all 20 partitions and with both thresholds], and the
-spline fitted by REML gives [E6.2: the same curve]. At this site
-\citet[Figure~3(a)]{Carslaw-2005} estimated a rise of the primary fraction
-from about 10\% to about 23\% by volume over 2002 and 2003; the step of the
-fit is measured after 2004, past the peak described next, and the rise to
-that peak is [E6.2: 12] points. Two departures from a single step appear
-[E6.2: in every fit], a dip at the beginning of 2002 and a peak at the end of
-2003: the dip also appears in the monthly estimates of
-\citet[Figure~3(a)]{Carslaw-2005}, whose series ends before the peak.
-Neither is interpreted here.
+oxidant follows the annual cycle, over a range of 23 to 24~ppb in the fits to
+the whole sample. The slope on NOx is flat until mid 2002 and then rises, by
+8.9 percentage points from its level before 2002 to its level from 2004 on in
+the fit to the whole sample, and by 9.3 to 10.3 points over the 20
+partitions; it has completed a quarter of the rise by January 2003 (0.16 to
+0.36 over the partitions) and 90\% of it by the end of July 2003, in the fit
+to the whole sample and in every partition. The two thresholds keep the same
+blocks along the date and give the same rise, and the spline fitted by REML
+gives a rise of 10.3 points, 90\% of it by the beginning of August 2003. At
+this site \citet[Figure~3(a)]{Carslaw-2005} estimated a rise of the primary
+fraction from about 10\% to about 23\% by volume over 2002 and 2003; the step
+of the fit is measured from 2004 on, past the peak described next, and the
+rise to that peak is 13.4 points (11.7 to 13.8 over the partitions). Two
+departures from a single step appear in every fit of the WAFC and of the
+spline fitted by REML, a dip at the beginning of 2002 and a peak in the
+second half of 2003: the dip also appears in the monthly estimates of
+\citet[Figure~3(a)]{Carslaw-2005}, whose series ends in December 2003,
+before the slope falls back from the peak. Neither is interpreted here.
 
-The wind speed modulates the slope by about [E6.2: 17\%] of the step. The
-WAFC drops that block, while the threshold of the smallest cross-validated
-error and both splines keep it, so the fit does not support the absence of
-that modulation, only its size, which is small beside the step. [E6.2: the
-blocks of the background.] On the held-out weeks, the WAFC with the threshold
-of the smallest cross-validated error predicts [E6.2: as well as] the better
-of the two splines [E6.2: the errors, their ratio and the fraction of
-partitions], and the WAFC [E6.2: is behind by]. Section~S10 of the
+The wind speed modulates the slope by 0.8 to 1.8 percentage points, 9\% to
+17\% of the step, in the fits to the whole sample that keep that block. The
+WAFC drops that block, in the fit to the whole sample and in every partition,
+while the threshold of the smallest cross-validated error keeps it in 19 of
+the 20 partitions and the splines fitted by REML and by GCV in 18 and 19, so
+the fit does not support the absence of that modulation, only its size,
+which is small beside the step. Both modulators act on the background in
+every fit of the threshold of the smallest cross-validated error and of the
+two splines, the wind speed over a range of 5.7 to 7.8~ppb in the fits to
+the whole sample; the WAFC keeps the date and drops the wind speed in the
+fit to the whole sample, and keeps the wind speed in 12 of the 20
+partitions. On the held-out weeks, the WAFC with the threshold of the
+smallest cross-validated error predicts as well as the better of the two
+splines: its root mean squared error is 11.52~ppb against 11.47 for the
+spline fitted by REML, which has the smaller mean error of the two; the
+ratio to the better spline of each partition is 1.005 on average, and the
+paired difference, 0.05~ppb with standard error 0.11, is negative in 8 of
+the 20 partitions. The WAFC is behind by 2.5\%, with an error of 11.75~ppb
+and a paired difference of 0.28~ppb (standard error 0.22). Section~S10 of the
 Supplementary Material gives the errors of every method, the frequency with
 which each block is kept over the partitions, and the choices of $J$, $\pen$,
 the threshold and $k$.

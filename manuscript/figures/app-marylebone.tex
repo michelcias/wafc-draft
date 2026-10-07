@@ -24,22 +24,41 @@
 %   of 2003. The wind speed modulates the slope by about [E6.2: 17\%] of the step;
 %   the WAFC drops that block, and the threshold of the smallest cross-validated
 %   error and the spline keep it. 
+% E5j (2026-10-07): a caixa virou a figura, copia de results/figures/ (o
+% compendio e a verdade); o 9.7 virou 8.9 (rise, wafc.cv1se, full, do
+% readings-marylebone.ukair.csv); a frase de D73, com "spacing" no lugar de
+% "support" (resposta do autor: o suporte do Daublets 8 no nivel 8 e ~75 dias).
+% Os colchetes do trecho acima sao do rascunho e nao vao ao texto.
+% E5j: com a figura no lugar da caixa, a legenda de D68(g) mais a frase de D73
+% passava da pagina por 158 pt (sobravam ~5 cm para os paineis); a legenda minima
+% abaixo, escolhida pelo autor, cabe na largura inteira: os tipos de linha sairam
+% (a legenda do PDF os nomeia), o 8.9 fica so no 6.3, "band" no lugar de "grey"
+% (a SS veda referencia a cor). A legenda anterior, para a E5b:
+%   Marylebone Road, London, hourly, 1998--2005: total oxidant
+%   $\mathrm{NO_2} + \mathrm{O_3}$ regressed on NOx with coefficients modulated by
+%   the date and the wind speed. Each panel shows $\widehat\beta_\ell$ along one
+%   modulating covariate, with the component of the other at its sample mean:
+%   the oxidant background (top, ppb) and the slope on NOx (bottom, percent of
+%   NOx), along the date (left) and the wind speed (right). Solid: the WAFC
+%   fitted to the whole sample; dashed: the WAFC with the threshold of the
+%   smallest cross-validated error; dot-dashed: \texttt{mgcv} with REML;
+%   grey: the range of the WAFC over 20 fits on 70\% of the weeks. The
+%   background follows the annual cycle, and the slope, an estimate of the
+%   fraction of NOx emitted directly as $\mathrm{NO_2}$, rises by 8.9
+%   percentage points from 2002 to 2004. The first and the last 60 days are not shown:
+%   there the periodized basis joins the end of the series to its start. Ticks on
+%   the axes mark the observed values; curves are not drawn over gaps in the data
+%   longer than the spacing of the finest wavelets, about 11 days.
 \begin{figure}[tp]
 \centering
-\fbox{\parbox[c][5cm][c]{0.9\textwidth}{\centering\small [E6.2: the figure
-\texttt{marylebone.ukair.pdf} of the compendium.]}}
-\caption{Marylebone Road, London, hourly, 1998--2005: total oxidant
-$\mathrm{NO_2} + \mathrm{O_3}$ regressed on NOx with coefficients modulated by
-the date and the wind speed. Each panel shows $\widehat\beta_\ell$ along one
-modulating covariate, with the component of the other at its sample mean:
-the oxidant background (top, ppb) and the slope on NOx (bottom, percent of
-NOx), along the date (left) and the wind speed (right). Solid: the WAFC
-fitted to the whole sample; dashed: the WAFC with the threshold of the
-smallest cross-validated error; dot-dashed: \texttt{mgcv} with REML;
-grey: the range of the WAFC over 20 fits on 70\% of the weeks. The
-background follows the annual cycle, and the slope, an estimate of the
-fraction of NOx emitted directly as $\mathrm{NO_2}$, rises by [E6.2: 9.7]
-percentage points from 2002 to 2004. The first and the last 60 days are not shown:
-there the periodized basis joins the end of the series to its start.}
+\includegraphics[width=\textwidth]{figures/marylebone.ukair.pdf}
+\caption{Marylebone Road, London, hourly, 1998--2005: the oxidant background
+(top, ppb) and the slope on NOx (bottom, percent of NOx) along the date
+(left) and the wind speed (right), with the component of the other modulator
+at its sample mean; the band is the range of the WAFC over 20 fits on 70\% of
+the weeks. Not shown: the first and the last 60 days, where the periodized
+basis joins the end of the series to its start, and the gaps in the data
+longer than the spacing of the finest wavelets, about 11 days; ticks on the
+axes mark the observed values.}
 \label{fig:marylebone}
 \end{figure}
