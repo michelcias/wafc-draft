@@ -64,11 +64,14 @@ report:
       wafc.cv1se: WAFC
       wafc.cv: WAFC (cv threshold)
       gam.reml: GAM (REML)
-    # The first and the last 60 days of the date are not drawn: the
-    # periodized basis joins the end of the series to its start, and the
-    # components bend there towards each other's level.
+    # The first and the last 60 days of the date are not drawn, nor the
+    # relative humidity below 6 points above its lowest grid value or above
+    # 4 points below its highest (about 15% and 95%): the periodized basis
+    # joins the two ends of a modulator, and the components bend there
+    # towards each other's level.
     trim:
       day: [60, 60]
+      rh: [6, 4]
     # Along these modulators, the curves and the band are broken over the
     # gaps in the data longer than the spacing of the finest level of the
     # WAFC fitted on the whole sample (2^-J of the range; about 10.7 days of
@@ -76,8 +79,9 @@ report:
     # penalty and the boundaries, not by the data.
     gaps: [day]
     # A rug of the observed values along these modulators, rounded to the
-    # resolution given (one day, 0.1 m/s), where the gaps show as breaks.
-    rug: {day: 1, ws: 0.1}
+    # resolution given (one day, 0.1 m/s, one point of humidity), where the
+    # gaps show as breaks.
+    rug: {day: 1, ws: 0.1, doy: 1, rh: 1}
   readings:
     marylebone.ukair:
       step:

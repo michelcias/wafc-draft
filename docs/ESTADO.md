@@ -4838,6 +4838,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-07 | Depois do piloto: a Figura S1 com o rug (D75(e)) e a umidade cortada a ~15% e ~95%, onde a base periodizada dobra (D67(e), a mesma nota da data); só o `structure-beijing.heat.csv` muda; `results/` atualizado |
 | 2026-10-07 | E5k catalogada: a `beijing.heat` e as frases de D75 e D76 na `k = 5`; o rug da Figura S1 depois do piloto |
 | 2026-10-07 | Pergunta 66 decidida (D76): sem sondar os splines da `beijing.heat`; as frases do §6.3 e da grade para a E5b |
 | 2026-10-07 | A aplicação terminou às 16h31 (168 unidades, 0 falhas; a `beijing.heat` vence o `gam.reml` em 20 de 20 partições, razão 0,92) e o piloto foi lançado pela cadeia. E6.2b fechada e integrada: a grade da aplicação fica (os splines no topo pioram com mais `k`; o WAFC perde em `J = 9`); as leituras sem os buracos (subida 9,0); `results/` com as duas bases; pergunta 66 |
