@@ -15,13 +15,14 @@ dados do UK-AIR e do ERA5 (o degrau de 2003, E6.1c; D59) como principal e
 (D56). **O próximo passo é o estudo de simulação (E4)**, com o desenho
 decidido (D60) e o compêndio nascendo na pasta `wafc-studies/` deste
 repositório; a **L12** (as fontes da aplicação) está no catálogo. O teto de páginas fica para o fim (D21).
-**Versão viva do manuscrito:** `k = 4` (`manuscript/ms_4.tex`,
-`supp_4.tex`, `references_4.bib`), aberta pela E5d em 2026-10-04 com a
-teoria em blocos (D44 a D51); as versões `k = 1` a `k = 3` ficam intactas.
-Os dois compilam limpos em **52 e 90 páginas** com a marcação, **45 e 89**
-sem o texto removido (depois da E5g; contadas numa cópia compilada em pasta
-nova, o que deu 45 e não 44 para a E5f); com as Seções 5 a 7 o corpo projeta ~54 páginas,
-contra o teto de 40 (D21, pergunta 47(e)).
+**Versão viva do manuscrito:** `k = 5` (`manuscript/ms_5.tex`,
+`supp_5.tex`, `references_5.bib`), aberta pela E5h em 2026-10-06 a pedido
+do autor, com as Seções 5 e 6 sem números (marcadores `[E4.3]`, `[E4.4]`,
+`[E6.2]`) e as S9 e S10 do supp; tabelas e figuras em `manuscript/tables/`
+e `manuscript/figures/` (D21). As versões `k = 1` a `k = 4` ficam
+intactas. Os dois compilam limpos em **72 e 97 páginas** com a marcação,
+**64 e 96** sem o texto removido, sem a Discussion e com as tabelas
+vazias, contra o teto de 40 (D21; pergunta 60(h)).
 **Cor da rodada corrente:** `colR1`, em uso desde `k = 2` (a rodada não foi
 aceita, então a marcação de E5c segue em `colR1` na `k = 3` e na `k = 4`).
 
@@ -2083,6 +2084,61 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
 - **Lição:** um teste exato num `J` fixo deixa de ser exato quando o `J` é
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
+
+### 2026-10-06: E5h fechada, as Seções 5 e 6 sem números na `k = 5`
+
+- **A `k = 5`** (decisão do autor): `ms_5.tex`, `supp_5.tex` e
+  `references_5.bib` (45 + 17 = **62 entradas**, copiadas do verificado sem
+  mudar campo; Opsomer fora, D65). No `ms_5`: **Seção 5 (Simulation)**,
+  5.1 Design, 5.2 Methods and tuning, 5.3 Measures, 5.4 Results; **Seção 6
+  (Application)**, 6.1 Data and model, 6.2 Fitting and evaluation, 6.3 The
+  step of 2003, 6.4 A second application; cada uma num grupo
+  `{\color{colR1} ...}`. O "Section~5" da introdução virou
+  `\ref{sec:simulation}`, o roteiro ganhou as Seções 5 e 6, os
+  Acknowledgements as atribuições das licenças, e os comentários `% E5b:`
+  foram resolvidos (o da Seção 7 continua). No `supp_5`: **S9** (o estudo:
+  o `uneven`, o modelo maior, as Tabelas S1 a S4) e **S10** (as
+  aplicações: Tabelas S5 e S6, a `beijing.heat` com a Figura S1).
+  `manuscript/tables/` (oito ambientes `table`) e `manuscript/figures/`
+  (três), cada um com legenda, rótulo e caixa `[E4.4]` ou `[E6.2]`.
+- **Conteúdo:** 5.1 a lei comum, as cinco células com a razão
+  sinal-ruído de cada uma (4 no `smooth` e no `uneven`, 3 no não homogêneo
+  e na `mixed`, `σ = 0.62` no nulo) e o `s'` com a razão, os três braços
+  (com a frase da E4.1b e a de D62), o modelo maior com `[E4.3]`, as
+  sementes independentes do piloto; 5.2 cada método nos seus termos, o
+  adaptive spline como substituto declarado do de Wang, Jiang & Liu (2024),
+  o KP com as diferenças da forma deles, as duas referências, a grade
+  efetiva `2:7` em `n = 250` e a de `n = 2000` em `[E4.3]`; **o VCBART não
+  aparece**; 5.3 as métricas; 6.1 o modelo de Clapp & Jenkin com a
+  qualificação de D64, Carslaw em Marylebone Road, as licenças, o corte de
+  60 dias; 6.2 as partições por semana, independentes das exploratórias
+  (D67(b)), cada método nos seus termos, nenhum modelando a dependência
+  (D56); 6.3 as leituras de D59 e D64 sem número; 6.4 a `beijing.heat`
+  remetendo à S10, com as marcas nominais (D66).
+- **Conferência:** os dois compilam com código 0, sem indefinida, o
+  `bibtex` sem aviso (recompilados no chat principal: 72 e 97 páginas).
+  **Sem o removido: `ms_5` 64, `supp_5` 96** (eram 45 e 89); a Seção 5 tem
+  ~10 páginas e a 6 ~5,5, contra as 10 somadas do `alvo-revista.md` §5.
+  A tabela dos marcadores e do número que cada um espera está no handoff,
+  resumida aqui: `[E4.3]` (o modelo maior, a grade de `n = 2000`), `[E4.4]`
+  (a Table 1, a Figure 1, a leitura, o processador, as Tabelas S1 a S4),
+  `[E6.2]` (o ciclo do fundo, a posição e o tamanho do degrau, as frações
+  em janeiro e julho de 2003, o pico, o vento sobre o degrau, a predição
+  das duas bases, a Figure 2, as Tabelas S5 e S6, a Figura S1), `[E7]` (o
+  endereço do compêndio).
+- **Lições:** (1) em espaço duplo, legenda de ~17 linhas mais a figura passa
+  da página, e um float `[t]` mais alto que `\topfraction` vai para depois
+  das referências sem erro: figura alta leva `[tp]`; a legenda da Figure 2
+  foi encurtada, e o resto já está no §6.3. (2) Redirecionar a saída do
+  `latexmk` para `<nome>.out` sobrescreve os marcadores do `hyperref` e
+  quebra a compilação seguinte com erros sem relação.
+- **Para o compêndio:** sem a linha do nível na Figura S1, a figura da
+  `beijing.heat` precisa de uma opção sem a linha `one`; a Figure 2 pede
+  altura menor que ~13 cm. **Para o código** (próxima tarefa que tocar o
+  `dgp.R`): o roxygen de `u_rho` diz que a cópula é permitida pela
+  hipótese de densidade; a densidade da cópula gaussiana é ilimitada em
+  dois cantos e vai a zero nos outros dois, fora da Assumption 3.
+- Pendências na pergunta 60.
 
 ### 2026-10-06: E6.2 com o código pronto, as rodadas à espera do aviso
 
@@ -4242,6 +4298,38 @@ Ordenadas pelo que bloqueia mais.
      decisão de apresentação da E5b; o supp mostra vento, temperatura e
      pressão, e a do nível sai ou vai com uma frase.
 
+60. **Pendências de E5h** (2026-10-06). Recomendação do chat principal:
+   - (a) **"The four rules are compared in the simulation study"** (§4.3):
+     o estudo de D60 só roda a validação cruzada do WAFC. **Recomendação:**
+     tirar a frase; citar números da regra da teoria pediria que o
+     compêndio os reproduzisse (D60(f)).
+   - (b) **O braço da cópula está fora da Assumption 3** (densidade
+     ilimitada em dois cantos), e o texto diz isso numa oração.
+     **Recomendação:** manter a frase e o braço (D60).
+   - (c) **O KP não é a forma de Klopp & Pensky** (pedaços dentro do nível,
+     pesos do `grpreg`), e o texto diz as duas diferenças.
+     **Recomendação:** manter.
+   - (d) **`Z_ℓ` na frase do braço** colide com a matriz de desenho `\bZ`.
+     **Recomendação:** trocar por `ζ_ℓ` na E5b.
+   - (e) **A UCI pede citar Zhang et al. (2017, *Proc. R. Soc. A* 473,
+     20170457)**, e nem ele nem o conjunto estão no verificado.
+     **Recomendação:** uma L14 curta com as duas entradas.
+   - (f) **"independent of the exploratory partitions on which this data
+     set was chosen"** (§6.2). **Recomendação:** manter, como a frase das
+     sementes do piloto no §5.1.
+   - (g) **A linha do nível fora da Figura S1, com uma frase (D67(f)), e a
+     legenda da Figure 2 encurtada.** **Recomendação:** manter as duas.
+   - (h) **O teto:** 64 páginas sem o removido contra 40, sem a Discussion.
+     **Recomendação:** decidir no fim (D21); o que vai ao supp sem
+     reescrever é a Table 1 e as Figures 1 e 2 (uma linha cada), e no
+     texto encurtam o parágrafo do `s'`, a descrição dos concorrentes e o
+     dos braços.
+   - (i) **Menores, na E5b:** "cross-validation" com hífen em todo o texto
+     (o §4.3 usa sem hífen); o resumo ganha a simulação e a aplicação;
+     "Hersbach et al., 2020, 2023" são grupos distintos que o
+     `chicago.bst` junta pelo primeiro nome, o que é o padrão do `natbib`
+     e fica.
+
 ---
 
 ## 5. Próximos passos
@@ -4304,6 +4392,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E5h fechada e integrada: a `k = 5` com as Seções 5 e 6 sem números e as S9 e S10 (72 e 97 páginas, 64 e 96 sem o removido; 62 entradas); pergunta 60 |
 | 2026-10-06 | E6.2 rodando desde 18h46 (a junção da `beijing.heat` e as 168 unidades, 3 processos; marylebone primeiro depois da junção). E4.3a (preparar o piloto, sem rodar) e E5h (as Seções 5 e 6 sem números, abrindo a `k = 5` a pedido do autor) catalogadas |
 | 2026-10-06 | Pergunta 59 decidida (D67): as rodadas da E6.2 antes da E4.3, que roda sozinha; partições independentes; a figura com `β_ℓ` remontado |
 | 2026-10-06 | E6.2 integrada com o código pronto (dados idênticos ao script 10, versionados; junção exata da partição 1 fora o WAFC da `beijing.heat`); as rodadas (~70 h de processador) esperam o aviso; o chat principal aplicou o que o handoff deixou nos arquivos comuns do compêndio; pergunta 59 |

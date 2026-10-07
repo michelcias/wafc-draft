@@ -75,7 +75,7 @@ Conferência de que tudo roda (da raiz de `wafc-draft`):
 Rscript -e 'library(WaveBased); w <- wbasis(sort(runif(64)), j0 = 0, J = 3); cat(dim(w), "\n")'   # 64 8
 cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd -   # compila
 cd manuscript/ss-template && latexmk -pdf SS-template.tex && latexmk -c && cd -   # compila (9 páginas)
-cd manuscript && latexmk -pdf ms_3.tex && latexmk -pdf supp_3.tex && latexmk -c && cd -   # versão viva k = 3; 34 e 30 páginas, sem indefinida
+cd manuscript && latexmk -pdf ms_5.tex && latexmk -pdf supp_5.tex && latexmk -c && cd -   # versão viva k = 5; 72 e 97 páginas, sem indefinida
 ```
 
 As conferências das derivações, que devem imprimir `OK` (tempos desta
@@ -157,11 +157,12 @@ Rscript run_all.R                                                               
   E3.2; a suíte padrão passa em menos de 60 s (1 202 testes) e a inteira
   com `WAFC_SLOW_TESTS=1` (1 427). A tabela de simulação mais recente é
   `wafc/cache/e25j/e25j-joined.rds` (37 350 linhas, não versionada).
-- **Manuscrito vivo em `k = 4`** (`ms_4.tex`, `supp_4.tex`,
-  `references_4.bib`): a teoria em blocos, 52 e 80 páginas com a marcação
-  (44 e 79 sem o removido); as Seções 5 a 7 são da E5b; o teto de 40 páginas
-  fica para o fim (D21).
-- **Bibliografia:** 88 entradas verificadas em
+- **Manuscrito vivo em `k = 5`** (`ms_5.tex`, `supp_5.tex`,
+  `references_5.bib`, com `tables/` e `figures/`): as Seções 5 e 6 sem
+  números, 72 e 97 páginas com a marcação (64 e 96 sem o removido); a
+  Seção 7 e os números são da E5b; o teto de 40 páginas fica para o fim
+  (D21).
+- **Bibliografia:** 99 entradas verificadas em
   `docs/referencias-verificadas.bib`; os PDFs em `refs/` (§4), com o padrão
   sobrenome e ano.
 - **Aplicação (D57, D59):** marylebone com dados do UK-AIR e do ERA5 (a
