@@ -2085,6 +2085,38 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-07: E4.3 fechada, o piloto do estudo
+
+- **A rodada** (lançada pela cadeia às 16h31, sozinha em 8 trabalhadores;
+  fim às 18h57, **2 h 26 min**): 884 unidades (`core2000` 245, `scale` 27,
+  `arms` 171, `coresmall` 441), **0 falhas**, pico de **1,9 GB** por
+  processo (em `n = 2000`), processador sobre tempo das unidades 1,00. As
+  células e as entradas herdadas iguais às da produção; **0 de 219
+  sementes em comum com as 6 300 da produção**; código `wafc/R` na árvore
+  `037a75f`. Saídas em `wafc/cache/e43/` (`read.log`, `read/`).
+- **Projeção da E4.4 em 8 trabalhadores:** núcleo 369 h de processador
+  (46 h de relógio; `n = 2000` sozinho 238 h), braços 90 h (11 h), escala
+  14 h (1,7 h); **total 472 h de processador, ~59 h de relógio** (a
+  estimativa de D60 era ~37 h para o núcleo). O que pesa em `n = 2000`: o
+  `gam.gcv` (700 a 880 s por unidade), o `bsgl` (390 a 920 s), o WAFC (125
+  a 185 s) e o `gam.reml` na `mixed` (290 s).
+- **A escala entra** (D60(c), D70): 1,7 h de relógio em 8 núcleos.
+- **O topo das grades** (informativo depois de D69): o WAFC e os métodos de
+  wavelets **nunca no topo** em `n = 2000` com `J` em `2:9` nas células com
+  componentes. **Os splines, sim:** o `gam.reml` e o `gam.gcv` escolhem o
+  topo (`k = 120` em `n = 2000`, `80` abaixo) em **todas** as réplicas do
+  não homogêneo em `n = 1000` e `2000` (o `gam.gcv` também em 250 e 500), o
+  `gam.reml` na `mixed` em `n = 1000` e `2000`, e nos braços dessas
+  células; o `k.check()` marca 5 de 5 em `n = 2000`. No `smooth` e no nulo,
+  nunca. Pela E2.5h, o custo do topo em `n = 1000` era de 1,0% a 1,4% no
+  erro (`k = 80` contra `k = 128`); em `n = 2000` não foi medido.
+- **Os tempos de `k = 120` estimados** (lei de potência por `k = 40` e
+  `80`) mostram o custo de ir além: o `gam.gcv` no não homogêneo em
+  `n = 2000` passa de ~300 s em `k = 80` a ~1 300 s em `k = 120`
+  (expoente ~3,7); o `gam.reml`, de ~6 s a ~12 s, e na `mixed` de ~70 s a
+  ~190 s.
+- Pendências na pergunta 67.
+
 ### 2026-10-07: E6.2 terminada; E6.2b fechada, a grade da aplicação fica
 
 - **A rodada da aplicação terminou** às 16h31 (a `beijing.heat` levou
@@ -4776,6 +4808,23 @@ Ordenadas pelo que bloqueia mais.
    - (c) **A frase da grade** (acima). **Recomendação:** no supp, junto da
      tabela de escolhas, com uma oração no §6.3, por causa do teto.
 
+67. **O piloto e a grade dos splines** (2026-10-07). Recomendação do chat
+   principal:
+   - (a) **Os splines no topo da grade** no não homogêneo e na `mixed` em
+     `n ≥ 1000`, mesmo com `k = 120` em `n = 2000`: a comparação nessas
+     células pode medir a grade do spline. Com erro independente, ao
+     contrário da aplicação, mais `k` deve ajudar o spline. **Recomendação:**
+     uma sondagem de ~1 a 2 h (máquina livre agora), com critério
+     declarado antes: o `gam.reml` com `k` até 240 em `n = 1000` e `2000`,
+     no não homogêneo e na `mixed`, 5 réplicas do mestre do piloto; se o
+     erro (`rmse_f`) cair mais de 1% em média, a grade do `gam.reml` cresce
+     nessas `n` (por `n`, não por célula, D41) antes da E4.4; senão fica,
+     com uma frase. O `gam.gcv` fica na grade atual pelo custo (expoente
+     ~3,7; a razão é a mesma de D41 para tirá-lo da `mixed`), com o topo
+     dito no texto.
+   - (b) **A produção (E4.4)**: ~59 h de relógio sozinha em 8
+     trabalhadores (~2,5 dias), com o aviso do autor, depois de (a).
+
 ---
 
 ## 5. Próximos passos
@@ -4838,6 +4887,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-07 | E4.3 fechada (o piloto, 2 h 26 min, 884 unidades, 0 falhas): a E4.4 projeta 472 h de processador, ~59 h em 8; a escala entra; os splines no topo da grade no não homogêneo e na `mixed` em `n ≥ 1000`; pergunta 67 |
 | 2026-10-07 | Depois do piloto: a Figura S1 com o rug (D75(e)) e a umidade cortada a ~15% e ~95%, onde a base periodizada dobra (D67(e), a mesma nota da data); só o `structure-beijing.heat.csv` muda; `results/` atualizado |
 | 2026-10-07 | E5k catalogada: a `beijing.heat` e as frases de D75 e D76 na `k = 5`; o rug da Figura S1 depois do piloto |
 | 2026-10-07 | Pergunta 66 decidida (D76): sem sondar os splines da `beijing.heat`; as frases do §6.3 e da grade para a E5b |

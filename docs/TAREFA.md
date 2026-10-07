@@ -104,6 +104,7 @@ que ler antes está aqui e no plano.
 | E5j marylebone na `k = 5` | **fechada** (2026-10-07): a figura com buracos interrompidos e rug; os números de marylebone no §6.3; D72; 73 e 97 páginas | `wafc-studies/R/application_report.R`, `results/`, `manuscript/` |
 | E5i as decisões de texto na `k = 5` | **fechada** (2026-10-06): D68(a), (d), (i), D69 e D71 aplicadas; 72 e 97 páginas; 64 entradas | `manuscript/ms_5.tex`, `supp_5.tex`, `references_5.bib` |
 | L14 a citação que a UCI pede | **fechada** (2026-10-06): 101 entradas; Zhang et al. (2017) e `Chen-UCI-2017`; a troca de estação do Dongsi em março de 2015 | `docs/referencias-verificadas.bib`, `docs/literatura.md`, `refs/` |
+| E4.3 o piloto do estudo | **fechada** (2026-10-07): 884 unidades, 0 falhas, 2 h 26 min; a E4.4 projeta ~59 h em 8 trabalhadores; a escala entra; os splines no topo (pergunta 67) | `wafc/cache/e43/` |
 | E4.3a preparar o piloto | **fechada** (2026-10-06): `wafc/scripts/11-pilot.yaml` e `11-pilot-read.R`, mestre `43000000`; fumaça de 38 unidades sem falha; a rodada (~3 h em 8, sozinha) espera o fim da E6.2 e o aviso | `wafc/scripts/11-*`, `wafc/cache/e43/` |
 | E5h as Seções 5 e 6 sem números | **fechada** (2026-10-06): a `k = 5` aberta; Seções 5 e 6, S9 e S10, com marcadores `[E4.3]`, `[E4.4]`, `[E6.2]`; 72 e 97 páginas (64 e 96 sem o removido) | `manuscript/ms_5.tex`, `supp_5.tex`, `references_5.bib`, `tables/`, `figures/` |
 | E6.2 a aplicação no compêndio | **rodada** (terminada em 2026-10-07 às 16h31, 168 unidades, 0 falhas; antes, código pronto em 2026-10-06): as duas bases em `wafc-studies/`, dados versionados idênticos ao script 10, junção exata da partição 1 fora o WAFC da `beijing.heat`; **as rodadas (~70 h de processador) esperam o aviso do autor** (pergunta 59) | `wafc-studies/R/application*.R`, `scripts/03_application.R`, `config/application.yaml`, `data-raw/`, `data/` |
@@ -111,7 +112,7 @@ que ler antes está aqui e no plano.
 | E4.1 o nascimento do compêndio | **fechada** (2026-10-06): a pasta `wafc-studies/` com `renv`, configuração por `n`, cache retomável e sementes independentes do piloto; fumaça sem falha; décima junção exata | `wafc-studies/`, `wafc/cache/e41/` (não versionado) |
 | E4.1b `X` dependente de `U` | **fechada** (2026-10-06): `x_u_rho` no `simulate_wafc()`, `h` linear e limitada, o padrão reproduz o `HEAD` em 900 de 900; 1 422 testes em 54 s | `wafc/R/dgp.R`, `wafc/tests/test-dgp.R` |
 | E3.3 empacotamento | **decidida** (2026-10-06, D61): `wafc/` fica até o fim e vai então ao `WaveBased` | `plano-projeto.md` E3.3 |
-| E4.3 (a rodada do piloto), E4.4, E5b, E7 | não abertas | |
+| E4.4, E5b, E7 | não abertas | |
 | L1 verificação bibliográfica | **fechada** (2026-09-18): 35 entradas verificadas | `referencias-verificadas.bib`, `literatura.md` |
 | L2 busca de novidade | **fechada** (2026-09-18): novidade confirmada, Klopp & Pensky (2015) é o vizinho | `busca-novidade.md`, `literatura.md` |
 
