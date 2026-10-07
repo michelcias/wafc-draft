@@ -2085,6 +2085,56 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-07: E6.2 terminada; E6.2b fechada, a grade da aplicação fica
+
+- **A rodada da aplicação terminou** às 16h31 (a `beijing.heat` levou
+  836 min com 3 trabalhadores, 82 unidades, 0 falhas; ~6 h antes da
+  previsão); a cadeia escreveu o relatório das duas bases e **lançou o
+  piloto às 16h31**. **A `beijing.heat`:** o WAFC vence o `gam.reml` em
+  **20 de 20 partições**, com erro 0,800 (`+cv1se`) e 0,797 (`+cv`) contra
+  0,871 (razão 0,920 e 0,916; diferença −0,070 com erro-padrão corrigido
+  0,023), o `gam.gcv` 0,892 e o linear 1,059; os mesmos sinais da E6.1b.
+  `results/` tem agora a figura e as quatro tabelas das duas bases, com a
+  origem e o SHA-256 no `results/README.md`.
+- **E6.2b, (b) e (c):** `drawn_grid()` no `application_report.R`; a figura,
+  as colunas `range_` e `jump_` e as leituras usam só os pontos desenhados.
+  Figura, predição e escolhas idênticas; em marylebone mudam `structure-`
+  (a amplitude de `nox × day` no WAFC de 57,2 para 15,8; o maior incremento
+  passa a 2003-08-17) e `readings-`: **subida do ajuste inteiro 9,0**
+  (era 8,9), pico **13,5** (era 13,4), fração em janeiro de 2003 de 0,17 a
+  0,36 nas partições; **a data de 90% passa a 12 de agosto de 2003 em 2
+  das 20 partições do WAFC** (a passagem caía no buraco de 2003). Na
+  `beijing.heat`, nada muda. O relatório final da cadeia já rodou com esse
+  código.
+- **E6.2b, (a), a sondagem** (`wafc/scripts/12-app-grid-probe.R`, 70 min
+  em 2 processos): em marylebone, com `k` em 80, 120, 160, **REML e GCV
+  escolhem 160, de novo o topo**, o `k.check()` segue marcando, e **o erro
+  de teste piora** 3,3% (REML) e 4,3% (GCV) nas partições 1 a 3; o WAFC
+  com `J = 9` perde 4,5% em validação cruzada no ajuste inteiro e escolhe
+  `J = 8` de novo. **Veredito pelo critério declarado: a grade da
+  aplicação fica.** A leitura do degrau dos splines fica dentro da faixa
+  das partições. Não sondados: os splines da `beijing.heat` e o WAFC das
+  partições de marylebone (memória: o WAFC com `J = 9` em ~61 000
+  observações ocupa ~10 GB, e a máquina chegou a swap de 4,4 GB ao lado da
+  cadeia). Rodar de novo com grades maiores custaria ~13 h nos splines e
+  70 a 100 h no WAFC.
+- **A frase da grade, rascunho para a E5b:**
+
+```tex
+Extending the grids does not change the comparison: with $k$ up to 160,
+REML and GCV again choose the largest dimension and the error on the
+held-out weeks rises by about 3 to 4 percent, and the cross-validated error
+of the WAFC at $J = 9$ is larger than at $J = 8$.
+```
+
+- **Lições:** (1) o `Rscript` lê o script aos poucos: editar um script em
+  execução estraga a parte que ele ainda não leu; (2) o WAFC com `J = 9`
+  em ~61 000 observações pede ~10 GB por processo, e a conta de memória é
+  por tipo de job, não por `free` no lançamento; (3) quando um prazo
+  depende de outra rodada, reler o log dela no lançamento (a previsão da
+  `beijing.heat` errou por ~6 h).
+- Pendências na pergunta 66.
+
 ### 2026-10-07: E5j fechada, marylebone na `k = 5`; a D74 aplicada
 
 - **Compêndio (D73):** `data_gaps()` e, no `application_figure()`, as
@@ -4712,6 +4762,19 @@ Ordenadas pelo que bloqueia mais.
    - (f) O comentário no topo do `app-marylebone.tex` ainda tem colchetes
      `[E6.2: ...]` do rascunho. **Recomendação:** limpar na E5b.
 
+66. **Pendências de E6.2b** (2026-10-07). Recomendação do chat principal:
+   - (a) **Os splines da `beijing.heat`** não foram sondados com `k` maior.
+     **Recomendação:** não rodar; em marylebone mais `k` piorou a predição,
+     e o seletor no topo sob erro dependente é o mesmo mecanismo.
+   - (b) **A frase da data de 90%** na `k = 5` ("by the end of July 2003
+     ... in every partition") não se sustenta nos pontos desenhados.
+     **Recomendação:** na E5b, "90% by July 2003 in the fit to the whole
+     sample and in 18 of the 20 partitions, and by the end of the gap in
+     the data of late July and early August 2003 in the other two", com
+     9,0 e 13,5 nos lugares de 8,9 e 13,4.
+   - (c) **A frase da grade** (acima). **Recomendação:** no supp, junto da
+     tabela de escolhas, com uma oração no §6.3, por causa do teto.
+
 ---
 
 ## 5. Próximos passos
@@ -4774,6 +4837,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-07 | A aplicação terminou às 16h31 (168 unidades, 0 falhas; a `beijing.heat` vence o `gam.reml` em 20 de 20 partições, razão 0,92) e o piloto foi lançado pela cadeia. E6.2b fechada e integrada: a grade da aplicação fica (os splines no topo pioram com mais `k`; o WAFC perde em `J = 9`); as leituras sem os buracos (subida 9,0); `results/` com as duas bases; pergunta 66 |
 | 2026-10-07 | Pergunta 65 decidida (D75); E6.2b catalogada (a sondagem do topo das grades da aplicação e as leituras sem os buracos) |
 | 2026-10-07 | E5j fechada e integrada: a figura de marylebone com os buracos interrompidos e o rug; os números de marylebone na `k = 5` (25 de 25 conferidos); D72 aplicada; D74 aplicada no `ms_5` e no `supp_5`; 73 e 97 páginas; pergunta 65 (os splines no topo da grade `k = 80` em todos os ajustes) |
 | 2026-10-07 | D74: o suporte de `ψ` é `[1 − L/2, L/2]` (Härdle et al. 1998, (7.8); o `WaveBased` confere), não `[0, L−1]`; corrigido nas derivações `02` e `07`; o `ms_5` e o `supp_5` depois da E5j |
