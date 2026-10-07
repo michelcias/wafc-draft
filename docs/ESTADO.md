@@ -4605,6 +4605,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E5i catalogada: as decisões de texto D68(a), (d), (i), D69 e D71 aplicadas na `k = 5`, sem abrir `k = 6` (decisão do autor) |
 | 2026-10-06 | Pergunta 62 decidida (D71): a troca de estação do Dongsi numa oração da S10 |
 | 2026-10-06 | L14 fechada e integrada (101 entradas): Zhang et al. (2017) e o conjunto da UCI; o Dongsi é um dos 12 sítios Guokong, e as covariáveis mudam de estação em 1 de março de 2015, sem degrau visível; pergunta 62 |
 | 2026-10-06 | Pergunta 61 fechada (D70): os 10 h da escala são de relógio em 8 núcleos; a escala do piloto nas réplicas 991 a 993 do mestre da produção |
