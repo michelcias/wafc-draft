@@ -69,6 +69,15 @@ report:
     # components bend there towards each other's level.
     trim:
       day: [60, 60]
+    # Along these modulators, the curves and the band are broken over the
+    # gaps in the data longer than the spacing of the finest level of the
+    # WAFC fitted on the whole sample (2^-J of the range; about 10.7 days of
+    # the date at J = 8): there the wavelets of that level are set by the
+    # penalty and the boundaries, not by the data.
+    gaps: [day]
+    # A rug of the observed values along these modulators, rounded to the
+    # resolution given (one day, 0.1 m/s), where the gaps show as breaks.
+    rug: {day: 1, ws: 0.1}
   readings:
     marylebone.ukair:
       step:

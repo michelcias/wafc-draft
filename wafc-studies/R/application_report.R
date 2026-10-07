@@ -31,7 +31,8 @@
 ##   partitions-<app>.csv  one row per method and split;
 ##   <app>.pdf, <app>.png  beta_l along each modulator: the fits on the
 ##                         whole sample and the range of the WAFC over the
-##                         partitions.
+##                         partitions, broken over the long gaps in the data
+##                         of a modulator, with a rug of the observed values.
 
 #' The units of one application, as a list of rows
 #'
@@ -76,6 +77,14 @@ partial_curve <- function(row, l, m) {
   if (is.null(row) || is.null(row[["components"]])) return(NULL)
   row[["cc"]][[l]] + row[["components"]][[l, m]] + row[["offset"]][l, m] +
     sum(row[["gmean"]][l, -m])
+}
+
+## The gaps in the observed values `u` of a modulator longer than `width`:
+## one row per gap, its first and last end.
+data_gaps <- function(u, width) {
+  s <- sort(unique(u))
+  i <- which(diff(s) > width)
+  cbind(start = s[i], end = s[i + 1L])
 }
 
 ## Where the largest increment of a curve on the grid is.
@@ -316,7 +325,15 @@ application_readings <- function(col, labels, data, spec) {
 #' (grey). The ends of the grid of a modulator listed in `figure$trim` are
 #' not drawn (in the units of the modulator, from the start and from the
 #' end): there the periodized basis joins the end of a non-periodic series
-#' to its start.
+#' to its start. Along a modulator listed in `figure$gaps`, the curves and
+#' the band are broken over the gaps in its observed values longer than the
+#' spacing of the finest level of the WAFC (the label `figure$band`) fitted
+#' on the whole sample, 2^-J of the range of the modulator, which is the
+#' period of the basis: the wavelets of that level centred in such a gap
+#' are set by the penalty and the boundaries, not by the data. Along a
+#' modulator listed in `figure$rug`, the panel carries a rug of its observed
+#' values, rounded to the resolution given there (in the units of the
+#' modulator).
 application_figure <- function(col, data, fig, path) {
   xn <- colnames(data[["x"]])
   un <- colnames(data[["u"]])
@@ -337,10 +354,23 @@ application_figure <- function(col, data, fig, path) {
         tr <- unlist(fig[["trim"]][[un[m]]])
         show <- if (is.null(tr)) rep(TRUE, length(v)) else
           v >= min(v) + tr[1L] & v <= max(v) - tr[2L]
+        um <- data[["u"]][, m]
+        hole <- rep(FALSE, length(v))
+        J <- pick_row(col, fig[["band"]], 0L)[["J"]]
+        if (un[m] %in% unlist(fig[["gaps"]]) && length(J) > 0L) {
+          gp <- data_gaps(um, diff(range(um)) / 2^J[min(m, length(J))])
+          for (i in seq_len(nrow(gp))) {
+            hole <- hole | (v > gp[i, "start"] & v < gp[i, "end"])
+          }
+        }
         band <- do.call(cbind, lapply(splits[splits > 0], function(s)
           partial_curve(pick_row(col, fig[["band"]], s), l, m)))
-        curves <- lapply(labs, function(lab)
-          partial_curve(pick_row(col, lab, 0L), l, m))
+        if (!is.null(band)) band[hole, ] <- NA
+        curves <- lapply(labs, function(lab) {
+          g <- partial_curve(pick_row(col, lab, 0L), l, m)
+          if (!is.null(g)) g[hole] <- NA
+          g
+        })
         yl <- range(c(unlist(lapply(curves, function(g) g[show])),
                       if (!is.null(band)) band[show, ]), na.rm = TRUE)
         o <- def[["origin"]][[un[m]]]
@@ -352,10 +382,16 @@ application_figure <- function(col, data, fig, path) {
                                       tolower(sub(" \\(.*\\)$", "",
                                                   def[["ulab"]][[un[m]]]))))
         if (!is.null(band)) {
-          graphics::polygon(c(xv[show], rev(xv[show])),
-                            c(apply(band[show, , drop = FALSE], 1L, min),
-                              rev(apply(band[show, , drop = FALSE], 1L, max))),
-                            col = "grey85", border = NA)
+          ## one polygon per run of the grid drawn outside the gaps
+          run <- rle(show & !hole)
+          end <- cumsum(run[["lengths"]])
+          for (k in which(run[["values"]])) {
+            ii <- (end[k] - run[["lengths"]][k] + 1L):end[k]
+            graphics::polygon(c(xv[ii], rev(xv[ii])),
+                              c(apply(band[ii, , drop = FALSE], 1L, min),
+                                rev(apply(band[ii, , drop = FALSE], 1L, max))),
+                              col = "grey85", border = NA)
+          }
         }
         for (i in seq_along(labs)) {
           if (!is.null(curves[[i]])) {
@@ -367,6 +403,13 @@ application_figure <- function(col, data, fig, path) {
         if (!is.null(mk)) {
           graphics::abline(v = if (is.null(o)) mk else o + mk, lty = 3,
                            col = "grey40")
+        }
+        res <- fig[["rug"]][[un[m]]]
+        if (!is.null(res)) {
+          ru <- unique(round(um / res) * res)
+          ru <- ru[ru >= min(v[show]) & ru <= max(v[show])]
+          graphics::rug(if (is.null(o)) ru else o + ru, ticksize = 0.025,
+                        lwd = 0.4, col = "grey30")
         }
       }
     }
