@@ -9,7 +9,13 @@ mesmo índice `k`; a versão `{k+1}` copia os três e atualiza
 A versão `1` não leva marcação de alteração; o preâmbulo já define `colR1`
 e carrega `ulem` para quando `k = 2` existir.
 
-**Versão viva: `k = 4`**, aberta em 2026-10-04 pela E5d como cópia de
+**Versão viva: `k = 5`**, aberta em 2026-10-06 pela E5h como cópia de
+`k = 4`, com as Seções 5 (Simulation) e 6 (Application) sem números, as S9
+e S10 do supp, e as tabelas e figuras em `\input{}` próprios nas pastas
+`tables/` e `figures/` (D21); 72 e 97 páginas com a marcação (64 e 96 sem
+o texto removido), `.bib` com 62 entradas.
+
+A `k = 4` foi aberta em 2026-10-04 pela E5d como cópia de
 `k = 3` (`ms_4.tex`, `supp_4.tex`, `references_4.bib`), com o estimador e a
 teoria em blocos de D44 a D51 marcados em `colR1`, e os enunciados, provas e
 displays removidos inteiros em blocos cinza sem tachado (D51); a teoria do
@@ -38,5 +44,5 @@ geradas dos arquivos de origem é item do checklist de submissão
 ## Compilar
 
 ```bash
-cd manuscript && latexmk -pdf ms_4.tex && latexmk -pdf supp_4.tex && latexmk -c
+cd manuscript && latexmk -pdf ms_5.tex && latexmk -pdf supp_5.tex && latexmk -c
 ```

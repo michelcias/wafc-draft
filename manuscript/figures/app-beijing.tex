@@ -1,0 +1,27 @@
+% figures/app-beijing.tex -- Figure S1 do supp_5.tex, Secao S10 (E5h, 2026-10-06;
+% D21, D57). A figura e a beijing.heat.pdf do compendio (R/application_report.R).
+% Duas escolhas de apresentacao da E5h, a confirmar na E5b: (i) a linha do nivel
+% (o intercepto a vento zero, 0 C e 1000 hPa) nao e desenhada (D67(f)), o que pede
+% tirar a linha `one` da figura no compendio; (ii) a borda da umidade se decide
+% depois da rodada (D67(e)). As marcas da temporada sao as nominais (D66).
+\begin{figure}[tp]
+\centering
+\fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering\small [E6.2: the figure
+\texttt{beijing.heat.pdf} of the compendium.]}}
+\caption{Beijing, Dongsi, hourly, March 2013 to February 2017: the logarithm
+of PM2.5 regressed on the wind speed, the temperature and the pressure, with
+coefficients modulated by the day of the year and the relative humidity. Each
+panel shows $\widehat\beta_\ell$ along one modulating covariate, with the
+component of the other at its sample mean: the coefficient of the wind speed
+(per m/s), of the temperature (per $^{\circ}$C) and of the pressure (per hPa),
+by row, along the day of the year (left) and the relative humidity (right).
+Solid: the WAFC fitted to the whole sample; dashed: the WAFC with the
+threshold of the smallest cross-validated error; dot-dashed: \texttt{mgcv}
+with REML; grey: the range of the WAFC over 20 fits on 70\% of the weeks.
+Vertical lines: the nominal start and end of the heating season, 15 November
+and 15 March. The level, the logarithm of PM2.5 at zero wind speed,
+$0\,^{\circ}$C and 1000 hPa, moves along the year together with the
+coefficient of the temperature and is not shown. [E6.2: the finding, and the
+range of the relative humidity shown.]}
+\label{fig:beijing}
+\end{figure}

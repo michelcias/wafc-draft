@@ -1,0 +1,20 @@
+% tables/sim-main.tex -- Table 1 do ms_5.tex (E5h, 2026-10-06; D21: cada tabela
+% num \input proprio, para que mandar ao supp seja mover uma linha).
+% So o lugar: o conteudo vem da E4.4 (results/tables/, do summary.csv e do
+% paired.csv do compendio wafc-studies/). Proposta de layout, a decidir na E5b:
+% linhas = as nove linhas do corpo, com os rotulos de config/study.yaml (WAFC,
+% WAFC (cv), GAM (REML), GAM (GCV), B-spline group lasso, Adaptive spline,
+% Block lasso (KP), Oracle support, Constant coefficients); colunas = as cinco
+% celulas do nucleo; tres paineis empilhados em n = 1000, (a) erro de predicao,
+% (b) ISE das componentes, media (erro-padrao), (c) P(S-hat = S). O GAM (GCV)
+% fica sem numero na mixed (nao roda ali). Sem paisagem (instrucoes da SS).
+\begin{table}[t]
+\caption{Simulation at $n = 1000$, 100 replicates per cell. [E4.4: root mean
+squared prediction error and integrated squared error of the components, mean
+and standard error, by method and cell, and the frequency with which the
+blocks kept are exactly the active ones.]}
+\label{tab:sim-main}
+\centering
+\fbox{\parbox{0.9\textwidth}{\centering\small [E4.4: the table, from
+\texttt{results/tables/}.]}}
+\end{table}
