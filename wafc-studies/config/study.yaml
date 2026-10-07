@@ -67,7 +67,12 @@ tuning:
     basis: {family: Daublets, filter_size: 8, prec_wavelet: 30}
   "500": *tuning
   "1000": *tuning
-  "2000": *tuning
+  # The grids grow with the sample size: at n = 2000, one more resolution
+  # level and one more basis dimension, fixed before the study is run.
+  "2000":
+    <<: *tuning
+    J: [2, 3, 4, 5, 6, 7, 8, 9]
+    k: [5, 10, 20, 40, 80, 120]
 
 # The fitted components kept on the grid, for the figures, by row label
 # and sample size. The integrated squared error of every component is kept
