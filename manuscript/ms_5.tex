@@ -1619,13 +1619,13 @@ offer the interval basis as an option.
 \subsection{Choosing the resolution and the penalty}
 \label{sec:tuning}
 
-The pair $(J,\pen)$ is chosen jointly. The default is $K$ fold cross
-validation on a grid of resolutions, with the folds drawn once and reused for
+The pair $(J,\pen)$ is chosen jointly. The default is $K$ fold \textcolor{gray}{\sout{cross
+validation}}\textcolor{colR1}{cross-validation} on a grid of resolutions, with the folds drawn once and reused for
 every $J$, one design and one penalty path per resolution, and the usual two
-readings of the curve: the minimizer of the cross validated error and the
+readings of the curve: the minimizer of the \textcolor{gray}{\sout{cross validated}}\textcolor{colR1}{cross-validated} error and the
 largest penalty within one standard error of it\textcolor{colR1}{; the threshold
 of Section~\ref{sec:threshold} is applied to the fit at the minimizer. In the
-software the whole procedure, from the cross validation over $(J,\pen)$ to the
+software the whole procedure, from the cross-validation over $(J,\pen)$ to the
 threshold, is the single call \texttt{cv.wafc(x, u, y)}}. Two cheaper rules are also
 available \textcolor{colR1}{for the lasso option}, the Bayesian information criterion and its extended version, with
 degrees of freedom equal to the number of nonzero coefficients plus the $p$
@@ -1650,11 +1650,11 @@ or below according to $\seff$}.
 % custa 2% e 18%, lambda_n sozinho 30% e 54%; J_n dois niveis abaixo com
 % s' = 3/2, dois acima com s' = 1/4 em E1.6).
 Its interest is as a reference for
-what the cross validated choice ought to approach, and the difference between
-the two is a finite sample quantity worth measuring. The four rules are
-compared in the simulation study.
-% E5h: o estudo da Secao 5 (D60) roda so a validacao cruzada do WAFC; a frase
-% acima e o comentario E5b logo acima ficam para decisao (docs/handoff-E5h.md).
+what the \textcolor{gray}{\sout{cross validated}}\textcolor{colR1}{cross-validated} choice ought to approach, and the difference between
+the two is a finite sample quantity worth measuring.\textcolor{gray}{\sout{ The four rules are
+compared in the simulation study.}}
+% E5i (D68(a)): a frase das quatro regras saiu, porque o estudo da Secao 5 (D60)
+% roda so a validacao cruzada do WAFC; o comentario E5b logo acima segue com a E5b.
 
 A remark on the \textcolor{gray}{\sout{structural variant}}\textcolor{colR1}{other penalties}. \textcolor{colR1}{The lasso option, with
 $\norm{\btheta}_1$ in place of $\nGw{\btheta}$, is fit by \texttt{glmnet}; its
@@ -1684,9 +1684,9 @@ $(J,\pen)$ already selected: each fold is refitted at that pair, with no new
 search, thresholded at every candidate $t$ and scored on the observations it
 left out. A thresholded fit is constant in $t$ between two consecutive block
 norms, so the candidates are exhaustive and not a grid. The default is the
-largest $t$ whose cross validated error is within one standard error, between
+largest $t$ whose cross-validated error is within one standard error, between
 folds, of the smallest, the one standard error rule of the penalty carried to
-the threshold; the minimizer of the cross validated error is available as an
+the threshold; the minimizer of the cross-validated error is available as an
 option aimed at prediction. The fit is not refitted after the threshold: the
 levels and the blocks kept are those of the fit, which is the estimator of
 Corollaries~\ref{cor:threshold} and~\ref{cor:thrisk}. Neither rule has a
@@ -1701,7 +1701,8 @@ costs.
 % (config/study.yaml, core.yaml, arms.yaml, scale.yaml; R/data.R, R/methods.R,
 % R/metrics.R; o gerador e wafc/R/dgp.R); os metodos e as grades sao os de D34,
 % D41, D44 a D46, D56 e D63. O VCBART roda no compendio e nao entra no texto
-% (D60(d)). [E4.3] espera o piloto (a grade de n = 2000 e o modelo maior);
+% (D60(d)). [E4.3] espera o piloto (o modelo maior; a grade de n = 2000 e a de D69,
+% aplicada na E5i);
 % [E4.4], a producao. A frase do terceiro braco e a da E4.1b (ESTADO.md), com o
 % pareamento escrito para p - 1 <= q, que cobre as duas celulas; a das
 % covariaveis gaussianas e a de D62.
@@ -1769,8 +1770,8 @@ distinct modulators nonzero; the density of this copula is unbounded at two
 corners of the unit square and vanishes at the other two, so that this arm
 lies outside Assumption~\ref{ass:U}. In the third arm the linear covariates
 depend on the modulating ones: each non-constant covariate is drawn as
-$X_\cv = (1-\rho^2)^{1/2} Z_\cv + \rho\, h(U_{\cv-1})$ with $\rho = 0.5$,
-where $Z_\cv$ is standard normal and $h(u) = \sqrt{12}\,(u - 1/2)$ is the
+$X_\cv = (1-\rho^2)^{1/2} \zeta_\cv + \rho\, h(U_{\cv-1})$ with $\rho = 0.5$,
+where $\zeta_\cv$ is standard normal and $h(u) = \sqrt{12}\,(u - 1/2)$ is the
 standard score of a uniform modulating covariate, so that $X_2$ is paired with
 $U_1$, the modulating covariate of its own coefficient. Each $X_\cv$ keeps
 unit variance and has correlation $\rho$ with its pair, and given $\bU$ the
@@ -1782,7 +1783,7 @@ bound $B_X$ of Assumption~\ref{ass:X}; what the third arm exercises is the
 eigenvalue condition, the part of that assumption that allows the covariates
 to depend on the modulators. A replicate of an arm is drawn from the seeds of
 the same replicate of its core cell, and the first and the third arms share
-with it the modulators, the draws $Z_\cv$ and the standardized errors.
+with it the modulators, the draws $\zeta_\cv$ and the standardized errors.
 
 A larger model [E4.3: run if the pilot measures its cost below about ten hours
 of processor time] has $(p,q) = (6,4)$ at $n = 1000$, with 24 blocks of which
@@ -1868,10 +1869,10 @@ $n = 250$ the 255 wavelets of $J = 8$ exceed the 249 distinct points that a
 modulator has on the circle after rescaling, where its two extremes meet at
 $0 \equiv 1$, so the level is built as $J = 7$ and the effective grid there
 is $\{2,\dots,7\}$, and the dimension 256 of the B-splines is dropped. At
-$n = 2000$ a grid is extended, to $J \le 9$ or to $k = 120$, for a method that
-chose the top of its grid in more than a fifth of the replicates of a pilot
-run drawn independently of the study [E4.3: the grids extended at $n = 2000$,
-or none].
+$n = 2000$, and only there, the grids are extended before the study, to
+$J \in \{2,\dots,9\}$ for the methods on the wavelet design and for the
+B-splines, and with $k = 120$ added to the grid of \texttt{mgcv}, because the
+resolution that the theory prescribes grows with $n$, as in \eqref{eq:Jn}.
 
 \subsection{Measures}
 \label{sec:sim-measures}
@@ -2031,7 +2032,8 @@ the threshold and $k$.
 
 Section~S10 of the Supplementary Material applies the method to the hourly
 PM2.5 at the site Dongsi in Beijing, from March 2013 to February 2017, in the
-Beijing Multi-Site Air Quality data of the UCI Machine Learning Repository:
+Beijing Multi-Site Air Quality data of the UCI Machine Learning Repository
+\citep{Chen-UCI-2017, Zhang-Guo-Dong-He-Xu-Chen-2017}:
 the logarithm of PM2.5 is regressed on the wind speed, the temperature and
 the pressure, with coefficients modulated by the day of the year, a periodic
 modulator, and the relative humidity, over 34,287 hours. The question there

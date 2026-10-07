@@ -3558,10 +3558,16 @@ the penalty, the threshold and $k$. [E6.2: the reading.]
 \subsection*{Beijing}
 
 The data are the hourly observations at the site Dongsi of the Beijing
-Multi-Site Air Quality data of the UCI Machine Learning Repository, from
-1 March 2013 to 28 February 2017, under the attribution given in the
-Acknowledgements of the paper; the 34,287 hours with PM2.5, temperature,
-pressure, dew point and wind speed observed, a relative humidity in $(0,100]$
+Multi-Site Air Quality data of the UCI Machine Learning Repository
+\citep{Chen-UCI-2017}, from 1 March 2013 to 28 February 2017, under the
+attribution given in the Acknowledgements of the paper. Dongsi is one of
+the 12 nationally controlled sites of the data set, which are among the 36
+sites whose PM2.5 series \citet{Zhang-Guo-Dong-He-Xu-Chen-2017} analyze;
+the meteorological variables of a site are those of the nearest station of
+the China Meteorological Administration, which for Dongsi changes in
+February 2015 \citep[Table~S1 of their Supplementary
+Material]{Zhang-Guo-Dong-He-Xu-Chen-2017}. The 34,287 hours with PM2.5,
+temperature, pressure, dew point and wind speed observed, a relative humidity in $(0,100]$
 and a positive PM2.5 are used. The response is the logarithm of PM2.5, the
 linear covariates are the constant, the wind speed (m/s), the temperature
 ($^{\circ}$C) and the pressure minus 1000 hPa, and the modulators are the day
