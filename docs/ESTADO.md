@@ -2407,6 +2407,15 @@ periodized basis joins the end of the series to its start.
   relançada **só com marylebone, 3 trabalhadores** (~5 h); a
   `beijing.heat` vem depois, com 3, retomando do cache (~19 h). Logs em
   `wafc/cache/e62/run-1.log` e `run-mary.log`.
+- **A cadeia** (`wafc/cache/e62/chain.sh`, não versionado, lançada às
+  22h29 com o aviso do autor para o piloto rodar "tão logo seja
+  possível"): espera o fim de marylebone (por PID), roda a `beijing.heat`
+  com 3 trabalhadores (`run-beijing.log`), escreve o relatório das duas
+  bases (`report.log`), espera não haver nenhum processo `R` e lança o
+  piloto da E4.3 (`wafc/cache/e43/run-pilot.sh`, 8 trabalhadores,
+  sozinho). Marcas em `wafc/cache/e62/chain.log`; PID em `chain.pid`.
+  Previsão: marylebone até ~3h de 2026-10-07, a `beijing.heat` até ~22h a
+  meia-noite, o piloto ~3 h depois.
 - Pendências na pergunta 59.
 
 ### 2026-10-06: E4.1c fechada, o oráculo em blocos e o `structure`
@@ -4605,6 +4614,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | Cadeia lançada às 22h29 com o aviso do autor: marylebone, depois a `beijing.heat` com 3 trabalhadores, o relatório das duas, e o piloto da E4.3 sozinho na máquina |
 | 2026-10-06 | E5i catalogada: as decisões de texto D68(a), (d), (i), D69 e D71 aplicadas na `k = 5`, sem abrir `k = 6` (decisão do autor) |
 | 2026-10-06 | Pergunta 62 decidida (D71): a troca de estação do Dongsi numa oração da S10 |
 | 2026-10-06 | L14 fechada e integrada (101 entradas): Zhang et al. (2017) e o conjunto da UCI; o Dongsi é um dos 12 sítios Guokong, e as covariáveis mudam de estação em 1 de março de 2015, sem degrau visível; pergunta 62 |
