@@ -2085,6 +2085,136 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-06: E4.3a fechada, o piloto pronto sem rodar
+
+- **Arquivos:** `wafc/scripts/11-pilot.yaml` (o desenho, lido pelo
+  `01_simulate.R` do compêndio por `--config`; semente mestra **`43000000`**,
+  só o `master` sobrescrito) e `wafc/scripts/11-pilot-read.R` (a leitura);
+  `wafc/cache/e43/run-pilot.sh` (não versionado; texto abaixo) roda os
+  passos sob `/usr/bin/time -v` e depois a leitura. Nada mudou no
+  compêndio.
+- **O desenho:** `core2000` (as cinco células em `n = 2000`, réplicas 1 a
+  10, 490 unidades: tempos e topo das grades); `scale` (`config/scale.yaml`
+  sem mudança, `n = 1000`, réplicas 991 a 993, 27 unidades: o custo);
+  `arms` (os seis braços em `n = 1000`, réplicas 1 a 3, 171 unidades);
+  `coresmall` (as cinco em 250, 500 e 1000, réplicas 1 a 3, 441 unidades:
+  a projeção sem extrapolar em `n`). **A escala usa o mestre da produção
+  nas réplicas 991 a 993**, porque a grade é por `n` e não por célula (no
+  arquivo dos braços ela cortaria os braços a `2:7`), e a codificação
+  injetiva deixa esses dados fora de qualquer produção com menos de 991
+  réplicas.
+- **A leitura:** (0) células e entradas herdadas iguais às da produção,
+  as sementes gravadas em cada unidade contra as 6 300 da produção, o
+  commit do código; (i) mediana por método e célula, e a projeção da E4.4
+  com as unidades e a ordem de despacho do compêndio, cada uma ao preço
+  médio do seu `(célula, n, método)`, com o relógio por escalonamento
+  guloso em 8; (ii) a escala em horas de processador e de relógio; (iii) a
+  fração no topo por método e célula com intervalo de Wilson, a regra pela
+  pior célula com componentes e a entrada `"2000"` pronta
+  (`read/rule-2000.yaml`), e a projeção com a grade subida (o `k = 120`
+  extrapolado; o `J` em `2:9` ao dobro, conjectura); (iv) o pico de RSS e
+  processador sobre tempo; a saúde dos ajustes em `n = 2000`.
+- **Conferência:** `--list` dos quatro passos sem erro; fumaça (1
+  trabalhador, com a E6.2 ao lado) de 38 unidades, 0 falhas, 3 min 56 s,
+  0,76 GB; retomada conferida; **0 de 15 sementes em comum com a
+  produção**, e a checagem acusa 30 de 30 sobre a fumaça da E4.1, feita
+  com o mestre da produção.
+- **Custo estimado:** ~19 a 23 h de processador, **~2,5 a 3,5 h de
+  relógio em 8 trabalhadores, sozinha na máquina** (D67). O pico em
+  `n = 2000` não foi medido (espera-se 2 a 3 GB por processo).
+- **Lições:** (1) checagem de sementes que recalcula pela configuração não
+  vê unidade sorteada com outra; a certa lê as sementes gravadas na
+  unidade. (2) Passo retomado sobrescrevia o registro do `time -v`; os
+  arquivos levam carimbo de hora e a leitura os soma.
+- **A rodada** (espera o fim da E6.2 e o aviso; o script recusa começar com
+  outro `R` rodando, `FORCE=1` passa): `setsid nohup bash
+  wafc/cache/e43/run-pilot.sh > wafc/cache/e43/run-pilot.out 2>&1 <
+  /dev/null &`, da raiz; o script grava o PID em `wafc/cache/e43/run.pid` e
+  "pilot end" em `run.log`; as saídas em `read.log` e `read/`.
+- O texto do `run-pilot.sh`:
+
+```bash
+#!/bin/bash
+## E4.3 pilot round (scratch, not versioned; its text is in
+## docs/handoff-E4.3a.md). The design is wafc/scripts/11-pilot.yaml, whose
+## header says what each step measures; the reading is
+## wafc/scripts/11-pilot-read.R.
+##
+##   bash wafc/cache/e43/run-pilot.sh          the round: 8 workers, alone
+##                                             on the machine
+##   bash wafc/cache/e43/run-pilot.sh smoke    the smoke: n = 250 (the scale
+##                                             at its n = 1000 with two cheap
+##                                             methods), 1 worker
+##
+## Each step runs scripts/01_simulate.R of the compendium under
+## /usr/bin/time -v, into <root>/steps/<step>.<time stamp>.{log,time}; the
+## units are cached, so a step that stops is resumed by running the script
+## again, and the resumed run adds its own pair of files next to the first
+## (the reading sums them by step). The script writes its own PID to
+## <root>/run.pid and the line "pilot end" to <root>/run.log when it ends.
+## In the round it refuses to start while another R process runs (the time
+## is what it measures); FORCE=1 overrides.
+
+set -u
+MODE=${1:-pilot}
+REPO=/home/montoril/Documentos/repo/wafc-draft
+cd "$REPO/wafc-studies" || exit 1
+P=../wafc/scripts/11-pilot.yaml
+CORE=smooth,inhomogeneous,mixed,null,uneven
+ARMS=inhomogeneous.snr1,mixed.snr1,inhomogeneous.urho,mixed.urho,inhomogeneous.xu,mixed.xu
+
+case "$MODE" in
+  pilot) R=../wafc/cache/e43; W=8 ;;
+  smoke) R=../wafc/cache/e43/smoke; W=1 ;;
+  *) echo "mode must be 'pilot' or 'smoke'" >&2; exit 2 ;;
+esac
+mkdir -p "$R/steps"
+L=$R/run.log
+echo $$ > "$R/run.pid"
+
+if [ "$MODE" = pilot ] && [ "${FORCE:-0}" != 1 ]; then
+  OTHER=$(pgrep -x R | tr '\n' ' ')
+  if [ -n "$OTHER" ]; then
+    echo "other R processes are running (PIDs $OTHER); the pilot measures time and runs alone. FORCE=1 overrides." | tee -a "$L" >&2
+    exit 3
+  fi
+fi
+if [ -n "$(git -C "$REPO" status --porcelain -- wafc/R)" ]; then
+  echo "warning: wafc/R has uncommitted changes; the units will record it" | tee -a "$L"
+fi
+
+## step <name> <arguments of 01_simulate.R>
+step() {
+  local name=$1; shift
+  local f=$R/steps/$name.$(date +%Y%m%dT%H%M%S)
+  echo "$name start $(date -Iseconds)" >> "$L"
+  /usr/bin/time -v -o "$f.time" \
+    Rscript scripts/01_simulate.R "$@" --workers=$W > "$f.log" 2>&1
+  echo "$name end $(date -Iseconds) exit=$?" >> "$L"
+}
+
+echo "pilot start $(date -Iseconds) mode=$MODE workers=$W" >> "$L"
+if [ "$MODE" = pilot ]; then
+  step core2000  --config=$P --out=$R/pilot --sizes=2000 --cells=$CORE --reps=10
+  step scale     --config=config/scale.yaml --out=$R/scale --reps=991:993
+  step arms      --config=$P --out=$R/pilot --sizes=1000 --cells=$ARMS --reps=3
+  step coresmall --config=$P --out=$R/pilot --sizes=250,500,1000 --cells=$CORE --reps=3
+  READ="--dir=wafc/cache/e43"
+else
+  M=wafc,lasso,gam.reml,bsgl,aspline,klopp,oracle,linear,vcbart
+  step core  --config=$P --out=$R/pilot --sizes=250 --cells=smooth,null,mixed --reps=1 --methods=$M
+  step arms  --config=$P --out=$R/pilot --sizes=250 --cells=inhomogeneous.xu --reps=1 --methods=$M
+  step scale --config=config/scale.yaml --out=$R/scale --reps=991:991 --methods=linear,aspline
+  READ="--dir=wafc/cache/e43/smoke --top-n=250 --arms-n=250"
+fi
+cd "$REPO" || exit 1
+Rscript wafc/scripts/11-pilot-read.R $READ > "${R#../}/read.log" 2>&1
+echo "read end $(date -Iseconds) exit=$?" >> "${R#../}/run.log"
+echo "pilot end $(date -Iseconds)" >> "${R#../}/run.log"
+```
+
+- Pendências na pergunta 61.
+
 ### 2026-10-06: E5h fechada, as Seções 5 e 6 sem números na `k = 5`
 
 - **A `k = 5`** (decisão do autor): `ms_5.tex`, `supp_5.tex` e
@@ -4331,6 +4461,25 @@ Ordenadas pelo que bloqueia mais.
      `chicago.bst` junta pelo primeiro nome, o que é o padrão do `natbib`
      e fica.
 
+61. **Pendências de E4.3a** (2026-10-06). Recomendação do chat principal:
+   - (a) **O gatilho de 20%** é lido na **pior célula com componentes**,
+     não na fração conjunta: se a grade aperta numa célula, o estimador ali
+     está limitado por ela; a leitura mostra as duas. **Recomendação:**
+     aceitar.
+   - (b) **Os ~10 h da escala (D60(c)) são de relógio em 8 núcleos**, como
+     os "~3 h" de cada braço; a estimativa é ~25 a 30 h de processador,
+     ~3,5 h de relógio. **Recomendação:** aceitar; a escala entra.
+   - (c) **10 réplicas em `n = 2000`**, estendidas a 20 só no método que
+     ficar a menos de 0,1 do gatilho (as 10 primeiras vêm do cache).
+     **Recomendação:** aceitar.
+   - (d) **O custo da grade subida é estimativa** (o fator 2 do `J` é
+     conjectura; no `bsgl` pode chegar a 4); se a regra disparar, as
+     primeiras unidades da produção em `n = 2000` dão o número.
+     **Recomendação:** aceitar, sem medição à parte.
+   - (e) **A escala no mestre da produção, réplicas 991 a 993.**
+     **Recomendação:** aceitar; a decisão dela é de custo, e os dados ficam
+     fora da produção.
+
 ---
 
 ## 5. Próximos passos
@@ -4393,6 +4542,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-06 | E4.3a fechada e integrada: o piloto pronto (1 129 unidades, ~19 a 23 h de processador, ~3 h em 8), fumaça sem falha, sementes fora da produção; a rodada espera o fim da E6.2 e o aviso; pergunta 61 |
 | 2026-10-06 | Pergunta 60 decidida (D68); L14 (Zhang et al. 2017 e o conjunto da UCI) catalogada |
 | 2026-10-06 | E5h fechada e integrada: a `k = 5` com as Seções 5 e 6 sem números e as S9 e S10 (72 e 97 páginas, 64 e 96 sem o removido; 62 entradas); pergunta 60 |
 | 2026-10-06 | E6.2 rodando desde 18h46 (a junção da `beijing.heat` e as 168 unidades, 3 processos; marylebone primeiro depois da junção). E4.3a (preparar o piloto, sem rodar) e E5h (as Seções 5 e 6 sem números, abrindo a `k = 5` a pedido do autor) catalogadas |

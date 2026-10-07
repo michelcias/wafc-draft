@@ -57,6 +57,7 @@ decisão em E3.3.
 | `sparsegl` | exigido por `wafc(penalty = "sglasso")`; o resto de `wafc/` roda sem ele, e os testes pulam os blocos de grupo se faltar | `install.packages("sparsegl")` |
 | `quadprog` | constante de compatibilidade exata em `check/03-desenho-produtos.R` (E1.4) | `install.packages("quadprog")` |
 | `VCBART` | exigido por `wafc_competitor("vcbart")` (E2.4); o resto de `wafc/` roda sem ele e os testes pulam o bloco se faltar. Instalado aqui: 1.2.5 | `install.packages("VCBART")` |
+| `/usr/bin/time` (pacote `time` do Ubuntu) | a rodada do piloto (E4.3) mede o pico de memória e o processador de cada passo com `time -v` | `sudo apt install time` |
 | `yaml` | só o compêndio (`wafc-studies/`), para ler `config/*.yaml`; 2.3.12 no `renv.lock` | `renv::restore()` dentro de `wafc-studies/` instala tudo, com o `WaveBased` do GitHub em `e494b0e` |
 | o próprio `WaveBased`, instalado de `../../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
 
@@ -134,6 +135,15 @@ Rscript data-raw/fetch.R --from=../wafc/cache/data                              
 Rscript data-raw/prepare.R --check                                                                  # reconstrói data/*.rds e compara com os versionados
 Rscript scripts/03_application.R --workers=3                                                        # as duas aplicações: 168 unidades, ~70 h de CPU, ~24 h em 3 processos de até 5 GB; só com o aviso do autor
 Rscript run_all.R                                                                                   # o estudo inteiro e as aplicações: centenas de horas de CPU, só com o aviso do autor
+```
+
+O piloto do estudo (E4.3), da raiz de `wafc-draft`; o `run-pilot.sh` não é
+versionado e o texto está no bloco da E4.3a do `ESTADO.md`:
+
+```bash
+bash wafc/cache/e43/run-pilot.sh smoke                                                              # fumaça: ~4 min, 1 trabalhador
+setsid nohup bash wafc/cache/e43/run-pilot.sh > wafc/cache/e43/run-pilot.out 2>&1 < /dev/null &    # a rodada: ~3 h em 8 trabalhadores, sozinha na máquina, só com o aviso do autor
+Rscript wafc/scripts/11-pilot-read.R                                                                # a leitura; na fumaça, --dir=wafc/cache/e43/smoke --top-n=250 --arms-n=250
 ```
 
 ## 3. Onde o trabalho está (resumo de 2026-10-06; o `ESTADO.md` manda)
