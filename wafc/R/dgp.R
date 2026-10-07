@@ -337,8 +337,12 @@ wafc_sprime <- function(scenario = c("smooth", "uneven", "inhomogeneous",
 #'   infinity that is far from uniform.
 #' @param u_rho Correlation of the Gaussian copula that couples the
 #'   modulating covariates. Zero (the default) makes them independent; a
-#'   value in \eqn{(-1,1)} keeps the marginals and makes them dependent,
-#'   which is allowed by hypothesis (A2) and by D14.
+#'   value in \eqn{(-1,1)} keeps the marginals and makes them dependent.
+#'   The density of the Gaussian copula is unbounded at two corners of the
+#'   unit square and tends to zero at the other two, so a nonzero value is
+#'   outside the assumption of a joint density bounded away from zero and
+#'   infinity; the components stay identified, since that density is
+#'   positive on the open square (D14).
 #' @param cc Vector of levels \eqn{c_\ell}, of length \eqn{p}. The default
 #'   recycles \code{c(1, 2, -1.5, 0.5)}.
 #' @param amplitude Multiplier of every non-zero component, of length 1 or
