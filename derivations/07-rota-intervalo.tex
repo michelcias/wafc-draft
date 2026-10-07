@@ -85,7 +85,8 @@ Partes A e B citam E1.2 a E1.6 e E1.3b sem mexer neles.
 
 A notação é a de \texttt{docs/notacao.md}. $L$ é o comprimento do filtro
 (\texttt{filter.size}), $N = L/2$ o número de momentos nulos para Daublets e
-Symmlets, e $\operatorname{supp}\psi \subseteq [0, L-1]$. As constantes
+Symmlets, e $\operatorname{supp}\psi \subseteq [1 - L/2,\, L/2]$, de
+comprimento $L-1$ (Härdle et al.\ 1998, Observação~7.1). As constantes
 $B_{X}$, $c_{U}$, $C_{U}$, $\kappa_{1}$, $\kappa_{2}$ são as das Hipóteses de
 E1.3 e E1.4. Escrevemos $\seff = s - (1/\pi - 1/2)_{+}$, e ``queda por
 nível'' para $-\log_{2}\bigl(\norm{\theta_{\lev+1,\cdot}}_{2} /
@@ -250,7 +251,7 @@ $[\bPhi Q \mid \bPsi^{\mathrm{int}}]$ de \eqref{eq:bloco}.
 \begin{proof}
 Fixe $\lev \ge \jzero$. As funções do nível $\lev$ são de três tipos. As
 $2^{\lev}-L$ \emph{interiores} são $2^{\lev/2}\psi(2^{\lev}u - \tsl)$; como
-$\operatorname{supp}\psi\subseteq[0,L-1]$, no máximo $L-1$ delas são não nulas
+$\operatorname{supp}\psi\subseteq[1-L/2,L/2]$, no máximo $L-1$ delas são não nulas
 em cada $u$, e cada uma é $\le 2^{\lev/2}\norm{\psi}_{\infty}$. As $L/2$
 \emph{de borda à esquerda} são $2^{\lev/2}\psi^{\mathrm{esq}}_{r}(2^{\lev}u)$,
 $r < L/2$, com $\psi^{\mathrm{esq}}_{r}$ um conjunto \emph{fixo} de funções
@@ -398,7 +399,7 @@ As duas coisas são a mesma conta, na mesma escala, e é isso que as torna
 incompatíveis.
 
 \begin{proposition}[o cruzamento exato]\label{prop:cruzamento}
-Base periodizada de uma família de suporte $[0,L-1]$,
+Base periodizada de uma família cuja wavelet tem suporte de comprimento $L-1$,
 $\operatorname{supp}P_{U_{\md}}\subseteq\Ieps$ com $\eps\in(0,1/4]$, e
 $T(\eps) = (L-1)/(2\eps)$. Na circunferência, a margem é um único arco de
 comprimento $2\eps$ centrado na emenda. Então:

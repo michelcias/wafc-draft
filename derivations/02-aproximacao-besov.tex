@@ -53,7 +53,10 @@ análise de multirresolução ortonormal de $L_{2}(\R)$, de suporte compacto,
 com $\psi$ limitada e com $N$ momentos nulos, $\int y^{a}\psi(y)\,dy = 0$
 para $a = 0, \dots, N-1$. Denotamos por $L$ o comprimento do filtro
 (\texttt{filter.size} no \texttt{WaveBased}), de modo que
-$\operatorname{supp}\psi \subseteq [0, L-1]$ e, para Daublets e Symmlets,
+$\operatorname{supp}\phi \subseteq [0, L-1]$ e
+$\operatorname{supp}\psi \subseteq [1 - L/2,\, L/2]$, um intervalo de
+comprimento $L-1$ (Härdle et al.\ 1998, Observação~7.1, eqs.~(7.7) e (7.8),
+com $L = 2N$; é a convenção do \texttt{WaveBased}), e, para Daublets e Symmlets,
 $N = L/2$. A base periodizada em $[0,1]$ é
 \[
   \wav{\lev}{\tsl}(u) \;=\; \sum_{\iota \in \mathbb{Z}} 2^{\lev/2}\,
@@ -234,7 +237,8 @@ $\gcomp{\cv}{\md}$ tem versão contínua e, para todo $J \ge 0$,
 \]
 porque a soma sobre as translações periodizadas é a soma sobre todas as
 translações inteiras em $\R$, e $\psi(2^{\lev}u - \tsl) \ne 0$ exige
-$2^{\lev}u - \tsl \in (0, L-1)$, o que no máximo $L - 1$ inteiros $\tsl$
+$2^{\lev}u - \tsl \in (1 - L/2,\, L/2)$, intervalo aberto de comprimento
+$L-1$, o que no máximo $L - 1$ inteiros $\tsl$
 satisfazem.
 
 \emph{Cota por nível.} Com $\max_{\tsl}|\theta_{\lev\tsl}| \le
@@ -336,7 +340,7 @@ não converge a zero.
 Seja $\tilde g$ a extensão $1$-periódica de $g$ a $\R$. Por construção da
 base periodizada, $\theta_{\lev\tsl} = \int_{\R}\tilde g(y)\,2^{\lev/2}
 \psi(2^{\lev}y - \tsl)\,dy$. Para $2^{\lev} \ge L-1$, separe em cada nível as
-translações \emph{interiores}, aquelas com $[\tsl, \tsl + L - 1] \subseteq
+translações \emph{interiores}, aquelas com $[\tsl + 1 - L/2,\, \tsl + L/2] \subseteq
 [0, 2^{\lev}]$, cujo suporte fica dentro de $[0,1]$, das translações de
 \emph{borda}, que atravessam $0 \equiv 1$; há no máximo $L - 1$ destas por
 nível.
