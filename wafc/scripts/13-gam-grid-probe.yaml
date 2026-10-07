@@ -1,0 +1,56 @@
+## ============================================================
+## wafc/scripts/13-gam-grid-probe.yaml -- the probe of the spline grid (D77)
+## ============================================================
+## A design file of the compendium wafc-studies/, kept outside it (D60(f)).
+## The pilot (E4.3) found gam.reml at the top of its grid of k in every
+## replicate of the cells "inhomogeneous" and "mixed" at n = 1000 (k = 80)
+## and n = 2000 (k = 120). This probe refits gam.reml there with k up to
+## 240, on the pilot's own data (its master seed, replicates 1 to 5), and
+## compares rmse_f with the pilot's units on the same replicates.
+##
+## Criterion, declared before the run (D77): if, in either cell, the mean
+## over the compared replicates of rmse_f(extended) / rmse_f(pilot) falls
+## below 0.99 at a sample size, the grid of k of gam.reml grows at that
+## sample size (for every cell, D41) before the production; otherwise the
+## grids stay, with a sentence. gam.gcv keeps its grid (cost, as in D41).
+##
+## From the root of the compendium:
+##   Rscript scripts/01_simulate.R --config=../wafc/scripts/13-gam-grid-probe.yaml
+##     --out=../wafc/cache/e44k --workers=4 --methods=gam.reml
+##     --cells=inhomogeneous,mixed --sizes=1000,2000 --reps=5
+## ------------------------------------------------------------
+
+design: gamprobe
+replicates: 5
+sample_sizes: [250, 500, 1000, 2000]
+
+seeds:
+  master: 43000000
+
+tuning:
+  "250": &probe
+    nfolds: 10
+    J: [2, 3, 4, 5, 6, 7, 8]
+    k: [5, 10, 20, 40, 80]
+    basis: {family: Daublets, filter_size: 8, prec_wavelet: 30}
+  "500": *probe
+  "1000":
+    <<: *probe
+    k: [5, 10, 20, 40, 80, 120, 160, 240]
+  "2000":
+    <<: *probe
+    J: [2, 3, 4, 5, 6, 7, 8, 9]
+    k: [5, 10, 20, 40, 80, 120, 160, 240]
+
+cells:
+  inhomogeneous:
+    scenario: inhomogeneous
+    p: 3
+    q: 2
+    snr: 3
+  mixed:
+    scenario: inhomogeneous
+    p: 4
+    q: 4
+    snr: 3
+    exclude: [gam.gcv]
