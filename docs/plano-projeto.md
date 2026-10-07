@@ -545,7 +545,7 @@ original e fica como registro.
   opcional, escala `(p, q) = (6, 4)` com 6 blocos ativos e a grade `2:7`, com
   o custo medido na E4.3 (o `(10, 5)` original tem 12 750 colunas em `J = 8`
   e não cabe).
-- **O topo das grades em `n = 2000`** (D60(e)): a E4.3 mede a fração das
+- **~~O topo das grades em `n = 2000`~~ substituído por D69 (2026-10-06):** a grade de `n = 2000` é fixada de antemão (`J` em `2:9`, `k = 120`), e o piloto mede só tempo e custo. Texto original (D60(e)): a E4.3 mede a fração das
   réplicas no topo com as grades de D34 e D41; acima de 20% (o gatilho de
   D34), a grade daquele método sobe só em `n = 2000` (`J` em `2:9` no WAFC,
   `k = 120` acrescentado no `gam`, com o custo do `gam.gcv` medido). A
