@@ -2431,6 +2431,20 @@ periodized basis joins the end of the series to its start.
   sozinho). Marcas em `wafc/cache/e62/chain.log`; PID em `chain.pid`.
   Previsão: marylebone até ~3h de 2026-10-07, a `beijing.heat` até ~22h a
   meia-noite, o piloto ~3 h depois.
+- **Marylebone terminou** em 2026-10-07 às 02h35: 84 unidades, **0
+  falhas**, 301 min com 3 trabalhadores; a cadeia lançou a `beijing.heat`
+  às 02h35 (82 a ajustar, 2 do cache). Primeira leitura de
+  `prediction-` e `readings-marylebone.ukair.csv`: na predição, o `+cv`
+  fica a 0,5% do `gam.reml` (diferença 0,049 com erro-padrão corrigido
+  0,107: empate) e o `+cv1se` a 2,5% (0,28 contra 0,22), o `gam.gcv` a
+  0,2%, o linear a 35%; o degrau do `+cv1se` é de 10,7 a 19,6 pontos
+  percentuais na amostra inteira (subida 8,9; mediana das partições 9,8,
+  de 9,3 a 10,3), com 0,25 da subida em janeiro de 2003 e 0,85 a 0,89 em
+  julho, pico de ~13 pontos acima do nível antes em outubro de 2003, e o
+  mergulho do começo de 2002 em −0,17 a −0,26 da subida; o vento é zero
+  no `+cv1se` em toda partição e ~9% a 16% do degrau no `+cv`; o
+  `gam.reml` dá subida de 10,3. Os mesmos sinais da E6.1c; a leitura para
+  o texto fica para quando a `beijing.heat` fechar.
 - Pendências na pergunta 59.
 
 ### 2026-10-06: E4.1c fechada, o oráculo em blocos e o `structure`
