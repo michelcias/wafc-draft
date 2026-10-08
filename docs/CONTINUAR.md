@@ -16,8 +16,9 @@ dizer o foco do dia. Não commitar nada por iniciativa própria.
 
 Os documentos usam caminhos relativos (`CLAUDE.md`, tabela de vizinhos),
 então a disposição tem de ser esta (o nome da pasta-mãe varia entre
-máquinas: `~/Documents` nesta, `~/Documentos` em outras; os caminhos
-relativos não dependem disso):
+máquinas: `~/Documents` no notebook e na desktop, `~/Documentos` em
+outras; os caminhos relativos não dependem disso, e os comandos abaixo
+usam `~/Documents`):
 
 ```
 ~/Documents/
@@ -74,6 +75,7 @@ install.packages(setdiff(pk, rownames(installed.packages())), repos = "https://c
 Conferência de que tudo roda (da raiz de `wafc-draft`):
 
 ```bash
+cd ~/Documents/repo/wafc-draft
 Rscript -e 'library(WaveBased); w <- wbasis(sort(runif(64)), j0 = 0, J = 3); cat(dim(w), "\n")'   # 64 8
 cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd -   # compila
 cd manuscript/ss-template && latexmk -pdf SS-template.tex && latexmk -c && cd -   # compila (9 páginas)
@@ -84,6 +86,7 @@ As conferências das derivações, que devem imprimir `OK` (tempos desta
 máquina):
 
 ```bash
+cd ~/Documents/repo/wafc-draft
 Rscript derivations/check/01-identificabilidade.R   # ~7 s
 Rscript derivations/check/03-desenho-produtos.R     # ~9 s, precisa de quadprog
 Rscript derivations/check/04-oraculo.R              # ~16 s, precisa de glmnet
@@ -98,6 +101,7 @@ Rscript derivations/check/08a-blocos.R             # ~1 min 30 s, a sondagem de 
 E o código do método, que já existe:
 
 ```bash
+cd ~/Documents/repo/wafc-draft
 Rscript -e 'testthat::test_dir("wafc/tests")'   # 1 006 passam, ~70 s
 Rscript wafc/scripts/01-smoke.R                 # imprime OK, ~3 s
 Rscript wafc/scripts/03-tune-decomp.R           # ~2 min
@@ -127,7 +131,7 @@ O compêndio (`wafc-studies/`, E4.1), sempre de dentro da pasta, com o
 `renv` dela:
 
 ```bash
-cd wafc-studies
+cd ~/Documents/repo/wafc-draft/wafc-studies
 Rscript -e 'renv::restore()'                                                                         # o ambiente do compêndio
 Rscript scripts/01_simulate.R --sizes=250 --reps=2 --workers=8 --out=../wafc/cache/e41/smoke-core   # fumaça, ~4,6 min, 0 falhas
 Rscript scripts/02_aggregate.R --sizes=250 --reps=2 --out=../wafc/cache/e41/smoke-core             # as tabelas da fumaça
@@ -142,6 +146,7 @@ O piloto do estudo (E4.3), da raiz de `wafc-draft`; o `run-pilot.sh` não é
 versionado e o texto está no bloco da E4.3a do `ESTADO.md`:
 
 ```bash
+cd ~/Documents/repo/wafc-draft
 bash wafc/cache/e43/run-pilot.sh smoke                                                              # fumaça: ~4 min, 1 trabalhador
 setsid nohup bash wafc/cache/e43/run-pilot.sh > wafc/cache/e43/run-pilot.out 2>&1 < /dev/null &    # a rodada: ~3 h em 8 trabalhadores, sozinha na máquina, só com o aviso do autor
 Rscript wafc/scripts/11-pilot-read.R                                                                # a leitura; na fumaça, --dir=wafc/cache/e43/smoke --top-n=250 --arms-n=250
@@ -165,7 +170,7 @@ por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
 2. **O repositório e o ambiente:**
 
    ```bash
-   mkdir -p ~/Documentos/repo && cd ~/Documentos/repo
+   mkdir -p ~/Documents/repo && cd ~/Documents/repo
    git clone https://github.com/michelcias/wafc-draft.git
    cd wafc-draft/wafc-studies
    Rscript -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
@@ -177,7 +182,7 @@ por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
    com o código `6aa4a3a`):
 
    ```bash
-   cd ~/Documentos/repo/wafc-draft
+   cd ~/Documents/repo/wafc-draft
    mkdir -p wafc/cache/e44 && tar xzf wafc/scripts/14-junction-ref.tar.gz -C wafc/cache/e44
    cd wafc-studies
    OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 Rscript scripts/01_simulate.R --config=../wafc/scripts/11-pilot.yaml --out=../wafc/cache/e44/junction-other --workers=10 --cells=smooth,mixed,inhomogeneous.xu --sizes=250,1000 --reps=1
@@ -187,21 +192,23 @@ por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
    Se der `JUNCTION FAILED`, parar e trazer a saída: a causa provável é a
    BLAS ou a versão de algum pacote.
 4. **A produção** (~592 h de processador; em 10 núcleos mais rápidos que
-   os daqui, ~45 a 60 h), da raiz de `wafc-draft`, com a árvore limpa:
+   os daqui, ~45 a 60 h), com a árvore limpa:
 
    ```bash
+   cd ~/Documents/repo/wafc-draft && mkdir -p wafc-studies/outputs
    setsid nohup bash wafc/scripts/14-production.sh 10 > wafc-studies/outputs/production.out 2>&1 < /dev/null &
-   tail wafc-studies/outputs/production.log      # as marcas; "production end" no fim
+   tail ~/Documents/repo/wafc-draft/wafc-studies/outputs/production.log      # as marcas; "production end" no fim
    ```
 
-   O script recusa começar com mudança não commitada no código ou na
-   configuração, grava a máquina em `outputs/machine.txt` e retoma do
-   cache se for parado e relançado.
+   O `mkdir` vem antes porque o shell abre o `production.out` antes de o
+   script criar a pasta. O script recusa começar com mudança não
+   commitada no código ou na configuração, grava a máquina em
+   `outputs/machine.txt` e retoma do cache se for parado e relançado.
 5. **No meio da rodada** (pergunta 69(a)): contar os candidatos de `k` que
    não convergiram, por célula, nas unidades já gravadas:
 
    ```bash
-   cd ~/Documentos/repo/wafc-draft/wafc-studies
+   cd ~/Documents/repo/wafc-draft/wafc-studies
    Rscript -e 'f <- list.files("outputs", "rds$", recursive = TRUE, full.names = TRUE); f <- f[grepl("/gam\\.reml/", f)]; e <- do.call(rbind, lapply(f, function(x) { g <- readRDS(x)$side$gam_k; if (is.null(g)) NULL else data.frame(cell = g$cell, n = g$n, k = g$k, nc = grepl("not converged", g$error)) })); print(aggregate(nc ~ cell + n + k, e, sum))'
    ```
 
@@ -212,16 +219,27 @@ por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
    saídas para outra máquina, empacotar:
 
    ```bash
-   cd ~/Documentos/repo/wafc-draft/wafc-studies
+   cd ~/Documents/repo/wafc-draft/wafc-studies
    tar czf ~/e44-outputs.tar.gz outputs/core outputs/arms outputs/scale outputs/machine.txt outputs/production.log outputs/steps
    ```
 
-   e, no destino, `tar xzf e44-outputs.tar.gz -C wafc-studies/`.
+   e, no destino, com o arquivo copiado para `~`:
 
-   **Para levar do notebook à desktop** (antes de começar lá; não
-   versionado): `tar czf ~/wafc-extra.tar.gz refs wafc-studies/outputs/application`
-   na raiz de `wafc-draft` no notebook, e `tar xzf wafc-extra.tar.gz` na
-   raiz de `wafc-draft` na desktop.
+   ```bash
+   cd ~/Documents/repo/wafc-draft && tar xzf ~/e44-outputs.tar.gz -C wafc-studies/
+   ```
+
+   **Para levar do notebook à desktop** (não versionado): no notebook,
+
+   ```bash
+   cd ~/Documents/repo/wafc-draft && tar czf ~/wafc-extra.tar.gz refs wafc-studies/outputs/application
+   ```
+
+   e, na desktop, com o arquivo copiado para `~`:
+
+   ```bash
+   cd ~/Documents/repo/wafc-draft && tar xzf ~/wafc-extra.tar.gz
+   ```
 
 ## 3. Onde o trabalho está (resumo de 2026-10-08; o `ESTADO.md` manda)
 

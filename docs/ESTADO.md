@@ -4951,8 +4951,13 @@ Ordenadas pelo que bloqueia mais.
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-08).** Tudo commitado e enviado; nenhum handoff
-pendente; **catálogo vazio**; nenhum processo rodando. **Perguntas em
+**Onde parou (2026-10-08).** Nenhum handoff pendente; **catálogo
+vazio**. **A E4.4 está rodando na desktop** (passos 1 a 4 do
+`CONTINUAR.md` §2b feitos lá): o `renv::restore()` instalou os 18
+pacotes, a junção deu **58 de 58 idênticas** fora o tempo
+(`JUNCTION OK`, 4,6 min em 10), e a produção começou em
+**2026-10-08 17:34** com `902e7b1`, 10 trabalhadores, o `core` com
+19 600 unidades. **Perguntas em
 aberto que pedem resposta do autor: 68** (nove itens de texto da E5k, todos
 com recomendação de aceitar, dois acrescentam texto) **e 69(a)** (a margem
 do limite de 80 iterações, com a leitura no meio da E4.4).
