@@ -35,7 +35,8 @@ aqui. Quando divergir do compêndio, o compêndio é a verdade.
   só `structure-` e `readings-` (a subida do ajuste inteiro de 8,876 a
   8,963).
 - **A Figura S1** refeita em 2026-10-07 depois do piloto, só o relatório da `beijing.heat`: o rug ao longo do dia do ano e da umidade (D75(e)) e a umidade cortada a ~15% e ~95% (`trim: rh: [6, 4]`), onde a base periodizada dobra (D67(e)); muda só o `structure-beijing.heat.csv` (as colunas `range_` e `jump_` ao longo da umidade).
-- O `manuscript/figures/marylebone.ukair.pdf` é cópia deste
-  `figures/marylebone.ukair.pdf`, para o manuscrito compilar autocontido.
+- O `manuscript/figures/marylebone.ukair.pdf` e o
+  `manuscript/figures/beijing.heat.pdf` são cópias dos daqui, para o
+  manuscrito compilar autocontido.
 - O `.pdf` traz a data de criação, então a soma muda a cada relatório; as
   tabelas, não.

@@ -2085,6 +2085,41 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-08: E5k fechada, a aplicação fechada na `k = 5`
+
+- **Feito:** os marcadores `[E6.2]` da `k = 5` saíram todos; D76(b) e (c),
+  D75(d) e (f) aplicadas; a Figura S1 no lugar da caixa (por recorte do PDF
+  do compêndio, sem a linha do nível, a `0.72\textwidth`); **Tabelas S5
+  (predição), S6 (estrutura) e S7 (escolhas, arquivo novo
+  `tables/app-tuning.tex`)**, geradas dos CSV; floats altos em `[tp]`.
+  Cada número conferido contra `results/tables/` (coluna e valor de cada
+  um no handoff da tarefa, lido inteiro na integração; os de marylebone
+  repetem a conferência da E5j).
+- **Os números novos:** §6.3, subida 9,0 (9,4 a 10,3 nas partições), um
+  quarto em janeiro de 2003 (0,17 a 0,36), 90% até o fim de julho de 2003
+  no ajuste inteiro e em 18 de 20 partições e depois do buraco nas outras
+  duas, o REML 10,3 com 90% no fim do buraco, pico 13,5 (11,7 a 13,8);
+  §6.4, o WAFC à frente do melhor spline em 20 de 20 partições, 8% abaixo
+  em média. S10: o linear 15,48 ppb (~um terço a mais); na `beijing.heat`
+  a diferença pareada −0,070 (0,023); o WAFC fica em `J = 4` e não zera
+  coeficiente dentro dos blocos (a vantagem de 8% não vem de esparsidade
+  interna); os contrastes da temporada (vento −0,18, temperatura −0,056,
+  pressão −0,028) negativos em todo ajuste, salvo a pressão onde o WAFC a
+  descarta numa partição.
+- **A coluna `wins`** é a fração de partições com erro abaixo do spline de
+  menor erro médio (o `gam.reml` nas duas bases), não do melhor spline de
+  cada partição; a legenda e a S10 dizem isso.
+- **Páginas:** **73 e 101** com a marcação (recompilados no chat
+  principal, sem indefinida), **66 e 100** sem o removido.
+- **O que a Figura S1 ainda pede ao compêndio:** uma opção de linhas
+  (sem a do nível) e uma proporção mais baixa para três linhas, para voltar
+  a um `\includegraphics` só e caber a `\textwidth`.
+- **Lições:** (1) em espaço duplo as linhas de uma tabela também dobram:
+  dividir antes de compactar; (2) tabela alta leva `[tp]`, como figura
+  alta; (3) recortar um painel de PDF sem mexer no compêndio: `trim`/`clip`
+  do `\includegraphics`, com as faixas medidas no `pdftoppm -r 72`.
+- Pendências na pergunta 68.
+
 ### 2026-10-07: E4.3 fechada, o piloto do estudo
 
 - **A rodada** (lançada pela cadeia às 16h31, sozinha em 8 trabalhadores;
@@ -4827,6 +4862,31 @@ Ordenadas pelo que bloqueia mais.
    - (b) **A produção (E4.4)**: ~59 h de relógio sozinha em 8
      trabalhadores (~2,5 dias), com o aviso do autor, depois de (a).
 
+68. **Pendências de E5k** (2026-10-08). Recomendação do chat principal:
+   - (a) **"by the end of July 2003"** no lugar do "by July 2003" de D76(b):
+     as 18 partições passam de 1 a ~20 de julho. **Recomendação:** aceitar.
+   - (b) **O REML "90% of it by the end of that gap"** (12 de agosto, o
+     primeiro ponto depois do buraco). **Recomendação:** aceitar.
+   - (c) **9,3 → 9,4** no mínimo das partições (9,355). **Recomendação:**
+     aceitar.
+   - (d) **A frase da grade com o escopo da sondagem** ("At Marylebone
+     Road", "in the first three partitions", "in the fit to the whole
+     sample") **e uma frase nova na S10:** "At Dongsi, where the splines
+     also choose $k = 80$, the grids were not extended." (D76(a)).
+     **Recomendação:** aceitar as duas; o referee vai perguntar.
+   - (e) **A S6 dividida em S6 e S7.** **Recomendação:** aceitar.
+   - (f) **A legenda da Figura S1** no padrão da Figure 2, com os dois
+     cortes ditos e o achado no texto. **Recomendação:** aceitar.
+   - (g) **A coluna de `R²` na Table S5.** **Recomendação:** fica (é supp e
+     situa o erro).
+   - (h) **A oração interpretativa da S10** sobre os sinais dos contrastes.
+     **Recomendação:** fica; é a leitura literal dos números.
+   - (i) **O tempo dos ajustes** da aplicação (o WAFC 1 800 a 8 800 s por
+     ajuste contra 7 a 470 s dos splines). **Recomendação:** uma linha na
+     Table S7, como a simulação dá na S4; o custo é a primeira pergunta de
+     um referee, e as unidades rodam num núcleo (piloto: processador sobre
+     tempo 1,00).
+
 ---
 
 ## 5. Próximos passos
@@ -4889,6 +4949,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-08 | E5k fechada e integrada: a aplicação fechada na `k = 5` (Tabelas S5 a S7, Figura S1, os números conferidos); 73 e 101 páginas; pergunta 68 |
 | 2026-10-08 | A sondagem de D77 terminou (20 unidades, 4 h 32 min em 4): o critério disparou (o `gam.reml` com `k` até 240 erra 2% a 8% menos e segue no topo; a `mixed` em `n = 1000` falha com 3 840 coeficientes); D78, a grade do `gam.reml` cresce; E4.3b catalogada |
 | 2026-10-07 | Pergunta 67 decidida (D77): a sondagem da grade do `gam.reml` com critério declarado, lançada no chat principal |
 | 2026-10-07 | E4.3 fechada (o piloto, 2 h 26 min, 884 unidades, 0 falhas): a E4.4 projeta 472 h de processador, ~59 h em 8; a escala entra; os splines no topo da grade no não homogêneo e na `mixed` em `n ≥ 1000`; pergunta 67 |

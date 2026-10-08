@@ -76,7 +76,7 @@ Conferência de que tudo roda (da raiz de `wafc-draft`):
 Rscript -e 'library(WaveBased); w <- wbasis(sort(runif(64)), j0 = 0, J = 3); cat(dim(w), "\n")'   # 64 8
 cd manuscript/ejs-template && latexmk -pdf ejs-sample.tex && latexmk -c && cd -   # compila
 cd manuscript/ss-template && latexmk -pdf SS-template.tex && latexmk -c && cd -   # compila (9 páginas)
-cd manuscript && latexmk -pdf ms_5.tex && latexmk -pdf supp_5.tex && latexmk -c && cd -   # versão viva k = 5; 72 e 97 páginas, sem indefinida
+cd manuscript && latexmk -pdf ms_5.tex && latexmk -pdf supp_5.tex && latexmk -c && cd -   # versão viva k = 5; 73 e 101 páginas, sem indefinida
 ```
 
 As conferências das derivações, que devem imprimir `OK` (tempos desta
@@ -169,7 +169,7 @@ Rscript wafc/scripts/11-pilot-read.R                                            
   `wafc/cache/e25j/e25j-joined.rds` (37 350 linhas, não versionada).
 - **Manuscrito vivo em `k = 5`** (`ms_5.tex`, `supp_5.tex`,
   `references_5.bib`, com `tables/` e `figures/`): as Seções 5 e 6 sem
-  números, 72 e 97 páginas com a marcação (64 e 96 sem o removido); a
+  números, 73 e 101 páginas com a marcação (66 e 100 sem o removido); a
   Seção 7 e os números são da E5b; o teto de 40 páginas fica para o fim
   (D21).
 - **Bibliografia:** 99 entradas verificadas em
