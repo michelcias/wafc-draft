@@ -394,6 +394,37 @@ wafc_k_matched <- function(u, J, kmin = 3L) {
 #' and the fit returned is the one on the whole sample at the \code{k}
 #' chosen. It costs one fit per fold and candidate, plus one.
 #'
+#' Step E4.3b bounds the search and lets a candidate fail without failing
+#' it. Decision D78 extends the grid of the study to 240 at
+#' \eqn{n \ge 1000}, where a candidate can have more coefficients than
+#' observations, and three rules follow (decisions D79 and D80). First, the
+#' size rule: a value of the grid above the common one, 80, whose smooths
+#' would have more than \eqn{2n} coefficients (\eqn{p q k} for a common
+#' \eqn{k}) is left out before it is fitted. In the cell "mixed" (16
+#' smooths) at \eqn{n = 1000} the search with 160 and 240 (2560 and 3840
+#' coefficients) took more than two hours a replicate, while 240 takes
+#' about half an hour at \eqn{n = 2000} (3840 against 4000) and under two
+#' minutes in the cells of six smooths at \eqn{n = 1000} (1440 against
+#' 2000); the common grid is searched whole at every size. Second, in a
+#' search with REML on \code{bam}, each fit has at most \code{k.maxit}
+#' outer iterations of the smoothing parameters, and a fit that does not
+#' converge within them leaves its candidate out. In one replicate of the
+#' cell with dependent modulators at \eqn{n = 1000} and \eqn{k = 240}
+#' the iterations drive the fit towards interpolation and do not converge:
+#' the 200 of mgcv's default take over two hours there, since each
+#' iteration halves its step more often than the one before, while the
+#' fits that converge in the cells of the study take at most 51
+#' (the limit and its reason are at \code{k.maxit}). Third, a candidate
+#' whose fit or whose score fails is left out of the choice: with more
+#' coefficients than observations the fit can come back with the penalty
+#' of a smooth below its declared rank, and the REML score stops on it,
+#' which before this step stopped the whole search. The reason of every
+#' candidate left out goes to its row of \code{k.table}; the search stops
+#' only when no candidate is left, with the error of the first fit that
+#' failed, or with the size rule when none was fitted. Where every
+#' candidate is within the rule and converges within the limit, nothing
+#' changes: the limit only ends a fit that would not have stopped sooner.
+#'
 #' @param x,u,y The data, as in \code{\link{wafc_competitor}}.
 #' @param k Basis dimension of each smooth: one value for every smooth, or
 #'   one value per modulating covariate. With \code{k.select} other than
@@ -410,6 +441,16 @@ wafc_k_matched <- function(u, J, kmin = 3L) {
 #'   away entirely and is the fair setting when half the blocks are zero.
 #' @param edf.tol Threshold on the effective degrees of freedom above which
 #'   a block counts as kept.
+#' @param k.maxit In a search with \code{k.select = "reml"} or
+#'   \code{"cv"} and \code{engine = "bam"}, the limit of the outer
+#'   iterations of the smoothing parameters of each fit (the \code{maxit}
+#'   of \code{\link[mgcv]{gam.control}}); a fit that does not converge
+#'   within it leaves its candidate out. The default, 80, is well above the
+#'   largest count among the fits that converge in the cells of the study
+#'   (51 in 523 fits, 41 outside the scale arm; step E4.3b), so that it
+#'   ends only the fits that drift.
+#'   The GCV search of \code{bam} and the engine \code{"gam"} keep mgcv's
+#'   own limits and are not checked.
 #' @param engine \code{"gam"} (the default) fits with
 #'   \code{\link[mgcv]{gam}} and \code{method = "REML"}, which is what
 #'   decision D30 asks for; \code{"bam"} fits with
@@ -422,15 +463,21 @@ wafc_k_matched <- function(u, J, kmin = 3L) {
 #'   carries the \code{edf} matrix, the \code{edf.tol} used, the vector
 #'   \code{k} (one value per modulating covariate), the \code{engine}, the
 #'   \code{k.select} and the smoothing criterion \code{smooth.method}. With
-#'   a search it also carries \code{k.table}, one row per candidate fitted
-#'   (the value of the grid, the dimensions used after the truncation, the
-#'   \code{score} of the criterion, its standard error \code{cvsd} for
+#'   a search it also carries \code{k.table}, one row per candidate of the
+#'   grid (the value of the grid, the dimensions used after the truncation,
+#'   the \code{score} of the criterion, its standard error \code{cvsd} for
 #'   \code{"cv"}, the \code{score.engine} the engine reports, the total
-#'   effective degrees of freedom, the number of coefficients and the
-#'   seconds; for \code{"cv"} the last three are the means over the folds
-#'   and \code{score.engine} is \code{NA}), and \code{k.top}, \code{TRUE}
-#'   when the candidate chosen is the largest one fitted; with
-#'   \code{"cv"}, also the \code{foldid} used.
+#'   effective degrees of freedom, the number of coefficients, the outer
+#'   iterations \code{iter} under \code{k.maxit} (\code{NA} where there is
+#'   no limit) and the seconds; for \code{"cv"} the effective degrees of
+#'   freedom and the coefficients are the means over the folds, \code{iter}
+#'   their maximum, and \code{score.engine} is \code{NA}; and
+#'   \code{error}, \code{NA} for a
+#'   candidate fitted and scored and the reason for one left out, the size
+#'   rule or the message of the failure, whose \code{score} is then
+#'   \code{NA}), and \code{k.top},
+#'   \code{TRUE} when the candidate chosen is the largest one fitted and
+#'   scored; with \code{"cv"}, also the \code{foldid} used.
 #'
 #' @references Kauermann, G. and Opsomer, J. D. (2011). Data-driven
 #'   selection of the spline dimension in penalized spline regression.
@@ -453,7 +500,7 @@ wafc_fit_gam <- function(x, u, y, k = NULL,
                          k.select = c("none", "reml", "gcv", "cv"),
                          select = TRUE, edf.tol = 0.1,
                          engine = c("gam", "bam"), nfolds = 10L,
-                         foldid = NULL, ...) {
+                         foldid = NULL, k.maxit = wafc_k_maxit, ...) {
   if (!requireNamespace("mgcv", quietly = TRUE)) {
     stop("method = \"gam\" needs the package 'mgcv'.", call. = FALSE)
   }
@@ -488,7 +535,33 @@ wafc_fit_gam <- function(x, u, y, k = NULL,
   ## predict(type = "terms") multiplies the smooth by, so evaluating the
   ## terms with every covariate set to one is what turns the term of the
   ## block (l, m) into the component g_{lm} itself.
-  fit_at <- function(kk, rows = seq_len(nrow(dat))) {
+  ## In a search with REML on bam, each fit of a candidate has at most
+  ## k.maxit outer iterations of the smoothing parameters, and one that does
+  ## not converge within them stops, which leaves the candidate out
+  ## (decision D80). The limit only ends a fit that would not have converged
+  ## sooner: a fit that converges within it is the fit without it.
+  limited <- k.select %in% c("reml", "cv") && engine == "bam"
+  if (limited && (length(k.maxit) != 1L || !is.finite(k.maxit) ||
+                  k.maxit < 1)) {
+    stop("'k.maxit' must be one positive number.", call. = FALSE)
+  }
+  bam_limited <- function(fo, d, control = list(), ...) {
+    control[["maxit"]] <- as.integer(k.maxit)
+    f <- withCallingHandlers(
+      mgcv::bam(fo, data = d, method = "fREML", discrete = TRUE,
+                select = select, control = control, ...),
+      warning = function(w) {
+        if (identical(conditionMessage(w), "algorithm did not converge")) {
+          invokeRestart("muffleWarning")
+        }
+      })
+    if (!isTRUE(as.logical(f[["mgcv.conv"]]))) {
+      stop(sprintf(paste("not converged in %d iterations of the smoothing",
+                         "parameters"), as.integer(k.maxit)), call. = FALSE)
+    }
+    f
+  }
+  fit_at <- function(kk, rows = seq_len(nrow(dat)), limit = FALSE) {
     terms <- character(0)
     for (l in seq_len(p)) {
       for (m in seq_len(q)) {
@@ -501,6 +574,8 @@ wafc_fit_gam <- function(x, u, y, k = NULL,
     d <- dat[rows, , drop = FALSE]
     if (engine == "gam") {
       mgcv::gam(fo, data = d, method = smooth.method, select = select, ...)
+    } else if (limit) {
+      bam_limited(fo, d, ...)
     } else if (smooth.method == "REML") {
       mgcv::bam(fo, data = d, method = "fREML", discrete = TRUE,
                 select = select, ...)
@@ -515,56 +590,96 @@ wafc_fit_gam <- function(x, u, y, k = NULL,
     fm <- numeric(nfolds)
     edf <- numeric(nfolds)
     nc <- numeric(nfolds)
+    it <- rep(NA_real_, nfolds)
     for (f in seq_len(nfolds)) {
       out <- which(foldid == f)
-      ff <- fit_at(kk, rows = -out)
+      ff <- fit_at(kk, rows = -out, limit = limited)
       pr <- as.numeric(stats::predict(ff, newdata = dat[out, , drop = FALSE]))
       fm[f] <- mean((y[out] - pr)^2)
       edf[f] <- sum(ff[["edf"]])
       nc[f] <- length(stats::coef(ff))
+      if (limited) it[f] <- ff[["iter"]]
       rm(ff)
     }
     list(cvm = mean(fm), cvsd = stats::sd(fm) / sqrt(nfolds),
-         edf = mean(edf), ncoef = mean(nc))
+         edf = mean(edf), ncoef = mean(nc), iter = max(it))
   }
   ## The search keeps only the best fit so far: a fit of mgcv carries its
   ## model matrix, and at the top of the grid in the cell "mixed" that is
   ## 16 smooths of 80 columns. The cross-validation fits the whole sample
   ## once, at the k it chooses.
+  ## Step E4.3b. Before any fit, a search leaves out the candidates the
+  ## size rule of decision D79 excludes (wafc_k_size()). A candidate whose
+  ## fit or whose score fails leaves the search too: with more coefficients
+  ## than observations the fit can come back with the penalty of a smooth
+  ## below its declared rank, and wafc_gam_reml() stops on it. The reason
+  ## goes to the column 'error' of the row. The search fails only when no
+  ## candidate is left, with the error of the first fit that failed, as it
+  ## did before the step, or with the size rule when none was fitted.
+  size <- wafc_k_size(cand, p)
+  big <- k.select != "none" & wafc_k_left_out(grid, size, nrow(x))
   fit <- NULL
   best <- Inf
-  ibest <- 1L
+  ibest <- 0L
+  err <- NULL
+  ok <- logical(length(cand))
   tab <- vector("list", length(cand))
   for (i in seq_along(cand)) {
     t0 <- proc.time()[["elapsed"]]
-    if (k.select == "cv") {
-      z <- cv_at(cand[[i]])
-      score <- z[["cvm"]]
-      row <- list(cvsd = z[["cvsd"]], score.engine = NA_real_,
-                  edf = z[["edf"]], ncoef = z[["ncoef"]])
-    } else {
-      fi <- fit_at(cand[[i]])
-      score <- switch(k.select, none = NA_real_,
-                      reml = as.numeric(wafc_gam_reml(fi, y)),
-                      gcv = as.numeric(fi[["gcv.ubre"]]))
-      row <- list(cvsd = NA_real_,
-                  score.engine = as.numeric(fi[["gcv.ubre"]]),
-                  edf = sum(fi[["edf"]]), ncoef = length(stats::coef(fi)))
-    }
+    fi <- NULL
+    score <- NA_real_
+    row <- list(cvsd = NA_real_, score.engine = NA_real_, edf = NA_real_,
+                ncoef = NA_real_, iter = NA_real_)
+    e <- if (big[i]) NULL else tryCatch({
+      if (k.select == "cv") {
+        z <- cv_at(cand[[i]])
+        score <- z[["cvm"]]
+        row <- list(cvsd = z[["cvsd"]], score.engine = NA_real_,
+                    edf = z[["edf"]], ncoef = z[["ncoef"]],
+                    iter = z[["iter"]])
+      } else {
+        fi <- fit_at(cand[[i]], limit = limited)
+        row <- list(cvsd = NA_real_,
+                    score.engine = as.numeric(fi[["gcv.ubre"]]),
+                    edf = sum(fi[["edf"]]), ncoef = length(stats::coef(fi)),
+                    iter = if (limited) fi[["iter"]] else NA_real_)
+        score <- switch(k.select, none = NA_real_,
+                        reml = as.numeric(wafc_gam_reml(fi, y)),
+                        gcv = as.numeric(fi[["gcv.ubre"]]))
+      }
+      NULL
+    }, error = function(e) e)
+    ok[i] <- !big[i] && is.null(e)
+    if (!ok[i]) score <- NA_real_
+    reason <- if (big[i]) {
+      sprintf("not fitted: %d coefficients in the smooths, more than %d n = %d",
+              as.integer(size[i]), as.integer(wafc_k_size_ratio),
+              as.integer(wafc_k_size_ratio * nrow(x)))
+    } else if (is.null(e)) NA_character_ else conditionMessage(e)
     tab[[i]] <- data.frame(k = grid[i],
                            k.used = paste(cand[[i]], collapse = ","),
                            score = score, cvsd = row[["cvsd"]],
                            score.engine = row[["score.engine"]],
                            edf = row[["edf"]], ncoef = row[["ncoef"]],
+                           iter = as.numeric(row[["iter"]]),
                            time = proc.time()[["elapsed"]] - t0,
-                           stringsAsFactors = FALSE)
-    if (is.na(best) || i == 1L || (!is.na(score) && score < best)) {
+                           error = reason, stringsAsFactors = FALSE)
+    if (!ok[i]) {
+      if (is.null(err) && !is.null(e)) err <- e
+    } else if (ibest == 0L || is.na(best) || (!is.na(score) && score < best)) {
       if (k.select != "cv") fit <- fi
       best <- score
       ibest <- i
     }
-    if (k.select != "cv") rm(fi)
+    fi <- NULL
   }
+  if (ibest == 0L && is.null(err)) {
+    stop("every candidate of k has more than ", wafc_k_size_ratio,
+         " n = ", wafc_k_size_ratio * nrow(x), " coefficients in the ",
+         "smooths (the smallest has ", min(size), "); see wafc_k_size().",
+         call. = FALSE)
+  }
+  if (ibest == 0L) stop(err)
   k <- cand[[ibest]]
   if (k.select == "cv") fit <- fit_at(k)
   ## Effective degrees of freedom by smooth, in the order the terms were
@@ -621,7 +736,7 @@ wafc_fit_gam <- function(x, u, y, k = NULL,
                     k.table = if (k.select == "none") NULL else
                       do.call(rbind, tab),
                     k.top = if (k.select == "none") NA else
-                      ibest == length(cand),
+                      ibest == max(which(ok)),
                     foldid = if (k.select == "cv") foldid else NULL))
 }
 
@@ -1531,6 +1646,35 @@ wafc_k_candidates <- function(u, k) {
   attr(out, "grid") <- k[keep]
   out
 }
+
+## The size rule of the search over k (step E4.3b, decision D79): the
+## number of coefficients of the smooths of each candidate, one smooth of
+## dimension k_m for every block (l, m), so p times the sum of the k_m, or
+## p q k for a common k. A search leaves out, before fitting it, a candidate
+## with more than wafc_k_size_ratio times n of them; the rule is by n and
+## by the size of the model, not by the cell, like the cap of the levels of
+## wafc_design().
+wafc_k_size_ratio <- 2
+wafc_k_size <- function(cand, p) {
+  vapply(cand, function(kk) p * sum(as.numeric(kk)), 0)
+}
+
+## The candidates the size rule leaves out (decision D80 amends D79): only
+## values of the grid above the common grid of D41 (wafc_k_grid, up to 80)
+## are subject to it, so that the grid every size shares is searched whole.
+wafc_k_left_out <- function(grid, size, n) {
+  !is.na(grid) & grid > max(wafc_k_grid) & size > wafc_k_size_ratio * n
+}
+
+## The limit of the outer iterations of the smoothing parameters of bam
+## (fREML) in each fit of a search over k (decision D80; see
+## wafc_fit_gam()): well above the largest count among the 523 fits that
+## converged in step E4.3b (51 in the scale arm, 41 elsewhere; every cell of
+## the study at the four sample sizes, the arms and the scale arm,
+## replicates 1 to 3 of the pilot), so that a fit that converges is the fit
+## without the limit. mgcv's own default is 200, which a fit that drifts
+## towards interpolation takes hours to reach.
+wafc_k_maxit <- 80L
 
 ## The restricted negative log-likelihood of a Gaussian fit of mgcv, at its
 ## smoothing parameters and profiled over the scale (step E2.5h). With the

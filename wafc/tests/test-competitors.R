@@ -1227,6 +1227,196 @@ test_that("the choice of k by cross-validation is the search redone by hand", {
                "at least 3 folds")
 })
 
+test_that("a candidate of k that fails leaves the search (step E4.3b)", {
+  skip_if_not(has("mgcv"))
+  ## The failure the probe of D78 met, in the cell "mixed" at n = 1000 with
+  ## k up to 240, does not happen at a size a test can afford, so it is
+  ## planted: the score of the REML search stops, with the message of
+  ## wafc_gam_reml(), on the fit at the top of the grid, or the fit itself
+  ## stops there. Either way the search is the one on the other candidates,
+  ## and the table keeps the candidate left out with its reason.
+  rank_msg <- "the penalty of a smooth has rank below the one mgcv declares."
+  top_of <- function(fit) {
+    any(vapply(fit[["smooth"]], function(sm) sm[["bs.dim"]], 0) == 20)
+  }
+  real_reml <- wafc_gam_reml
+  plant <- function(fails) {
+    assign("wafc_gam_reml", function(fit, y) {
+      if (fails(fit)) stop(rank_msg, call. = FALSE)
+      real_reml(fit, y)
+    }, envir = globalenv())
+  }
+  withr::defer(assign("wafc_gam_reml", real_reml, envir = globalenv()))
+  ## the search on the two candidates that do not fail
+  ref <- wafc_competitor("gam", xk, uk, yk, k = c(5L, 10L),
+                         k.select = "reml", engine = "bam")
+  rt <- ref[["extra"]][["k.table"]]
+  expect_true(all(is.na(rt[["error"]])))
+  plant(top_of)
+  fs <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "reml",
+                        engine = "bam")
+  ts <- fs[["extra"]][["k.table"]]
+  expect_identical(ts[["k"]], gridk)
+  expect_identical(ts[["error"]], c(NA, NA, rank_msg))
+  expect_identical(ts[["score"]][1:2], rt[["score"]])
+  expect_true(is.na(ts[["score"]][3L]))
+  ## the fit was there, so its size is recorded
+  expect_equal(ts[["ncoef"]][3L], 4 * 20)
+  expect_identical(fs[["extra"]][["k"]], ref[["extra"]][["k"]])
+  expect_identical(fs[["fitted"]], ref[["fitted"]])
+  ## the top is read on the candidates fitted and scored
+  expect_identical(fs[["extra"]][["k.top"]], ref[["extra"]][["k.top"]])
+  ## a fit that fails is left out the same way, with nothing of it in the
+  ## table but the reason (inside the folds of the cross-validation too, in
+  ## the slow test below)
+  assign("wafc_gam_reml", real_reml, envir = globalenv())
+  real_bam <- mgcv::bam
+  local_mocked_bindings(bam = function(formula, ...) {
+    if (grepl("k = 20", paste(deparse(formula), collapse = ""))) {
+      stop("planted failure of the fit", call. = FALSE)
+    }
+    real_bam(formula, ...)
+  }, .package = "mgcv")
+  ff <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "reml",
+                        engine = "bam")
+  tf <- ff[["extra"]][["k.table"]]
+  expect_identical(tf[["error"]], c(NA, NA, "planted failure of the fit"))
+  expect_true(all(is.na(unlist(tf[3L, c("score", "edf", "ncoef")]))))
+  expect_identical(tf[["score"]][1:2], rt[["score"]])
+  expect_identical(ff[["fitted"]], ref[["fitted"]])
+  ## when every candidate fails, the search stops with the error of the
+  ## first, as it did before the step
+  plant(function(fit) TRUE)
+  expect_error(wafc_competitor("gam", xk, uk, yk, k = gridk,
+                               k.select = "reml", engine = "bam"),
+               rank_msg, fixed = TRUE)
+  expect_error(wafc_competitor("gam", xk, uk, yk, k = 20L, engine = "bam"),
+               "planted failure of the fit", fixed = TRUE)
+})
+
+test_that("a fold that fails or does not converge leaves its k out (E4.3b)", {
+  skip_slow()
+  skip_if_not(has("mgcv"))
+  fk <- rep_len(1:5, length(yk))
+  ## a fit that fails inside a fold of the cross-validation
+  real_bam <- mgcv::bam
+  local_mocked_bindings(bam = function(formula, ...) {
+    if (grepl("k = 20", paste(deparse(formula), collapse = ""))) {
+      stop("planted failure of the fit", call. = FALSE)
+    }
+    real_bam(formula, ...)
+  }, .package = "mgcv")
+  rc <- wafc_competitor("gam", xk, uk, yk, k = c(5L, 10L), k.select = "cv",
+                        engine = "bam", foldid = fk)
+  fc <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "cv",
+                        engine = "bam", foldid = fk)
+  tc <- fc[["extra"]][["k.table"]]
+  expect_identical(tc[["error"]], c(NA, NA, "planted failure of the fit"))
+  expect_true(all(is.na(unlist(tc[3L, c("score", "cvsd", "edf", "ncoef")]))))
+  expect_identical(tc[["score"]][1:2], rc[["extra"]][["k.table"]][["score"]])
+  expect_identical(fc[["extra"]][["k"]], rc[["extra"]][["k"]])
+  expect_identical(fc[["fitted"]], rc[["fitted"]])
+  ## a fold that does not converge within the limit (decision D80): on
+  ## this replicate the folds take at most 35, 30 and 30 outer iterations at
+  ## k = 5, 10 and 20, so 31 stops k = 5 only (folds at 33 and 35)
+  local_mocked_bindings(bam = real_bam, .package = "mgcv")
+  msg <- "not converged in 31 iterations of the smoothing parameters"
+  rc <- wafc_competitor("gam", xk, uk, yk, k = c(10L, 20L), k.select = "cv",
+                        engine = "bam", foldid = fk)
+  fc <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "cv",
+                        engine = "bam", foldid = fk, k.maxit = 31L)
+  tc <- fc[["extra"]][["k.table"]]
+  expect_identical(tc[["error"]], c(msg, NA, NA))
+  expect_identical(tc[["iter"]], c(NA, 30, 30))
+  expect_identical(tc[["score"]][2:3], rc[["extra"]][["k.table"]][["score"]])
+  expect_identical(fc[["fitted"]], rc[["fitted"]])
+})
+
+test_that("the size rule of D79 leaves a k out before it is fitted", {
+  skip_if_not(has("mgcv"))
+  ## the count: one smooth of k_m columns per block, p sum(k_m), and the
+  ## bound 2n is kept, only what passes it is left out
+  expect_identical(wafc_k_size(list(c(75L, 75L), c(76L, 75L)), 2L),
+                   c(300, 302))
+  expect_identical(wafc_k_size_ratio, 2)
+  ## and only above the common grid of D41 (decision D80): 80 stays even
+  ## past the bound, 90 does not
+  expect_identical(wafc_k_left_out(c(80L, 90L, 90L, NA), c(320, 360, 300, 999),
+                                   150L), c(FALSE, TRUE, FALSE, FALSE))
+  ## n = 150 with p = q = 2: 4 smooths, so k = 90 has 360 > 300
+  ## coefficients and is never fitted; the search is the one without it
+  real_bam <- mgcv::bam
+  fitted_k <- integer(0)
+  local_mocked_bindings(bam = function(formula, ...) {
+    fo <- paste(deparse(formula), collapse = "")
+    fitted_k <<- c(fitted_k, as.integer(sub(".*k = ([0-9]+).*", "\\1", fo)))
+    real_bam(formula, ...)
+  }, .package = "mgcv")
+  ref <- wafc_competitor("gam", xk, uk, yk, k = c(5L, 10L),
+                         k.select = "reml", engine = "bam")
+  fitted_k <- integer(0)
+  fs <- wafc_competitor("gam", xk, uk, yk, k = c(5L, 10L, 90L),
+                        k.select = "reml", engine = "bam")
+  expect_false(90L %in% fitted_k)
+  ts <- fs[["extra"]][["k.table"]]
+  expect_identical(ts[["k"]], c(5L, 10L, 90L))
+  expect_identical(ts[["error"]][3L], paste("not fitted: 360 coefficients in",
+                                            "the smooths, more than 2 n = 300"))
+  expect_true(all(is.na(unlist(ts[3L, c("score", "edf", "ncoef")]))))
+  expect_identical(ts[["score"]][1:2], ref[["extra"]][["k.table"]][["score"]])
+  expect_identical(fs[["extra"]][["k"]], ref[["extra"]][["k"]])
+  expect_identical(fs[["fitted"]], ref[["fitted"]])
+  expect_identical(fs[["extra"]][["k.top"]], ref[["extra"]][["k.top"]])
+  ## the same in the cross-validation, where nothing of 80 is fitted in
+  ## any fold either
+  fitted_k <- integer(0)
+  fc <- wafc_competitor("gam", xk, uk, yk, k = c(5L, 90L), k.select = "cv",
+                        engine = "bam", foldid = rep_len(1:5, length(yk)))
+  expect_false(90L %in% fitted_k)
+  expect_identical(fc[["extra"]][["k"]], c(5L, 5L))
+  ## a search with every candidate past the bound stops on the rule
+  expect_error(wafc_competitor("gam", xk, uk, yk, k = c(90L, 160L),
+                               k.select = "reml", engine = "bam"),
+               "every candidate of k has more than 2 n = 300", fixed = TRUE)
+})
+
+test_that("a candidate of k that does not converge leaves the search (D80)", {
+  skip_if_not(has("mgcv"))
+  ## On this replicate bam converges in 35, 24 and 16 outer iterations at
+  ## k = 5, 10 and 20, and in at most 35, 30 and 30 in the folds. A limit
+  ## of 20 stops the first two; the search is then the one on k = 20 alone,
+  ## and that fit, within the limit, is the fit without it.
+  f20 <- wafc_competitor("gam", xk, uk, yk, k = 20L, k.select = "reml",
+                         engine = "bam", k.maxit = 1000L)
+  fs <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "reml",
+                        engine = "bam", k.maxit = 20L)
+  ts <- fs[["extra"]][["k.table"]]
+  msg <- "not converged in 20 iterations of the smoothing parameters"
+  expect_identical(ts[["error"]], c(msg, msg, NA))
+  expect_identical(ts[["iter"]], c(NA, NA, 16))
+  expect_identical(ts[["score"]][3L], f20[["extra"]][["k.table"]][["score"]])
+  expect_identical(fs[["extra"]][["k"]], c(20L, 20L))
+  expect_identical(fs[["fitted"]], f20[["fitted"]])
+  ## with a limit no fit reaches, the search is the one of mgcv's default
+  ## of 200 iterations, and the default limit (80) is one of them here
+  fa <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "reml",
+                        engine = "bam")
+  fb <- wafc_competitor("gam", xk, uk, yk, k = gridk, k.select = "reml",
+                        engine = "bam", k.maxit = 200L)
+  expect_identical(fa[["extra"]][["k.table"]][["iter"]], c(35, 24, 16))
+  expect_identical(fa[["fitted"]], fb[["fitted"]])
+  expect_identical(fa[["extra"]][["k.table"]][["score"]],
+                   fb[["extra"]][["k.table"]][["score"]])
+  ## (in the folds of the cross-validation too, in the slow test above)
+  ## no candidate converges: the error of the first; the limit is checked
+  expect_error(wafc_competitor("gam", xk, uk, yk, k = gridk,
+                               k.select = "reml", engine = "bam", k.maxit = 2L),
+               "not converged in 2 iterations", fixed = TRUE)
+  expect_error(wafc_competitor("gam", xk, uk, yk, k = gridk,
+                               k.select = "reml", engine = "bam", k.maxit = 0),
+               "'k.maxit' must be one positive number", fixed = TRUE)
+})
+
 ## ---------------------------------------------------------------------------
 ## What grpreg returned of the path of the block LASSO (step E2.5j)
 ## ---------------------------------------------------------------------------
