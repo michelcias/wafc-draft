@@ -2085,6 +2085,53 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
 
+### 2026-10-08: E4.3b fechada, a grade nova do `gam.reml`
+
+- **O código** (`wafc/R/competitors.R`, `6aa4a3a`, árvore `34f2e04`; o
+  `PROVENANCE.md` do compêndio aponta essa árvore): na busca de `k` do
+  `wafc_fit_gam()`, (a) a **regra de tamanho** (D79, D80): sai antes de
+  ajustar o candidato acima de 80 cujas suavizações teriam mais de `2n`
+  coeficientes; (b) o **limite de iterações** (D80): argumento
+  `k.maxit = 80` (o `control$maxit` do laço externo do REML no `bam`), e o
+  candidato com `mgcv.conv = FALSE` sai com a razão; (c) o **descarte por
+  erro** (D78). A tabela `gam_k` ganha `iter` e `error`; `k.top` é o maior
+  candidato ajustado e pontuado. O limite só vale no REML do `bam` (o GCV
+  do `bam` passa pelo `magic`, que ignora o `maxit`). Testes: 1 770 na
+  suíte padrão (2 003 com os lentos), 0 falhas; `test-competitors.R`
+  reconferido no chat principal (278, 0 falhas).
+- **A grade** (`wafc-studies/config/study.yaml`): o `gam.reml` com `k` em
+  `{5, …, 80, 120, 160, 240}` em `n = 1000` e `2000`; o `gam.gcv` na grade
+  comum (120 acrescentado em `n = 2000`, D69). Pela regra, a `mixed` para
+  em 120 em `n = 1000` e a `scale` em 80. O README do compêndio e o
+  `methods.R` dizem a grade, a regra, o limite e o que é o topo.
+- **Por que 80 iterações:** 523 ajustes que convergiram, em todas as
+  células nos quatro `n`, nos seis braços e na `scale`, usaram no máximo
+  **51** (41 fora da `scale`); só o `k = 240` do `urho` nas réplicas 1 e 3
+  não converge. O diagnóstico com o rastro do `mgcv`: com mais
+  coeficientes que observações e as moduladoras dependentes, a deviance
+  penalizada fica negativa (o ajuste caminha para interpolar), o passo da
+  escala não converge, e cada iteração fica mais lenta (de ~2 s para ~40 s
+  perto da iteração 80); as 200 do padrão levariam horas.
+- **Conferências:** junção exata onde tudo converge (67 de 68 no
+  levantamento, 19 de 20 na conferência final, 12 de 12 no `gam.gcv`, a
+  `scale` igual ao piloto; a exceção é só a linha do 240 do `urho`
+  réplica 1, com a mesma escolha); a `mixed` em `n = 250` e `500` volta
+  ao piloto (a isenção de D80 funciona); o `urho` termina em ~300 s por
+  unidade (antes, mais de 2 h 50). **A tabela de D78 completa:** razão do
+  `rmse_f` contra o piloto de 0,980 e 0,991 em `n = 1000` (não homogêneo e
+  `mixed`, esta no topo admissível 120) e 0,920 e 0,925 em `n = 2000`.
+- **A E4.4 projetada:** **592 h de processador, ~74 h de relógio em 8**
+  (núcleo 57 h, braços 15 h, `scale` 1,7 h); o `gam.reml` soma 69 h em
+  `n = 1000` e 73 h em `2000` (eram 12 e 11). Picos: 3,8 GB por processo
+  na `mixed` em `n = 2000`.
+- **Lições:** (1) no `step()` dos scripts de rodada (o `run-pilot.sh` da
+  E4.3a, a `chain.sh` da E6.2 e os da E4.3b), `exit=$?` dentro de
+  `"... $(date -Iseconds) exit=$?"` registra o código do `date`: guardar o
+  código numa variável antes do `echo`; (2) um ajuste que não termina não
+  é um erro: o descarte por erro não o pega, e o tempo não serve de
+  critério reprodutível; o número de iterações serve.
+- Pendências na pergunta 69.
+
 ### 2026-10-08: E5k fechada, a aplicação fechada na `k = 5`
 
 - **Feito:** os marcadores `[E6.2]` da `k = 5` saíram todos; D76(b) e (c),
@@ -4889,6 +4936,16 @@ Ordenadas pelo que bloqueia mais.
      um referee, e as unidades rodam num núcleo (piloto: processador sobre
      tempo 1,00).
 
+69. **Pendências de E4.3b** (2026-10-08). Recomendação do chat principal:
+   - (a) **A margem do limite de 80 iterações:** o máximo observado foi 51
+     em 523 ajustes; a produção faz ~19 000. **Recomendação:** ficar com
+     80 e, no meio da E4.4, ler no `gam_k.csv` a contagem de "not
+     converged" por célula; se aparecer fora do `urho` e da `mixed` em `k`
+     grande, parar e reabrir antes do fim (subir para 100 custaria ~1 000 s
+     por ajuste que deriva).
+   - (b) **A E4.4:** pronta para rodar, ~74 h de relógio sozinha em 8
+     trabalhadores (~3 dias), com o aviso do autor.
+
 ---
 
 ## 5. Próximos passos
@@ -4951,6 +5008,7 @@ D46).
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-08 | E4.3b fechada e integrada: a regra de tamanho acima de 80, o limite de 80 iterações e o descarte (523 ajustes convergidos em no máximo 51 iterações; o `urho` em ~300 s); junção exata onde tudo converge; a E4.4 projetada em ~74 h em 8; pergunta 69 |
 | 2026-10-08 | Primeira rodada da E4.3b com a regra de D79 (junção exata onde ela não morde; a `mixed` em `n = 1000` em `k = 120`, razão 0,991; E4.4 projetada em 71 a 105 h pelo `urho`); D80: a regra só além de `k = 80`, e um limite determinístico de iterações para o `urho`; a E4.3b segue aberta |
 | 2026-10-08 | A E4.3b travou na `mixed` em `n = 1000` (`k = 160` e `240` em 16 suavizações, mais de 2 h por unidade, swap de 4 GB); processos parados no chat principal; D79, a regra de tamanho `(suavizações) × k ≤ 2n` antes de ajustar; a E4.3b emendada |
 | 2026-10-08 | E5k fechada e integrada: a aplicação fechada na `k = 5` (Tabelas S5 a S7, Figura S1, os números conferidos); 73 e 101 páginas; pergunta 68 |
