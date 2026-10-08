@@ -96,7 +96,7 @@ options, the tuning grids by sample size, and the labels of the tables.
 | `wafc.cv1se` | the WAFC estimator: `cv.wafc()` with the block lasso, `(J, lambda)` by 10-fold cross-validation over `J` in 2, ..., 8, then the threshold on the norms of the blocks at one standard error |
 | `wafc.cv` | the same fit with the threshold of the smallest cross-validated error |
 | `lasso`, `lasso.cv1se` | the coordinatewise lasso on the same design, without and with the threshold |
-| `gam.reml`, `gam.gcv` | `mgcv` with one smooth `s(u_m, by = x_l)` per block, the basis dimension `k` in 5, 10, 20, 40, 80 chosen by REML or by GCV, with `mgcv::k.check()` on the final fit |
+| `gam.reml`, `gam.gcv` | `mgcv` with one smooth `s(u_m, by = x_l)` per block, the basis dimension `k` chosen by REML or by GCV from 5, 10, 20, 40, 80, a grid that grows with `n` (`config/study.yaml`: for REML up to 240 at `n` = 1000 and 2000, for GCV 120 added at `n` = 2000), with `mgcv::k.check()` on the final fit. A candidate above 80 whose smooths would have more than `2n` coefficients is left out before it is fitted, and a REML fit that does not converge in 80 iterations of the smoothing parameters leaves the search; the top of the grid is read on the candidates fitted and scored |
 | `bsgl` | cubic B-splines with a group lasso by block, `2^J` basis functions |
 | `aspline` | a spline with knots chosen adaptively per block |
 | `klopp` | the block lasso of Klopp and Pensky (2015) on the wavelet design |

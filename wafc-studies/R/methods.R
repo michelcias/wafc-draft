@@ -199,6 +199,9 @@ fit_competitor <- function(ctx, tuning, options, fit, engine, own = list()) {
     kt <- ex[["k.table"]]
     if (!is.null(kt)) {
       kt[["chosen"]] <- kt[["k.used"]] == paste(ex[["k"]], collapse = ",")
+      ## k.top is the largest candidate that was fitted and scored: a
+      ## candidate left out by the size rule, or one that did not converge,
+      ## does not count as the top of the grid.
       kt[["top"]] <- kt[["chosen"]] & ex[["k.top"]]
       extra[["k"]] <- kt[["k"]][kt[["chosen"]]][1L]
       extra[["top"]] <- ex[["k.top"]]
