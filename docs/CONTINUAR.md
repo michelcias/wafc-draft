@@ -58,6 +58,7 @@ decisão em E3.3.
 | `quadprog` | constante de compatibilidade exata em `check/03-desenho-produtos.R` (E1.4) | `install.packages("quadprog")` |
 | `VCBART` | exigido por `wafc_competitor("vcbart")` (E2.4); o resto de `wafc/` roda sem ele e os testes pulam o bloco se faltar. Instalado aqui: 1.2.5 | `install.packages("VCBART")` |
 | `/usr/bin/time` (pacote `time` do Ubuntu) | a rodada do piloto (E4.3) mede o pico de memória e o processador de cada passo com `time -v` | `sudo apt install time` |
+| `/usr/bin/time` também na máquina da E4.4 | ver §2b | `sudo apt install time` |
 | `yaml` | só o compêndio (`wafc-studies/`), para ler `config/*.yaml`; 2.3.12 no `renv.lock` | `renv::restore()` dentro de `wafc-studies/` instala tudo, com o `WaveBased` do GitHub em `e494b0e` |
 | o próprio `WaveBased`, instalado de `../../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
 
@@ -145,6 +146,76 @@ bash wafc/cache/e43/run-pilot.sh smoke                                          
 setsid nohup bash wafc/cache/e43/run-pilot.sh > wafc/cache/e43/run-pilot.out 2>&1 < /dev/null &    # a rodada: ~3 h em 8 trabalhadores, sozinha na máquina, só com o aviso do autor
 Rscript wafc/scripts/11-pilot-read.R                                                                # a leitura; na fumaça, --dir=wafc/cache/e43/smoke --top-n=250 --arms-n=250
 ```
+
+## 2b. A produção do estudo (E4.4) noutra máquina
+
+A E4.4 roda numa máquina só, porque o tempo de cada unidade é métrica do
+estudo (D81). A máquina prevista é a desktop do autor (Intel i9-10900KF,
+10 núcleos físicos com hyperthreading, ~50 GB): **10 trabalhadores**, um
+por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
+`n = 2000`). O passo a passo, nela:
+
+1. **Ferramentas:** R **4.6.1** (a versão do `renv.lock`), compilador C e
+   Fortran (`sudo apt install build-essential gfortran`), o `/usr/bin/time`
+   (`sudo apt install time`), `git` e acesso ao `michelcias/wafc-draft`
+   (privado; `gh auth login` ou um token). **A BLAS tem de ser a de
+   referência**, como aqui (não instalar `libopenblas`):
+   `Rscript -e 'extSoftVersion()["BLAS"]'` deve mostrar
+   `.../blas/libblas.so.3...`.
+2. **O repositório e o ambiente:**
+
+   ```bash
+   mkdir -p ~/Documentos/repo && cd ~/Documentos/repo
+   git clone https://github.com/michelcias/wafc-draft.git
+   cd wafc-draft/wafc-studies
+   Rscript -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
+   Rscript -e 'renv::restore()'      # instala os 19 pacotes, o WaveBased do GitHub em e494b0e
+   ```
+
+3. **A junção entre máquinas** (minutos; tem de dar `JUNCTION OK` antes da
+   produção; as unidades de referência foram ajustadas aqui em 2026-10-08,
+   com o código `6aa4a3a`):
+
+   ```bash
+   cd ~/Documentos/repo/wafc-draft
+   mkdir -p wafc/cache/e44 && tar xzf wafc/scripts/14-junction-ref.tar.gz -C wafc/cache/e44
+   cd wafc-studies
+   OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 Rscript scripts/01_simulate.R --config=../wafc/scripts/11-pilot.yaml --out=../wafc/cache/e44/junction-other --workers=10 --cells=smooth,mixed,inhomogeneous.xu --sizes=250,1000 --reps=1
+   cd .. && Rscript wafc/scripts/14-junction.R wafc/cache/e44/junction-ref wafc/cache/e44/junction-other
+   ```
+
+   Se der `JUNCTION FAILED`, parar e trazer a saída: a causa provável é a
+   BLAS ou a versão de algum pacote.
+4. **A produção** (~592 h de processador; em 10 núcleos mais rápidos que
+   os daqui, ~45 a 60 h), da raiz de `wafc-draft`, com a árvore limpa:
+
+   ```bash
+   setsid nohup bash wafc/scripts/14-production.sh 10 > wafc-studies/outputs/production.out 2>&1 < /dev/null &
+   tail wafc-studies/outputs/production.log      # as marcas; "production end" no fim
+   ```
+
+   O script recusa começar com mudança não commitada no código ou na
+   configuração, grava a máquina em `outputs/machine.txt` e retoma do
+   cache se for parado e relançado.
+5. **No meio da rodada** (pergunta 69(a)): contar os candidatos de `k` que
+   não convergiram, por célula, nas unidades já gravadas:
+
+   ```bash
+   cd ~/Documentos/repo/wafc-draft/wafc-studies
+   Rscript -e 'f <- list.files("outputs", "rds$", recursive = TRUE, full.names = TRUE); f <- f[grepl("/gam\\.reml/", f)]; e <- do.call(rbind, lapply(f, function(x) { g <- readRDS(x)$side$gam_k; if (is.null(g)) NULL else data.frame(cell = g$cell, n = g$n, k = g$k, nc = grepl("not converged", g$error)) })); print(aggregate(nc ~ cell + n + k, e, sum))'
+   ```
+
+   Fora do `urho` e da `mixed` em `k` grande, um "not converged" é motivo
+   para parar e avisar.
+6. **A volta:** empacotar e trazer para esta máquina, na mesma pasta:
+
+   ```bash
+   cd ~/Documentos/repo/wafc-draft/wafc-studies
+   tar czf ~/e44-outputs.tar.gz outputs/core outputs/arms outputs/scale outputs/machine.txt outputs/production.log outputs/steps
+   ```
+
+   Aqui: `tar xzf e44-outputs.tar.gz -C wafc-studies/`, e o chat principal
+   copia as tabelas para `results/` (a E5b lê de lá).
 
 ## 3. Onde o trabalho está (resumo de 2026-10-06; o `ESTADO.md` manda)
 
