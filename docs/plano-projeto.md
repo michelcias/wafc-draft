@@ -560,6 +560,11 @@ original e fica como registro.
 
 ### E4.3 Piloto
 
+**Fechada em 2026-10-07 (E4.3a, E4.3, E4.3b; D69, D70, D77 a D80):** a
+escala entra, a grade de `n = 2000` foi fixada de antemão, a do `gam.reml`
+cresce até 240 com a regra de tamanho e o limite de iterações; a E4.4
+custa ~592 h de processador.
+
 Réplicas, grade de `J` e de `λ`, e `nfolds` fixados por piloto **antes** da
 produção, registrados em `config/`. A **tabela de avaliação da base** também:
 uma por `(family, filter.size)`, construída com `WaveBased::wtable()` no
@@ -567,6 +572,9 @@ início da corrida e passada em `wavelet.table`, porque é o caminho rápido e a
 regra `auto` não dispara nos `n` do estudo (D31).
 
 ### E4.4 Produção e agregação
+
+**Próximo passo (2026-10-08):** na desktop do autor, 10 trabalhadores,
+depois da junção entre máquinas (D81; `CONTINUAR.md` §2b).
 
 Figuras e tabelas com os nomes que o `.tex` vai referenciar; cópia para
 `results/` deste repositório; um parágrafo por figura.
@@ -641,6 +649,10 @@ declarada, que fica como a aplicação principal (UK-AIR e vento de fonte declar
 aplicações**, marylebone (estrutura) e beijing.heat (predição).
 
 ### E6.2 Ajustar e comparar
+
+**Fechada em 2026-10-07 (E6.2, E6.2b; D73, D75, D76):** as duas bases
+rodaram no compêndio (168 unidades, 0 falhas), as tabelas e figuras em
+`results/`, os números na `k = 5`.
 
 WAFC contra `mgcv` e linear; diagnóstico das funções estimadas; figura com
 `β̂_ℓ(u)` interpretável.

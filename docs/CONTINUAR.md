@@ -207,51 +207,41 @@ por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
 
    Fora do `urho` e da `mixed` em `k` grande, um "not converged" é motivo
    para parar e avisar.
-6. **A volta:** empacotar e trazer para esta máquina, na mesma pasta:
+6. **Depois da rodada:** as tabelas vão a `results/` na própria desktop
+   (com origem e SHA-256 no `results/README.md`). Se for preciso levar as
+   saídas para outra máquina, empacotar:
 
    ```bash
    cd ~/Documentos/repo/wafc-draft/wafc-studies
    tar czf ~/e44-outputs.tar.gz outputs/core outputs/arms outputs/scale outputs/machine.txt outputs/production.log outputs/steps
    ```
 
-   Aqui: `tar xzf e44-outputs.tar.gz -C wafc-studies/`, e o chat principal
-   copia as tabelas para `results/` (a E5b lê de lá).
+   e, no destino, `tar xzf e44-outputs.tar.gz -C wafc-studies/`.
 
-## 3. Onde o trabalho está (resumo de 2026-10-06; o `ESTADO.md` manda)
+   **Para levar do notebook à desktop** (antes de começar lá; não
+   versionado): `tar czf ~/wafc-extra.tar.gz refs wafc-studies/outputs/application`
+   na raiz de `wafc-draft` no notebook, e `tar xzf wafc-extra.tar.gz` na
+   raiz de `wafc-draft` na desktop.
 
-- **Fechado:** E0, E1 (E1.2 a E1.15, E1.9 no nível da taxa), E2 inteira
-  (E2.1 a E2.5j; o rumo em D44 a D46), E3.1 a E3.4, E5a, E5c, E5d a E5g, as
-  sondagens E6.1a a E6.1c, e as rodadas de bibliografia L1 a L12; no
-  catálogo, a E4.1c (o oráculo em blocos e o `structure`). Decisões
-  D1 a D62 na tabela do `ESTADO.md` §2; E4.1 e E4.1b fechadas, o compêndio na pasta `wafc-studies/` (D60).
-- **O método (D44, D45):** o block LASSO na forma balanceada, com os níveis
-  livres e os pesos do `grpreg`, seguido do limiar `cv1se`; o LASSO
-  coordenado fica como opção (D43). `cv.wafc(x, u, y)` é o estimador (D48).
-- **Teoria:** o enunciado principal é o Corolário 11 de `08-blocos.tex`
-  (Theorem 1 do manuscrito, D47); a taxa lenta sem condição de desenho
-  cobre todo `s' > 0` (Corolário 14, E1.13 e E1.14) e, pelo comparador
-  truncado, alcança a do Theorem 1 em `s < 1/2` (Corolário 15, E1.15); a
-  cota inferior no nível da taxa (`09-cota-inferior.tex`, E1.9) faz o
-  Corolário 11 ótimo em `π ≥ 2` para todo `q`; a teoria do LASSO é a de
-  E1.5 e E1.6, com a Proposição 4 completada.
-- **Código** (`wafc/`, privado, D4): a interface de D48 com os gráficos de
-  E3.2; a suíte padrão passa em menos de 60 s (1 202 testes) e a inteira
-  com `WAFC_SLOW_TESTS=1` (1 427). A tabela de simulação mais recente é
-  `wafc/cache/e25j/e25j-joined.rds` (37 350 linhas, não versionada).
-- **Manuscrito vivo em `k = 5`** (`ms_5.tex`, `supp_5.tex`,
-  `references_5.bib`, com `tables/` e `figures/`): as Seções 5 e 6 sem
-  números, 73 e 101 páginas com a marcação (66 e 100 sem o removido); a
-  Seção 7 e os números são da E5b; o teto de 40 páginas fica para o fim
-  (D21).
-- **Bibliografia:** 99 entradas verificadas em
-  `docs/referencias-verificadas.bib`; os PDFs em `refs/` (§4), com o padrão
-  sobrenome e ano.
-- **Aplicação (D57, D59):** marylebone com dados do UK-AIR e do ERA5 (a
-  base `marylebone.ukair`, E6.1c) como principal e beijing.heat como
-  segunda, cada método nos seus termos (D56)
-  (`docs/aplicacao-candidatas.md` §9 a §17).
-- **O próximo passo é o estudo de simulação (E4)**, com a proposta de
-  desenho na pergunta 54 do `ESTADO.md`.
+## 3. Onde o trabalho está (resumo de 2026-10-08; o `ESTADO.md` manda)
+
+- **Fechado:** E0 a E3 inteiras, E4.1 a E4.3b, E5a, E5c a E5k, E6.1a a
+  E6.2b, L1 a L14. Decisões D1 a D81 na tabela do `ESTADO.md` §2.
+  Catálogo vazio.
+- **O método (D44, D45):** o block LASSO na forma balanceada seguido do
+  limiar `cv1se`; `cv.wafc(x, u, y)` é o estimador (D48).
+- **Código** (`wafc/`, D4): a suíte padrão passa em ~1 min (1 770 testes;
+  2 003 com `WAFC_SLOW_TESTS=1`); o último commit de `wafc/R` é
+  `6aa4a3a` (árvore `34f2e04`).
+- **O compêndio** (`wafc-studies/`): o estudo (`core`, `arms`, `scale`) e
+  as duas aplicações; as aplicações rodaram (168 unidades) e as tabelas e
+  figuras estão em `results/`; o estudo espera a E4.4.
+- **Manuscrito vivo em `k = 5`**: 73 e 101 páginas com a marcação (66 e
+  100 sem o removido); a Seção 6 com os números finais, a 5 à espera da
+  E4.4, sem a Seção 7.
+- **Bibliografia:** 101 entradas verificadas em
+  `docs/referencias-verificadas.bib`.
+- **O próximo passo é a E4.4 na desktop do autor** (§2b; D81).
 - **Se aparecer um `docs/handoff-*.md`,** é de chat de tarefa que não foi
   integrado (§7 de `instrucoes.md`).
 
@@ -259,8 +249,14 @@ por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
 
 - A memória local do assistente (`~/.claude/...`) e o scratchpad: nada do
   projeto depende deles; tudo que importa está nos repositórios.
-- Resultados de piloto (`.rds`) e `wafc/cache/`: não versionados; só o
-  handoff e o `ESTADO.md` registram os números.
+- Resultados de piloto (`.rds`) e `wafc/cache/` (1,1 GB): não
+  versionados; só o `ESTADO.md` registra os números. Ficam na máquina onde
+  rodaram.
+- **As unidades e as saídas do compêndio** (`wafc-studies/outputs/`): não
+  versionadas. As da aplicação (3,5 MB) estão no notebook; para refazer o
+  relatório das figuras noutra máquina sem reajustar, copiar a pasta
+  `wafc-studies/outputs/application/`. As da E4.4 nascem na desktop e ficam
+  lá; o que vai ao repositório são as tabelas copiadas para `results/`.
 - A instalação do `WaveBased`: reinstalar com `R CMD INSTALL .` na pasta
   clonada.
 - **Os PDFs de `refs/`** (não versionados, por direito autoral): as fontes

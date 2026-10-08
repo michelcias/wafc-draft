@@ -1,30 +1,30 @@
 # Estado do trabalho, handoff de continuidade
 
-**Última atualização:** 2026-10-06.
-**Etapa corrente:** **E0, E1, E2, E3.1 a E3.4, E5a, E5c, E5d a E5g, E6.1a a
-E6.1c e L1 a L11 fechadas.** O WAFC é o block LASSO na forma balanceada
-seguido do limiar `cv1se` (D44, D45), com o LASSO coordenado como opção
-(D43); o alvo é a *Statistica Sinica* (D5). A teoria em blocos está provada
-(`08-blocos.tex`: o Corolário 11 é o Theorem 1, D47), com a taxa lenta sem
-condição de desenho em todo `s' > 0` e, pelo comparador truncado, a taxa do
-Theorem 1 em `s < 1/2` (E1.13 a E1.15), e a cota inferior que o faz ótimo em
-`π ≥ 2` para todo `q` (E1.9). A interface `cv.wafc(x, u, y)` está
-ratificada (D48, D58). A aplicação tem duas bases (D57): **marylebone** com
-dados do UK-AIR e do ERA5 (o degrau de 2003, E6.1c; D59) como principal e
-**beijing.heat** como segunda; cada método é sintonizado nos seus termos
-(D56). **O próximo passo é o estudo de simulação (E4)**, com o desenho
-decidido (D60) e o compêndio nascendo na pasta `wafc-studies/` deste
-repositório; a **L12** (as fontes da aplicação) está no catálogo. O teto de páginas fica para o fim (D21).
+**Última atualização:** 2026-10-08.
+**Etapa corrente:** **E0 a E3 inteiras; E4.1 a E4.3b; E5a, E5c a E5k; E6.1a
+a E6.2b; L1 a L14 fechadas. O próximo passo é a produção do estudo de
+simulação (E4.4), na desktop do autor (D81), com um orquestrador novo
+naquela máquina.** O WAFC é o block LASSO na forma balanceada seguido do
+limiar `cv1se` (D44, D45); o alvo é a *Statistica Sinica* (D5). A teoria
+em blocos está provada (o Corolário 11 de `08-blocos.tex` é o Theorem 1,
+D47), com a taxa lenta sem condição de desenho e a cota inferior que a faz
+ótima em `π ≥ 2` (E1.9). **O compêndio** é a pasta `wafc-studies/` (D60),
+que vira repositório só no fim, por cópia; o código do método fica em
+`wafc/` e vai ao `WaveBased` no fim (D61). **As duas aplicações rodaram**
+(168 unidades, 0 falhas; marylebone no corpo, beijing.heat no supp; os
+números na `k = 5`). **O desenho do estudo** está fixado (D60, D62, D63,
+D69, D70, D77 a D80) e o piloto rodou (E4.3: a escala entra; a E4.4 custa
+~592 h de processador, ~74 h em 8 trabalhadores, ~45 a 60 h nos 10 da
+desktop). O teto de páginas fica para o fim (D21).
 **Versão viva do manuscrito:** `k = 5` (`manuscript/ms_5.tex`,
-`supp_5.tex`, `references_5.bib`), aberta pela E5h em 2026-10-06 a pedido
-do autor, com as Seções 5 e 6 sem números (marcadores `[E4.3]`, `[E4.4]`,
-`[E6.2]`) e as S9 e S10 do supp; tabelas e figuras em `manuscript/tables/`
-e `manuscript/figures/` (D21). As versões `k = 1` a `k = 4` ficam
-intactas. Os dois compilam limpos em **72 e 97 páginas** com a marcação,
-**64 e 96** sem o texto removido, sem a Discussion e com as tabelas
-vazias, contra o teto de 40 (D21; pergunta 60(h)).
-**Cor da rodada corrente:** `colR1`, em uso desde `k = 2` (a rodada não foi
-aceita, então a marcação de E5c segue em `colR1` na `k = 3` e na `k = 4`).
+`supp_5.tex`, `references_5.bib`, com `tables/` e `figures/`), aberta pela
+E5h em 2026-10-06; as Seções 5 e 6 estão escritas, a 6 com os números
+finais e a 5 com marcadores `[E4.4]` à espera da produção; a Discussion
+(Seção 7) não existe. Os dois compilam limpos em **73 e 101 páginas** com a
+marcação, **66 e 100** sem o texto removido, contra o teto de 40 (D21).
+As versões `k = 1` a `k = 4` ficam intactas.
+**Cor da rodada corrente:** `colR1`, em uso desde `k = 2` (nenhuma rodada
+foi aceita, então toda a marcação segue em `colR1`).
 
 Este documento é o ponto de partida de cada sessão. Ele diz onde o trabalho
 parou, o que já foi decidido (para não reabrir) e o que vem a seguir.
@@ -4951,64 +4951,60 @@ Ordenadas pelo que bloqueia mais.
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-06).** Pergunta 54 decidida (D60); a pasta
-`wafc-studies/` criada; E3.3 decidida (D61); **E4.1b fechada e
-integrada** (`x_u_rho`, pergunta 55, D62). **E4.1 fechada e integrada**
-(o compêndio na pasta, décima junção exata; pergunta 56, D63). **Catálogo:
-E4.1c** (o oráculo em blocos e o `structure`; `TAREFA.md` §3). A E4.3
-espera a E4.1c. **L12 fechada e integrada** (97 entradas; o degrau de
-Marylebone Road é de ~10 a ~23 vol%, não a média de Londres; pergunta 57). **Catálogo: só a L12** (as
-fontes da aplicação; `TAREFA.md` §3), que pede ao autor os PDFs que não
-abrirem. Nenhum handoff pendente. O manuscrito está em `k = 4` (52 e 90
-páginas com a marcação, 45 e 89 sem o removido), sem as Seções 5 a 7.
+**Onde parou (2026-10-08).** Tudo commitado e enviado; nenhum handoff
+pendente; **catálogo vazio**; nenhum processo rodando. **Perguntas em
+aberto que pedem resposta do autor: 68** (nove itens de texto da E5k, todos
+com recomendação de aceitar, dois acrescentam texto) **e 69(a)** (a margem
+do limite de 80 iterações, com a leitura no meio da E4.4).
 
-**O próximo passo é o estudo de simulação (E4)**, na ordem:
+**O próximo passo é a E4.4, a produção do estudo**, na desktop do autor
+(i9-10900KF, 10 núcleos físicos, ~50 GB; D81), inteira lá:
 
-1. **E4.1**, o nascimento do compêndio na pasta `wafc-studies/` (D60),
-   nos moldes do `wall` (`R/`, `scripts/`, `config/*.yaml`, `renv`,
-   `PROVENANCE.md`, `INSTRUCTIONS.md`, `CLAUDE.md`), com a documentação
-   escrita como a do estudo final; e, em paralelo, **a opção de `X`
-   dependente de `U` no `dgp.R`**.
-2. **E4.3**, o piloto reduzido, fora da pasta do compêndio: os tempos em
-   `n = 2000` e nos braços, o custo do braço de escala (entra abaixo de
-   ~10 h) e **a fração no topo das grades em `n = 2000`** (acima de 20%, a
-   grade daquele método sobe só ali, D60(e)). A grade de `J` (D34), as 10
-   dobras e a tabela da base (D31) já estão fixadas pela E2.5.
-3. **E4.4**, a produção, com a rodada longa esperando o aviso do autor.
-4. **No fim do projeto**, o autor cria o repositório a partir da pasta, por
-   cópia sem o histórico, com só o que reproduz o manuscrito e o supp.
+1. **Instalar e conferir** pelo `CONTINUAR.md` §2b, passos 1 e 2 (R 4.6.1,
+   a BLAS de referência, o `renv::restore()`).
+2. **A junção entre máquinas** (passo 3): as 58 unidades de
+   `wafc/scripts/14-junction-ref.tar.gz` têm de sair idênticas lá fora o
+   tempo (`JUNCTION OK`). Se falhar, parar: BLAS ou versão de pacote.
+3. **A rodada** (passo 4), com o aviso do autor:
+   `bash wafc/scripts/14-production.sh 10` em segundo plano; ~45 a 60 h.
+4. **No meio da rodada** (passo 5, pergunta 69(a)): contar os candidatos
+   de `k` que não convergiram; fora do `urho` e da `mixed` em `k` grande, é
+   motivo para parar.
+5. **Depois:** as tabelas de `wafc-studies/outputs/{core,arms,scale}/tables/`
+   copiadas para `results/` (com origem e SHA-256 no `results/README.md`,
+   como as da aplicação), e a **E5b**: os marcadores `[E4.4]` das Seções 5
+   e S9 (a Table 1, a Figure 1, as Tabelas S1 a S4, o processador), a
+   Seção 7 (Discussion), o resumo com a simulação e a aplicação (D68(i)),
+   os itens de texto pendentes (D72 já aplicado; D76; a pergunta 68 se
+   aceita), e a frase sobre o topo das grades dos splines (D78, D80: o
+   `gam.reml` no topo admissível, o `gam.gcv` preso pelo custo).
+6. **A decisão do teto de páginas** (D21): 66 páginas sem o removido contra
+   40, sem a Discussion; o que vai ao supp sem reescrever está na pergunta
+   60(h).
+7. **E7**, a submissão: o `wafc/` ao `WaveBased` (D61), a extração do
+   compêndio (D60(f), com o `LICENSE` e a lista das árvores de código de
+   cada rodada no `PROVENANCE.md`), os DOIs, o checklist do
+   `alvo-revista.md` §6.
 
-**Em paralelo ao E4:**
+**O que levar desta máquina para a desktop** (não versionado; ver
+`CONTINUAR.md` §4): os PDFs de `refs/` (114 MB, só para conferir citação) e
+as unidades da aplicação, `wafc-studies/outputs/application/` (3,5 MB,
+para refazer o relatório das figuras na E5b sem reajustar). O `wafc/cache/`
+(1,1 GB, pilotos e sondagens) fica aqui; só os números registrados neste
+arquivo importam.
 
-- **E6.2**, a aplicação no compêndio, **catalogada em 2026-10-06**:
-  marylebone (`marylebone.ukair`) e beijing.heat com as 20 partições por
-  bloco da E6.1b e da E6.1c (a nota antiga dizia "uma partição cada", sem
-  decisão por trás) e o ajuste na amostra inteira para a figura, contra os
-  dois splines de D46 e o linear, com as leituras de D59 e D64. A primeira
-  no corpo, a segunda com tabela e figura no supp (D57). A rodada das 20
-  partições espera o aviso do autor.
-- **E3.3** decidida (D61): `wafc/` fica onde está e vai ao `WaveBased` só
-  no fim, antes da E7 e da extração do compêndio.
-
-**Depois:** E5b (Seções 5 a 7 com os números de E4 e E6, a tabela da §4.3
-(32(g)) e o endereço de reprodutibilidade (32(f))); a decisão do teto de
-páginas (D21), sabendo que o corpo já tem 45 páginas sem as Seções 5 a 7 e
-que a §3 tem 19 (pergunta 47(e)); E7 (submissão, com os itens 27(b) e (c)
-do checklist).
-
-**Medições opcionais** (não catalogadas): `boundary = "interval"`, que pede
-a reparametrização do bloco de escala (`01-identificabilidade.md` §5;
-pergunta 6) e só se um referee pedir (D59); um meio-termo entre o `cv1se` e
-o `+cv`.
-
-**Sem bloquear:** 12 (o cenário `smooth`), 13 (o nome da (BD)), 21 (`p`
-crescente), 32(d) (o Lema 10 no supp), 36(b) e (c) (sem objeto depois de
-D46).
+**Sem bloquear:** 12 (o cenário `smooth`), 13 (o nome da (BD)), 14 (o
+KP como opção do `wafc()`), 21 (`p` crescente), 27 (o acabamento da
+semana de submissão, E7), 32 (as pendências de E5c, entre elas o Lema 10
+no supp), 35, 36 e 39 (pendências de L5, E2.5d e L8); as opções da figura da
+`beijing.heat` no compêndio (sem a linha do nível, proporção mais baixa;
+bloco da E5k), para a E5b; `boundary = "interval"` só se um referee pedir.
 
 ## 6. Histórico de sessões
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-08 | Verificação geral para o orquestrador novo na desktop: cabeçalho e §5 reescritos, `CONTINUAR.md` §3 e §4, o `README.md` e o plano atualizados; nada a integrar |
 | 2026-10-08 | D81: a E4.4 vai à desktop do autor (i9-10900KF, 10 trabalhadores); o script de produção, a junção entre máquinas (58 unidades de referência, empacotadas) e o passo a passo no `CONTINUAR.md` §2b |
 | 2026-10-08 | E4.3b fechada e integrada: a regra de tamanho acima de 80, o limite de 80 iterações e o descarte (523 ajustes convergidos em no máximo 51 iterações; o `urho` em ~300 s); junção exata onde tudo converge; a E4.4 projetada em ~74 h em 8; pergunta 69 |
 | 2026-10-08 | Primeira rodada da E4.3b com a regra de D79 (junção exata onde ela não morde; a `mixed` em `n = 1000` em `k = 120`, razão 0,991; E4.4 projetada em 71 a 105 h pelo `urho`); D80: a regra só além de `k = 80`, e um limite determinístico de iterações para o `urho`; a E4.3b segue aberta |
