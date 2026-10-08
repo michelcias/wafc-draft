@@ -3536,7 +3536,12 @@ against $\log n$. [E4.4: the reading.]
 % (D57: beijing.heat no supp, com tabela e figura). Os dados e o modelo sao os de
 % wafc-studies/R/application_data.R e data/README.md; o paragrafo da temporada e
 % o rascunho da L13 (ESTADO.md), com "neighbouring" fora; as marcas sao as
-% nominais (D66).
+% nominais (D66). E5k (2026-10-08): os marcadores [E6.2] trocados pelos numeros de
+% results/tables/ (prediction-, structure-, choices- e readings-<app>.csv; cada um e a
+% sua coluna no handoff-E5k.md); a frase da grade da E6.2b (D76(c)), com o escopo da
+% sondagem (as particoes 1 a 3 nos splines, o ajuste inteiro no WAFC); a frase das
+% tabelas casada com o que o application_prediction() calcula (a diferenca e o wins
+% contra o spline de menor erro medio, nao contra o melhor de cada particao).
 {\color{colR1}
 \section{The applications: further results}
 \label{sec:supp-app}
@@ -3547,13 +3552,39 @@ Table~\ref{tab:app-prediction} gives, for the two applications, the root mean
 squared error on the held-out weeks, its mean over the 20 partitions with the
 standard error of \citet{Nadeau-Bengio-2003}, which corrects for the overlap
 of the training samples, the ratio to the better of the two splines in each
-partition, and the fraction of partitions in which a method beats that
-spline. Table~\ref{tab:app-structure} gives, for every block, the frequency
-with which each method keeps it over the partitions, and the choices of $J$,
-the penalty, the threshold and $k$. [E6.2: the reading.]
+partition, and the paired difference to the spline with the smaller mean
+error, with the fraction of partitions in which it is negative.
+Table~\ref{tab:app-structure} gives, for every block, the frequency with
+which each method keeps it over the partitions, and
+Table~\ref{tab:app-tuning} the choices of $J$, the penalty, the threshold
+and $k$.
+
+At Marylebone Road the comparison is that of Section 6.3 of the paper; the
+constant coefficients have an error of 15.48~ppb, about a third more than
+the methods with varying coefficients. At Dongsi the WAFC is ahead of the
+spline fitted by REML, the better of the two splines in every partition, in
+all 20 partitions and with either threshold, with an error smaller by 8\% on
+average and a paired difference of $-0.070$ (standard error 0.023). There
+both thresholds and both splines keep every block in the fit to the whole
+sample, and the one standard error rule drops the pressure along the day of
+the year in one partition and along the humidity in two.
+
+Both splines choose $k = 80$, the top of the grid, in all 21 fits of each
+application, and \texttt{k.check} flags two of the four smooths at
+Marylebone Road in every fit and four to eight of the eight at Dongsi. The
+WAFC chooses $J = 8$, the top of its grid, in the fit to the whole sample at
+Marylebone Road and $J = 5$ or 6 in the partitions; at Dongsi it chooses
+$J = 4$ in the fit to the whole sample and in 19 of the 20 partitions, and
+every coefficient of a block it keeps is nonzero. At Marylebone Road,
+extending the grids does not change the comparison: with $k$ up to 160 in
+the first three partitions, REML and GCV again choose the largest dimension
+and the error on the held-out weeks rises by about 3 to 4 percent, and in the
+fit to the whole sample the cross-validated error of the WAFC at $J = 9$ is
+larger than at $J = 8$.
 
 \input{tables/app-prediction}
 \input{tables/app-structure}
+\input{tables/app-tuning}
 
 \subsection*{Beijing}
 
@@ -3584,9 +3615,17 @@ significantly at its start and falls at its end in every season from 2010 to
 2014 \citep[Section~7]{Liang-Zou-Guo-Li-Zhang-Zhang-Huang-Chen-2015}; the
 effective dates move with the temperature (for instance, the season started
 on 3 November in 2012), so the marks at 15 November and 15 March in
-Figure~\ref{fig:beijing} are nominal. [E6.2: for each coefficient, the mean of
-its component along the day of the year inside the season minus the mean
-outside it, and the reading.]
+Figure~\ref{fig:beijing} are nominal. Along the day of the year, the mean of
+the component of a coefficient inside the nominal season minus its mean
+outside it is, in the fit of the WAFC to the whole sample, $-0.18$ per m/s
+for the wind speed ($-0.19$ to $-0.13$ over the partitions), $-0.056$ per
+$^{\circ}$C for the temperature ($-0.058$ to $-0.031$) and $-0.028$ per hPa
+for the pressure ($-0.032$ to 0), and the two splines give $-0.17$ to
+$-0.18$, $-0.062$ and $-0.033$. The three differences are negative in every
+fit of the WAFC and of the two splines, except that of the pressure in the
+partition in which the WAFC drops that block: inside the season a unit of
+wind speed goes with a larger decrease of PM2.5, and a degree of temperature
+with a smaller increase, than outside it.
 
 \input{figures/app-beijing}
 % E5h: a figura S1 cai depois das referencias sem isto.

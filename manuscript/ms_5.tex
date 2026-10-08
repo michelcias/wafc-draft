@@ -1929,7 +1929,12 @@ the study.]
 % trocados pelos de results/tables/ (handoff-E5j.md, cada numero e a sua
 % coluna); a frase dos buracos no 6.1 (D73, "spacing" no lugar de "support"),
 % o pico na segunda metade de 2003 e a serie de Carslaw ate dezembro de 2003
-% (respostas do autor na E5j). Os da beijing.heat (6.4) ficam. A frase de Opsomer, Wang e Yang (2001)
+% (respostas do autor na E5j). Os da beijing.heat (6.4) ficam. E5k (2026-10-08): o
+% do 6.4 trocado pelo de prediction-beijing.heat.csv (ratio_best_spline e wins do
+% wafc.cv1se); no 6.3, D76(b) com os numeros que o drawn_grid() da E6.2b mudou
+% (rise 9.0, 9.4 a 10.3; fraction_at_2003-01-01 0.17 a 0.36; date_90 em 18 das 20
+% particoes antes do buraco de 2003, nas outras duas e no gam.reml no primeiro ponto
+% desenhado depois dele; peak_above_before 13.5) e a oracao de D76(c). A frase de Opsomer, Wang e Yang (2001)
 % nao entra (D65). As atribuicoes que as licencas pedem estao nos
 % Acknowledgements.
 {\color{colR1}
@@ -2010,17 +2015,19 @@ Figure~\ref{fig:marylebone} shows each coefficient along each modulator, with
 the component of the other modulator at its sample mean. The background of
 oxidant follows the annual cycle, over a range of 23 to 24~ppb in the fits to
 the whole sample. The slope on NOx is flat until mid 2002 and then rises, by
-8.9 percentage points from its level before 2002 to its level from 2004 on in
-the fit to the whole sample, and by 9.3 to 10.3 points over the 20
-partitions; it has completed a quarter of the rise by January 2003 (0.16 to
-0.36 over the partitions) and 90\% of it by the end of July 2003, in the fit
-to the whole sample and in every partition. The two thresholds keep the same
-blocks along the date and give the same rise, and the spline fitted by REML
-gives a rise of 10.3 points, 90\% of it by the beginning of August 2003. At
+9.0 percentage points from its level before 2002 to its level from 2004 on in
+the fit to the whole sample, and by 9.4 to 10.3 points over the 20
+partitions; it has completed a quarter of the rise by January 2003 (0.17 to
+0.36 over the partitions) and 90\% of it by the end of July 2003 in the fit
+to the whole sample and in 18 of the 20 partitions, and by the end of the gap
+in the data of late July and early August 2003 in the other two. The two
+thresholds keep the same blocks along the date and give the same rise, and
+the spline fitted by REML gives a rise of 10.3 points, 90\% of it by the end
+of that gap. At
 this site \citet[Figure~3(a)]{Carslaw-2005} estimated a rise of the primary
 fraction from about 10\% to about 23\% by volume over 2002 and 2003; the step
 of the fit is measured from 2004 on, past the peak described next, and the
-rise to that peak is 13.4 points (11.7 to 13.8 over the partitions). Two
+rise to that peak is 13.5 points (11.7 to 13.8 over the partitions). Two
 departures from a single step appear in every fit of the WAFC and of the
 spline fitted by REML, a dip at the beginning of 2002 and a peak in the
 second half of 2003: the dip also appears in the monthly estimates of
@@ -2047,8 +2054,9 @@ paired difference, 0.05~ppb with standard error 0.11, is negative in 8 of
 the 20 partitions. The WAFC is behind by 2.5\%, with an error of 11.75~ppb
 and a paired difference of 0.28~ppb (standard error 0.22). Section~S10 of the
 Supplementary Material gives the errors of every method, the frequency with
-which each block is kept over the partitions, and the choices of $J$, $\pen$,
-the threshold and $k$.
+which each block is kept over the partitions and the choices of $J$, $\pen$,
+the threshold and $k$, and shows that extending the grids of $J$ and $k$ does
+not change the comparison.
 
 \input{figures/app-marylebone}
 
@@ -2065,8 +2073,9 @@ modulator, and the relative humidity, over 34,287 hours. The question there
 is prediction. The coefficients change with the season, around the nominal
 dates of the heating season, 15 November to 15 March
 \citep[Section~7]{Liang-Zou-Guo-Li-Zhang-Zhang-Huang-Chen-2015}, and on the
-held-out weeks the WAFC [E6.2: the prediction against the better of the two
-splines].
+held-out weeks the WAFC is ahead of the better of the two splines in all 20
+partitions, with a root mean squared error 8\% below that of the better
+spline on average.
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

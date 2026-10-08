@@ -1,0 +1,42 @@
+% tables/app-tuning.tex -- tabela do supp_5.tex, Secao S10 (E5k, 2026-10-08; D21: cada tabela
+% num \input proprio). O painel (b) da Table S6 da E5h ("the choices of J, lambda, the
+% threshold and k"), separado porque as duas juntas passavam 454 pt da pagina em espaco
+% duplo. Os numeros de results/tables/choices-<app>.csv (o compendio e a verdade): split 0
+% e a mediana (minimo--maximo) dos splits 1 a 20 de J e lambda (iguais nas duas linhas do
+% WAFC), t_frac * 100 (o limiar como fracao da maior norma de bloco do ajuste, a coluna c
+% do wafc_threshold()), nzero, k (o mesmo nas duas moduladoras, "80,80", k_top TRUE nos
+% 21 ajustes) e kcheck_n_low (de 4 suavizacoes em marylebone, 8 na beijing.heat; os dois
+% splines dao os mesmos resumos, por isso uma linha so). \color{colR1} dentro do float (D75(d)).
+\begin{table}[tp]
+\color{colR1}
+\caption{The two applications, tuning: the choices in the fit to the whole
+sample and their median (range) over the 20 partitions. $J$ and $\pen$ are
+those of the WAFC, which the two thresholds share; the threshold is in
+percent of the largest block norm of the fit, followed by the number of
+nonzero coefficients after it; $k$ is the dimension chosen by the two
+splines, at both modulators, and the last row the number of smooths that
+\texttt{k.check} of \texttt{mgcv} flags, of 4 at Marylebone Road and of 8 at
+Dongsi, which is the same for REML and GCV. The grids are
+$J \in \{2,\dots,8\}$ and $k \in \{5,10,20,40,80\}$.}
+\label{tab:app-tuning}
+\centering
+\small
+\begin{tabular}{lcccc}
+\hline
+ & \multicolumn{2}{c}{Marylebone Road} & \multicolumn{2}{c}{Dongsi} \\
+ & Whole & Partitions & Whole & Partitions \\
+\hline
+$J$ & 8 & 5 (5--6) & 4 & 4 (3--4) \\
+$\pen \times 10^{3}$ & 101.9 & 40.2 (29.7--73.2) & 0.43 & 0.88 (0.56--1.60) \\
+\multicolumn{5}{l}{WAFC} \\
+\quad Threshold (\%) & 77 & 77 (56--93) & 0.95 & 0.98 (0.55--1.13) \\
+\quad Nonzero coefficients & 458 & 77 (62--152) & 120 & 120 (56--120) \\
+\multicolumn{5}{l}{WAFC (cv threshold)} \\
+\quad Threshold (\%) & 5.7 & 10.6 (3.9--33.3) & 0.46 & 0.46 (0.28--1.02) \\
+\quad Nonzero coefficients & 488 & 108 (77--178) & 120 & 120 (56--120) \\
+\multicolumn{5}{l}{GAM (REML) and GAM (GCV)} \\
+\quad $k$ & 80 & 80 (80--80) & 80 & 80 (80--80) \\
+\quad Smooths flagged & 2 & 2 (2--2) & 4 & 4 (4--8) \\
+\hline
+\end{tabular}
+\end{table}

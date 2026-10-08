@@ -1,8 +1,43 @@
 % tables/app-structure.tex -- tabela do supp_5.tex, Secao S10 (E5h, 2026-10-06; D21: cada tabela num
 % \input proprio). So o lugar: o conteudo vem da E6.2 (os structure-<app>.csv e choices-<app>.csv do compendio).
-\begin{table}[t]
-\caption{The two applications, structure and tuning. [E6.2: for every block, the frequency with which each method keeps it over the 20 partitions and whether the fit to the whole sample keeps it; the choices of $J$, $\lambda$, the threshold and $k$.]}
+% E5k (2026-10-08): os numeros de results/tables/ (o compendio e a verdade). Painel (a),
+% do structure-<app>.csv: kept_<rotulo> * 20 e, entre parenteses, range_<rotulo> (a
+% amplitude no ajuste inteiro nos pontos desenhados, D75(b); zero quando full_<rotulo> e
+% FALSE). O painel (b) das escolhas foi a tables/app-tuning.tex (Table S7): as duas
+% juntas, em espaco duplo, passavam 454 pt da pagina. \color{colR1} dentro do float (D75(d)).
+\begin{table}[tp]
+\color{colR1}
+\caption{The two applications, structure: for every block, the number of the
+20 partitions in which each method keeps it and, in parentheses, the range of
+the component in the fit to the whole sample over the points drawn in
+Figure~2 of the paper and Figure~\ref{fig:beijing}, which is zero when that
+fit drops the block; in ppb for the background and in percentage points for
+the slope at Marylebone Road, and in the logarithm of PM2.5 at Dongsi, per
+unit of the covariate (m/s, $^{\circ}$C, hPa) for the coefficients. WAFC
+(cv): the threshold of the smallest cross-validated error.}
 \label{tab:app-structure}
 \centering
-\fbox{\parbox{0.9\textwidth}{\centering\small [E6.2: the table.]}}
+\small
+\setlength{\tabcolsep}{5pt}
+\begin{tabular}{lcccc}
+\hline
+Block & WAFC & WAFC (cv) & GAM (REML) & GAM (GCV) \\
+\hline
+\multicolumn{5}{l}{Marylebone Road} \\
+Background, date & 20 (24.2) & 20 (24.2) & 20 (22.9) & 20 (24.4) \\
+Background, wind speed & 12 (0) & 20 (5.75) & 20 (7.82) & 20 (7.38) \\
+Slope on NOx, date & 20 (15.8) & 20 (15.8) & 20 (20.8) & 20 (21.0) \\
+Slope on NOx, wind speed & 0 (0) & 19 (0.795) & 18 (1.15) & 19 (1.78) \\
+\hline
+\multicolumn{5}{l}{Dongsi} \\
+Level, day of the year & 20 (6.33) & 20 (6.33) & 20 (8.36) & 20 (8.89) \\
+Level, humidity & 20 (2.26) & 20 (2.26) & 20 (2.15) & 20 (2.10) \\
+Wind speed, day of the year & 20 (0.417) & 20 (0.417) & 20 (0.685) & 20 (0.744) \\
+Wind speed, humidity & 20 (0.294) & 20 (0.294) & 20 (0.211) & 20 (0.212) \\
+Temperature, day of the year & 20 (0.101) & 20 (0.101) & 20 (0.178) & 20 (0.198) \\
+Temperature, humidity & 20 (0.0735) & 20 (0.0735) & 20 (0.0654) & 20 (0.0663) \\
+Pressure, day of the year & 19 (0.109) & 20 (0.109) & 20 (0.186) & 20 (0.221) \\
+Pressure, humidity & 18 (0.0501) & 20 (0.0501) & 20 (0.0350) & 20 (0.0358) \\
+\hline
+\end{tabular}
 \end{table}

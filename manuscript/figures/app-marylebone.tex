@@ -2,8 +2,8 @@
 % A figura e a marylebone.ukair.pdf do compendio (R/application_report.R,
 % split00 e as 20 particoes; D67(d): beta_l remontado, 60 dias cortados em cada
 % ponta da data). A legenda e o rascunho da E6.2 no ESTADO.md, com tres mudancas:
-% os numeros ganharam o prefixo "E6.2:" e "in every partition" foi aos colchetes
-% (as particoes do compendio sao novas, D67(b)); "as does the rise from about 10
+% os numeros foram marcados para a rodada (as particoes do compendio sao novas,
+% D67(b)) e, na E5k (D75(f)), trocados pelos de readings-marylebone.ukair.csv; "as does the rise from about 10
 % to about 23 percent by volume that Carslaw estimated" passou a uma frase
 % propria, porque comparava uma subida com outra pela sintaxe do verbo; e "Fig."
 % passou a "Figure", como no corpo. Sem referencia a cor (SS).
@@ -15,20 +15,21 @@
 %   grey: the range of the WAFC over 20 fits on 70\% of the weeks. The
 %   background follows the annual cycle. The slope, an estimate of the fraction
 %   of NOx emitted directly as $\mathrm{NO_2}$
-%   \citep{Clapp-Jenkin-2001,Carslaw-Beevers-2005}, rises by [E6.2: 9.7]
-%   percentage points from 2002 to 2004, [E6.2: a quarter] of the rise by January
-%   2003 and [E6.2: 90\%] by July 2003 [E6.2: in every partition]. At this site,
+%   \citep{Clapp-Jenkin-2001,Carslaw-Beevers-2005}, rises by 9.0
+%   percentage points from 2002 to 2004, a quarter of the rise by January
+%   2003 and 90\% by the end of July 2003 in 18 of the 20 partitions. At this site,
 %   \citet[Figure~3(a)]{Carslaw-2005} estimated a rise from about 10 to about 23
 %   percent by volume over 2002 and 2003. The dip at the beginning of 2002 also
 %   appears in his monthly estimates, whose series ends before the peak at the end
-%   of 2003. The wind speed modulates the slope by about [E6.2: 17\%] of the step;
+%   of 2003. The wind speed modulates the slope by 9\% to 17\% of the step;
 %   the WAFC drops that block, and the threshold of the smallest cross-validated
 %   error and the spline keep it. 
 % E5j (2026-10-07): a caixa virou a figura, copia de results/figures/ (o
 % compendio e a verdade); o 9.7 virou 8.9 (rise, wafc.cv1se, full, do
 % readings-marylebone.ukair.csv); a frase de D73, com "spacing" no lugar de
 % "support" (resposta do autor: o suporte do Daublets 8 no nivel 8 e ~75 dias).
-% Os colchetes do trecho acima sao do rascunho e nao vao ao texto.
+% E5k (D75(f), D76(b)): os colchetes do trecho acima sairam, com os numeros da
+% rodada; o 8.9 da legenda anterior abaixo virou 9.0. \color{colR1} dentro do float (D75(d)).
 % E5j: com a figura no lugar da caixa, a legenda de D68(g) mais a frase de D73
 % passava da pagina por 158 pt (sobravam ~5 cm para os paineis); a legenda minima
 % abaixo, escolhida pelo autor, cabe na largura inteira: os tipos de linha sairam
@@ -44,12 +45,13 @@
 %   smallest cross-validated error; dot-dashed: \texttt{mgcv} with REML;
 %   grey: the range of the WAFC over 20 fits on 70\% of the weeks. The
 %   background follows the annual cycle, and the slope, an estimate of the
-%   fraction of NOx emitted directly as $\mathrm{NO_2}$, rises by 8.9
+%   fraction of NOx emitted directly as $\mathrm{NO_2}$, rises by 9.0
 %   percentage points from 2002 to 2004. The first and the last 60 days are not shown:
 %   there the periodized basis joins the end of the series to its start. Ticks on
 %   the axes mark the observed values; curves are not drawn over gaps in the data
 %   longer than the spacing of the finest wavelets, about 11 days.
 \begin{figure}[tp]
+\color{colR1}
 \centering
 \includegraphics[width=\textwidth]{figures/marylebone.ukair.pdf}
 \caption{Marylebone Road, London, hourly, 1998--2005: the oxidant background

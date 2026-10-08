@@ -1,8 +1,45 @@
 % tables/app-prediction.tex -- tabela do supp_5.tex, Secao S10 (E5h, 2026-10-06; D21: cada tabela num
 % \input proprio). So o lugar: o conteudo vem da E6.2 (os prediction-<app>.csv do compendio).
-\begin{table}[t]
-\caption{The two applications, prediction on the held-out weeks over 20 partitions. [E6.2: root mean squared error, mean and standard error with the correction of \citet{Nadeau-Bengio-2003}, ratio to the better of the two splines in each partition, and fraction of partitions in which a method beats that spline, by method.]}
+% E5k (2026-10-08): os numeros de results/tables/prediction-<app>.csv (o compendio e
+% a verdade): rmse; se * nb_factor (o erro-padrao corrigido de Nadeau e Bengio, com o
+% fator que o application_prediction() aplica a diferenca); ratio_best_spline; diff e
+% diff_se_nb contra a coluna versus (gam.reml nas duas bases); wins (a fracao de
+% particoes com erro abaixo do gam.reml, nao do melhor spline de cada particao, que
+% so coincidem na beijing.heat, onde o gam.reml e o melhor em todas); r2. A legenda
+% diz isso no lugar do "fraction of partitions in which a method beats that spline" da
+% E5h. \color{colR1} dentro do float (D75(d)).
+\begin{table}[tp]
+\color{colR1}
+\caption{The two applications, prediction on the held-out weeks over 20
+partitions: the root mean squared error (RMSE), mean and standard error with
+the correction of \citet{Nadeau-Bengio-2003}; its ratio to that of the better
+of the two splines in each partition; the paired difference to the spline
+with the smaller mean error, GAM (REML) in both applications, with the
+corrected standard error, and the fraction of partitions in which it is
+negative; and $R^2$, one minus the ratio of the mean squared error to the
+variance of the held-out response. WAFC: the threshold of the one standard
+error rule; WAFC (cv threshold): the threshold of the smallest
+cross-validated error.}
 \label{tab:app-prediction}
 \centering
-\fbox{\parbox{0.9\textwidth}{\centering\small [E6.2: the table.]}}
+\small
+\begin{tabular}{lccccc}
+\hline
+ & RMSE & Ratio & Difference & Negative & $R^2$ \\
+\hline
+\multicolumn{6}{l}{Marylebone Road, total oxidant (ppb)} \\
+WAFC & 11.75 (0.28) & 1.025 & 0.28 (0.22) & 0.30 & 0.68 \\
+WAFC (cv threshold) & 11.52 (0.32) & 1.005 & 0.05 (0.11) & 0.40 & 0.69 \\
+GAM (REML) & 11.47 (0.32) & 1.000 & -- & -- & 0.69 \\
+GAM (GCV) & 11.49 (0.33) & 1.002 & 0.02 (0.02) & 0.10 & 0.69 \\
+Constant coefficients & 15.48 (0.30) & 1.352 & 4.02 (0.30) & 0.00 & 0.44 \\
+\hline
+\multicolumn{6}{l}{Dongsi, logarithm of PM2.5} \\
+WAFC & 0.800 (0.017) & 0.920 & $-$0.070 (0.023) & 1.00 & 0.53 \\
+WAFC (cv threshold) & 0.797 (0.016) & 0.916 & $-$0.074 (0.021) & 1.00 & 0.54 \\
+GAM (REML) & 0.871 (0.027) & 1.000 & -- & -- & 0.45 \\
+GAM (GCV) & 0.892 (0.029) & 1.024 & 0.021 (0.006) & 0.00 & 0.42 \\
+Constant coefficients & 1.059 (0.016) & 1.218 & 0.188 (0.026) & 0.00 & 0.18 \\
+\hline
+\end{tabular}
 \end{table}
