@@ -66,9 +66,9 @@ tuning:
     k: [5, 10, 20, 40, 80]
     basis: {family: Daublets, filter_size: 8, prec_wavelet: 30}
   "500": *tuning
-  # From n = 1000 the grid of k of gam.reml goes to 240: below that, its
+  # From n = 1000 the grid of k of gam.reml goes beyond 80: below that, its
   # choice sits at the top of the grid in the cells with inhomogeneous
-  # components. It stops at 240 because one more value would take about
+  # components. At n = 2000 it stops at 240 because one more value would take about
   # an hour per fit in the cell "mixed" at n = 2000. gam.gcv keeps the
   # common grid, since its fits cost several times those of gam.reml at
   # the same k. In every search of k, a value above 80 whose smooths
@@ -78,10 +78,16 @@ tuning:
   # within 80 outer iterations of its smoothing parameters, and one
   # that cannot be fitted or scored, are left out too. Every candidate left
   # out is recorded in gam_k.csv with its reason.
+  # At n = 1000 the grid of gam.reml stops at 160 (decision D82): in the
+  # production of E4.4 the fit at 240 did not converge in 30 of 98
+  # replicates of the cell "inhomogeneous" and 5 of 100 of "uneven", and in
+  # some of them the step halving inside each outer iteration of mgcv,
+  # which has no limit of its own, ran up to 1067 halvings per iteration,
+  # about 13 hours for one candidate that is left out at the end.
   "1000":
     <<: *tuning
     methods:
-      gam.reml: {k: [5, 10, 20, 40, 80, 120, 160, 240]}
+      gam.reml: {k: [5, 10, 20, 40, 80, 120, 160]}
   # The grids grow with the sample size: at n = 2000, one more resolution
   # level and one more basis dimension, fixed before the study is run.
   "2000":
