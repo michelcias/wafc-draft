@@ -1,10 +1,11 @@
 # Estado do trabalho, handoff de continuidade
 
-**Última atualização:** 2026-10-08.
-**Etapa corrente:** **E0 a E3 inteiras; E4.1 a E4.3b; E5a, E5c a E5k; E6.1a
-a E6.2b; L1 a L14 fechadas. O próximo passo é a produção do estudo de
-simulação (E4.4), na desktop do autor (D81), com um orquestrador novo
-naquela máquina.** O WAFC é o block LASSO na forma balanceada seguido do
+**Última atualização:** 2026-10-12.
+**Etapa corrente:** **E0 a E3 inteiras; E4.1 a E4.4; E5a, E5c a E5k; E6.1a
+a E6.2b; L1 a L14 fechadas. A produção do estudo de simulação (E4.4)
+rodou na desktop do autor (D81, D82), e as tabelas estão em
+`results/tables/{core,arms,scale}/`. O próximo passo é a E5b, os números
+do estudo no manuscrito.** O WAFC é o block LASSO na forma balanceada seguido do
 limiar `cv1se` (D44, D45); o alvo é a *Statistica Sinica* (D5). A teoria
 em blocos está provada (o Corolário 11 de `08-blocos.tex` é o Theorem 1,
 D47), com a taxa lenta sem condição de desenho e a cota inferior que a faz
@@ -2084,6 +2085,54 @@ Mediana da razão dentro da réplica, `n = 250, 500, 1000`.
 - **Lição:** um teste exato num `J` fixo deixa de ser exato quando o `J` é
   escolhido nos mesmos dados (12% a 17% de rejeição sob o nulo contra 5%);
   é leitura do mecanismo, não medida.
+
+### 2026-10-12: E4.4 fechada, a produção do estudo
+
+- **A máquina e a junção** (D81): desktop do autor (i9-10900KF, 10
+  trabalhadores, BLAS de referência em uma thread); `renv::restore()` com
+  os 18 pacotes do `renv.lock`; a junção deu **58 de 58 unidades
+  idênticas** fora o tempo (4,6 min em 10).
+- **A rodada:** de 2026-10-08 17h34 a 2026-10-11 20h51, com uma parada.
+  **19 600 unidades do `core`, 5 700 dos braços e 900 da `scale`, 0
+  falhas e 0 erros de linha.** Processador: **498,6 h** no `core`,
+  **126,6 h** nos braços e **22,7 h** na `scale`, **647,9 h** no total
+  (a projeção era 592 h na escala do notebook); relógio dos braços
+  12 h 40 min, da `scale` 2 h 16 min. Pico de 1,5 GB por processo no
+  `time -v` (o processo-mãe; os filhos do `mclapply` não entram).
+- **O `gam.reml` em `n = 2000` custou 122 h** contra 73 h projetadas
+  (~1,7 vez), provavelmente pela disputa de memória entre os 10
+  processos; o resultado não muda, só o tempo.
+- **A parada (D82):** em `n = 1000` o `k = 240` do `gam.reml` não
+  convergiu em 30 de 98 réplicas do `inhomogeneous` e 5 de 100 do
+  `uneven` (zero em `n = 2000`), e as réplicas 59 e 74 passaram de 15 h.
+  A reprodução da réplica 59 com rastro mostrou a causa: no `bgam.fitd`
+  do `mgcv`, o corte de passo dentro de cada iteração externa é um
+  `repeat` sem limite próprio; a partir da iteração 54 cada uma faz
+  **1 067 cortes** (até o passo virar zero), ~29 min, e o `k.maxit = 80`
+  de D80 só limita as externas. O autor tirou o 240 de `n = 1000`
+  (a trava por número de cortes foi descartada: tempo demais na sintonia
+  de um competidor). As 498 unidades antigas estão em
+  `wafc/cache/e44/stale-gam.reml-n1000-k240/`; só elas foram reajustadas
+  (os outros 39 grupos do `core` conferidos iguais), em 1 h 44 min.
+- **O `gam.reml` depois de D82:** nenhum "not converged" em nenhum
+  desenho; os candidatos fora são só os da regra de tamanho (a `mixed` em
+  160, a `scale` em 120 e 160). **Escolha no topo da grade:** em
+  `n = 1000`, 16 de 100 no `inhomogeneous`, 0 no `uneven`, 97 na `mixed`
+  (topo admissível 120); nos braços, 0, 16 e 15 nas variantes
+  `inhomogeneous` (`snr1`, `urho`, `xu`) e 1, 95 e 99 nas da `mixed`; em
+  `n = 2000`, 100 de 100 no `inhomogeneous` e na `mixed` (topo 240); a
+  `scale` em 89 de 100. Com o 240, ele era o escolhido em 66 de 98 e 79 de
+  100 em `n = 1000`, por diferenças mínimas de critério (1,5 e 1,2 de
+  REML em média).
+- **As tabelas** (sem os `curves.csv`, 85 a 256 MB, que ficam na desktop
+  com o SHA-256 registrado) estão em `results/tables/{core,arms,scale}/`,
+  com origem e SHA-256 no `results/README.md`. O código do método na
+  árvore `34f2e04`; a configuração em `aa11e76`.
+- **Lições:** (1) um comando de rodada com redirecionamento para
+  `outputs/` falha antes de o script criar a pasta: o `CONTINUAR.md`
+  agora cria a pasta e entra na raiz em cada bloco; (2) o `maxit` de um
+  otimizador não limita o tempo se houver um laço interno sem teto: medir
+  por chamada à rotina interna, não por iteração externa.
 
 ### 2026-10-08: E4.3b fechada, a grade nova do `gam.reml`
 
@@ -4952,55 +5001,40 @@ Ordenadas pelo que bloqueia mais.
 
 ## 5. Próximos passos
 
-**Onde parou (2026-10-08).** Nenhum handoff pendente; **catálogo
-vazio**. **A E4.4 está rodando na desktop** (passos 1 a 4 do
-`CONTINUAR.md` §2b feitos lá): o `renv::restore()` instalou os 18
-pacotes, a junção deu **58 de 58 idênticas** fora o tempo
-(`JUNCTION OK`, 4,6 min em 10), e a produção começou em
-**2026-10-08 17:34** com `902e7b1`, 10 trabalhadores, o `core` com
-19 600 unidades. **2026-10-11, ~04:00, a rodada parou** com o `core` em
-19 598 de 19 600 (D82): o 240 do `gam.reml` em `n = 1000` sai da grade,
-as 498 unidades dessa combinação vão ao reajuste e o resto do cache
-vale; relançar com o `CONTINUAR.md` §2b, passo 4, depois do commit da
-configuração. A pergunta 69(a) fica respondida por D82. **Perguntas em
-aberto que pedem resposta do autor: 68** (nove itens de texto da E5k, todos
-com recomendação de aceitar, dois acrescentam texto) **e 69(a)** (a margem
-do limite de 80 iterações, com a leitura no meio da E4.4).
+**Onde parou (2026-10-12).** Nenhum handoff pendente; **catálogo
+vazio**; nenhum processo rodando. **A E4.4 fechou** (bloco de 2026-10-12
+no §2; D82): 26 200 unidades, 0 falhas, 647,9 h de processador; as
+tabelas em `results/tables/{core,arms,scale}/`. A pergunta 69 fica
+respondida por D82. **Pergunta em aberto que pede resposta do autor: 68**
+(nove itens de texto da E5k, todos com recomendação de aceitar, dois
+acrescentam texto).
 
-**O próximo passo é a E4.4, a produção do estudo**, na desktop do autor
-(i9-10900KF, 10 núcleos físicos, ~50 GB; D81), inteira lá:
+**O próximo passo é a E5b**, os números do estudo no manuscrito, a
+partir de `results/tables/`:
 
-1. **Instalar e conferir** pelo `CONTINUAR.md` §2b, passos 1 e 2 (R 4.6.1,
-   a BLAS de referência, o `renv::restore()`).
-2. **A junção entre máquinas** (passo 3): as 58 unidades de
-   `wafc/scripts/14-junction-ref.tar.gz` têm de sair idênticas lá fora o
-   tempo (`JUNCTION OK`). Se falhar, parar: BLAS ou versão de pacote.
-3. **A rodada** (passo 4), com o aviso do autor:
-   `bash wafc/scripts/14-production.sh 10` em segundo plano; ~45 a 60 h.
-4. **No meio da rodada** (passo 5, pergunta 69(a)): contar os candidatos
-   de `k` que não convergiram; fora do `urho` e da `mixed` em `k` grande, é
-   motivo para parar.
-5. **Depois:** as tabelas de `wafc-studies/outputs/{core,arms,scale}/tables/`
-   copiadas para `results/` (com origem e SHA-256 no `results/README.md`,
-   como as da aplicação), e a **E5b**: os marcadores `[E4.4]` das Seções 5
-   e S9 (a Table 1, a Figure 1, as Tabelas S1 a S4, o processador), a
-   Seção 7 (Discussion), o resumo com a simulação e a aplicação (D68(i)),
-   os itens de texto pendentes (D72 já aplicado; D76; a pergunta 68 se
-   aceita), e a frase sobre o topo das grades dos splines (D78, D80: o
-   `gam.reml` no topo admissível, o `gam.gcv` preso pelo custo).
-6. **A decisão do teto de páginas** (D21): 66 páginas sem o removido contra
-   40, sem a Discussion; o que vai ao supp sem reescrever está na pergunta
-   60(h).
-7. **E7**, a submissão: o `wafc/` ao `WaveBased` (D61), a extração do
+1. Os marcadores `[E4.4]` das Seções 5 e S9: a Table 1, a Figure 1 (dos
+   `curves.csv`, que estão só na desktop), as Tabelas S1 a S4, o
+   processador e o tempo (647,9 h, a máquina de D81).
+2. A frase sobre o topo das grades dos splines (D78, D80, D82): o
+   `gam.reml` no topo admissível na `mixed` e em `n = 2000`, o 240 fora
+   de `n = 1000` pelo custo, o `gam.gcv` preso pelo custo.
+3. A Seção 7 (Discussion), o resumo com a simulação e a aplicação
+   (D68(i)), os itens de texto pendentes (D76; a pergunta 68 se aceita).
+4. **A decisão do teto de páginas** (D21): 66 páginas sem o removido
+   contra 40, sem a Discussion; o que vai ao supp sem reescrever está na
+   pergunta 60(h).
+5. **E7**, a submissão: o `wafc/` ao `WaveBased` (D61), a extração do
    compêndio (D60(f), com o `LICENSE` e a lista das árvores de código de
    cada rodada no `PROVENANCE.md`), os DOIs, o checklist do
    `alvo-revista.md` §6.
 
-**O que levar desta máquina para a desktop** (não versionado; ver
-`CONTINUAR.md` §4): os PDFs de `refs/` (114 MB, só para conferir citação) e
-as unidades da aplicação, `wafc-studies/outputs/application/` (3,5 MB,
-para refazer o relatório das figuras na E5b sem reajustar). O `wafc/cache/`
-(1,1 GB, pilotos e sondagens) fica aqui; só os números registrados neste
+**Ainda falta trazer do notebook para a desktop** (não versionado; o
+comando no `CONTINUAR.md` §2b, passo 6): os PDFs de `refs/` (114 MB, só
+para conferir citação) e as unidades da aplicação,
+`wafc-studies/outputs/application/` (3,5 MB, para refazer o relatório das
+figuras na E5b sem reajustar). Os `curves.csv` do estudo estão só na
+desktop, então a Figure 1 da E5b se faz lá. O `wafc/cache/` do notebook
+(1,1 GB, pilotos e sondagens) fica lá; só os números registrados neste
 arquivo importam.
 
 **Sem bloquear:** 12 (o cenário `smooth`), 13 (o nome da (BD)), 14 (o
@@ -5014,6 +5048,7 @@ bloco da E5k), para a E5b; `boundary = "interval"` só se um referee pedir.
 
 | Data | O que aconteceu |
 |---|---|
+| 2026-10-12 | E4.4 fechada na desktop: junção 58/58, 26 200 unidades, 0 falhas, 647,9 h de processador; D82 (o 240 do `gam.reml` sai de `n = 1000`, com a causa no corte de passo do `mgcv`); as tabelas em `results/tables/` |
 | 2026-10-08 | Verificação geral para o orquestrador novo na desktop: cabeçalho e §5 reescritos, `CONTINUAR.md` §3 e §4, o `README.md` e o plano atualizados; nada a integrar |
 | 2026-10-08 | D81: a E4.4 vai à desktop do autor (i9-10900KF, 10 trabalhadores); o script de produção, a junção entre máquinas (58 unidades de referência, empacotadas) e o passo a passo no `CONTINUAR.md` §2b |
 | 2026-10-08 | E4.3b fechada e integrada: a regra de tamanho acima de 80, o limite de 80 iterações e o descarte (523 ajustes convergidos em no máximo 51 iterações; o `urho` em ~300 s); junção exata onde tudo converge; a E4.4 projetada em ~74 h em 8; pergunta 69 |

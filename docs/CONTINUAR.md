@@ -241,10 +241,10 @@ por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
    cd ~/Documents/repo/wafc-draft && tar xzf ~/wafc-extra.tar.gz
    ```
 
-## 3. Onde o trabalho está (resumo de 2026-10-08; o `ESTADO.md` manda)
+## 3. Onde o trabalho está (resumo de 2026-10-12; o `ESTADO.md` manda)
 
-- **Fechado:** E0 a E3 inteiras, E4.1 a E4.3b, E5a, E5c a E5k, E6.1a a
-  E6.2b, L1 a L14. Decisões D1 a D81 na tabela do `ESTADO.md` §2.
+- **Fechado:** E0 a E3 inteiras, E4.1 a E4.4, E5a, E5c a E5k, E6.1a a
+  E6.2b, L1 a L14. Decisões D1 a D82 na tabela do `ESTADO.md` §2.
   Catálogo vazio.
 - **O método (D44, D45):** o block LASSO na forma balanceada seguido do
   limiar `cv1se`; `cv.wafc(x, u, y)` é o estimador (D48).
@@ -253,13 +253,16 @@ por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
   `6aa4a3a` (árvore `34f2e04`).
 - **O compêndio** (`wafc-studies/`): o estudo (`core`, `arms`, `scale`) e
   as duas aplicações; as aplicações rodaram (168 unidades) e as tabelas e
-  figuras estão em `results/`; o estudo espera a E4.4.
+  figuras estão em `results/`; o estudo rodou na desktop (E4.4, D82:
+  26 200 unidades, 0 falhas) e as tabelas estão em
+  `results/tables/{core,arms,scale}/`; os `curves.csv` ficam só na desktop.
 - **Manuscrito vivo em `k = 5`**: 73 e 101 páginas com a marcação (66 e
   100 sem o removido); a Seção 6 com os números finais, a 5 à espera da
   E4.4, sem a Seção 7.
 - **Bibliografia:** 101 entradas verificadas em
   `docs/referencias-verificadas.bib`.
-- **O próximo passo é a E4.4 na desktop do autor** (§2b; D81).
+- **O próximo passo é a E5b na desktop do autor**: os números do estudo
+  no manuscrito (a Figure 1 precisa dos `curves.csv` de lá).
 - **Se aparecer um `docs/handoff-*.md`,** é de chat de tarefa que não foi
   integrado (§7 de `instrucoes.md`).
 
