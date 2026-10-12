@@ -5027,7 +5027,12 @@ Seção 5.4 e da S9, a frase da grade do REML no 5.2 e a subseção "The grids
 of the splines" na S9 (D82), o processador. O enquadramento combinado com o
 autor: a estrutura exata e a predição lado a lado, as concessões ditas e
 explicadas (células suaves, `n = 2000`, `snr1`, o REML no topo em
-`n = 500`). 76 e 113 páginas. Falta: a Figure 1 e a sua leitura, a
+`n = 500`). A Figure 1: as medianas ponto a ponto das 100 réplicas do
+WAFC e do GAM (REML) em bumps e blocks (o WAFC alcança de 14% a 44% mais
+da altura de cada um dos 11 picos; os dois abaixo da verdade em [0,3; 0,4]),
+e a Figure S1 com as faixas de 5% a 95% (largura média quase igual), as
+duas de `manuscript/figures/make-sim-components.R`, que lê os `curves.csv`
+da desktop; a figura de Dongsi passa a S2. 76 e 114 páginas. Falta: a
 Seção 7, o resumo e D21.
 
 **O que era o plano da E5b**, os números do estudo no manuscrito, a

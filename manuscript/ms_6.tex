@@ -1932,8 +1932,12 @@ within 6\% of the oracle support and keeps the exact structure, which GAM
 (REML) finds in 21\% and 36\% of the replicates. In the null cell the
 threshold removes every block, and the WAFC coincides with the constant
 coefficients, the correct model, while the methods that keep null blocks have
-errors from 47\% to 230\% above it. [E4.4: the reading of
-Figure~\ref{fig:sim-components}.]
+errors from 47\% to 230\% above it. In Figure~\ref{fig:sim-components} the
+pointwise median of the WAFC reaches a larger part of the height of each of
+the eleven peaks of the bumps, above the baseline, than that of GAM (REML), by
+14\% to 44\%, and the two follow the jumps of the blocks, both below the
+truth between 0.3 and 0.4 (0.53 and 0.63 against 0.75); the pointwise
+quantiles are in Figure~S1 of the Supplementary Material.
 
 Across sample sizes the comparison of prediction depends on $n$. In the
 inhomogeneous cell GAM (GCV) is ahead at $n = 250$ and $500$, by 6\% and 5\%,
@@ -1966,7 +1970,7 @@ errors against $\log n$. [E7: the address of the compendium that reproduces
 the study.]
 
 \input{tables/sim-main_6}
-\input{figures/sim-components}
+\input{figures/sim-components_6}
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
