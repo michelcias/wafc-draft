@@ -1,0 +1,131 @@
+% Gerado por tables/make-sim-supp.R (E5b, 2026-10-12) de results/tables/ (o compendio e a verdade).
+% \color{colR1} dentro do float (D75(d)).
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation, the smooth cell, 100 replicates per sample size: the root mean squared error of prediction, the integrated squared error of the components times 100, and the frequency of the exact structure. The constant coefficients have a prediction error of 1.73 in the cells with varying coefficients, and coincide with the oracle support in the null cell; GAM (GCV) is not run in the mixed cell, and the lasso rows are the coordinatewise lasso of Section 4 of the paper.}
+\label{tab:sim-sizes}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l cccc cccc cccc}
+\hline
+ & \multicolumn{4}{c}{Prediction error} & \multicolumn{4}{c}{Components ($\times 100$)} & \multicolumn{4}{c}{Exact structure} \\
+$n$ & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 \\
+\hline
+WAFC & 0.317 & 0.228 & 0.165 & 0.118 & 9.49 & 4.89 & 2.57 & 1.34 & 1.00 & 1.00 & 1.00 & 1.00 \\
+WAFC (cv) & 0.327 & 0.235 & 0.169 & 0.121 & 10.18 & 5.30 & 2.72 & 1.40 & 0.65 & 0.70 & 0.71 & 0.77 \\
+Lasso & 0.332 & 0.248 & 0.183 & 0.137 & 10.35 & 5.92 & 3.23 & 1.81 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Lasso + threshold & 0.296 & 0.225 & 0.167 & 0.123 & 8.16 & 4.80 & 2.65 & 1.46 & 1.00 & 1.00 & 1.00 & 1.00 \\
+GAM (REML) & 0.257 & 0.183 & 0.131 & 0.101 & 5.96 & 3.05 & 1.60 & 0.94 & 0.34 & 0.30 & 0.21 & 0.28 \\
+GAM (GCV) & 0.299 & 0.203 & 0.144 & 0.107 & 8.53 & 3.89 & 2.01 & 1.08 & 0.16 & 0.16 & 0.11 & 0.18 \\
+B-spline group lasso & 0.357 & 0.267 & 0.208 & 0.145 & 12.08 & 6.89 & 4.25 & 2.06 & 0.05 & 0.00 & 0.00 & 0.01 \\
+Adaptive spline & 0.358 & 0.224 & 0.159 & 0.111 & 12.39 & 4.82 & 2.48 & 1.18 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Block lasso (KP) & 0.322 & 0.236 & 0.175 & 0.124 & 9.58 & 5.11 & 2.86 & 1.45 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Oracle support & 0.287 & 0.212 & 0.157 & 0.114 & 7.73 & 4.25 & 2.32 & 1.23 & 1.00 & 1.00 & 1.00 & 1.00 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation, the uneven cell, 100 replicates per sample size: the root mean squared error of prediction, the integrated squared error of the components times 100, and the frequency of the exact structure.}
+\label{tab:sim-sizes-uneven}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l cccc cccc cccc}
+\hline
+ & \multicolumn{4}{c}{Prediction error} & \multicolumn{4}{c}{Components ($\times 100$)} & \multicolumn{4}{c}{Exact structure} \\
+$n$ & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 \\
+\hline
+WAFC & 0.487 & 0.343 & 0.247 & 0.179 & 22.75 & 11.39 & 5.92 & 3.15 & 1.00 & 1.00 & 1.00 & 1.00 \\
+WAFC (cv) & 0.497 & 0.348 & 0.251 & 0.181 & 23.71 & 11.73 & 6.11 & 3.23 & 0.71 & 0.79 & 0.72 & 0.79 \\
+Lasso & 0.562 & 0.392 & 0.278 & 0.200 & 30.36 & 14.94 & 7.52 & 3.95 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Lasso + threshold & 0.513 & 0.361 & 0.254 & 0.182 & 25.24 & 12.63 & 6.26 & 3.26 & 1.00 & 1.00 & 1.00 & 1.00 \\
+GAM (REML) & 0.418 & 0.310 & 0.224 & 0.158 & 16.50 & 9.11 & 4.82 & 2.44 & 0.30 & 0.33 & 0.36 & 0.21 \\
+GAM (GCV) & 0.440 & 0.307 & 0.222 & 0.158 & 18.44 & 9.01 & 4.76 & 2.47 & 0.13 & 0.16 & 0.09 & 0.09 \\
+B-spline group lasso & 0.628 & 0.444 & 0.308 & 0.214 & 37.87 & 19.28 & 9.47 & 4.63 & 0.02 & 0.00 & 0.00 & 0.00 \\
+Adaptive spline & 0.626 & 0.337 & 0.250 & 0.195 & 83.91 & 11.23 & 6.42 & 3.96 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Block lasso (KP) & 0.535 & 0.364 & 0.263 & 0.189 & 26.84 & 12.60 & 6.65 & 3.46 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Oracle support & 0.466 & 0.324 & 0.234 & 0.170 & 20.87 & 10.12 & 5.28 & 2.85 & 1.00 & 1.00 & 1.00 & 1.00 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation, the inhomogeneous cell, 100 replicates per sample size: the root mean squared error of prediction, the integrated squared error of the components times 100, and the frequency of the exact structure.}
+\label{tab:sim-sizes-inhomogeneous}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l cccc cccc cccc}
+\hline
+ & \multicolumn{4}{c}{Prediction error} & \multicolumn{4}{c}{Components ($\times 100$)} & \multicolumn{4}{c}{Exact structure} \\
+$n$ & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 \\
+\hline
+WAFC & 1.240 & 0.986 & 0.768 & 0.592 & 148.57 & 97.72 & 61.84 & 36.02 & 0.36 & 0.91 & 1.00 & 1.00 \\
+WAFC (cv) & 1.202 & 0.977 & 0.771 & 0.592 & 138.87 & 95.98 & 62.29 & 36.09 & 0.55 & 0.83 & 0.88 & 0.96 \\
+Lasso & 1.324 & 1.081 & 0.831 & 0.640 & 168.99 & 117.83 & 71.91 & 42.53 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Lasso + threshold & 1.331 & 1.048 & 0.795 & 0.609 & 170.83 & 110.86 & 65.69 & 38.50 & 0.36 & 0.88 & 1.00 & 1.00 \\
+GAM (REML) & 1.250 & 1.064 & 0.836 & 0.583 & 149.89 & 114.23 & 73.35 & 35.33 & 0.22 & 0.33 & 0.28 & 0.32 \\
+GAM (GCV) & 1.171 & 0.932 & 0.785 & 0.609 & 132.27 & 87.02 & 64.63 & 38.53 & 0.10 & 0.14 & 0.09 & 0.08 \\
+B-spline group lasso & 1.268 & 1.108 & 0.941 & 0.756 & 153.56 & 123.91 & 92.27 & 59.75 & 0.04 & 0.01 & 0.00 & 0.00 \\
+Adaptive spline & 1.366 & 1.190 & 1.047 & 0.997 & 178.91 & 142.85 & 113.78 & 103.19 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Block lasso (KP) & 1.251 & 1.019 & 0.796 & 0.609 & 148.39 & 103.94 & 65.67 & 38.07 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Oracle support & 1.159 & 0.950 & 0.748 & 0.573 & 129.24 & 90.63 & 58.65 & 33.62 & 1.00 & 1.00 & 1.00 & 1.00 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation, the mixed cell, 100 replicates per sample size: the root mean squared error of prediction, the integrated squared error of the components times 100, and the frequency of the exact structure.}
+\label{tab:sim-sizes-mixed}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l cccc cccc cccc}
+\hline
+ & \multicolumn{4}{c}{Prediction error} & \multicolumn{4}{c}{Components ($\times 100$)} & \multicolumn{4}{c}{Exact structure} \\
+$n$ & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 \\
+\hline
+WAFC & 1.301 & 1.052 & 0.820 & 0.625 & 166.97 & 109.92 & 69.77 & 40.13 & 0.25 & 0.84 & 1.00 & 1.00 \\
+WAFC (cv) & 1.258 & 1.036 & 0.822 & 0.627 & 155.58 & 106.21 & 70.24 & 40.35 & 0.39 & 0.75 & 0.84 & 0.85 \\
+Lasso & 1.426 & 1.207 & 0.937 & 0.724 & 199.81 & 144.01 & 90.61 & 53.76 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Lasso + threshold & 1.411 & 1.169 & 0.872 & 0.672 & 195.89 & 135.60 & 78.47 & 46.69 & 0.20 & 0.69 & 1.00 & 1.00 \\
+GAM (REML) & 1.289 & 1.084 & 0.854 & 0.590 & 162.63 & 116.72 & 75.52 & 35.95 & 0.00 & 0.00 & 0.02 & 0.00 \\
+B-spline group lasso & 1.309 & 1.149 & 0.975 & 0.794 & 167.52 & 130.81 & 98.37 & 65.80 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Adaptive spline & 1.630 & 1.284 & 1.085 & 1.022 & 259.03 & 163.84 & 121.24 & 107.59 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Block lasso (KP) & 1.343 & 1.140 & 1.015 & 0.810 & 173.10 & 126.53 & 105.20 & 67.72 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Oracle support & 1.184 & 0.962 & 0.758 & 0.575 & 137.80 & 91.10 & 59.43 & 33.88 & 1.00 & 1.00 & 1.00 & 1.00 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation, the null cell, 100 replicates per sample size: the root mean squared error of prediction, the integrated squared error of the components times 100, and the frequency of the exact structure.}
+\label{tab:sim-sizes-null}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{l cccc cccc cccc}
+\hline
+ & \multicolumn{4}{c}{Prediction error} & \multicolumn{4}{c}{Components ($\times 100$)} & \multicolumn{4}{c}{Exact structure} \\
+$n$ & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 & 250 & 500 & 1000 & 2000 \\
+\hline
+WAFC & 0.064 & 0.045 & 0.030 & 0.022 & 0.00 & 0.00 & 0.00 & 0.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+WAFC (cv) & 0.091 & 0.068 & 0.044 & 0.031 & 0.48 & 0.28 & 0.12 & 0.05 & 0.28 & 0.23 & 0.21 & 0.20 \\
+Lasso & 0.093 & 0.070 & 0.048 & 0.036 & 0.54 & 0.32 & 0.16 & 0.09 & 0.16 & 0.15 & 0.08 & 0.13 \\
+Lasso + threshold & 0.064 & 0.046 & 0.030 & 0.022 & 0.01 & 0.00 & 0.00 & 0.00 & 0.99 & 1.00 & 1.00 & 1.00 \\
+GAM (REML) & 0.096 & 0.069 & 0.048 & 0.033 & 0.54 & 0.28 & 0.16 & 0.06 & 0.06 & 0.07 & 0.07 & 0.08 \\
+GAM (GCV) & 0.152 & 0.103 & 0.070 & 0.046 & 2.33 & 0.95 & 0.47 & 0.19 & 0.03 & 0.04 & 0.03 & 0.04 \\
+B-spline group lasso & 0.083 & 0.061 & 0.045 & 0.029 & 0.31 & 0.18 & 0.13 & 0.04 & 0.35 & 0.34 & 0.19 & 0.32 \\
+Adaptive spline & 0.219 & 0.142 & 0.100 & 0.066 & 4.29 & 1.85 & 0.94 & 0.39 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Block lasso (KP) & 0.111 & 0.088 & 0.065 & 0.043 & 0.58 & 0.36 & 0.20 & 0.08 & 0.08 & 0.07 & 0.05 & 0.07 \\
+Oracle support & 0.064 & 0.045 & 0.030 & 0.022 & 0.00 & 0.00 & 0.00 & 0.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+\hline
+\end{tabular}
+\end{table}
+

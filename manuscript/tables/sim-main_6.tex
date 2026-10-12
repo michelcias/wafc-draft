@@ -1,0 +1,43 @@
+% tables/sim-main_6.tex -- Table 1 do ms_6.tex (E5b, 2026-10-12), o lugar de
+% tables/sim-main.tex da k = 5 com os numeros da E4.4. Gerada de
+% results/tables/core/summary.csv em n = 1000 (o compendio e a verdade): (a) rmse_f_mean,
+% com a faixa de rmse_f_se (0.00122 a 0.00552) na legenda, pela largura; (b) exact_support. O ISE das componentes fica na Table S1 (em espaco
+% duplo, as instrucoes da SS, tres paineis passavam da pagina); o painel (b) sem o oraculo
+% (1 por construcao) e os coeficientes constantes (0, e 1 na nula). Linhas na ordem de
+% config/study.yaml, com os rotulos de la; o VCBART e o lasso coordenado ficam fora do
+% corpo (D60(d); o lasso vai a S9). Colunas da celula mais suave a mais dificil, a nula
+% por ultimo. O GAM (GCV) nao roda na mixed. \color{colR1} dentro do float (D75(d)).
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation at $n = 1000$, 100 replicates per cell: (a) root mean
+squared error of prediction (standard errors 0.001 to 0.006); (b) frequency
+of the exact structure. GAM (GCV) is not run in the mixed cell.}
+\label{tab:sim-main}
+\centering
+\small
+\begin{tabular}{lccccc}
+\hline
+ & Smooth & Uneven & Inhomogeneous & Mixed & Null \\
+\hline
+\multicolumn{6}{l}{(a) Prediction error} \\
+WAFC & 0.165 & 0.247 & 0.768 & 0.820 & 0.030 \\
+WAFC (cv) & 0.169 & 0.251 & 0.771 & 0.822 & 0.044 \\
+GAM (REML) & 0.131 & 0.224 & 0.836 & 0.854 & 0.048 \\
+GAM (GCV) & 0.144 & 0.222 & 0.785 & -- & 0.070 \\
+B-spline group lasso & 0.208 & 0.308 & 0.941 & 0.975 & 0.045 \\
+Adaptive spline & 0.159 & 0.250 & 1.047 & 1.085 & 0.100 \\
+Block lasso (KP) & 0.175 & 0.263 & 0.796 & 1.015 & 0.065 \\
+Oracle support & 0.157 & 0.234 & 0.748 & 0.758 & 0.030 \\
+Constant coefficients & 1.733 & 1.738 & 1.738 & 1.727 & 0.030 \\
+\hline
+\multicolumn{6}{l}{(b) Frequency of the exact structure, $\Prob(\widehat{\mathcal{S}} = \mathcal{S})$} \\
+WAFC & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 \\
+WAFC (cv) & 0.71 & 0.72 & 0.88 & 0.84 & 0.21 \\
+GAM (REML) & 0.21 & 0.36 & 0.28 & 0.02 & 0.07 \\
+GAM (GCV) & 0.11 & 0.09 & 0.09 & -- & 0.03 \\
+B-spline group lasso & 0.00 & 0.00 & 0.00 & 0.00 & 0.19 \\
+Adaptive spline & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Block lasso (KP) & 0.00 & 0.00 & 0.00 & 0.00 & 0.05 \\
+\hline
+\end{tabular}
+\end{table}

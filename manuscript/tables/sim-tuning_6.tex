@@ -1,0 +1,79 @@
+% Gerado por tables/make-sim-supp.R (E5b, 2026-10-12) de results/tables/ (o compendio e a verdade).
+% \color{colR1} dentro do float (D75(d)).
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation, tuning and time: the mean resolution $J$ chosen by the WAFC and the mean dimension $k$ chosen by the two splines, each followed by the fraction of replicates at the top of its grid, and the median time of a fit with its tuning, in seconds.}
+\label{tab:sim-tuning}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{ll cc cc cc ccc}
+\hline
+ & & \multicolumn{2}{c}{WAFC} & \multicolumn{2}{c}{GAM (REML)} & \multicolumn{2}{c}{GAM (GCV)} & \multicolumn{3}{c}{Time (s)} \\
+Cell & $n$ & $J$ & Top & $k$ & Top & $k$ & Top & WAFC & REML & GCV \\
+\hline
+Smooth & 250 & 3.41 & 0.00 & 12 & 0.00 & 19 & 0.04 & 3.5 & 4.4 & 113.7 \\
+ & 500 & 3.49 & 0.00 & 15 & 0.02 & 15 & 0.01 & 12.1 & 4.9 & 125.8 \\
+ & 1000 & 3.83 & 0.00 & 14 & 0.00 & 24 & 0.16 & 40.5 & 46.3 & 128.3 \\
+ & 2000 & 4.15 & 0.00 & 14 & 0.00 & 26 & 0.09 & 131.3 & 123.9 & 552.9 \\
+Uneven & 250 & 4.54 & 0.00 & 27 & 0.03 & 35 & 0.12 & 3.7 & 4.0 & 154.8 \\
+ & 500 & 5.00 & 0.00 & 28 & 0.05 & 42 & 0.18 & 12.2 & 4.6 & 165.9 \\
+ & 1000 & 5.12 & 0.00 & 43 & 0.00 & 50 & 0.27 & 40.9 & 40.7 & 178.0 \\
+ & 2000 & 5.20 & 0.00 & 50 & 0.00 & 59 & 0.12 & 130.2 & 108.7 & 708.6 \\
+Null & 250 & 4.65 & 0.14 & 8 & 0.02 & 15 & 0.02 & 3.8 & 3.9 & 86.0 \\
+ & 500 & 5.29 & 0.19 & 11 & 0.03 & 15 & 0.02 & 15.8 & 4.7 & 78.7 \\
+ & 1000 & 4.56 & 0.11 & 15 & 0.02 & 14 & 0.03 & 52.0 & 44.7 & 77.6 \\
+ & 2000 & 5.56 & 0.16 & 19 & 0.02 & 20 & 0.05 & 174.5 & 115.8 & 339.8 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation, tuning and time (continued from Table~\ref{tab:sim-tuning}).}
+\label{tab:sim-tuning-b}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{ll cc cc cc ccc}
+\hline
+ & & \multicolumn{2}{c}{WAFC} & \multicolumn{2}{c}{GAM (REML)} & \multicolumn{2}{c}{GAM (GCV)} & \multicolumn{3}{c}{Time (s)} \\
+Cell & $n$ & $J$ & Top & $k$ & Top & $k$ & Top & WAFC & REML & GCV \\
+\hline
+Inhomogeneous & 250 & 5.12 & 0.03 & 29 & 0.03 & 62 & 0.59 & 4.6 & 4.5 & 148.9 \\
+ & 500 & 6.31 & 0.01 & 68 & 0.71 & 80 & 0.99 & 15.8 & 5.1 & 210.5 \\
+ & 1000 & 7.23 & 0.24 & 125 & 0.16 & 80 & 1.00 & 56.3 & 46.7 & 239.7 \\
+ & 2000 & 8.04 & 0.06 & 240 & 1.00 & 120 & 1.00 & 176.4 & 139.4 & 1006.6 \\
+Mixed & 250 & 4.80 & 0.04 & 27 & 0.02 & -- & -- & 10.1 & 85.1 & -- \\
+ & 500 & 6.14 & 0.00 & 66 & 0.65 & -- & -- & 33.9 & 91.3 & -- \\
+ & 1000 & 6.90 & 0.09 & 119 & 0.97 & -- & -- & 78.8 & 430.1 & -- \\
+ & 2000 & 7.94 & 0.01 & 240 & 1.00 & -- & -- & 245.8 & 3806.4 & -- \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation, the slope of the least squares line of the logarithm of the mean squared error of prediction against $\log n$, over $n = 250$, 500, 1000 and 2000.}
+\label{tab:sim-slopes}
+\centering
+\small
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{lccccc}
+\hline
+ & Smooth & Uneven & Inhomogeneous & Mixed & Null \\
+\hline
+WAFC & $-$0.95 & $-$0.96 & $-$0.71 & $-$0.71 & $-$1.04 \\
+WAFC (cv) & $-$0.96 & $-$0.97 & $-$0.68 & $-$0.67 & $-$1.05 \\
+Lasso & $-$0.85 & $-$0.99 & $-$0.70 & $-$0.66 & $-$0.93 \\
+Lasso + threshold & $-$0.84 & $-$1.00 & $-$0.76 & $-$0.73 & $-$1.02 \\
+GAM (REML) & $-$0.91 & $-$0.94 & $-$0.73 & $-$0.75 & $-$1.04 \\
+GAM (GCV) & $-$0.99 & $-$0.98 & $-$0.62 & -- & $-$1.16 \\
+B-spline group lasso & $-$0.85 & $-$1.04 & $-$0.50 & $-$0.48 & $-$1.00 \\
+Adaptive spline & $-$1.11 & $-$1.10 & $-$0.31 & $-$0.45 & $-$1.15 \\
+Block lasso (KP) & $-$0.91 & $-$0.99 & $-$0.69 & $-$0.47 & $-$0.90 \\
+Oracle support & $-$0.89 & $-$0.97 & $-$0.68 & $-$0.69 & $-$1.03 \\
+\hline
+\end{tabular}
+\end{table}
+

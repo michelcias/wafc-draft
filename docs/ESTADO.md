@@ -5017,7 +5017,20 @@ respondida por D82; a 68 foi aceita como recomendada em 2026-10-12 e
 aplicada na `k = 6`. **Nenhuma pergunta em aberto pede resposta do
 autor.**
 
-**O próximo passo é a E5b**, os números do estudo no manuscrito, a
+**A E5b está em curso na `k = 6`** (2026-10-12). Feito: a Table 1
+(predição e estrutura exata em `n = 1000`; o ISE foi à S1 porque, em
+espaço duplo, três painéis passavam da página), as Tabelas S1 a S11 (uma
+por célula com RMSE, ISE e estrutura em todo `n`; nulos mantidos; pares;
+braços e modelo maior; sintonia e tempo; inclinações), geradas por
+`manuscript/tables/make-sim-main.R` e `make-sim-supp.R`; a leitura da
+Seção 5.4 e da S9, a frase da grade do REML no 5.2 e a subseção "The grids
+of the splines" na S9 (D82), o processador. O enquadramento combinado com o
+autor: a estrutura exata e a predição lado a lado, as concessões ditas e
+explicadas (células suaves, `n = 2000`, `snr1`, o REML no topo em
+`n = 500`). 76 e 113 páginas. Falta: a Figure 1 e a sua leitura, a
+Seção 7, o resumo e D21.
+
+**O que era o plano da E5b**, os números do estudo no manuscrito, a
 partir de `results/tables/`:
 
 1. Os marcadores `[E4.4]` das Seções 5 e S9: a Table 1, a Figure 1 (dos

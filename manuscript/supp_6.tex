@@ -3507,8 +3507,7 @@ $[0,1]$.
 
 \subsection*{The larger model}
 
-[E4.3: kept if the pilot measures its cost below about ten hours of processor
-time.] With $(p,q) = (6,4)$ the levels are $(1, 2, -1.5, 0.5, 1, 2)$, and the
+With $(p,q) = (6,4)$ the levels are $(1, 2, -1.5, 0.5, 1, 2)$, and the
 nonzero components are $\gcomp{1}{1}$ (bumps), $\gcomp{1}{2}$ (blocks) and
 $\gcomp{2}{1}$ (heavisine), as in the inhomogeneous cell, and
 $\gcomp{3}{3}$ (bumps), $\gcomp{3}{4}$ (blocks) and $\gcomp{4}{3}$
@@ -3516,23 +3515,71 @@ $\gcomp{3}{3}$ (bumps), $\gcomp{3}{4}$ (blocks) and $\gcomp{4}{3}$
 of $J$ stops at 7, since at $J = 8$ the design has $6 \times 4 \times 255 =
 6120$ penalized columns for 1000 observations.
 
+\subsection*{The grids of the splines}
+
+In either search of \texttt{mgcv} a dimension above 80 whose smooths would
+have more than $2n$ coefficients is not fitted, which stops the grid at 120 in
+the mixed cell at $n = 1000$ and at 80 in the larger model, and a fit by REML
+whose smoothing parameters do not converge within 80 outer iterations leaves
+the search. At $n = 1000$ the grid of GAM (REML) stops at 160 because the fit
+at 240 did not converge in about a third of the replicates of the
+inhomogeneous cell, and in two of them did not finish in 15 hours; where it
+was fitted, it would lower the error of GAM (REML) by 0.3\% in that cell and
+by 1.2\% in the uneven one.
+
 \subsection*{Further results}
 
-Table~\ref{tab:sim-sizes} gives the errors of every row at every sample size,
+\textcolor{gray}{\sout{Table~\mbox{\ref{tab:sim-sizes}} gives the errors of every row at every sample size,
 together with the coordinatewise lasso of Section 4 of the paper, fitted at
 the pair chosen by cross-validation (Lasso) and thresholded by the one
-standard error rule (Lasso + threshold); Table~\ref{tab:sim-structure} gives
-the recovery of the structure; Table~\ref{tab:sim-arms} the arms at
-$n = 1000$ [E4.3: and the larger model]; and Table~\ref{tab:sim-tuning} the
+standard error rule (Lasso + threshold); Table~\mbox{\ref{tab:sim-structure}} gives
+the recovery of the structure; Table~\mbox{\ref{tab:sim-arms}} the arms at
+$n = 1000$ and the larger model; and Table~\mbox{\ref{tab:sim-tuning}} the
 resolution or dimension chosen, the fraction of replicates at the top of the
 grid, the time, and the slope of the logarithm of the mean squared errors
-against $\log n$. [E4.4: the reading.]
+against $\log n$.}}
+Tables~\ref{tab:sim-sizes} to~\ref{tab:sim-sizes-null} give, one cell each,
+the errors and the frequency of the exact structure of every row at every
+sample size, together with the coordinatewise lasso of Section 4 of the
+paper, fitted at the pair chosen by cross-validation (Lasso) and thresholded
+by the one standard error rule (Lasso + threshold);
+Table~\ref{tab:sim-structure} gives the null blocks kept at $n = 1000$ and
+Table~\ref{tab:sim-paired} the paired comparisons; Table~\ref{tab:sim-arms}
+the arms at $n = 1000$ and the larger model;
+Tables~\ref{tab:sim-tuning} and~\ref{tab:sim-tuning-b} the resolution or
+dimension chosen, the fraction of replicates at the top of the grid and the
+time; and Table~\ref{tab:sim-slopes} the slope of the logarithm of the mean
+squared error against $\log n$.
 
-\input{tables/sim-sizes}
-\input{tables/sim-structure}
-\input{tables/sim-arms}
-\input{tables/sim-tuning}
+The coordinatewise lasso with the threshold recovers the same structure as
+the WAFC from $n = 1000$, and less often at $n = 500$ in the mixed cell (69\%
+against 84\%). Its prediction error is 3\% to 11\% above that of the WAFC in
+the inhomogeneous and mixed cells at every sample size and 2\% to 5\% above
+it in the uneven cell, within 1\% in the null cell, and in the smooth cell
+7\% below it at $n = 250$ and within 4\% at the other sizes; the blocks of
+the penalty pay where the components are inhomogeneous. The WAFC reaches the
+top of its grid of $J$ in at most 24\% of the replicates of a cell. GAM
+(GCV), whose grid is not extended because of the cost of its fits, chooses
+its top in at least 99\% of the replicates of the inhomogeneous cell from
+$n = 500$. GAM (REML) chooses the top of its grid in 71\% and 65\% of the
+replicates of the inhomogeneous and mixed cells at $n = 500$, where the grid
+stops at 80, in 16\% and 97\% at $n = 1000$, where the size rule stops it at
+120 in the mixed cell, and in every replicate of both at $n = 2000$. The time
+of the WAFC grows from 4 to 10 seconds at $n = 250$ to 130 to 250 seconds at
+$n = 2000$; that of GAM (REML) is comparable except in the mixed cell, where
+it reaches 3800 seconds at $n = 2000$, and that of GAM (GCV) reaches 340 to
+1000 seconds. The slopes of the WAFC, $-0.71$ in the inhomogeneous and mixed
+cells and $-0.95$ to $-1.04$ in the others, are within 0.06 of those of the
+oracle support.
+
+\input{tables/sim-sizes_6}
+\input{tables/sim-structure_6}
+\input{tables/sim-arms_6}
+\input{tables/sim-tuning_6}
 }
+
+% E5b (k = 6): as tabelas da S9 nao passam para a S10.
+\clearpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % E5h (k = 5): a S10, o que completa a Secao 6 do ms_5 e a segunda aplicacao

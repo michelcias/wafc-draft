@@ -1,0 +1,40 @@
+% Gerado por tables/make-sim-supp.R (E5b, 2026-10-12) de results/tables/ (o compendio e a verdade).
+% \color{colR1} dentro do float (D75(d)).
+\begin{table}[tp]
+\color{colR1}
+\caption{Simulation, the arms at $n = 1000$ and the larger model, 100 replicates each: (a) the root mean squared error of prediction; (b) the frequency of the exact structure. SNR 1: signal to noise ratio 1; copula: modulators coupled by a Gaussian copula; $X$ on $U$: linear covariates dependent on the modulators; larger: $(p,q) = (6,4)$ with 6 of 24 blocks active. GAM (GCV) is run only in the arms of the inhomogeneous cell.}
+\label{tab:sim-arms}
+\centering
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lccccccc}
+\hline
+ & \multicolumn{3}{c}{Inhomogeneous} & \multicolumn{3}{c}{Mixed} & \\
+ & SNR 1 & Copula & $X$ on $U$ & SNR 1 & Copula & $X$ on $U$ & Larger \\
+\hline
+\multicolumn{8}{l}{(a) Prediction error} \\
+WAFC & 1.322 & 0.769 & 0.765 & 1.353 & 0.817 & 0.818 & 1.458 \\
+WAFC (cv) & 1.211 & 0.773 & 0.769 & 1.250 & 0.821 & 0.821 & 1.430 \\
+Lasso & 1.313 & 0.836 & 0.828 & 1.390 & 0.940 & 0.937 & 1.652 \\
+Lasso + threshold & 1.383 & 0.795 & 0.796 & 1.433 & 0.876 & 0.879 & 1.609 \\
+GAM (REML) & 1.265 & 0.834 & 0.835 & 1.293 & 0.851 & 0.852 & 1.498 \\
+GAM (GCV) & 1.186 & 0.788 & 0.784 & -- & -- & -- & -- \\
+B-spline group lasso & 1.275 & 0.938 & 0.931 & 1.304 & 0.974 & 0.961 & 1.602 \\
+Adaptive spline & 1.382 & 1.040 & 1.046 & 1.552 & 1.087 & 1.087 & 1.786 \\
+Block lasso (KP) & 1.262 & 0.797 & 0.791 & 1.331 & 1.018 & 1.011 & 1.585 \\
+Oracle support & 1.182 & 0.752 & 0.744 & 1.180 & 0.750 & 0.752 & 1.341 \\
+\hline
+\multicolumn{8}{l}{(b) Exact structure} \\
+WAFC & 0.06 & 1.00 & 1.00 & 0.07 & 1.00 & 1.00 & 0.65 \\
+WAFC (cv) & 0.62 & 0.84 & 0.85 & 0.47 & 0.82 & 0.83 & 0.72 \\
+Lasso & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Lasso + threshold & 0.08 & 1.00 & 1.00 & 0.07 & 1.00 & 1.00 & 0.47 \\
+GAM (REML) & 0.18 & 0.26 & 0.31 & 0.00 & 0.00 & 0.01 & 0.00 \\
+GAM (GCV) & 0.13 & 0.13 & 0.11 & -- & -- & -- & -- \\
+B-spline group lasso & 0.03 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Adaptive spline & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+Block lasso (KP) & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 & 0.00 \\
+\hline
+\end{tabular}
+\end{table}
+

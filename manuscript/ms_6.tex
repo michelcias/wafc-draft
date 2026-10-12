@@ -1793,8 +1793,7 @@ to depend on the modulators. A replicate of an arm is drawn from the seeds of
 the same replicate of its core cell, and the first and the third arms share
 with it the modulators, the draws $\zeta_\cv$ and the standardized errors.
 
-A larger model [E4.3: run if the pilot measures its cost below about ten hours
-of processor time] has $(p,q) = (6,4)$ at $n = 1000$, with 24 blocks of which
+A larger model has $(p,q) = (6,4)$ at $n = 1000$, with 24 blocks of which
 6 are active: the active structure of the inhomogeneous cell twice, on
 $(X_1,X_2)\times(U_1,U_2)$ and on $(X_3,X_4)\times(U_3,U_4)$, with $\beta_5$
 and $\beta_6$ constant and signal to noise ratio 3.
@@ -1881,6 +1880,10 @@ $n = 2000$, and only there, the grids are extended before the study, to
 $J \in \{2,\dots,9\}$ for the methods on the wavelet design and for the
 B-splines, and with $k = 120$ added to the grid of \texttt{mgcv}, because the
 resolution that the theory prescribes grows with $n$, as in \eqref{eq:Jn}.
+The grid of GAM (REML) is extended further, to $k = 160$ at $n = 1000$ and
+$k = 240$ at $n = 2000$, where its choice would otherwise sit at the top of
+the grid in the cells with inhomogeneous components; Section~S9 of the
+Supplementary Material gives the rules that leave a candidate out.
 
 \subsection{Measures}
 \label{sec:sim-measures}
@@ -1901,7 +1904,8 @@ numbers of null blocks kept and of active blocks dropped; a smooth of
 \texttt{mgcv} counts as kept when its effective degrees of freedom exceed
 $0.1$, since the extra penalty shrinks it toward zero but never to zero
 exactly. The time is the elapsed time of a fit, the search over the grids and
-the threshold included, in a single process [E4.4: the processor]. Means over
+the threshold included, in a single process on one core of an Intel Core
+i9-10900KF, ten fits at a time on its ten cores. Means over
 the replicates are reported with their standard errors; since the methods
 share the samples of a replicate, the Supplementary Material also gives the
 median, within replicate, of the ratio of each error to that of the WAFC, and
@@ -1912,15 +1916,56 @@ the fraction of replicates in which a method has the smaller error.
 
 Table~\ref{tab:sim-main} gives the errors and the recovery of the structure at
 $n = 1000$, and Figure~\ref{fig:sim-components} the fitted components of the
-inhomogeneous cell. [E4.4: the reading of Table~\ref{tab:sim-main} and
-Figure~\ref{fig:sim-components}.] Section~S9 of the Supplementary Material
-gives the errors at every sample size, the arms [E4.3: and the larger model],
+inhomogeneous cell. The WAFC recovers the structure exactly in every replicate
+of every cell, which no competitor does in more than 36\% of the replicates of
+any cell: GAM (REML) keeps about one null block per replicate in the cells with
+three active blocks and close to five of the 13 null blocks of the mixed cell
+(Section~S9 of the Supplementary Material). In the inhomogeneous and the mixed
+cells, where the components are spatially inhomogeneous, it is also the most
+accurate of the methods that do not know the structure: its error is 9\% and
+4\% below that of GAM (REML), and smaller in 95\% and 82\% of the paired
+replicates, and within 3\% and 8\% of that of the oracle support, which is the
+price of not knowing the structure. In the smooth and the uneven cells, whose
+components are infinitely differentiable, the splines are in their own
+setting and predict better, GAM (REML) by 20\% and 9\%; there the WAFC stays
+within 6\% of the oracle support and keeps the exact structure, which GAM
+(REML) finds in 21\% and 36\% of the replicates. In the null cell the
+threshold removes every block, and the WAFC coincides with the constant
+coefficients, the correct model, while the methods that keep null blocks have
+errors from 47\% to 230\% above it. [E4.4: the reading of
+Figure~\ref{fig:sim-components}.]
+
+Across sample sizes the comparison of prediction depends on $n$. In the
+inhomogeneous cell GAM (GCV) is ahead at $n = 250$ and $500$, by 6\% and 5\%,
+and behind from $n = 1000$; GAM (REML) is behind at $n = 500$ and $1000$ and
+ahead at $n = 2000$, by 2\% in the inhomogeneous cell and 6\% in the mixed
+one, with its grid extended to $k = 240$, at 15 times the time of the WAFC in
+the mixed cell and without the exact structure in any of its replicates. The
+WAFC recovers the structure in 36\% and 25\% of the replicates of these two
+cells at $n = 250$, in 91\% and 84\% at $n = 500$, and in every replicate of
+the other cells at every $n$. The slopes of the logarithm of the errors
+against $\log n$ are close to those of the oracle support in every cell.
+
+In the arms, the copula and the dependent covariates leave the comparison as
+in the core cells. With signal to noise ratio 1 the WAFC recovers the
+structure in 6\% and 7\% of the replicates: it keeps almost no null block and
+drops 1.2 active blocks on average, because the error of a fitted active
+component, about 0.77 in $L_2[0,1]$, is then close to the unit norm of the
+block, and the window of Corollary~\ref{cor:threshold}(iii) closes; GAM
+(REML) and GAM (GCV), which do not threshold, predict better by 4\% and 10\%.
+In the larger model, with 24 blocks of which 6 are active, the WAFC has an
+error 3\% below that of GAM (REML) and recovers the structure in 65\% of the
+replicates, dropping one active block in the others, while GAM (REML) keeps
+6.4 null blocks on average. A fit of the WAFC with its tuning takes 40 to 80
+seconds at $n = 1000$, against about 45 for GAM (REML), 430 in the mixed
+cell, and 80 to 240 for GAM (GCV). Section~S9 of the Supplementary Material
+gives the errors at every sample size, the arms and the larger model,
 the structure, the resolution and the dimension chosen with the frequency of
 choices at the top of a grid, the time, and the slope of the logarithm of the
 errors against $\log n$. [E7: the address of the compendium that reproduces
 the study.]
 
-\input{tables/sim-main}
+\input{tables/sim-main_6}
 \input{figures/sim-components}
 }
 
