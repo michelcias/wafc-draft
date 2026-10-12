@@ -269,6 +269,12 @@ coefficients, and the thresholded estimator keeps the rate of the fit.} The
 estimator is a single convex
 program and is fit by \textcolor{gray}{\sout{coordinate descent on a sparse design matrix}}\textcolor{colR1}{standard
 group lasso software}.
+\textcolor{colR1}{In a simulation study the thresholded estimator recovers
+the structure exactly in every replicate from $n = 1000$ and, where the
+components are spatially inhomogeneous, predicts better than penalized
+splines and within 8\% of an estimator that knows the structure; on hourly
+air pollution data it predicts within 3\% of penalized splines in London and
+8\% better in Beijing.}
 \textcolor{colR1}{An implementation in R and the code that reproduces every
 numerical result of the paper are made available with it.}
 
@@ -420,7 +426,8 @@ penalty and the tuning rules\textcolor{colR1}{, the threshold among them}.
 \textcolor{colR1}{Section~\ref{sec:simulation} compares the method with penalized
 splines and with other competitors in a simulation study, and
 Section~\ref{sec:application} applies it to hourly air pollution data from
-London.} Proofs are collected in the online Supplementary
+London.} \textcolor{colR1}{Section~\ref{sec:discussion} discusses where the method
+does not win and what is left open.} Proofs are collected in the online Supplementary
 Material\textcolor{colR1}{, which also gives the theory of the coordinatewise lasso,
 offered by the software as an option}\textcolor{colR1}{, the details and further
 results of the simulation study, and a second application, to data from
@@ -1957,6 +1964,9 @@ drops 1.2 active blocks on average, because the error of a fitted active
 component, about 0.77 in $L_2[0,1]$, is then close to the unit norm of the
 block, and the window of Corollary~\ref{cor:threshold}(iii) closes; GAM
 (REML) and GAM (GCV), which do not threshold, predict better by 4\% and 10\%.
+With the threshold of the smallest cross-validated error, which keeps more
+blocks, the WAFC recovers the structure in 62\% and 47\% of the replicates
+and predicts better than GAM (REML), by 4\% and 3\%.
 In the larger model, with 24 blocks of which 6 are active, the WAFC has an
 error 3\% below that of GAM (REML) and recovers the structure in 65\% of the
 replicates, dropping one active block in the others, while GAM (REML) keeps
@@ -2130,6 +2140,52 @@ dates of the heating season, 15 November to 15 March
 held-out weeks the WAFC is ahead of the better of the two splines in all 20
 partitions, with a root mean squared error 8\% below that of the better
 spline on average.
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% E5b (k = 6): a Secao 7, com os numeros da E4.4 (results/tables/; o enquadramento
+% combinado com o autor: o que o metodo entrega, onde nao ganha e por que, o que fica
+% aberto).
+{\color{colR1}
+\section{Discussion}
+\label{sec:discussion}
+
+The WAFC answers two questions with one fit: which modulators act on which
+coefficients, and what the coefficients are. The theory gives the rate of
+nonlinear wavelet approximation, which is minimax optimal when $\pi \ge 2$,
+and the recovery of the structure by a threshold that does not cost the rate.
+In the simulation study the thresholded estimator found the exact structure in
+every replicate of every cell from $n = 1000$, and where the components are
+spatially inhomogeneous it predicted better than penalized splines at that
+sample size and within 3\% to 8\% of the estimator that knows the structure.
+
+The study also shows where the method does not win. Where every component is
+smooth, splines with a global smoothing parameter are in their own setting.
+In the smooth cell part of the gap has an identifiable source: the periodic
+extension of the cubic has a corner at $0 \equiv 1$, which limits its
+effective regularity to $3/2$ (Section~\ref{sec:sim-design}), and the basis
+adapted to the interval of Section~\ref{sec:boundary} would remove that
+corner, at the structural cost described there. When the signal is weak, the
+window of Corollary~\ref{cor:threshold}(iii) narrows, and the one standard
+error rule, which errs toward sparsity, drops active blocks. The threshold of
+the smallest cross-validated error, offered by the software, errs the other
+way: with signal to noise ratio 1 it recovers the structure in 62\% and 47\%
+of the replicates of the two arms, against 18\% and none for GAM (REML), and
+predicts better than GAM (REML) in both. At the largest sample size, GAM
+(REML) closes the gap in prediction with a grid of $k$ extended to 240, at a
+cost that grows with the number of blocks and without recovering the
+structure.
+
+Several questions are left open. The threshold is chosen by a rule for which
+no theorem is given here: Corollary~\ref{cor:threshold} gives the window that
+recovers the structure, and a data driven choice provably inside it would
+complete the theory. The numbers of covariates and of modulators are fixed;
+letting them grow with $n$, as in the high dimensional regime of
+\citet{Klopp-Pensky-2015}, would require the bound of
+Proposition~\ref{prop:gram} uniformly over the active blocks. The fit gives
+no confidence statement for the components, and inference after the
+selection of blocks is a separate problem. Finally, the threshold acts on
+whole blocks and says nothing about which wavelets are active inside a block.
 }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

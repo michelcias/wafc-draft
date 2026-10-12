@@ -5032,8 +5032,12 @@ WAFC e do GAM (REML) em bumps e blocks (o WAFC alcança de 14% a 44% mais
 da altura de cada um dos 11 picos; os dois abaixo da verdade em [0,3; 0,4]),
 e a Figure S1 com as faixas de 5% a 95% (largura média quase igual), as
 duas de `manuscript/figures/make-sim-components.R`, que lê os `curves.csv`
-da desktop; a figura de Dongsi passa a S2. 76 e 114 páginas. Falta: a
-Seção 7, o resumo e D21.
+da desktop; a figura de Dongsi passa a S2. A Seção 7 (Discussion: o que o
+método entrega, onde não ganha e por que, o que fica aberto), a frase da
+simulação e da aplicação no resumo (D68(i)), o roteiro da Introdução, e a
+oração do limiar de menor erro de validação cruzada no `snr1` (estrutura
+em 62% e 47%, à frente do REML por 4% e 3%) na 5.4. 78 e 114 páginas.
+Falta: D21, o teto de páginas.
 
 **O que era o plano da E5b**, os números do estudo no manuscrito, a
 partir de `results/tables/`:
