@@ -17,13 +17,15 @@ números na `k = 5`). **O desenho do estudo** está fixado (D60, D62, D63,
 D69, D70, D77 a D80) e o piloto rodou (E4.3: a escala entra; a E4.4 custa
 ~592 h de processador, ~74 h em 8 trabalhadores, ~45 a 60 h nos 10 da
 desktop). O teto de páginas fica para o fim (D21).
-**Versão viva do manuscrito:** `k = 5` (`manuscript/ms_5.tex`,
-`supp_5.tex`, `references_5.bib`, com `tables/` e `figures/`), aberta pela
-E5h em 2026-10-06; as Seções 5 e 6 estão escritas, a 6 com os números
-finais e a 5 com marcadores `[E4.4]` à espera da produção; a Discussion
-(Seção 7) não existe. Os dois compilam limpos em **73 e 101 páginas** com a
-marcação, **66 e 100** sem o texto removido, contra o teto de 40 (D21).
-As versões `k = 1` a `k = 4` ficam intactas.
+**Versão viva do manuscrito:** `k = 6` (`manuscript/ms_6.tex`,
+`supp_6.tex`, `references_6.bib`), aberta pela E5b em 2026-10-12 como cópia
+da `k = 5`; os `\input` de `tables/` e `figures/` que a `k = 6` muda ganham
+o sufixo `_6` (o primeiro: `tables/app-tuning_6.tex`), para a `k = 5`
+compilar como estava. As Seções 5 e 6 estão escritas, a 6 com os números
+finais e a 5 com marcadores `[E4.4]`, que a E5b preenche com as tabelas da
+E4.4; a Discussion (Seção 7) não existe. Os dois compilam limpos em **73 e
+101 páginas** com a marcação, contra o teto de 40 (D21). As versões `k = 1`
+a `k = 5` ficam intactas.
 **Cor da rodada corrente:** `colR1`, em uso desde `k = 2` (nenhuma rodada
 foi aceita, então toda a marcação segue em `colR1`).
 
@@ -4962,7 +4964,13 @@ Ordenadas pelo que bloqueia mais.
    - (b) **A produção (E4.4)**: ~59 h de relógio sozinha em 8
      trabalhadores (~2,5 dias), com o aviso do autor, depois de (a).
 
-68. **Pendências de E5k** (2026-10-08). Recomendação do chat principal:
+68. **Pendências de E5k** (2026-10-08). **Respondida em 2026-10-12: o
+   autor aceitou as nove recomendações.** A E5k já tinha aplicado (a),
+   (b), (c), (e), (f) e a parte de Marylebone do (d) na `k = 5`; (g) e (h)
+   ficam; a `k = 6` acrescentou a frase de Dongsi do (d) na S10 e as três
+   linhas do tempo por ajuste do (i) na Table S7
+   (`tables/app-tuning_6.tex`, da coluna `time` de
+   `results/tables/choices-<app>.csv`). Recomendação do chat principal:
    - (a) **"by the end of July 2003"** no lugar do "by July 2003" de D76(b):
      as 18 partições passam de 1 a ~20 de julho. **Recomendação:** aceitar.
    - (b) **O REML "90% of it by the end of that gap"** (12 de agosto, o
@@ -5005,9 +5013,9 @@ Ordenadas pelo que bloqueia mais.
 vazio**; nenhum processo rodando. **A E4.4 fechou** (bloco de 2026-10-12
 no §2; D82): 26 200 unidades, 0 falhas, 647,9 h de processador; as
 tabelas em `results/tables/{core,arms,scale}/`. A pergunta 69 fica
-respondida por D82. **Pergunta em aberto que pede resposta do autor: 68**
-(nove itens de texto da E5k, todos com recomendação de aceitar, dois
-acrescentam texto).
+respondida por D82; a 68 foi aceita como recomendada em 2026-10-12 e
+aplicada na `k = 6`. **Nenhuma pergunta em aberto pede resposta do
+autor.**
 
 **O próximo passo é a E5b**, os números do estudo no manuscrito, a
 partir de `results/tables/`:

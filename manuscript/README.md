@@ -9,7 +9,13 @@ mesmo índice `k`; a versão `{k+1}` copia os três e atualiza
 A versão `1` não leva marcação de alteração; o preâmbulo já define `colR1`
 e carrega `ulem` para quando `k = 2` existir.
 
-**Versão viva: `k = 5`**, aberta em 2026-10-06 pela E5h como cópia de
+**Versão viva: `k = 6`**, aberta em 2026-10-12 pela E5b como cópia de
+`k = 5`, para os números do estudo de simulação (E4.4), a Seção 7 e a
+pergunta 68; os `\input` de `tables/` e `figures/` que ela muda ganham o
+sufixo `_6` (o primeiro: `tables/app-tuning_6.tex`), para a `k = 5`
+compilar como estava. 73 e 101 páginas com a marcação ao abrir.
+
+A `k = 5` foi aberta em 2026-10-06 pela E5h como cópia de
 `k = 4`, com as Seções 5 (Simulation) e 6 (Application) sem números, as S9
 e S10 do supp, e as tabelas e figuras em `\input{}` próprios nas pastas
 `tables/` e `figures/` (D21); 72 e 97 páginas com a marcação (64 e 96 sem
