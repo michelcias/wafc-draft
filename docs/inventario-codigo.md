@@ -17,7 +17,7 @@ com nomes próprios.
 
 ---
 
-## 1. `michelcias/WaveBased` 2.6-0 (`../../WaveBased`)
+## 1. `michelcias/WaveBased` 2.6-0 (`../WaveBased`)
 
 | Camada | Arquivos | Serve ao WAFC? |
 |---|---|---|
@@ -48,7 +48,7 @@ o padrão do WAFC é `0` nas duas bases (D35, depois de E2.4 medir `eps = 0` dom
 `standardize = FALSE` por padrão (base ortonormal); erro informativo em
 argumento desconhecido (lição do 2.6-0).
 
-## 2. `wall` (compêndio, `../../wall`)
+## 2. `wall` (compêndio, `../wall`)
 
 `R/` funções, `scripts/` orquestração numerada, `config/*.yaml` dados,
 `renv.lock` fixando o `WaveBased` por commit, cache por unidade `dataset ×
@@ -64,7 +64,7 @@ dependem de BLAS e ficam numa máquina só; tabelas agregadas se movem em toda
 rodada que acrescente unidade ao cache. Diferença: o compêndio do WAFC fixa
 também o código de `wafc/` por commit do `wafc-draft`.
 
-## 3. `wall-manuscript` (`../../wall-manuscript`)
+## 3. `wall-manuscript` (`../wall-manuscript`)
 
 - `manuscript/theo/ms_theo_1.tex`: Seções 2 (base, vetor de parâmetros,
   desenho), 3 (estimador), 5 (hipóteses A1 a A7 e o teorema), 7 (trilha
@@ -86,7 +86,7 @@ R 4.6.1; `glmnet`, `grpreg`, `gglasso` (group LASSO), `Matrix`, `bench`,
 o modelo de coeficientes aditivos por splines penalizadas), `splines2`,
 `posterior`; `latexmk`, `pdflatex`. **Não instalados:** `SGL` (sparse group
 LASSO, a referência original) e `targets`. O `WaveBased` 2.6-0 foi instalado
-de `../../WaveBased` (`R CMD INSTALL .`) em 2026-09-18.
+de `../WaveBased` (`R CMD INSTALL .`) em 2026-09-18.
 
 Na máquina de trabalho do autor (conferida em 2026-09-18), `grpreg`,
 `gglasso` e `sparsegl` vieram do repositório do Ubuntu (`r-cran-*`, em

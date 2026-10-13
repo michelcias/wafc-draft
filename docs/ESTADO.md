@@ -43,7 +43,7 @@ parou, o que já foi decidido (para não reabrir) e o que vem a seguir.
 4. Ler a etapa em foco em [`plano-projeto.md`](plano-projeto.md). Em E1,
    também [`proposta-metodo.md`](proposta-metodo.md).
 5. Se for escrever fórmula: [`notacao.md`](notacao.md) antes, e as Seções 2,
-   3 e 5 de `../../wall-manuscript/manuscript/theo/ms_theo_1.tex`, que é o
+   3 e 5 de `../wall-manuscript/manuscript/theo/ms_theo_1.tex`, que é o
    molde da prova.
 
 ### Mensagem de abertura sugerida
@@ -106,7 +106,7 @@ fez buscas de literatura. O que saiu:
   paralelas ([`plano-projeto.md`](plano-projeto.md)); catálogo de tarefas
   abertas em [`TAREFA.md`](TAREFA.md).
 - **Ferramentas locais:** R 4.6.1, `glmnet`, `grpreg`, `gglasso`, `mgcv`,
-  `latexmk`; o `WaveBased` 2.6-0 foi instalado de `../../WaveBased` e o
+  `latexmk`; o `WaveBased` 2.6-0 foi instalado de `../WaveBased` e o
   `wall()` roda. Faltam `sparsegl` (E2.2) e `gh`.
 
 ### 2026-09-18: E0.3 fechada (instruções e template da Statistica Sinica)

@@ -44,7 +44,7 @@ o autor não sabia.
    opinar sobre ela.
 5. Se o foco for matemática, ler o arquivo correspondente em `derivations/` e
    [`notacao.md`](notacao.md) antes de escrever qualquer fórmula. A prova do
-   WALL teórico (`../../wall-manuscript/manuscript/theo/ms_theo_1.tex`,
+   WALL teórico (`../wall-manuscript/manuscript/theo/ms_theo_1.tex`,
    Seções 5, 7 e 8) é o molde de arquitetura; ler o passo correspondente
    antes de reescrevê-lo para o caso de regressão.
 

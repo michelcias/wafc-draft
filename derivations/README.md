@@ -30,6 +30,6 @@ de a prova ser escrita; o script imprime `OK` ou falha. Os scripts chamam o
 avaliação de wavelets.
 
 O molde de prova é o WALL teórico
-(`../../wall-manuscript/manuscript/theo/ms_theo_1.tex`, Seções 5, 7, 8):
+(`../wall-manuscript/manuscript/theo/ms_theo_1.tex`, Seções 5, 7, 8):
 ler o passo correspondente antes de escrever o do WAFC, e registrar no
 arquivo o que foi transposto e o que é novo.

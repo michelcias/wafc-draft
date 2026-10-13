@@ -81,9 +81,9 @@ documento normativo: fluxo, escrita, marcação, git). Em caso de conflito, o
 
 | Repositório | Papel |
 |---|---|
-| `../../WaveBased` | pacote R/C do autor (`michelcias/WaveBased`); fornece as bases de wavelets (`wbasis()`, `wtable()`); o `wall()` é referência de leitura para o desenho por blocos. Não recebe código deste projeto por enquanto (D4) |
-| `../../wall-manuscript` | artigos do WALL (teórico e aplicado); o teórico é o molde da arquitetura de prova (sieve, Besov, desigualdade oráculo, compressibilidade) |
-| `../../wall` | compêndio de benchmark do WALL; molde do `wafc-studies` |
+| `../WaveBased` | pacote R/C do autor (`michelcias/WaveBased`); fornece as bases de wavelets (`wbasis()`, `wtable()`); o `wall()` é referência de leitura para o desenho por blocos. Não recebe código deste projeto por enquanto (D4) |
+| `../wall-manuscript` | artigos do WALL (teórico e aplicado); o teórico é o molde da arquitetura de prova (sieve, Besov, desigualdade oráculo, compressibilidade) |
+| `../wall` | compêndio de benchmark do WALL; molde do `wafc-studies` |
 | `../bdm-draft` | projeto irmão; a origem destas convenções de trabalho |
 | `wafc-draft` (este) | manuscrito, documentos de trabalho, derivações, o código do método (`wafc/`) e o plano |
 | `wafc-studies/` (pasta deste repositório, D60) | compêndio de simulação e aplicação; vira repositório próprio só no fim, por cópia, com só o que reproduz o manuscrito e o supp |

@@ -93,7 +93,7 @@ decisões para a hora errada.
 
 Presentes: R 4.6.1, `glmnet`, `grpreg`, `gglasso`, `mgcv`, `Matrix`,
 `bench`, `testthat`, `devtools`, `roxygen2`, `pkgdown`, `renv`, `latexmk`.
-`WaveBased` 2.6-0 instalado de `../../WaveBased` em 2026-09-18; `sparsegl`,
+`WaveBased` 2.6-0 instalado de `../WaveBased` em 2026-09-18; `sparsegl`,
 `VCBART`, `quadprog` e `gh` instalados depois. A lista em dia está em
 `CONTINUAR.md` §2.
 

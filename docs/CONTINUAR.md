@@ -61,7 +61,7 @@ decisão em E3.3.
 | `/usr/bin/time` (pacote `time` do Ubuntu) | a rodada do piloto (E4.3) mede o pico de memória e o processador de cada passo com `time -v` | `sudo apt install time` |
 | `/usr/bin/time` também na máquina da E4.4 | ver §2b | `sudo apt install time` |
 | `yaml` | só o compêndio (`wafc-studies/`), para ler `config/*.yaml`; 2.3.12 no `renv.lock` | `renv::restore()` dentro de `wafc-studies/` instala tudo, com o `WaveBased` do GitHub em `e494b0e` |
-| o próprio `WaveBased`, instalado de `../../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
+| o próprio `WaveBased`, instalado de `../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
 
 No Ubuntu, `grpreg`, `gglasso` e `sparsegl` também saem do repositório da
 distribuição (`sudo apt install r-cran-grpreg r-cran-gglasso r-cran-sparsegl`),

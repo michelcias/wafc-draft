@@ -26,7 +26,7 @@ que ler antes está aqui e no plano.
    [`inventario-codigo.md`](inventario-codigo.md) e `wafc/README.md` se for código;
    [`alvo-revista.md`](alvo-revista.md) se for manuscrito. Se for prova, o
    passo correspondente do WALL teórico
-   (`../../wall-manuscript/manuscript/theo/ms_theo_1.tex`).
+   (`../wall-manuscript/manuscript/theo/ms_theo_1.tex`).
 
 ## 2. O que já foi feito
 
