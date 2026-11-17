@@ -1,0 +1,137 @@
+\section[\texorpdfstring{Approximation by the wavelet spaces $\WJ$}{Approximation by the wavelet spaces W\_J}]{Approximation by the wavelet \texorpdfstring{spaces $\WJ$}{spaces W\_J}}
+\setcounter{equation}{0}
+
+\subsection*{Proof of Lemma 2}
+
+Fix a pair $(\cv,\md)$ and write $g = \gcomp{\cv}{\md}$ and
+$\theta_{\lev\tsl} = \coefs{\cv}{\md}{\lev}{\tsl}$.
+
+\emph{Tail sum.} By Step 2 below the coefficients are square summable, so
+$g \in L_2[0,1]$ and, the system being complete and $g$ orthogonal to the
+constant, $g = \sum_{\lev\ge0}\sum_{\tsl}\theta_{\lev\tsl}\wav{\lev}{\tsl}$ in
+$L_2$. The orthogonal projection onto $\WJ$ retains the levels below $J$, and
+Parseval's identity gives
+$\norm{g-\PiJ g}^2_{L_2[0,1]} = \sum_{\lev\ge J}
+\norm{\theta_{\lev\cdot}}_2^2$.
+
+\emph{From $\ell_\pi$ to $\ell_2$ inside a level.} In $\R^{2^{\lev}}$ one has
+$\norm{a}_2 \le \norm{a}_{\pi}$ when $\pi \le 2$, and
+$\norm{a}_2 \le (2^{\lev})^{1/2-1/\pi}\norm{a}_{\pi}$ by Hölder's inequality
+when $\pi > 2$. In both cases $\norm{\theta_{\lev\cdot}}_2 \le
+2^{\lev(1/2-1/\pi)_{+}}\norm{\theta_{\lev\cdot}}_{\pi}$, and
+Assumption 5 gives
+\[
+  \norm{\theta_{\lev\cdot}}_2 \;\le\;
+  C_g\,2^{-\lev\{s+1/2-1/\pi-(1/2-1/\pi)_{+}\}}
+  \;=\; C_g\,2^{-\lev\seff},
+\]
+since the exponent equals $s$ when $\pi \ge 2$ and $s-(1/\pi-1/2)$ when
+$\pi < 2$. This is where the loss $(1/\pi-1/2)_{+}$ appears.
+
+\emph{Geometric sum and density.}
+$\sum_{\lev\ge J}C_g^2 2^{-2\lev\seff} = C_g^2 2^{-2J\seff}/(1-2^{-2\seff})$,
+finite because $\seff > 0$, which is the first display of Lemma 2. For the
+second, write $f-f_J = \sum_{\cv,\md}X_{\cv}h_{\cv\md}(U_{\md})$ with
+$h_{\cv\md} = \gcomp{\cv}{\md}-\PiJ\gcomp{\cv}{\md}$, the levels cancelling.
+By the Cauchy-Schwarz inequality over the $pq$ terms and
+$|X_{\cv}| \le B_X$,
+\[
+  \E\{(f-f_J)^2\} \;\le\; pq\sum_{\cv,\md}
+  \E\{X_{\cv}^2h_{\cv\md}^2(U_{\md})\}
+  \;\le\; pq\,B_X^2\sum_{\cv,\md}\E\{h_{\cv\md}^2(U_{\md})\},
+\]
+and $\E\{h^2(U_{\md})\} = \int_0^1 h^2 p_{U_{\md}} \le C_U\norm{h}^2_{L_2[0,1]}$,
+the marginal density being bounded by $C_U$ because integrating the joint
+density over the other $q-1$ coordinates of $[0,1]^{q-1}$ does not increase
+the bound. One factor $pq$ comes from the Cauchy-Schwarz inequality and the
+other from the sum. \qed
+
+The uniform version is used in Section S5 to bound the empirical norm of the
+bias without an appeal to Markov's inequality.
+
+\begin{lemma}[Uniform approximation error]
+\label{lem:sup}
+Under Assumptions 4 and 5 with $s > 1/\pi$, each component has a continuous
+version and, for every $J \ge 0$,
+\[
+  \norm{\gcomp{\cv}{\md}-\PiJ\gcomp{\cv}{\md}}_{\infty}
+  \;\le\; \frac{(L-1)\norm{\psi}_{\infty}C_g}{1-2^{-(s-1/\pi)}}\,
+  2^{-J(s-1/\pi)} ,
+\]
+and therefore
+$\normn{\bb} \le \norm{f-f_J}_{\infty} \le pq B_X(L-1)\norm{\psi}_{\infty}
+C_g\,2^{-J(s-1/\pi)}/\{1-2^{-(s-1/\pi)}\}$ for every sample.
+\end{lemma}
+
+\begin{proof}
+At a point $u$ and a level $\lev$ at most $L-1$ periodized translates are
+nonzero, because $\psi(2^{\lev}u-\tsl)\ne0$ requires
+$2^{\lev}u-\tsl \in{}$ $(1-L/2,\,L/2)$, so
+$\sum_{\tsl}|\wav{\lev}{\tsl}(u)| \le (L-1)2^{\lev/2}\norm{\psi}_{\infty}$.
+With $\max_{\tsl}|\theta_{\lev\tsl}| \le \norm{\theta_{\lev\cdot}}_{\pi} \le
+C_g2^{-\lev(s+1/2-1/\pi)}$ the level contributes at most
+$(L-1)\norm{\psi}_{\infty}C_g2^{-\lev(s-1/\pi)}$ in the supremum norm. Since
+$s > 1/\pi$ the series converges absolutely and uniformly, so its sum is
+continuous and agrees almost everywhere with $g$; the tail from level $J$ on
+is the geometric sum of the displayed bounds, and the statement for $f-f_J$ is
+the triangle inequality over the $pq$ terms.
+\end{proof}
+
+The next proposition is the one referred to in Section 2.2 of the paper: it
+quantifies what the periodized basis charges for a component that does not
+match at the two ends of the interval.
+
+\begin{proposition}[Cost of periodization]
+\label{prop:periodization}
+Let the basis be as in Assumption 4 and let
+$g \in \Besov{s}{\pi}{r}[0,1]$, the Besov space of the interval and not of the
+circle, with $s > 1/\pi$, $N > s$ and $\int_0^1 g = 0$. Then there is a
+constant $C$ depending on $g$, on $\psi$ and on $(s,\pi)$ such that, for every
+$J$ with $2^J \ge L-1$,
+\[
+  \norm{g-\PiJ g}^2_{L_2[0,1]} \;\le\; C\,2^{-2J\seff}
+  \;+\; 2(L-1)\norm{\psi}_1^2\norm{g}^2_{\infty}\,2^{-J},
+\]
+so that the $L_2$ rate is $2^{-J\min(\seff,1/2)}$. If $g$ is continuous with
+$g(0) \ne g(1)$, the second term is of the exact order $2^{-J}$ and
+$\norm{g-\PiJ g}_{\infty}$ does not converge to zero.
+\end{proposition}
+
+\begin{proof}
+Let $\tilde g$ be the one periodic extension of $g$, so that
+$\theta_{\lev\tsl} = \int_{\R}\tilde g(y)2^{\lev/2}\psi(2^{\lev}y-\tsl)\,dy$.
+At a level with $2^{\lev} \ge L-1$, separate the interior translates, whose
+support lies inside $[0,1]$, from the at most $L-1$ boundary translates that
+cross the identification of $0$ with $1$. For an interior translate,
+$\theta_{\lev\tsl} = \inner{Eg}{\psi_{\lev\tsl}}_{\R}$ for any extension $Eg$
+of $g$ to the line; taking $E$ a bounded extension operator from
+$\Besov{s}{\pi}{r}[0,1]$ to $\Besov{s}{\pi}{r}(\R)$
+\citep[Chapter 3]{Triebel-1983} and using the wavelet characterization of the
+latter, which for the implication from the function to the sequence requires
+only $N > s$ vanishing moments, gives
+$\norm{(\theta_{\lev\tsl})_{\rm int}}_{\pi} \le C_12^{-\lev(s+1/2-1/\pi)}$,
+whose tail sum is bounded as in Lemma 2. For a boundary translate,
+$s > 1/\pi$ makes $g$ bounded and
+$|\theta_{\lev\tsl}| \le \norm{g}_{\infty}\norm{\psi_{\lev\tsl}}_1 =
+\norm{g}_{\infty}\norm{\psi}_12^{-\lev/2}$, and there are at most $L-1$ of
+them per level, so their tail sum is at most
+$2(L-1)\norm{\psi}_1^2\norm{g}_{\infty}^22^{-J}$. For the exact order, if $g$
+is continuous with $g(0) \ne g(1)$ then on the support of a boundary translate
+$\tilde g$ equals $g(1)+o(1)$ to the left of the identification point and
+$g(0)+o(1)$ to the right, so
+$\theta_{\lev\tsl} = 2^{-\lev/2}\{g(0)-g(1)\}\int_{y>a_{\tsl}}\psi(y)\,dy +
+o(2^{-\lev/2})$; since $\int\psi = 0$ and $\psi$ vanishes on no subinterval of
+its support, that partial integral is nonzero for some translate, and the
+boundary contribution of the level is of order $2^{-\lev}$. The failure of
+uniform convergence is that of any wavelet series at a jump.
+\end{proof}
+
+Under Assumption 5 nothing changes, since that assumption is already a
+periodic one; what Proposition S3.1 gives is the price of its failure. With
+the basis of \citet*{cohen1993wavelets} the space $\VJ$ reproduces polynomials
+of degree below $N$ and its basis characterizes $\Besov{s}{\pi}{r}[0,1]$
+without periodicity \citep[Section 3.9]{Cohen-2003}, so Lemma 2 holds with
+that space and the same proof.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/03-desenho-produtos.tex

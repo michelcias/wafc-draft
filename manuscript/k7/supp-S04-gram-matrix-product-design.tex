@@ -1,0 +1,101 @@
+\section{The Gram matrix of the product design}
+\setcounter{equation}{0}
+
+Recall $\bPsi(u) \in \R^{K}$, $K = 1+q\NJ$, the vector that collects the
+constant and the wavelets of the $q$ modulators, and the identity
+$\bZ = \Pi\{\bX \otimes \bPsi(\bU)\}$, where $\Pi$ is the fixed permutation
+that moves the $p$ entries $X_{\cv}\cdot 1$ to the front. Since $\Pi$ is
+orthogonal, every statement about eigenvalues is invariant to the column
+order. Assumption 4 also gives a constant $C_\psi$, depending only on the
+family, with
+\begin{equation}
+  \label{eq:pointwise}
+  \sup_{u\in[0,1]}\sum_{\lev<J}\sum_{\tsl}\wav{\lev}{\tsl}(u)^2
+  \;\le\; C_\psi\,2^{J} \qquad \text{for every } J \ge 1 :
+\end{equation}
+at each level at most $L$ periodized wavelets are nonzero at a given $u$ and
+$\norm{\wav{\lev}{\tsl}}_{\infty} = 2^{\lev/2}\norm{\psi}_{\infty}$, so the
+left side is at most
+$L\norm{\psi}^2_{\infty}\sum_{\lev<J}2^{\lev} \le L\norm{\psi}^2_{\infty}2^J$.
+
+\subsection*{Proof of Proposition 2}
+
+\emph{Part (i), the modulators.} For $a \in \R^{K}$ write
+$h_a(u) = a\T\bPsi(u) = a_0 + \sum_{\md}h_{a,\md}(u_{\md})$ with
+$h_{a,\md} = \sum_{\lev\tsl}a_{\md,\lev\tsl}\wav{\lev}{\tsl}$. The functions
+$1$ and $\wav{\lev}{\tsl}(u_{\md})$, $\md = 1,\dots,q$, are orthonormal in
+$L_2([0,1]^q,du)$: within one coordinate this is the orthonormality of the
+periodized system, and across coordinates
+$\int\wav{\lev}{\tsl}(u_{\md})\wav{\lev'}{\tsl'}(u_{\md'})\,du =
+\int_0^1\wav{\lev}{\tsl}\int_0^1\wav{\lev'}{\tsl'} = 0$ for
+$\md \ne \md'$, because every wavelet integrates to zero. Hence
+$\int_{[0,1]^q}h_a^2 = \norm{a}_2^2$ and, by Assumption 3,
+$c_U\norm{a}_2^2 \le \E\{h_a(\bU)^2\} \le C_U\norm{a}_2^2$, which is the claim
+since $a\T\Gram_{\bPsi}a = \E\{h_a(\bU)^2\}$.
+
+\emph{Part (i), the full matrix.} Let $\delta \in \R^{pK}$ and reshape it as
+$\Delta \in \R^{p\times K}$, row $\cv$ holding the coefficients attached to
+$X_{\cv}$, so that $\{\bX\otimes\bPsi(\bU)\}\T\delta = \bX\T\Delta\bPsi(\bU)$.
+By the tower property,
+\[
+  \delta\T\Pi\T\Gram\Pi\delta
+  = \E\bigl[\{\bX\T\Delta\bPsi(\bU)\}^2\bigr]
+  = \E\bigl[\bPsi(\bU)\T\Delta\T\,\E(\bX\bX\T\mid\bU)\,\Delta\bPsi(\bU)\bigr].
+\]
+Assumption 2 bounds the inner quadratic form between
+$\kappa_1\norm{\Delta\bPsi(\bU)}_2^2$ and $\kappa_2\norm{\Delta\bPsi(\bU)}_2^2$
+almost surely, and
+$\E\norm{\Delta\bPsi(\bU)}_2^2 = \delta\T(I_p\otimes\Gram_{\bPsi})\delta$ lies
+between $\lmin(\Gram_{\bPsi})\norm{\delta}_2^2$ and
+$\lmaxx(\Gram_{\bPsi})\norm{\delta}_2^2$. Combining the two and using the
+first part gives $\gamma = \kappa_1c_U \le \lmin(\Gram)$ and
+$\lmaxx(\Gram) \le \kappa_2C_U$. If $\bX$ and $\bU$ are independent, the
+conditional second moment matrix is constant, the same computation gives
+$\delta\T\Pi\T\Gram\Pi\delta = \delta\T\{\E(\bX\bX\T)\otimes\Gram_{\bPsi}\}
+\delta$ for every $\delta$, and two symmetric matrices with the same quadratic
+form are equal; the eigenvalues of a Kronecker product of symmetric matrices
+are the products of the eigenvalues, and
+$\lmin\{\E(\bX\bX\T)\} \ge \kappa_1$ by Jensen's inequality, since $\lmin$ is
+concave and $\E(\bX\bX\T) = \E\{\E(\bX\bX\T\mid\bU)\}$.
+
+\emph{Part (ii), the empirical matrix.} First the range:
+$\norm{\bZ_i}_2^2 = \norm{\bX_i}_2^2\norm{\bPsi(\bU_i)}_2^2 \le
+pB_X^2(1+qC_\psi2^J) = R_J$ by \eqref{eq:pointwise} applied to each of the $q$
+coordinates. Set $A_i = (\bZ_i\bZ_i\T-\Gram)/n$, independent, centered and
+symmetric, with $\Gramhat - \Gram = \sum_i A_i$. Then
+$\opnorm{\bZ_i\bZ_i\T} = \norm{\bZ_i}_2^2 \le R_J$ and
+$\opnorm{\Gram} \le R_J$, so $\opnorm{A_i} \le 2R_J/n$; and
+$\E\{(\bZ\bZ\T-\Gram)^2\} = \E(\norm{\bZ}_2^2\bZ\bZ\T) - \Gram^2 \preceq
+R_J\Gram$, so that
+$\opnorm{\sum_i\E A_i^2} \le R_J\lmaxx(\Gram)/n \le R_J\kappa_2C_U/n$. The
+matrix Bernstein inequality \citep[Theorem 1.4]{tropp2012user} applied to
+$\pm\sum_iA_i$ gives, for every $t>0$,
+\[
+  \Prob\bigl(\opnorm{\Gramhat-\Gram} \ge t\bigr)
+  \;\le\; 2D\exp\Bigl\{-\frac{nt^2}{2R_J(\kappa_2C_U+2t/3)}\Bigr\},
+\]
+and $t = \gamma/2$ with Weyl's inequality gives
+$\lmin(\Gramhat) \ge \lmin(\Gram)-\gamma/2 \ge \gamma/2$ on the complementary
+event, which is the display of part (ii). The exponent is $-cn/R_J$ with $c$
+fixed and $R_J \asymp pq2^J$, while $\log(2D) \asymp \log(pq2^J)$, so the
+bound tends to zero exactly when $n/(pq2^J) - \log(pq2^J) \to \infty$, which
+is implied by $pq2^J\log(pq2^J)/n \to 0$. On that event
+$\compat^2(S;\Gramhat) \ge \gamma/2$ for every support, by
+\eqref{eq:compat-lmin}. \qed
+
+\begin{remark}[What the two assumptions exclude]
+\label{rem:excl}
+Assumption 2 fails exactly when a nontrivial linear combination of the linear
+covariates is almost surely a function of the modulators on a set of positive
+probability; in the canonical case $X_1\equiv1$ and $X_2 = h(U_1)$ the
+conditional second moment matrix has rank one and the population Gram matrix
+degenerates as $J$ grows, because $h(u_1)\wav{\lev}{\tsl}(u_1)$ is approached
+by the span of the basis. In Assumption 3 it is the joint density that is
+bounded below: if $U_2 = U_1$ almost surely, both marginals are uniform but
+$\wav{\lev}{\tsl}(U_1)-\wav{\lev}{\tsl}(U_2) \equiv 0$ and
+$\Gram_{\bPsi}$ is singular. Independence between $\bX$ and $\bU$ buys the
+exact factorization of part (i) and nothing else.
+\end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/04-oraculo.tex

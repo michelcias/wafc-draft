@@ -1,0 +1,431 @@
+\section{The oracle inequality}
+\setcounter{equation}{0}
+
+
+
+
+A proposition on the partition into chunks and four lemmas
+precede the proof of Theorem~2.
+
+% derivations/08-blocos.tex, Proposicao 7 (numeracao global).
+
+\begin{proposition}[The partition into chunks]
+\label{prop:balanced}
+Let $\Gcal$ be the partition of Section~2.3 of the paper with $b \ge 2$ and
+$J \ge 1$, and let $\jst = \max\{\lev \ge 0 : 2^{\lev} < b\}$.
+\begin{enumerate}
+\item[(i)] Every chunk of a fine level, $\lev > \jst$, is contained in that
+level and has between $b$ and $2b-1$ coefficients. If $J > \jst+1$, the coarse
+chunk has $2^{\jst+1}-1$ coefficients, and $b-1 \le 2^{\jst+1}-1 \le 2b-3$;
+if $J \le \jst+1$, each block is a single chunk of $2^{J}-1$ coefficients.
+\item[(ii)] $|\Gcal| \le pq(1 + 2^{J}/b)$.
+\item[(iii)] With $w_{G} = |G|^{1/2}$,
+$\varrho^{2} = \max_{G}|G|/\min_{G}|G| \le (2b-1)/(b-1) \le 3$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+All blocks have the same structure, so it suffices to look at one. The coarse
+chunk has $\sum_{\lev=0}^{\min(\jst,J-1)}2^{\lev} = 2^{\min(\jst,J-1)+1}-1$
+coefficients. If $J \le \jst+1$, this is $2^{J}-1$ and there is no fine level.
+Otherwise $2^{\jst} < b \le 2^{\jst+1}$ and, $b$ being an integer,
+$2^{\jst} \le b-1$, so that $b-1 \le 2^{\jst+1}-1 \le 2b-3$. A fine level
+$\lev$ has $k_{\lev} = \lfloor 2^{\lev}/b\rfloor \ge 1$ chunks, $k_{\lev}-1$ of
+them with $b$ coefficients and the last with $b + r_{\lev}$, where
+$r_{\lev} = 2^{\lev} - k_{\lev}b \in \{0,\dots,b-1\}$; all lie between $b$ and
+$2b-1$, which is (i). For (ii), a block has
+$1 + \sum_{\lev=\jst+1}^{J-1}\lfloor 2^{\lev}/b\rfloor \le
+1 + (2^{J}-2^{\jst+1})/b \le 1 + 2^{J}/b$ chunks. For (iii), with
+$w_{G} = |G|^{1/2}$, $\varrho^{2} = \max|G|/\min|G|$; with no fine level every
+chunk has $2^{J}-1$ coefficients and $\varrho = 1$, and otherwise (i) gives
+$\min|G| \ge b-1$ and $\max|G| \le 2b-1$, and
+$(2b-1)/(b-1) = 2 + 1/(b-1) \le 3$.
+\end{proof}
+
+
+
+\begin{lemma}[Profiling and the Schur complement]
+\label{lem:profile}
+Suppose $\Amat$ has rank $p$. Then $\thetahat$ minimizes
+$\normn{\MA\bY-\Btil\btheta}^2+2\pen\nGw{\btheta}$,
+or the same with $\norm{\btheta}_1$ for the lasso, and
+$\chat = (\Amat\T\Amat)^{-1}\Amat\T(\bY-\Bmat\thetahat)$; with
+$v = \thetahat-\thetastar$,
+\begin{equation}
+  \label{eq:decomp}
+  \widehat{f}-f_J \;=\; \Btil v + \PA(\bb+\bveps),
+\end{equation}
+and the same identity holds with any comparator
+$\bar\bbeta$, $\bbar$ and $\vbar = \thetahat-\thbar$ in place of $\betastar$,
+$\bb$ and $v$;
+$\GBA$ is the Schur complement of the block $\Amat$ in $\Gramhat$ and
+\begin{equation}
+  \label{eq:schur}
+  \gtil \;=\; \lmin(\GBA) \;\ge\; \lmin(\Gramhat);
+\end{equation}
+and if $\lmin(\Gramhat)>0$ the minimizer in (2.5) is unique.
+\end{lemma}
+
+\begin{proof}
+The argument uses only that the penalty does not depend on
+$\bc$ and is convex, so it holds for both penalties. The objective is convex and, for fixed $\btheta$, quadratic and coercive in
+$\bc$, with minimum at the stated value and minimized value
+$\normn{\MA(\bY-\Bmat\btheta)}^2 = \normn{\MA\bY-\Btil\btheta}^2$, since $\MA$
+is a symmetric idempotent; minimizing first in $\bc$ and then in $\btheta$
+gives the same set of minimizers as minimizing jointly. For
+\eqref{eq:decomp}, $\Amat\chat = \PA(\bY-\Bmat\thetahat)$ and
+$\Amat\bc = \PA\Amat\bc$, and $\bY = \Amat\bc+\Bmat\thetastar+\bb+\bveps$, so
+$\Amat(\chat-\bc) = \PA(\bb+\bveps)-\PA\Bmat v$ and
+$\widehat{f}-f_J = \MA\Bmat v + \PA(\bb+\bveps)$; the same
+computation with $\bY = \Amat\bar\bc + \Bmat\thbar + \bbar + \bveps$ gives the
+identity for a comparator. For \eqref{eq:schur}, the
+variational characterization of the Schur complement gives, for every
+$v \in \R^d$,
+\[
+  v\T\GBA v \;=\; \min_{u\in\R^p}(u\T,v\T)\,\Gramhat\,(u\T,v\T)\T
+  \;\ge\; \min_{u}\lmin(\Gramhat)(\norm{u}_2^2+\norm{v}_2^2)
+  \;=\; \lmin(\Gramhat)\norm{v}_2^2 .
+\]
+Finally $\lmin(\Gramhat)>0$ makes the quadratic term strictly convex, and
+adding a convex function preserves strict convexity.
+\end{proof}
+
+% derivations/08-blocos.tex, Lema 14 (numeracao global).
+
+\begin{lemma}[Calibration of the penalty over chunks]
+\label{lem:calib-blocks}
+Under Assumption~1, let $\Gcal$ be any partition of the penalized coordinates
+and $\alpha \in (0,1)$.
+\begin{enumerate}
+\item[(i)] With $\lamz{G}$ as in Theorem~2, the event
+$\Ecal = \{\norm{(\Btil\T\bveps/n)_{G}}_{2} \le \lamz{G} \text{ for every } G\}$
+has $\Prob(\Ecal\mid\bX,\bU) \ge 1-\alpha$. Consequently, for any weights $w$
+and every $\pen \ge \pen_{w}$, $\Ecal \subseteq \Tw$ and
+$\Prob(\Tw) \ge 1-\alpha$.
+\item[(ii)] (Closed form.) $\mathrm{tr}(\Psitil_{G}) \le |G|\smax^{2}$ and
+$\opnorm{\Psitil_{G}} \le \lmaxx(\Gramhat)$; hence, on the event
+$\{\smax^{2} \le 2B_X^{2}C_U\}\cap\{\lmaxx(\Gramhat) \le \Lambda\}$,
+$\lamz{G} \le \lamzbar{G}$ for every $G$, with
+\[
+  \lamzbar{G} \;=\; \frac{\sigma}{\sqrt{n}}\Bigl\{B_X\sqrt{2C_U|G|}
+  + \sqrt{2\Lambda\log(|\Gcal|/\alpha)}\Bigr\},
+\]
+which is deterministic and is the quantity of equation (3.1) of the paper.
+\item[(iii)] (The price of the weights.) With
+$\lamG = 2\max_{G}\lamzbar{G}/w_{G}$ and $\lamGone = 2\max_{G}\lamzbar{G}$,
+$\lamG w_{G} \le \varrho\lamGone$ for every $G$, and therefore
+$(\lamG)^{2}\Wcal(\Hcal) \le \varrho^{2}(\lamGone)^{2}|\Hcal|$ for every
+$\Hcal \subseteq \Gcal$. The same holds with $\pen_{w}$ and
+$2\max_{G}\lamz{G}$ in place of $\lamG$ and $\lamGone$.
+\end{enumerate}
+\end{lemma}
+
+The event $\Ecal$ does not depend on the weights: they only choose the chunk
+that dictates the penalty, the one with the largest $\lamz{G}/w_{G}$, and the
+price of unequal weights is the factor $\varrho$ of (iii), paid in the
+estimation term. With unit weights and chunks of at most $b_{\max}$
+coefficients, $\lamGone \asymp \sigma\{(b_{\max} + \log|\Gcal|)/n\}^{1/2}$,
+which is the penalty level of \citet[eq.~3.14]{Klopp-Pensky-2015} up to
+constants and the sub-Gaussian version of the level of
+\citet[Lemma~3.1]{Lounici-Pontil-vandeGeer-Tsybakov-2011}.
+
+\begin{proof}
+\emph{(i).} Condition on $(\bX,\bU)$. Then $\Btil$ is fixed and, by
+Assumption~1, the errors are independent with
+$\E\{\exp(a_{i}\varepsilon_{i})\mid\bX,\bU\} \le \exp(\sigma^{2}a_{i}^{2}/2)$,
+so that $\E\{\exp(a\T\bveps)\mid\bX,\bU\} \le \exp(\sigma^{2}\norm{a}_{2}^{2}/2)$
+for every $a \in \R^{n}$, which is the condition of
+\citet[Theorem~2.1]{Hsu-Kakade-Zhang-2012} with mean zero. Fix $G$ and write
+$M_{G} = \Btil_{G}\T/n$, so that $(\Btil\T\bveps/n)_{G} = M_{G}\bveps$, and
+$\Sigma_{G} = M_{G}\T M_{G} \in \R^{n\times n}$. The theorem is stated for a
+square matrix $A$ with $\Sigma = A\T A$; take $A = \Sigma_{G}^{1/2}$, which has
+the same $\Sigma_{G}$, and note that
+$\norm{\Sigma_{G}^{1/2}\bveps}_{2}^{2} = \bveps\T\Sigma_{G}\bveps =
+\norm{M_{G}\bveps}_{2}^{2}$. Since $\mathrm{tr}(\Sigma_{G}) =
+\mathrm{tr}(\Psitil_{G})/n$, $\opnorm{\Sigma_{G}} = \opnorm{\Psitil_{G}}/n$
+and $\mathrm{tr}(\Sigma_{G}^{2}) \le \opnorm{\Sigma_{G}}\mathrm{tr}(\Sigma_{G})$,
+the theorem gives, for every $t > 0$, with conditional probability at least
+$1 - e^{-t}$,
+\[
+  \norm{(\Btil\T\bveps/n)_{G}}_{2}^{2}
+  \;\le\; \sigma^{2}\bigl[\mathrm{tr}(\Sigma_{G})
+  + 2\{\mathrm{tr}(\Sigma_{G}^{2})t\}^{1/2} + 2\opnorm{\Sigma_{G}}t\bigr]
+  \;\le\; \frac{\sigma^{2}}{n}\Bigl[\{\mathrm{tr}(\Psitil_{G})\}^{1/2}
+  + \{2\opnorm{\Psitil_{G}}t\}^{1/2}\Bigr]^{2}.
+\]
+With $t = \log(|\Gcal|/\alpha)$ each chunk fails with conditional probability
+at most $\alpha/|\Gcal|$, and a union bound over the chunks and the tower
+property give $\Prob(\Ecal) \ge 1-\alpha$. On $\Ecal$,
+$\norm{(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \lamz{G}/w_{G} \le \pen_{w}/2 \le
+\pen/2$ for every $G$, so $\Ecal \subseteq \Tw$.
+
+\emph{(ii).} Since $\MA \preceq I_{n}$,
+$\Psitil_{G} = \Bmat_{G}\T\MA\Bmat_{G}/n \preceq \Gramhat_{GG}$, the principal
+submatrix of $\Gramhat$ on $G$. Hence $\mathrm{tr}(\Psitil_{G}) \le
+\sum_{a\in G}(\Gramhat)_{aa} \le |G|\smax^{2}$, and
+$\opnorm{\Psitil_{G}} \le \lmaxx(\Gramhat_{GG}) \le \lmaxx(\Gramhat)$ by Cauchy
+interlacing. On the event of the statement,
+$\smax \le B_X(2C_U)^{1/2}$ and $\lmaxx(\Gramhat) \le \Lambda$.
+
+\emph{(iii).} For every $G$,
+$\lamG w_{G} = 2\max_{G'}(\lamzbar{G'}w_{G}/w_{G'}) \le
+2\max_{G'}\lamzbar{G'}\cdot\max_{G'}(w_{G}/w_{G'}) \le \varrho\lamGone$, and
+$(\lamG)^{2}\Wcal(\Hcal) = \sum_{G\in\Hcal}(\lamG w_{G})^{2} \le
+\varrho^{2}(\lamGone)^{2}|\Hcal|$. The same computation holds with the
+$\lamz{G}$.
+\end{proof}
+
+
+\begin{lemma}[Empirical column norms]
+\label{lem:columns}
+Under Assumptions 2 to 4, every penalized column has
+$\E\{(\Gramhat)_{aa}\} \le B_X^2C_U$ and, for every $t>0$, with
+$R'_J = B_X^2\norm{\psi}^2_{\infty}2^{J-1}$,
+\[
+  \Prob(\smax^2 > B_X^2C_U+t) \;\le\;
+  d\exp\Bigl\{-\frac{nt^2}{2(R'_JB_X^2C_U+R'_Jt/3)}\Bigr\} .
+\]
+In particular $\Prob(\smax^2 \le 2B_X^2C_U) \to 1$ whenever
+$2^J\log d/n \to 0$.
+\end{lemma}
+
+\begin{proof}
+For the column $a = (\cv\md,\lev\tsl)$ the summand is
+$W_i = X_{i\cv}^2\wav{\lev}{\tsl}(U_{i\md})^2 \ge 0$, with
+$\E(W) \le B_X^2\int_0^1\wav{\lev}{\tsl}^2p_{U_{\md}} \le B_X^2C_U$ by
+orthonormality and the bounded marginal density, and
+$0 \le W_i \le B_X^2\norm{\psi}_{\infty}^22^{J-1} = R'_J$ because
+$\lev \le J-1$. Then $\Var(W) \le \E(W^2) \le R'_J\E(W) \le R'_JB_X^2C_U$, and
+the one sided Bernstein inequality with a union bound over the $d$ columns
+gives the display. With $t = B_X^2C_U$ the exponent is
+$-3nB_X^2C_U/(8R'_J)$ and $R'_J \asymp 2^J$.
+\end{proof}
+
+\begin{lemma}[The $\ell_1$ norm of the oracle]
+\label{lem:l1}
+Under Assumption 5, for every pair $(\cv,\md)$ and every level,
+$\sum_{\tsl}|\coefs{\cv}{\md}{\lev}{\tsl}| \le
+2^{\lev(1-1/\pi)}\norm{\theta^{*}_{\cv\md,\lev\cdot}}_{\pi} \le
+C_g2^{\lev(1/2-s)}$, with no dependence on $\pi$, and therefore
+$\norm{\thetastar}_1 \le pqC_g\sum_{\lev<J}2^{\lev(1/2-s)}$, which is
+$O(1)$ if $s>1/2$, of order $J$ if $s = 1/2$ and of order
+$2^{J(1/2-s)}$ if $s<1/2$.
+\end{lemma}
+
+\begin{proof}
+Hölder's inequality in $\R^{2^{\lev}}$ gives
+$\norm{a}_1 \le (2^{\lev})^{1-1/\pi}\norm{a}_{\pi}$, and Assumption 5 bounds
+the $\ell_\pi$ norm of the level by $C_g2^{-\lev(s+1/2-1/\pi)}$; the resulting
+exponent is $\lev(1-1/\pi)-\lev(s+1/2-1/\pi) = \lev(1/2-s)$, in which $\pi$
+has disappeared. Summing over the levels below $J$ and over the $pq$ blocks
+gives the three regimes of the geometric sum.
+\end{proof}
+
+% derivations/08-blocos.tex, prova do Teorema 3 (numeracao global).
+
+\subsection*{Proof of Theorem 2}
+
+The event $\Tw$ has probability at least $1-\alpha$ whenever
+$\pen \ge \pen_{w}$, by Lemma~\ref{lem:calib-blocks}(i). Fix a comparator
+$\bar\bbeta = (\bar\bc,\thbar)$ and write $\norm{\cdot}$ for $\nGw{\cdot}$ in
+this proof.
+
+\emph{Step 1, the basic inequality.} By Lemma~\ref{lem:profile}, $\thetahat$
+minimizes the residualized objective; comparing its value at $\thetahat$ with
+its value at $\thbar$, and using $\bY = \Amat\bar\bc + \Bmat\thbar + \bbar +
+\bveps$ and $\MA\Amat = 0$, so that $\MA\bY = \Btil\thbar + r$ with
+$r = \MA(\bbar + \bveps)$,
+\begin{equation}
+  \label{eq:basic-blocks}
+  \normn{\Btil\vbar}^{2} + 2\pen\norm{\thetahat}
+  \;\le\; 2\inner{r}{\Btil\vbar}_{n} + 2\pen\norm{\thbar} .
+\end{equation}
+
+\emph{Step 2, the two noises.} Since $\MA$ is symmetric and $\MA\Btil = \Btil$,
+$\inner{r}{\Btil\vbar}_{n} = \inner{\bbar+\bveps}{\Btil\vbar}_{n}$. The
+stochastic part is handled by the dual norm of $\norm{\cdot}$, which is
+$z \mapsto \max_{G}\norm{z_{G}}_{2}/w_{G}$: on $\Tw$,
+\[
+  2\bigl|\inner{\bveps}{\Btil\vbar}_{n}\bigr|
+  = 2\Bigl|\sum_{G}\inner{(\Btil\T\bveps/n)_{G}}{\vbar_{G}}\Bigr|
+  \le 2\max_{G}\frac{\norm{(\Btil\T\bveps/n)_{G}}_{2}}{w_{G}}
+  \sum_{G}w_{G}\norm{\vbar_{G}}_{2}
+  \le \pen\norm{\vbar} .
+\]
+The deterministic part is handled by the Cauchy-Schwarz and Young
+inequalities: $2|\inner{\bbar}{\Btil\vbar}_{n}| =
+2|\inner{\MA\bbar}{\Btil\vbar}_{n}| \le 2\normn{\bbar}\normn{\Btil\vbar} \le
+\normn{\Btil\vbar}^{2}/2 + 2\normn{\bbar}^{2}$. Substituting both in
+\eqref{eq:basic-blocks},
+\begin{equation}
+  \label{eq:basic2-blocks}
+  \tfrac12\normn{\Btil\vbar}^{2} + 2\pen\norm{\thetahat}
+  \;\le\; \pen\norm{\vbar} + 2\pen\norm{\thbar} + 2\normn{\bbar}^{2} .
+\end{equation}
+
+\emph{Step 3, the slow rate.} Bounding $\norm{\vbar} \le \norm{\thetahat} +
+\norm{\thbar}$ in \eqref{eq:basic2-blocks} gives part (i). No property of
+$\Gramhat$ was used.
+
+\emph{Step 4, decomposability.} For $G \notin \Gbar$, $\thbar_{G} = 0$ and
+$\thetahat_{G} = \vbar_{G}$; for $G \in \Gbar$,
+$\norm{\thetahat_{G}}_{2} \ge \norm{\thbar_{G}}_{2} - \norm{\vbar_{G}}_{2}$.
+Hence $\norm{\thetahat} \ge \norm{\thbar} - \norm{\vbar_{\Gbar}} +
+\norm{\vbar_{\Gbar^{c}}}$, while $\norm{\vbar} = \norm{\vbar_{\Gbar}} +
+\norm{\vbar_{\Gbar^{c}}}$; substituting in \eqref{eq:basic2-blocks} and
+cancelling $2\pen\norm{\thbar}$,
+\begin{equation}
+  \label{eq:cone-blocks}
+  \tfrac12\normn{\Btil\vbar}^{2} + \pen\norm{\vbar_{\Gbar^{c}}}
+  \;\le\; 3\pen\norm{\vbar_{\Gbar}} + 2\normn{\bbar}^{2} .
+\end{equation}
+
+\emph{Step 5, two cases, with no cone.} By the Cauchy-Schwarz inequality and
+the definition of $\gtil$,
+\begin{equation}
+  \label{eq:cs-blocks}
+  \norm{\vbar_{\Gbar}} = \sum_{G\in\Gbar}w_{G}\norm{\vbar_{G}}_{2}
+  \le \bar\Wcal^{1/2}\norm{\vbar}_{2}
+  \le (\bar\Wcal/\gtil)^{1/2}\normn{\Btil\vbar},
+\end{equation}
+because $\normn{\Btil\vbar}^{2} = \vbar\T\GBA\vbar \ge \gtil\norm{\vbar}_{2}^{2}$.
+If $2\normn{\bbar}^{2} \le \pen\norm{\vbar_{\Gbar}}$, then
+\eqref{eq:cone-blocks} gives $\tfrac12\normn{\Btil\vbar}^{2} +
+\pen\norm{\vbar_{\Gbar^{c}}} \le 4\pen\norm{\vbar_{\Gbar}}$, and with
+\eqref{eq:cs-blocks}, $\tfrac12\normn{\Btil\vbar}^{2} \le
+4\pen(\bar\Wcal/\gtil)^{1/2}\normn{\Btil\vbar}$, that is
+$\normn{\Btil\vbar}^{2} \le 64\pen^{2}\bar\Wcal/\gtil$ and
+$\norm{\vbar}_{2}^{2} \le \normn{\Btil\vbar}^{2}/\gtil \le
+64\pen^{2}\bar\Wcal/\gtil^{2}$. If instead
+$2\normn{\bbar}^{2} > \pen\norm{\vbar_{\Gbar}}$, then \eqref{eq:cone-blocks}
+gives $\tfrac12\normn{\Btil\vbar}^{2} < 8\normn{\bbar}^{2}$, that is
+$\normn{\Btil\vbar}^{2} < 16\normn{\bbar}^{2}$, and
+$\norm{\vbar}_{2}^{2} < 16\normn{\bbar}^{2}/\gtil$. Each quantity is bounded by
+the maximum of the two cases, hence by their sum, which is part (ii).
+
+\emph{Step 6, prediction.} By Lemma~\ref{lem:profile} with the comparator,
+$\widehat{f}-f = \Btil\vbar + \PA(\bbar+\bveps) - \bbar$, and
+$\normn{\PA\bbar} \le \normn{\bbar}$, which gives the triangle inequality of
+part (iii). Conditionally on the covariates the errors are independent,
+centered and of variance at most $\sigma^{2}$, so
+$\E(\normn{\PA\bveps}^{2}\mid\bX,\bU) \le \sigma^{2}\mathrm{tr}(\PA)/n \le
+\sigma^{2}p/n$. Since $\Tw$, $\gtil$ and $\pen$ do not depend on the
+comparator, the bounds hold simultaneously for all comparators, and with
+$(x+y+z)^{2} \le 3(x^{2}+y^{2}+z^{2})$ and part (ii) they give, on
+$\Tw\cap\{\gtil > 0\}$,
+\begin{equation}
+  \label{eq:oracle-min-blocks}
+  \normn{\widehat{f}-f}^{2} \;\le\;
+  3\min_{\bar\bbeta}\Bigl\{\frac{64\pen^{2}\bar\Wcal}{\gtil}
+  + 20\normn{\bbar}^{2}\Bigr\} + 3\normn{\PA\bveps}^{2} . \qquad\qed
+\end{equation}
+
+\begin{remark}[Why there is no cone condition, also over chunks]
+\label{rem:nocone-blocks}
+The step that dispenses with the cone is the one of the lasso
+(Remark~\ref{rem:nocone}): profiling removes the levels from the problem, and
+the full smallest eigenvalue of Proposition 2 controls
+$\norm{\vbar_{\Gbar}} \le (\bar\Wcal/\gtil)^{1/2}\normn{\Btil\vbar}$ over the
+whole space, by \eqref{eq:cs-blocks}.
+\citet{Lounici-Pontil-vandeGeer-Tsybakov-2011} need a restricted eigenvalue
+condition for groups on a weighted cone (their Assumption~3.1); here it is
+dominated by the full smallest eigenvalue, and the constant is the same for
+every $\Gbar$.
+\end{remark}
+
+% derivations/08-blocos.tex, Observacao 2 (a variante branca); D47(d).
+\begin{remark}[The estimator that the software computes]
+\label{rem:white}
+The software standardizes the columns, orthonormalizes each chunk and
+penalizes the orthonormalized coordinates with the weights $|G|^{1/2}$. On the
+original scale its penalty is $\sum_{G}w_{G}\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$,
+with $Q_{G} = \Bmat_{G}\T M_{1}\Bmat_{G}/n$ the centered Gram matrix of the
+chunk, $M_{1} = I_{n} - n^{-1}\mathbf{1}\mathbf{1}\T$.
+% L11 (D55, pergunta 49(c)): Simon & Tibshirani (2012), eq. (1.4) e Section 2.
+Since
+$\norm{M_{1}\Bmat_{G}\btheta_{G}}_{2} = n^{1/2}\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$,
+this is the standardized group lasso of
+\citet[eq.~1.4]{Simon-Tibshirani-2012}, which penalizes the fit of each
+chunk rather than its coefficients and which they show to be equivalent to
+orthonormalizing within groups (their Section~2). Theorem~2 holds with any
+$Q_{G}$ positive definite and measurable with respect to the covariates, with
+three changes: the event becomes
+$\{\max_{G}\norm{Q_{G}^{-1/2}(\Btil\T\bveps/n)_{G}}_{2}/w_{G} \le \pen/2\}$, by
+the dual norm; $\bar\Wcal$ becomes $q_{\max}\bar\Wcal$ in parts (ii) and
+(iii), with $q_{\max} = \max_{G}\lmaxx(Q_{G})$, because Step 5 reads
+$\sum_{G\in\Gbar}w_{G}\norm{Q_{G}^{1/2}\vbar_{G}}_{2} \le
+(q_{\max}\bar\Wcal)^{1/2}\norm{\vbar}_{2}$; and Lemma~\ref{lem:calib-blocks}(i)
+holds with $Q_{G}^{-1/2}\Psitil_{G}Q_{G}^{-1/2}$ in place of $\Psitil_{G}$, by
+the same proof with $Q_{G}^{-1/2}\Btil_{G}\T/n$ in place of $\Btil_{G}\T/n$.
+When the constant covariate $X_{1}\equiv 1$ is among the columns of $\Amat$,
+$\PA \succeq I_{n} - M_{1}$, so that $\MA \preceq M_{1}$ and
+$\Psitil_{G} \preceq Q_{G}$: the trace of $Q_{G}^{-1/2}\Psitil_{G}Q_{G}^{-1/2}$
+is at most $|G|$ and its norm at most one, and
+\[
+  \lamz{G} \;\le\; \frac{\sigma}{\sqrt{n}}\Bigl\{|G|^{1/2}
+  + \sqrt{2\log(|\Gcal|/\alpha)}\Bigr\},
+\]
+which is pivotal, with neither $\smax$ nor $\Lambda$; and
+$q_{\max} \le \lmaxx(\Gramhat) \le \Lambda$ on $\ESig$, since
+$Q_{G} \preceq \Gramhat_{GG}$. The rates of Section~S6 hold for this estimator
+with the constant multiplied by $\Lambda$.
+\end{remark}
+
+% derivations/08-blocos.tex, Corolario 9 (numeracao global).
+\begin{corollary}[The ideal risk form]
+\label{cor:ideal}
+In the conditions of Theorem~2, on the event $\Tw\cap\{\gtil > 0\}$, let
+$\Lambda' \ge \lmaxx(\Gramhat)$, for instance $\Lambda' = \Lambda$ on $\ESig$,
+and
+\[
+  \eta \;=\; \frac{1.6\max_{G}(\pen w_{G})^{2}}{\Lambda'\gtil}.
+\]
+Then
+\[
+  \normn{\widehat{f}-f}^{2} \;\le\; 120\Lambda'\Rid(\thetastar;\eta)
+  + 120\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2},
+  \qquad
+  \norm{\thetahat-\thetastar}_{2}^{2} \;\le\;
+  \frac{82\Lambda'\Rid(\thetastar;\eta) + 64\normn{\bb}^{2}}{\gtil}.
+\]
+With $\pen = \lamG$, or $\pen = \pen_{w}$, Lemma~\ref{lem:calib-blocks}(iii)
+gives $\eta \le \varrho^{2}\eta_{1}$, with
+$\eta_{1} = 1.6(\lamGone)^{2}/(\Lambda'\gtil)$ the level of unit weights, and
+$\Rid(\thetastar;\eta) \le \varrho^{2}\Rid(\thetastar;\eta_{1})$.
+\end{corollary}
+
+\begin{proof}
+Let $T = \{G : \norm{\thetastar_{G}}_{2}^{2} > \eta\}$ and take the comparator
+$\bar\bbeta = (\bc,\thbar)$ with $\thbar_{G} = \thetastar_{G}\mathbf{1}\{G\in T\}$.
+Then $\Gbar \subseteq T$ and, by the definition of $\eta$,
+$\pen^{2}\bar\Wcal \le \sum_{G\in T}(\pen w_{G})^{2} \le
+|T|\max_{G}(\pen w_{G})^{2} = |T|\eta\Lambda'\gtil/1.6$. The residual is
+$\bbar = \bb + \Bmat(\thetastar-\thbar)$, and since $\Bmat\T\Bmat/n$ is a
+principal submatrix of $\Gramhat$,
+\[
+  \normn{\bbar}^{2} \;\le\; 2\normn{\bb}^{2}
+  + 2\lmaxx(\Gramhat)\norm{\thetastar-\thbar}_{2}^{2}
+  \;\le\; 2\normn{\bb}^{2} + 2\Lambda'\sum_{G\notin T}\norm{\thetastar_{G}}_{2}^{2}.
+\]
+By \eqref{eq:oracle-min-blocks},
+$\normn{\widehat{f}-f}^{2} \le 192\pen^{2}\bar\Wcal/\gtil + 60\normn{\bbar}^{2}
++ 3\normn{\PA\bveps}^{2} \le 120\Lambda'\{\eta|T| +
+\sum_{G\notin T}\norm{\thetastar_{G}}_{2}^{2}\} + 120\normn{\bb}^{2} +
+3\normn{\PA\bveps}^{2}$, and the term in braces is exactly
+$\Rid(\thetastar;\eta)$. For the coefficients, Theorem~2(ii) gives
+$\norm{\vbar}_{2}^{2} \le 64\pen^{2}\bar\Wcal/\gtil^{2} +
+16\normn{\bbar}^{2}/\gtil \le (40\Lambda'\eta|T| + 32\normn{\bb}^{2} +
+32\Lambda'\sum_{G\notin T}\norm{\thetastar_{G}}_{2}^{2})/\gtil \le
+(40\Lambda'\Rid + 32\normn{\bb}^{2})/\gtil$, and
+$\norm{\thetahat-\thetastar}_{2}^{2} \le 2\norm{\vbar}_{2}^{2} +
+2\norm{\thbar-\thetastar}_{2}^{2} \le (80\Lambda'\Rid +
+64\normn{\bb}^{2})/\gtil + 2\Rid$; since $\gtil \le \lmin(\Bmat\T\Bmat/n) \le
+\lmaxx(\Gramhat) \le \Lambda'$, the Schur complement being dominated by the
+block, $2\Rid \le 2\Lambda'\Rid/\gtil$, which gives the second bound. The last
+statement is Lemma~\ref{lem:calib-blocks}(iii) and the two properties of
+$\Rid$ in Section~S1.
+\end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/05-taxas.tex

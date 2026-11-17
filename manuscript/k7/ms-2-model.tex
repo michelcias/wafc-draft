@@ -1,0 +1,190 @@
+\section{Model and Wavelet \texorpdfstring{Approximation Space}{Approximation Space}}
+\label{sec:model}
+
+\subsection{The additive functional coefficient model}
+\label{sec:model-def}
+
+Let $Y$ be a scalar response, $\bX = (X_1,\dots,X_p)\T$ a vector of linear
+covariates and $\bU = (U_1,\dots,U_q)\T$ a vector of modulating covariates,
+taking values in $[0,1]^q$ after a monotone transformation of each
+coordinate. The model is
+\begin{equation}
+  \label{eq:model}
+  Y \;=\; \sum_{\cv=1}^{p} \fcoef{\cv}(\bU)\,X_{\cv} \;+\; \varepsilon,
+  \qquad \E(\varepsilon \mid \bX, \bU) = 0,
+\end{equation}
+with each functional coefficient additive in the modulators,
+\begin{equation}
+  \label{eq:additive}
+  \fcoef{\cv}(u) \;=\; \lvl{\cv} \;+\; \sum_{\md=1}^{q}\gcomp{\cv}{\md}(u_{\md}),
+  \qquad \int_{0}^{1}\gcomp{\cv}{\md}(v)\,dv = 0,
+  \qquad \cv = 1,\dots,p .
+\end{equation}
+The constant $\lvl{\cv}$ is the level of the $\cv$th coefficient and
+$\gcomp{\cv}{\md}$ is the component of that coefficient along the $\md$th
+modulator. The centering in \eqref{eq:additive} is with respect to Lebesgue
+measure, which is the convention of the wavelet literature and the one the
+basis of Section~\ref{sec:sieve} imposes at no cost; the parametrization
+centered at the law of $\bU$ is obtained from it by the shift
+$\lvl{\cv} \mapsto \lvl{\cv} + \sum_{\md}\E\{\gcomp{\cv}{\md}(U_{\md})\}$,
+which moves mass between the levels and the components but changes neither
+$\fcoef{\cv}$ nor the estimator.
+
+The model contains several familiar ones. With $X_1 \equiv 1$ the first
+coefficient is an additive intercept, so that $p = 1$ gives the additive model
+and $p > 1$ with $\gcomp{\cv}{\md} \equiv 0$ for $\cv \ge 2$ gives the
+partially linear additive model; $q = 1$ gives the classical varying
+coefficient model with a single index; and $\gcomp{\cv}{\md}\equiv 0$ for all
+pairs gives linear regression. Writing
+$f(x,u) = \sum_{\cv} x_{\cv}\fcoef{\cv}(u)$ for the regression function, the
+first question is whether the distribution of $(Y,\bX,\bU)$ determines the
+parameters. Two degeneracies have to be excluded: if $\bX$ is confined to a
+hyperplane given $\bU$, only a combination of the coefficients is determined,
+and if one modulator is a function of another, only the sum of the
+corresponding components is.
+
+% derivations/01-identificabilidade.md, Proposicao 1 (numeracao global).
+\begin{proposition}[Identification]
+\label{prop:identif}
+Suppose that $\E\norm{\bX}_2^2 < \infty$, that $\E(\bX\bX\T \mid \bU)$ is
+nonsingular almost surely, and that $\bU$ has a Lebesgue density on $[0,1]^q$
+that is positive almost everywhere. Then, among the parametrizations that
+satisfy \eqref{eq:additive}, the levels $\lvl{1},\dots,\lvl{p}$ and the
+components $\gcomp{\cv}{\md} \in L_2[0,1]$ are determined by $f$: the levels
+uniquely, and each component up to a Lebesgue null set.
+\end{proposition}
+
+Dependence between $\bX$ and $\bU$ is allowed, and so is dependence among the
+modulators; what the two conditions exclude is a linear combination of the
+linear covariates that is a function of the modulators, and a modulator that
+is a function of the others. Both exclusions return in quantitative form in
+Section~\ref{sec:theory}.
+
+\subsection{The wavelet \texorpdfstring{approximation space}{approximation space}}
+\label{sec:sieve}
+
+Let $\phi$ and $\psi$ be the scaling function and the mother wavelet of an
+orthonormal multiresolution analysis of $L_2(\R)$, compactly supported, with
+$\psi$ bounded and with $N$ vanishing moments, and let $L$ be the length of
+the filter, so that the support of $\phi$ is contained in $[0,L-1]$ and that of $\psi$ in $[1-L/2,\,L/2]$, an interval of length $L-1$ \citep[Chapter~7]{hardle1998wavelets}. Write
+\begin{equation}
+  \label{eq:periodized}
+  \wav{\lev}{\tsl}(u) \;=\; \sum_{\iota \in \mathbb{Z}}
+  2^{\lev/2}\psi\{2^{\lev}(u+\iota) - \tsl\},
+  \qquad \lev \ge 0, \quad \tsl = 0,\dots,2^{\lev}-1,
+\end{equation}
+for the periodization of the basis to $[0,1]$. The system
+$\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$ is an orthonormal basis of
+$L_2[0,1]$ under Lebesgue measure and every wavelet in it integrates to zero
+\citep[Section 9.3]{Daubechies-1992}. We take the coarsest level to be
+$\jzero = 0$, so that the only scaling function is the constant
+$\phi_{00}\equiv 1$, and we discard it: it is already carried by the level
+$\lvl{\cv}$. The approximation space (the sieve) of resolution $J$ is then
+\[
+  \WJ \;=\; \mathrm{span}\{\wav{\lev}{\tsl} : 0 \le \lev < J,\;
+  0 \le \tsl < 2^{\lev}\},
+  \qquad \dim \WJ = \NJ = 2^{J}-1,
+\]
+the orthogonal complement of the constants inside the multiresolution space
+$\VJ$, and $\PiJ$ is the orthogonal projection onto it. Every element of $\WJ$
+integrates to zero, so that the identification constraint of
+\eqref{eq:additive} holds by construction, no numerical restriction is imposed
+on the fit, and the approximation space is a plain linear space.
+
+% derivations/01-identificabilidade.md, Lema 1 (numeracao global).
+\begin{lemma}[The basis carries the constraint]
+\label{lem:basis}
+Under the conditions of Proposition~\ref{prop:identif}, for every $J$ the map
+\[
+  (\bc, \btheta) \;\longmapsto\;
+  \sum_{\cv=1}^{p} x_{\cv}\Bigl\{\lvl{\cv} + \sum_{\md=1}^{q}
+  \sum_{\lev<J}\sum_{\tsl} \coef{\cv}{\md}{\lev}{\tsl}
+  \wav{\lev}{\tsl}(u_{\md})\Bigr\}
+\]
+is injective on $\R^{p}\times\R^{d}$, $d = pq\NJ$; equivalently, the
+population Gram matrix of the design defined in \eqref{eq:design} is positive
+definite. If instead the column $X_{\cv}\phi_{00}(U_{\md})$ is retained in
+each block, that matrix is singular with nullity exactly $pq$.
+\end{lemma}
+
+Replacing $\gcomp{\cv}{\md}$ by $\PiJ\gcomp{\cv}{\md}$ leaves a bias, which
+Section~\ref{sec:theory} controls under a Besov condition. Two practical
+consequences of periodization deserve mention. A component whose values at the
+two ends of the interval disagree is not periodic, and its projection error
+then stalls at the order $2^{-J/2}$ in $L_2$ regardless of the interior
+smoothness (Proposition~S3.1 in the Supplementary Material). The two remedies,
+rescaling the modulators to a proper subinterval and using the basis of
+\citet*{cohen1993wavelets} adapted to the interval, are matters of computation
+and are discussed in Section~\ref{sec:computation}.
+
+\subsection{The estimator}
+\label{sec:estimator}
+
+Let $(Y_i,\bX_i,\bU_i)$, $i = 1,\dots,n$, be independent copies of
+$(Y,\bX,\bU)$. The row of the design matrix is the vector of the $p$ linear
+covariates followed by the $d = pq\NJ$ products between a linear covariate and
+a wavelet of a modulator,
+\begin{equation}
+  \label{eq:design}
+  \bZ = [\,\Amat \;\; \Bmat\,], \qquad
+  \Amat_{i\cv} = X_{i\cv}, \qquad
+  \Bmat_{i,(\cv\md,\lev\tsl)} = X_{i\cv}\,\wav{\lev}{\tsl}(U_{i\md}),
+\end{equation}
+with the blocks $(\cv,\md)$ in lexicographic order and, inside a block, the
+wavelets ordered by level and then by translation. The penalty
+acts on chunks of wavelet coefficients inside a block. Fix an integer
+$b \ge 2$ and let $\jst$ be the finest level with $2^{\jst} < b$. In each block
+$(\cv,\md)$ the levels $\lev \le \jst$ form a single chunk, the coarse chunk,
+and each finer level, which has $2^{\lev} \ge b$ coefficients, is cut into
+$\lfloor 2^{\lev}/b\rfloor$ chunks of consecutive translations, all with $b$
+coefficients except the last, which also takes the remainder. Write $\Gcal$ for
+the resulting partition of the $d$ penalized coordinates, $\btheta_{G}$ and
+$|G|$ for the subvector and the size of a chunk $G$, and, for positive weights
+$w = (w_{G})_{G\in\Gcal}$, $\nGw{\btheta} = \sum_{G\in\Gcal}w_{G}\norm{\btheta_{G}}_{2}$.
+Writing
+$\bY = (Y_1,\dots,Y_n)\T$, the estimator is
+% derivations/08-blocos.tex, eq. (est-blocos) e a forma balanceada (D44).
+
+
+\begin{equation}
+  \label{eq:estimator}
+  (\chat,\thetahat) \;\in\; \mathop{\rm arg\,min}_{(\bc,\btheta)\in
+  \R^{p}\times\R^{d}}
+  \Bigl\{\normn{\bY - \Amat\bc - \Bmat\btheta}^{2}
+  \;+\; 2\pen\nGw{\btheta}\Bigr\} ,
+\end{equation}
+with $b = \bn = \lceil\log n\rceil$ and $w_{G} = |G|^{1/2}$. Every chunk of a
+fine level has between $b$ and $2b-1$ coefficients, the coarse chunk has
+$2^{\jst+1}-1$, which lies between $b-1$ and $2b-3$ (when $J \le \jst+1$
+each block is a single chunk), there are at most
+$pq(1+2^{J}/b)$ chunks, and the ratio $\varrho = \max_{G}w_{G}/\min_{G}w_{G}$
+of the weights satisfies $\varrho^{2} \le (2b-1)/(b-1) \le 3$
+(Proposition~S5.1 in the Supplementary Material). The theory of
+Section~\ref{sec:theory} holds for any weights whose ratio stays bounded, and
+the bound on $\varrho$ is what makes it cover the weights $|G|^{1/2}$ that
+group lasso software uses by default.
+The penalty does not reach the levels $\bc$: they are $p$ parameters of a
+parametric part, and shrinking them would bias every fitted coefficient by a
+constant. The fitted components and coefficients are recovered from
+$\thetahat$ by
+\[
+  \widehat{g}_{\cv\md}(v) = \sum_{\lev<J}\sum_{\tsl}
+  \widehat{\theta}_{\cv\md,\lev\tsl}\,\wav{\lev}{\tsl}(v),
+  \qquad
+  \widehat{\fcoef{\cv}}(u) = \widehat{c}_{\cv}
+  + \sum_{\md=1}^{q}\widehat{g}_{\cv\md}(u_{\md}).
+\]
+% E5f (L10; D54): a citacao de Yuan & Lin dentro do grupo azul de k = 4.
+Problem \eqref{eq:estimator} is a  group lasso \citep{Yuan-Lin-2006} with some coordinates unpenalized, so
+it is convex, and it is strictly convex, hence uniquely solved, whenever the
+Gram matrix of $\bZ$ is nonsingular.  It differs from the block lasso of
+\citet{Klopp-Pensky-2015} in three respects: their chunks run across resolution
+levels, their weights are equal, and their levels are penalized with everything
+else. Two other penalties are available and are discussed in
+Section~\ref{sec:computation}: the lasso \citep{tibshirani1996regression}, with
+$\norm{\btheta}_{1}$ in place of $\nGw{\btheta}$, whose theory is given in
+Section~S8 of the Supplementary Material, and a sparse group lasso
+\citep{Simon-Friedman-Hastie-Tibshirani-2013} whose groups are the blocks
+$(\cv,\md)$. The theory below is for \eqref{eq:estimator}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

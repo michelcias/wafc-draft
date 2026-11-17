@@ -1,0 +1,42 @@
+\section{Discussion}
+\label{sec:discussion}
+
+The WAFC answers two questions with one fit: which modulators act on which
+coefficients, and what the coefficients are. The theory gives the rate of
+nonlinear wavelet approximation, which is minimax optimal when $\pi \ge 2$,
+and the recovery of the structure by a threshold that does not cost the rate.
+In the simulation study the thresholded estimator found the exact structure in
+every replicate of every cell from $n = 1000$, and where the components are
+spatially inhomogeneous it predicted better than penalized splines at that
+sample size and within 3\% to 8\% of the estimator that knows the structure.
+
+The study also shows where the method does not win. Where every component is
+smooth, splines with a global smoothing parameter are in their own setting.
+In the smooth cell part of the gap has an identifiable source: the periodic
+extension of the cubic has a corner at $0 \equiv 1$, which limits its
+effective regularity to $3/2$ (Section~\ref{sec:sim-design}), and the basis
+adapted to the interval of Section~\ref{sec:boundary} would remove that
+corner, at the structural cost described there. When the signal is weak, the
+window of Corollary~\ref{cor:threshold}(iii) narrows, and the one standard
+error rule, which errs toward sparsity, drops active blocks. The threshold of
+the smallest cross-validated error, offered by the software, errs the other
+way: with signal to noise ratio 1 it recovers the structure in 62\% and 47\%
+of the replicates of the two arms, against 18\% and none for GAM (REML), and
+predicts better than GAM (REML) in both. At the largest sample size, GAM
+(REML) closes the gap in prediction with a grid of $k$ extended to 240, at a
+cost that grows with the number of blocks and without recovering the
+structure.
+
+Several questions are left open. The threshold is chosen by a rule for which
+no theorem is given here: Corollary~\ref{cor:threshold} gives the window that
+recovers the structure, and a data driven choice provably inside it would
+complete the theory. The numbers of covariates and of modulators are fixed;
+letting them grow with $n$, as in the high dimensional regime of
+\citet{Klopp-Pensky-2015}, would require the bound of
+Proposition~\ref{prop:gram} uniformly over the active blocks. The fit gives
+no confidence statement for the components, and inference after the
+selection of blocks is a separate problem. Finally, the threshold acts on
+whole blocks and says nothing about which wavelets are active inside a block.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

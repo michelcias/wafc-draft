@@ -37,9 +37,13 @@ o autor não sabia.
 ### Como a conversa começa
 
 1. Ler `CLAUDE.md`.
-2. Ler [`ESTADO.md`](ESTADO.md): onde o trabalho parou e o que já foi decidido,
-   para não reabrir.
-3. Ler a etapa em foco em `plano-projeto.md` (`ESTADO.md` diz qual é).
+2. **Orquestrador:** ler [`ESTADO.md`](ESTADO.md), que é uma cabeça curta
+   (onde o trabalho está, o quadro da fase, o próximo passo), os
+   `docs/handoff-*.md` pendentes e, do [`plano-fase2.md`](plano-fase2.md), só
+   a seção da tarefa em foco. **Executor:** ler [`TAREFA.md`](TAREFA.md) e o
+   cartão; o estado não se lê (§7).
+3. O arquivo morto (`docs/estado/`: diário, decisões, perguntas fechadas) se
+   consulta por `grep` do identificador; não se lê inteiro.
 4. Se o foco for o manuscrito, ler o `.tex` da seção em questão **antes** de
    opinar sobre ela.
 5. Se o foco for matemática, ler o arquivo correspondente em `derivations/` e
@@ -120,6 +124,13 @@ criar a versão `{k+1}`:**
 A pergunta é feita uma vez por rodada, não a cada edição. O primeiro `.tex`
 nasce como `k = 1`, sem marcação, porque não há versão anterior contra a qual
 marcar.
+
+A partir de `k = 7` (D86), o texto vive em `manuscript/k{k}/`, uma seção por
+arquivo, e `ms_{k}.tex` e `supp_{k}.tex` guardam o preâmbulo e os `\input`; a
+versão `{k+1}` copia também a pasta. Uma tarefa lê só a seção em que mexe.
+Quando o autor aceita uma rodada, `manuscript/tools/accept-round.py` tira a
+marcação e `split-sections.py` reparte o resultado; a conferência é a do
+bloco da E8.4 em `estado/diario-2026-11.md`.
 
 ### Marcação de alterações
 
@@ -267,56 +278,88 @@ Quando o `results/` e o compêndio divergirem, o compêndio é a verdade.
 
 ---
 
-## 7. Chats paralelos
+## 7. Orquestrador e executores
 
-Etapas sem dependência entre si (`plano-projeto.md`, tabela de dependências)
-podem correr em chats separados na **mesma árvore de trabalho**. O que evita
-perda:
+A fase 2 ([`plano-fase2.md`](plano-fase2.md), D83) corre com um orquestrador
+e executores, todos no máximo Opus, na **mesma árvore de trabalho**. O que
+evita perda e gasto:
 
-- **Um chat principal por vez.** É o único que edita `ESTADO.md`,
-  `plano-projeto.md` e `notacao.md`, e o único que commita. Os demais são
-  chats de tarefa.
-- **Um chat de tarefa faz uma etapa (ou subetapa) e só toca nos arquivos
-  dela**, listados no catálogo de [`TAREFA.md`](TAREFA.md). Não commita, não
-  faz push, não edita arquivo de outra etapa. Símbolo novo, decisão ou mudança
-  fora do escopo vira proposta no handoff, não edição.
-- **Todo chat de tarefa termina escrevendo `docs/handoff-<etapa>.md`** com
-  quatro seções: o que foi feito (arquivos), o que a conferência numérica
-  mostrou (números), o que deve entrar no `ESTADO.md` (decisões, sinais,
-  lições), perguntas em aberto. O chat principal integra o handoff no
-  `ESTADO.md`, commita por caminho explícito e apaga o arquivo de handoff.
-- **Commit por caminho explícito**, nunca `git add -A`, enquanto houver mais
-  de um chat aberto: o `git status` mostra o que é de quem.
-- Etapa que depende de resultado ainda em curso não abre em paralelo.
+- **Um orquestrador por vez.** É o chat principal: o único que edita a
+  cabeça do `ESTADO.md`, os arquivos de `docs/estado/`, o `plano-fase2.md`,
+  o `notacao.md` e os cartões, e o único que commita (quando o autor pede).
+  Uma sessão dele é um lote: integra os handoffs pendentes, compara cada
+  medição com o critério declarado, escreve os cartões destravados,
+  despacha, atualiza o quadro e termina. Ele não lê saída bruta de tarefa,
+  só o handoff.
+- **Uma tarefa é um cartão** (`docs/tarefas/<ID>.md`, até 60 linhas; o
+  modelo está no `plano-fase2.md` §5): objetivo, modelo e esforço, a lista
+  fechada do que ler (com intervalos de linha), a lista fechada do que
+  escrever, os passos e o critério de saída verificável por comando. O
+  executor lê o `CLAUDE.md`, o [`TAREFA.md`](TAREFA.md) e o cartão; não lê
+  o estado.
+- **Modelo e esforço são os do cartão.** Tarefa que cabe num turno e não
+  pede aviso do autor vai a um subagente (os papéis estão em
+  `.claude/agents/`); as outras abrem em chat próprio, com o modelo e o
+  esforço escolhidos na abertura. Tarefa que falha o critério de saída duas
+  vezes recebe cartão novo um nível acima, com a causa escrita.
+- **Um executor só toca nos arquivos do cartão.** Não commita, não faz
+  push. Símbolo novo, decisão ou mudança fora do escopo vira proposta no
+  handoff, não edição.
+- **Todo executor termina escrevendo `docs/handoff-<ID>.md`**, com até 60
+  linhas e as quatro seções do `TAREFA.md` §3. O orquestrador integra (o
+  bloco no diário do mês, a decisão em `estado/decisoes.md`, o quadro na
+  cabeça), commita por caminho explícito quando o autor pedir e apaga o
+  handoff e o cartão.
+- **Commit por caminho explícito**, nunca `git add -A`, enquanto houver
+  mais de uma tarefa aberta: o `git status` mostra o que é de quem.
+- **Paralelo só com arquivos disjuntos.** Código novo vai em arquivo novo;
+  o que é comum a duas tarefas corre em série. Etapa que depende de
+  resultado ainda em curso não abre.
+- **Rodada longa é script, não conversa:** PID gravado, marcador de fim, e
+  o aviso do autor antes de começar. Quem lê o resultado é uma tarefa nova.
+- **Verificação por script** sempre que existir (testes, compilação, junção
+  exata, conferência numérica, texto contra tabela). Segundo modelo, em
+  contexto novo, só para matemática e para as afirmações do resumo.
 
-### Mensagem de abertura de um chat de etapa
+### Mensagens de abertura
 
-Uma linha, porque [`TAREFA.md`](TAREFA.md) carrega o resto:
+Orquestrador:
 
-> Leia `docs/TAREFA.md` e execute a tarefa E1.3.
+> Leia `CLAUDE.md` e `docs/ESTADO.md`. Integre os handoffs pendentes e
+> despache o próximo lote.
+
+Executor, com o modelo e o esforço do cartão:
+
+> Leia `docs/TAREFA.md` e execute o cartão `docs/tarefas/E9.1a.md`.
 
 ---
 
 ## 8. Continuidade entre máquinas
 
 O trabalho troca de computador com frequência, e o que viaja é o que está
-commitado. Três arquivos são o contrato de continuidade, e mantê-los em dia
+commitado. Estes arquivos são o contrato de continuidade, e mantê-los em dia
 é parte de fechar uma etapa, não tarefa à parte:
 
 | Arquivo | O que tem de estar em dia |
 |---|---|
-| [`ESTADO.md`](ESTADO.md) | um bloco na §2 por etapa fechada, com os números que a fecharam; a decisão na tabela; a pergunta na §4; o próximo passo na §5 |
-| [`TAREFA.md`](TAREFA.md) | a tabela de estado da §2 e o catálogo da §3, com os arquivos permitidos de cada tarefa aberta |
+| [`ESTADO.md`](ESTADO.md) (a cabeça, até 150 linhas) | onde o trabalho está, o quadro da fase, as perguntas que pedem o autor, o próximo passo |
+| `estado/diario-AAAA-MM.md` | um bloco por etapa fechada, com os números que a fecharam e a lição que custou horas |
+| `estado/decisoes.md` | a decisão, numa linha da tabela; pergunta respondida vira linha aqui |
+| `tarefas/<ID>.md` | um cartão por tarefa aberta, com os arquivos permitidos |
 | [`CONTINUAR.md`](CONTINUAR.md) | a disposição das pastas, as ferramentas e **todo pacote novo que um script passou a usar**, mais os comandos de conferência |
 
 As regras que vêm disso:
 
 - **Etapa fechada é etapa registrada.** Não se encerra uma rodada com o
-  resultado só no chat: o que não está no `ESTADO.md` não existe na máquina
-  seguinte. O mesmo vale para uma lição que custou horas.
+  resultado só no chat: o que não está no diário e no quadro não existe na
+  máquina seguinte. O mesmo vale para uma lição que custou horas.
+- **A cabeça do `ESTADO.md` não cresce.** O que deixa de ser corrente sai
+  dela para o diário; ela diz onde o trabalho está, não como chegou lá.
+- **Arquivo morto se consulta, não se lê:** `grep` pelo identificador (`D56`,
+  `E6.1b`) e leitura do trecho.
 - **Dependência nova entra no `CONTINUAR.md` na mesma rodada** em que o
   script passa a usá-la.
-- **Edição nesses três arquivos é verificada, não presumida.** Depois de
+- **Edição nesses arquivos é verificada, não presumida.** Depois de
   editar, conferir que o trecho novo está lá.
 - **Produto de compilação não é documentação.** PDF compilado viaja quando
   for a entrega; `.aux`, `.bbl` e afins ficam de fora até haver razão.

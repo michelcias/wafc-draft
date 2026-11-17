@@ -60,6 +60,8 @@ decisão em E3.3.
 | `VCBART` | exigido por `wafc_competitor("vcbart")` (E2.4); o resto de `wafc/` roda sem ele e os testes pulam o bloco se faltar. Instalado aqui: 1.2.5 | `install.packages("VCBART")` |
 | `/usr/bin/time` (pacote `time` do Ubuntu) | a rodada do piloto (E4.3) mede o pico de memória e o processador de cada passo com `time -v` | `sudo apt install time` |
 | `/usr/bin/time` também na máquina da E4.4 | ver §2b | `sudo apt install time` |
+| `python3` (só a biblioteca padrão) | `manuscript/tools/accept-round.py` e `split-sections.py`, que abrem uma versão `k` de texto limpo (E8.4) | `python3 --version` |
+| `pdftotext`, `pdfinfo` (pacote `poppler-utils`) | conferir o texto e contar as páginas de um PDF compilado | `pdfinfo -v` |
 | `yaml` | só o compêndio (`wafc-studies/`), para ler `config/*.yaml`; 2.3.12 no `renv.lock` | `renv::restore()` dentro de `wafc-studies/` instala tudo, com o `WaveBased` do GitHub em `e494b0e` |
 | o próprio `WaveBased`, instalado de `../WaveBased` (ou `remotes::install_github("michelcias/WaveBased")`) | bases de wavelets (`wbasis()`, `wtable()`) chamadas por `wafc/R/design.R`; não recebe código | `cd ~/Documents/WaveBased && R CMD INSTALL .` |
 
@@ -241,30 +243,27 @@ por núcleo físico, até ~38 GB no pico (3,8 GB por processo na `mixed` em
    cd ~/Documents/repo/wafc-draft && tar xzf ~/wafc-extra.tar.gz
    ```
 
-## 3. Onde o trabalho está (resumo de 2026-10-12; o `ESTADO.md` manda)
+## 3. Onde o trabalho está (resumo de 2026-11-16; o `ESTADO.md` manda)
 
-- **Fechado:** E0 a E3 inteiras, E4.1 a E4.4, E5a, E5c a E5k, E6.1a a
-  E6.2b, L1 a L14. Decisões D1 a D82 na tabela do `ESTADO.md` §2.
-  Catálogo vazio.
+- **Fase 1 fechada:** E0 a E6 e L1 a L14 (`estado/etapas-fechadas.md`).
+  Decisões D1 a D90 em `estado/decisoes.md`.
+- **Fase 2 em curso** (`plano-fase2.md`): a E8 fechou; o quadro das tarefas
+  está na cabeça do `ESTADO.md`, §3.
 - **O método (D44, D45):** o block LASSO na forma balanceada seguido do
   limiar `cv1se`; `cv.wafc(x, u, y)` é o estimador (D48).
 - **Código** (`wafc/`, D4): a suíte padrão passa em ~1 min (1 770 testes;
   2 003 com `WAFC_SLOW_TESTS=1`); o último commit de `wafc/R` é
   `6aa4a3a` (árvore `34f2e04`).
-- **O compêndio** (`wafc-studies/`): o estudo (`core`, `arms`, `scale`) e
-  as duas aplicações; as aplicações rodaram (168 unidades) e as tabelas e
-  figuras estão em `results/`; o estudo rodou na desktop (E4.4, D82:
-  26 200 unidades, 0 falhas) e as tabelas estão em
-  `results/tables/{core,arms,scale}/`; os `curves.csv` ficam só na desktop.
-- **Manuscrito vivo em `k = 5`**: 73 e 101 páginas com a marcação (66 e
-  100 sem o removido); a Seção 6 com os números finais, a 5 à espera da
-  E4.4, sem a Seção 7.
+- **O compêndio** (`wafc-studies/`): o estudo rodou na desktop (E4.4, D82:
+  26 200 unidades, 0 falhas); as tabelas estão em
+  `results/tables/{core,arms,scale}/`; o cache das unidades e os
+  `curves.csv` ficam só na desktop.
+- **Manuscrito vivo em `k = 7`** (texto limpo, uma seção por arquivo em
+  `manuscript/k7/`): 71 e 111 páginas; a cor corrente é `colR2`.
 - **Bibliografia:** 101 entradas verificadas em
   `docs/referencias-verificadas.bib`.
-- **O próximo passo é a E5b na desktop do autor**: os números do estudo
-  no manuscrito (a Figure 1 precisa dos `curves.csv` de lá).
-- **Se aparecer um `docs/handoff-*.md`,** é de chat de tarefa que não foi
-  integrado (§7 de `instrucoes.md`).
+- **Se aparecer um `docs/handoff-*.md`,** é de tarefa que o orquestrador
+  ainda não integrou (§7 de `instrucoes.md`).
 
 ## 4. O que não viaja
 

@@ -1,0 +1,1174 @@
+\section{Rates}
+\setcounter{equation}{0}
+
+
+
+Throughout this section $p$, $q$, $\sigma$, $B_X$, $c_U$, $C_U$, $\kappa_1$,
+$\kappa_2$, $C_g$, $s$, $\pi$, $r$ and $\alpha$ are fixed as $n$ grows,
+$J = J_n \to \infty$, $d_n = pq(2^{J_n}-1)$,
+$2^{J_n} \le 2n$,
+$\bn = \lceil\log n\rceil$ with $n \ge 3$, so that $\bn \ge 2$, $\Gcal_{n}$ is
+the partition of Section~2.3 of the paper with $b = \bn$, the weights have
+ratio $\varrho \le \bar\varrho$ for a fixed $\bar\varrho$, and $\pen = \lamG$
+is as in (3.1).  The statements in $O_p$
+are proved by exhibiting, for each $\epsilon > 0$, an event of probability at
+least $1-\epsilon$ for $n$ large, built with the confidence levels
+$\alpha = \alpha' = \alpha'' = \epsilon/4$ for the noise, the bias and the
+levels, on which the error is at most a constant $M_\epsilon$ times the rate.
+The constant $\Lambda = \kappa_2C_U + \gamma/2$ and the event $\ESig$ are those
+of Section~S1.
+
+% derivations/08-blocos.tex, as duas consequencias da Hipotese B.
+
+\begin{lemma}[The penalty level and the regime]
+\label{lem:regime}
+In the setting above,
+\begin{equation}
+  \label{eq:order-lambda}
+  (\lamGone)^{2} \;\le\; C_{\pen}\,\frac{\sigma^{2}\bn}{n},
+  \qquad
+  C_{\pen} = 16\bigl\{2B_X^{2}C_U + \Lambda\bigl(1 + \tfrac12\log(2pq/\alpha)\bigr)\bigr\},
+\end{equation}
+and, on the event $\Acal = \{\smax^{2} \le 2B_X^{2}C_U\}\cap\ESig$,
+$\lamG \ge \pen_{w}$, so that $\Ecal \subseteq \Tw$ for the event $\Ecal$ of
+Lemma~\ref{lem:calib-blocks}(i), $\gtil > \gamma/2$, $\Amat$ has rank $p$ and
+$\lmaxx(\Gramhat) < \Lambda$. Moreover $\Prob(\Acal) \to 1$ whenever
+$pq2^{J_n}\log(pq2^{J_n})/n \to 0$.
+\end{lemma}
+
+\begin{proof}
+By $(x+y)^{2} \le 2x^{2}+2y^{2}$, $(\lamGone)^{2} = 4\max_{G}\lamzbar{G}^{2} \le
+(8\sigma^{2}/n)\{2B_X^{2}C_U b_{\max} + 2\Lambda\log(|\Gcal_{n}|/\alpha)\}$, with
+$b_{\max} = \max_{G}|G|$. By Proposition~\ref{prop:balanced},
+$b_{\max} \le 2\bn - 1 < 2\bn$ and $|\Gcal_{n}| \le pq(1 + 2^{J_n}/\bn) \le
+pq(1+n) \le 2pqn$, because $2^{J_n} \le 2n$ and $\bn \ge 2$; hence
+$\log(|\Gcal_{n}|/\alpha) \le \log(2pq/\alpha) + \log n \le \log(2pq/\alpha) +
+\bn$, and $(\lamGone)^{2} \le (16\sigma^{2}/n)\{(2B_X^{2}C_U + \Lambda)\bn +
+\Lambda\log(2pq/\alpha)\} \le C_{\pen}\sigma^{2}\bn/n$, using $\bn \ge 2$. On
+$\Acal$, Lemma~\ref{lem:calib-blocks}(ii) gives $\lamz{G} \le \lamzbar{G}$ for
+every $G$, so that $\lamG \ge \pen_{w}$ and, by the same lemma,
+$\Ecal \subseteq \Tw$. On $\ESig$, $\lmin(\Gramhat) > \gamma/2$ and
+$\lmaxx(\Gramhat) < \Lambda$; \eqref{eq:schur} gives $\gtil > \gamma/2$, and
+$\lmin(\Amat\T\Amat/n) \ge \lmin(\Gramhat) > 0$ gives the rank. Finally
+$\Prob(\smax^{2} \le 2B_X^{2}C_U) \to 1$ by Lemma~\ref{lem:columns}, which asks
+$2^{J}\log d/n \to 0$, and $\Prob(\ESig) \to 1$ when
+$pq2^{J_n}\log(pq2^{J_n})/n \to 0$ (Section~S1); the second condition implies
+the first.
+\end{proof}
+
+
+
+% derivations/08-blocos.tex, prova do Lema 15 (numeracao global).
+
+\subsection*{Proof of Lemma 3}
+
+Fix a block and write $\theta_{\lev} = \theta^{*}_{\cv\md,\lev\cdot} \in
+\R^{2^{\lev}}$, set to zero for $\lev \ge J$, which only decreases the risk;
+write $\Gcal_{\lev}$ for the chunks of a fine level $\lev$, those with
+$2^{\lev} \ge b$, and $r_{\lev} = \sum_{G\in\Gcal_{\lev}}
+\min(\norm{\theta_{G}}_{2}^{2},\eta)$. The coarse chunk, if there is one,
+contributes at most $\eta$, so the block contributes at most
+$\eta + \sum_{\lev}r_{\lev}$, the sum running over the fine levels. The first
+bound on $r_{\lev}$ is the count: each chunk of $\Gcal_{\lev}$ has at least $b$
+of the $2^{\lev}$ coefficients of the level, so that
+$r_{\lev} \le |\Gcal_{\lev}|\eta \le 2^{\lev}\eta/b$.
+
+\emph{The case $\pi \le 2$.} Write $a = \pi(s+1/2) > 1$. For $u \ge 0$,
+$\min(u,\eta) \le \eta^{1-\pi/2}u^{\pi/2}$, and $\norm{x}_{2} \le \norm{x}_{\pi}$
+for $\pi \le 2$; hence the second bound,
+\[
+  r_{\lev} \;\le\; \eta^{1-\pi/2}\sum_{G\in\Gcal_{\lev}}\norm{\theta_{G}}_{\pi}^{\pi}
+  \;\le\; \eta^{1-\pi/2}\norm{\theta_{\lev}}_{\pi}^{\pi}
+  \;\le\; \eta^{1-\pi/2}C_g^{\pi}2^{-\lev(a-1)},
+\]
+by Assumption~5, because the chunks of $\Gcal_{\lev}$ are disjoint and
+contained in the level. Define $x \in \R$ by
+$2^{xa} = bC_g^{\pi}\eta^{-\pi/2}$, so that the two bounds agree at
+$\lev = x$, with common value
+$h = 2^{x}\eta/b = \eta^{1-\pi/2}C_g^{\pi}2^{-x(a-1)}$. Summing the first bound
+over the levels $\lev \le x$ gives at most $2^{\lfloor x\rfloor+1}\eta/b \le 2h$
+(an empty sum if $x < 0$), and summing the second over the levels $\lev > x$
+gives at most $h\sum_{i\ge0}2^{-i(a-1)} = h/(1-2^{1-a})$, since the first
+integer $\lev > x$ has $2^{-\lev(a-1)} \le 2^{-x(a-1)}$. The block therefore
+contributes at most $\eta + \{2 + (1-2^{1-a})^{-1}\}h$. Since $1/a = \tau/\pi$,
+$2^{x} = b^{\tau/\pi}C_g^{\tau}\eta^{-\tau/2}$ and
+$h = b^{\tau/\pi-1}C_g^{\tau}\eta^{1-\tau/2}$, and, with
+$1-\tau/2 = 2s/(2s+1)$,
+\[
+  h \;=\; C_g^{\tau}\Bigl(\frac{\eta}{b}\Bigr)^{2s/(2s+1)}
+  b^{\tau/\pi - 1 + 2s/(2s+1)}
+  \;=\; C_g^{\tau}\Bigl(\frac{\eta}{b}\Bigr)^{2s/(2s+1)}
+  b^{\tau(1/\pi-1/2)},
+  \qquad
+  \tau\Bigl(\frac{1}{\pi}-\frac12\Bigr) = \frac{2/\pi-1}{2s+1}.
+\]
+
+\emph{The case $\pi \ge 2$.} Hölder's inequality in $\R^{2^{\lev}}$ gives
+$\norm{\theta_{\lev}}_{2} \le 2^{\lev(1/2-1/\pi)}\norm{\theta_{\lev}}_{\pi} \le
+C_g2^{-\lev s}$, with $1/\pi = 0$ if $\pi = \infty$, and the second bound is
+$r_{\lev} \le \norm{\theta_{\lev}}_{2}^{2} \le C_g^{2}2^{-2\lev s}$. With
+$2^{x(2s+1)} = C_g^{2}b/\eta$ and $h = 2^{x}\eta/b = C_g^{2}2^{-2xs}$, the same
+computation gives the contribution $\eta + \{2 + (1-2^{-2s})^{-1}\}h$, and
+$h = (C_g^{2}b/\eta)^{1/(2s+1)}\eta/b = C_g^{\tau}(\eta/b)^{2s/(2s+1)}$, because
+$2/(2s+1) = \tau$.
+
+Summing over the $pq$ blocks gives the statement; at $\pi = 2$,
+$1-2^{1-a} = 1-2^{-2s}$ and the two constants agree. \qed
+
+
+We also record that, on the event of Proposition 2(ii) with $t = \gamma/2$,
+\begin{equation}
+  \label{eq:lmax}
+  \normn{\Bmat\delta}^2 \le \lmaxx(\Gramhat)\norm{\delta}_2^2
+  \quad\text{and}\quad \lmaxx(\Gramhat) \le \Lambda,
+\end{equation}
+the first because $\Bmat\T\Bmat/n$ is a principal submatrix of $\Gramhat$ and
+the second by Weyl's inequality and Proposition 2(i).
+
+% derivations/08-blocos.tex, a contagem (eq. contagem-lenta) e a prova do
+% Corolario 14 (numeracao global); D47(c), D49(b).
+
+\begin{lemma}[The norm of the oracle over chunks]
+\label{lem:count}
+Under Assumptions~4 and 5, let $\Gcal$ be the partition of Section~2.3 of the
+paper with $b \ge 2$, and let $\vartheta_{\pi} = \min(1-1/\pi,\,1/2)$, with
+$\vartheta_{\infty} = 1/2$. Then, for every $J$,
+\begin{equation}
+  \label{eq:count}
+  \nGone{\thetastar} \;\le\; pqC_g\Bigl\{\frac{1}{1-2^{-\seff}}
+  + b^{-\vartheta_{\pi}}\sum_{\lev=\jst+1}^{J-1}2^{\lev(1/2-s)}\Bigr\}.
+\end{equation}
+The bound for each fine level is attained, by a level whose energy is spread
+evenly when $\pi \ge 2$, and by a level with one large coefficient in each
+chunk when $\pi \le 2$.
+\end{lemma}
+
+\begin{proof}
+Fix a block and write $\theta_{\lev}$ for its coefficients of level $\lev$.
+By Assumption~5, $\norm{\theta_{\lev}}_{2} \le
+2^{\lev(1/2-1/\pi)_{+}}\norm{\theta_{\lev}}_{\pi} \le C_g2^{-\lev\seff}$, by
+Hölder's inequality in $\R^{2^{\lev}}$ if $\pi \ge 2$ and by
+$\norm{\cdot}_{2} \le \norm{\cdot}_{\pi}$ if $\pi \le 2$. The coarse chunk
+contributes at most $\sum_{\lev\le\jst}\norm{\theta_{\lev}}_{2} \le
+C_g(1-2^{-\seff})^{-1}$. At a fine level $\lev$ the $k_{\lev} \le 2^{\lev}/b$
+chunks $G \in \Gcal_{\lev}$ partition the level. If $\pi \ge 2$, by the
+Cauchy-Schwarz inequality,
+\[
+  \sum_{G\in\Gcal_{\lev}}\norm{\theta_{G}}_{2}
+  \;\le\; k_{\lev}^{1/2}\norm{\theta_{\lev}}_{2}
+  \;\le\; \Bigl(\frac{2^{\lev}}{b}\Bigr)^{1/2}C_g2^{-\lev s}
+  \;=\; C_g\,b^{-1/2}\,2^{\lev(1/2-s)} ;
+\]
+if $\pi \le 2$, by $\norm{\theta_{G}}_{2} \le \norm{\theta_{G}}_{\pi}$ and
+Hölder's inequality over the chunks,
+\[
+  \sum_{G\in\Gcal_{\lev}}\norm{\theta_{G}}_{2}
+  \;\le\; k_{\lev}^{1-1/\pi}\Bigl(\sum_{G\in\Gcal_{\lev}}
+  \norm{\theta_{G}}_{\pi}^{\pi}\Bigr)^{1/\pi}
+  = k_{\lev}^{1-1/\pi}\norm{\theta_{\lev}}_{\pi}
+  \;\le\; \Bigl(\frac{2^{\lev}}{b}\Bigr)^{1-1/\pi}C_g2^{-\lev(s+1/2-1/\pi)}
+  = C_g\,b^{-(1-1/\pi)}\,2^{\lev(1/2-s)} .
+\]
+Both are $C_gb^{-\vartheta_{\pi}}2^{\lev(1/2-s)}$, and the equality cases of
+the two inequalities are the configurations of the statement. Summing over the
+fine levels $\jst < \lev < J$ and over the $pq$ blocks gives \eqref{eq:count}.
+\end{proof}
+
+\subsection*{Proof of Proposition 3}
+
+\emph{The nonasymptotic bound.} On $\Tw$, Theorem~2(i) with the comparator
+$\bar\bbeta = \betastar$, so that $\bbar = \bb$ and
+$\vbar = v = \thetahat-\thetastar$, gives
+$\normn{\Btil v}^{2} \le 6\pen\nGw{\thetastar} + 4\normn{\bb}^{2}$, and the
+first part of Theorem~2(iii), with $(x+y+z)^{2} \le 3(x^{2}+y^{2}+z^{2})$, gives
+\begin{equation}
+  \label{eq:slow-nonasymptotic}
+  \normn{\widehat{f}-f}^{2} \;\le\; 18\pen\nGw{\thetastar}
+  + 24\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}
+  \qquad\text{on } \Tw .
+\end{equation}
+Steps 1 to 3 and 6 of the proof of Theorem~2, the only ones used, do not
+involve $\Gramhat$. With $\pen \ge \pen_{w}$, calibrated on the covariates by
+Lemma~\ref{lem:calib-blocks}(i), the bound holds with probability at least
+$1-\alpha$ in any design in which $\Amat$ has rank $p$, including designs with
+$d > n$, where $\gtil = 0$.
+
+\emph{The penalty level of the theory.} Let
+$\Acal^{+} = \{\smax^{2} \le 2B_X^{2}C_U\}\cap\{\lmaxx(\Gramhat) \le \Lambda\}$.
+On it Lemma~\ref{lem:calib-blocks}(ii) gives $\lamz{G} \le \lamzbar{G}$ for
+every $G$, hence $\lamG \ge \pen_{w}$ and $\Ecal \subseteq \Tw$. The first
+event has probability tending to one by Lemma~\ref{lem:columns}, whose proof
+uses only $|X_{\cv}| \le B_X$ and $p_{\bU} \le C_U$. For the second,
+$\Prob\{\lmaxx(\Gramhat) \le \Lambda\} \ge
+\Prob\{\opnorm{\Gramhat-\Gram} < \Lambda - \kappa_2C_U\}$ by Weyl's inequality,
+since $\lmaxx(\Gram) \le \kappa_2C_U$, and the matrix Bernstein bound in the
+proof of Proposition~2(ii), with $t = \Lambda - \kappa_2C_U$, sends it to one;
+that bound uses only $\norm{\bZ_{i}}_{2}^{2} \le R_J$ and
+$\lmaxx(\Gram) \le \kappa_2C_U$, the upper half of Proposition~2(i), and
+neither $c_U$ nor $\kappa_1$, so that any $\Lambda > \kappa_2C_U$ serves. Both
+probabilities tend to one when $pq2^{J_n}\log(pq2^{J_n})/n \to 0$. Fix
+$\epsilon > 0$, take $\alpha = \alpha' = \alpha'' = \epsilon/4$ and intersect
+$\Acal^{+}$, $\Ecal$, $\{\normn{\bb}^{2} \le \mathcal{B}_{J_n}^{2}/\alpha'\}$
+and $\{\normn{\PA\bveps}^{2} \le \sigma^{2}p/(n\alpha'')\}$, the last two by
+Markov's inequality, Lemma~2 and Theorem~2(iii); for $n$ large the
+intersection has probability at least $1-\epsilon$, and on it
+$\normn{\widehat{f}-f}^{2} \le 18\lamG\nGw{\thetastar} +
+24\mathcal{B}_{J_n}^{2}/\alpha' + 3\sigma^{2}p/(n\alpha'')$, which is the first
+display of Proposition~3. For the chain, Lemma~\ref{lem:calib-blocks}(iii)
+gives $\lamG w_{G} \le \varrho\lamGone$ for every $G$, and summing with the
+weights $\norm{\thetastar_{G}}_{2}$ gives
+$\lamG\nGw{\thetastar} \le \varrho\lamGone\nGone{\thetastar}$, with
+$\varrho \le \bar\varrho$; and $\norm{x}_{2} \le \norm{x}_{1}$ in each chunk
+gives $\nGone{\thetastar} \le \norm{\thetastar}_{1}$. The order of $\lamGone$
+is \eqref{eq:order-lambda}.
+
+\emph{Part (i).} With $s > 1/2$ and $2^{\jst+1} \ge b$,
+$\sum_{\lev>\jst}2^{\lev(1/2-s)} \le 2^{(\jst+1)(1/2-s)}/(1-2^{1/2-s}) \le
+\bn^{1/2-s}/(1-2^{1/2-s})$, and Lemma~\ref{lem:count} gives
+$\nGone{\thetastar} \le pqC_g\{(1-2^{-\seff})^{-1} +
+\bn^{1/2-s-\vartheta_{\pi}}(1-2^{1/2-s})^{-1}\} = O(1)$; hence
+$\lamG\nGw{\thetastar} = O\{(\bn/n)^{1/2}\} = O\{(\log n/n)^{1/2}\}$. With
+$J_n \ge \log_2 n/(4\seff)$, $\mathcal{B}_{J_n}^{2} \asymp 2^{-2J_n\seff} \le
+n^{-1/2}$, and $p/n$ is of smaller order. With $\seff > 1/4$ the choice
+$J_n = \lceil\log_2 n/(4\seff)\rceil$ has $2^{J_n} < 2n^{1/(4\seff)}$ and
+satisfies the conditions of the statement.
+
+\emph{Part (ii).} With $s < 1/2$,
+$\sum_{\jst<\lev<J_n}2^{\lev(1/2-s)} \le 2^{J_n(1/2-s)}/(2^{1/2-s}-1)$, so that
+$\nGone{\thetastar} = O\{1 + \bn^{-\vartheta_{\pi}}2^{J_n(1/2-s)}\}$ and, since
+$1/2 - \vartheta_{\pi} = (1/\pi-1/2)_{+}$,
+\[
+  \lamG\nGw{\thetastar} \;\lesssim\; \Bigl(\frac{\bn}{n}\Bigr)^{1/2}
+  + n^{-1/2}\,\bn^{(1/\pi-1/2)_{+}}\,2^{J_n(1/2-s)} .
+\]
+Equating the second term with the bias $2^{-2J_n\seff}$ gives
+$2^{J_n(1/2-s+2\seff)} \asymp n^{1/2}\bn^{-(1/\pi-1/2)_{+}}$, which is the
+choice of the statement, with common value $2^{-2J_n\seff} \asymp
+\{\bn^{(2/\pi-1)_{+}}/n\}^{2\seff/(1-2s+4\seff)}$. The term $(\bn/n)^{1/2}$ and
+$p/n$ are of smaller order, because $2\seff/(1-2s+4\seff) < 1/2$ is equivalent
+to $s < 1/2$. The conditions of the statement hold because $\seff > s/2$ gives
+$1/(1-2s+4\seff) < 1$, and $2^{J_n} \ge \bn$ for $n$ large. When $\pi \ge 2$,
+$\seff = s$, $(2/\pi-1)_{+} = 0$ and $1-2s+4s = 2s+1$. \qed
+
+% derivations/08-blocos.tex, Corolario 14(iii) e (iv), a equacao mu-blocos e a
+% prova dos dois itens (E1.14; E5e, D52).
+\subsection*{Proposition 3 above the concentration ceiling}
+
+The conditions $\seff > 1/4$ in Proposition~3(i) and $\seff > s/2$ in
+Proposition~3(ii) keep the resolution of the balance below the ceiling
+$2^{J_n} \asymp n/\log n$, under which $\smax^{2} \le 2B_X^{2}C_U$ and
+$\lmaxx(\Gramhat) \le \Lambda$ hold with probability tending to one. The pairs
+that they exclude, all with $\pi < 2$, and the boundary $s = 1/2$ call for
+$2^{J_n}$ above that ceiling, where neither bound holds: the wavelets of the
+finest level take values up to $2^{(J-1)/2}\norm{\psi}_{\infty}$ and have one
+or two sample points in their support, so that $\smax^{2}$ and
+$\lmaxx(\Gramhat)$ grow with $2^{J}/n$, and the deterministic level (3.1) is
+no longer admissible. With $D = p + d$, $\xi = \Lambda - \kappa_2C_U > 0$,
+$C_\psi$ as in Proposition~2(ii) and $\norm{\psi}_{\infty}$ as in
+Lemma~\ref{lem:columns}, write
+\begin{equation}
+  \label{eq:mu-blocks}
+  \mu^{\Gcal}_{J} = 1 + c_{\mu}\frac{2^{J}\log(2D)}{n},
+  \qquad
+  \lamGp = (\mu^{\Gcal}_{J_n})^{1/2}\lamG,
+\end{equation}
+with
+\[
+  c_{\psi} = \frac{7\norm{\psi}_{\infty}^{2}}{12C_U},
+  \qquad
+  c_{\mu} = \max\Bigl\{c_{\psi},\
+  \frac{2pB_X^{2}(1+qC_\psi)}{\Lambda}
+  \Bigl(\frac{\kappa_2C_U}{2\xi} + \frac43\Bigr)\Bigr\}.
+\]
+When $pq2^{J_n}\log(pq2^{J_n})/n \to 0$, $\lamGp = \lamG\{1 + o(1)\}$.
+
+\begin{proposition}[Proposition 3 above the concentration ceiling]
+\label{prop:slow-ceiling}
+Let the assumptions of Proposition~3 hold, with the conditions $2^{J_n} \le 2n$
+and $pq2^{J_n}\log(pq2^{J_n})/n \to 0$ replaced by $2^{J_n} \le n^{2}$, and
+with $\lamGp$ of \eqref{eq:mu-blocks} in place of $\lamG$ in the estimator.
+Then
+\[
+  \normn{\widehat{f}-f}^{2} = O_p\bigl\{\lamGp\nGw{\thetastar} +
+  \mathcal{B}_{J_n}^{2} + p/n\bigr\},
+\]
+where $\lamGp\nGw{\thetastar} \le \bar\varrho\,(\mu^{\Gcal}_{J_n})^{1/2}
+\lamGone\nGone{\thetastar}$,
+with $(\lamGone)^{2} \le (C_{\pen} + 16\Lambda)\sigma^{2}\bn/n$ and $C_{\pen}$
+as in \eqref{eq:order-lambda}, and:
+\begin{enumerate}
+\item[(iii)] (the pairs that Proposition~3(i) and (ii) exclude, all with
+$\pi < 2$) (a) if $s > 1/2$ and $\seff \le 1/4$, the choice
+$2^{J_n} \asymp (n/\log n)^{2/(1+4\seff)}$ gives
+\[
+  \normn{\widehat{f}-f}^{2} = O_p\bigl\{(\log n/n)^{4\seff/(1+4\seff)}\bigr\};
+\]
+(b) if $s < 1/2$ and $\seff \le s/2$, the choice
+$2^{J_n} \asymp (n/\bn^{1/\pi})^{1/(1-s+2\seff)}$ gives
+\[
+  \normn{\widehat{f}-f}^{2}
+  = O_p\bigl\{n^{-2\seff/(1-s+2\seff)}
+  (\log n)^{(1/\pi)2\seff/(1-s+2\seff)}\bigr\};
+\]
+in both, $2^{J_n} \gtrsim n/\log n$, and the powers of $n$ join those of
+Proposition~3(i) and (ii) at $\seff = 1/4$ and $\seff = s/2$;
+\item[(iv)] (the boundary $s = 1/2$, with $\pi > 1$)
+$\nGone{\thetastar} \le pqC_g\{(1-2^{-\seff})^{-1} + \bn^{-\vartheta_{\pi}}J_n\}$,
+and: if $\seff \ge 1/4$, that is $\pi \ge 4/3$, the choice
+$2^{J_n} \asymp (n/\bn)^{1/(4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} = O_p\{n^{-1/2}(\log n)^{3/2-\vartheta_{\pi}}\}$,
+which is $n^{-1/2}\log n$ when $\pi \ge 2$; if $\seff < 1/4$, that is
+$1 < \pi < 4/3$, the choice
+$2^{J_n} \asymp \{n/\bn^{1+1/\pi}\}^{2/(1+4\seff)}$ gives
+$\normn{\widehat{f}-f}^{2} =
+O_p[\{(\log n)^{1+1/\pi}/n\}^{4\seff/(1+4\seff)}]$.
+\end{enumerate}
+The proof uses no lower bound on $\Gramhat$, and no property of $\Gramhat$
+other than the upper bound $\lmaxx(\Gramhat) \le \Lambda\mu^{\Gcal}_{J_n}$, which
+holds with probability tending to one under the upper bounds of Assumptions~2
+and~3 alone, with no condition on $J_n$.
+\end{proposition}
+
+Stopping $J_n$ at the ceiling instead, with $2^{J_n} = n/(K\log n)$ and $K$
+fixed and large enough, keeps $\lamG$ admissible and gives
+$O_p\{(\log n/n)^{2\seff}\}$ in the pairs of (iii); above the ceiling the
+estimation term grows more slowly than the bias decreases, and the exponents
+of (iii) are strictly larger than $2\seff$ away from $\seff = 1/4$ and
+$\seff = s/2$ (Remark~\ref{rem:ceiling} in Section~S8, for the lasso). Compared
+with Proposition~\ref{prop:lasso-slow}(iii) and (iv) for the lasso, the chunks
+remove nothing in (iii)(a), where the coarse chunk dominates both norms, as in
+Proposition~3(i); the factor $(\log n)^{(1-1/\pi)2\seff/(1-s+2\seff)}$ in
+(iii)(b); and, in (iv), $(\log n)^{\vartheta_{\pi}}$ when $\seff \ge 1/4$, half
+a logarithm when $\pi \ge 2$, and $(\log n)^{(1-1/\pi)4\seff/(1+4\seff)}$ when
+$\seff < 1/4$. This is the mechanism of Proposition~3(ii): the logarithm comes
+from the size of the chunks, and the count of Lemma~\ref{lem:count} returns it
+to the extent that the signal is spread over them.
+
+\subsection*{Proof of Proposition~\ref{prop:slow-ceiling}}
+
+\emph{The two events above the ceiling.} Let
+$\Acal^{++} = \{\smax^{2} \le 2B_X^{2}C_U\mu^{\Gcal}_{J}\}\cap
+\{\lmaxx(\Gramhat) \le \Lambda\mu^{\Gcal}_{J}\}$. For the first, the Bernstein
+bound of Lemma~\ref{lem:columns} holds for every $J$ and every $t > 0$. With
+$x = 2\log d$ and $t = (2xR'_JB_X^{2}C_U/n)^{1/2} + 2xR'_J/(3n)$,
+$nt^{2} \ge 2xR'_JB_X^{2}C_U + (2/3)xR'_Jt$, so that the exponent is at most
+$-x$; and $(2ab)^{1/2} \le a + b/2$ with $a = B_X^{2}C_U$ and $b = xR'_J/n$
+gives $t \le B_X^{2}C_U + (7/6)xR'_J/n$. Since
+$2B_X^{2}C_U + (7/3)R'_J\log d/n = 2B_X^{2}C_U(1 + c_{\psi}2^{J}\log d/n)$,
+\begin{equation}
+  \label{eq:smax-ceiling}
+  \Prob\bigl\{\smax^{2} > 2B_X^{2}C_U(1 + c_{\psi}2^{J}\log d/n)\bigr\}
+  \;\le\; \frac{1}{d}
+  \qquad\text{for every } J,
+\end{equation}
+and $c_{\psi}2^{J}\log d \le c_{\mu}2^{J}\log(2D)$. For the second, the matrix
+Bernstein bound in the proof of Proposition~2(ii),
+$\Prob(\opnorm{\Gramhat-\Gram} \ge t) \le
+2D\exp\{-nt^{2}/(2R_J(\kappa_2C_U + 2t/3))\}$, holds for every $J$ and every
+$t > 0$. With $x = 2\log(2D)$ and
+$t = (2xR_J\kappa_2C_U/n)^{1/2} + (4/3)xR_J/n$,
+$nt^{2} \ge 2xR_J\kappa_2C_U + (4/3)xR_Jt$, and the probability is at most
+$2De^{-x} = 1/(2D)$; and $(2ab)^{1/2} \le \xi + ab/(2\xi)$ with
+$a = \kappa_2C_U$ and $b = xR_J/n$ gives
+$t \le \xi + \{\kappa_2C_U/(2\xi) + 4/3\}xR_J/n$. By Weyl's inequality and
+$\lmaxx(\Gram) \le \kappa_2C_U$, off that event
+$\lmaxx(\Gramhat) < \Lambda + \{\kappa_2C_U/(2\xi) + 4/3\}2\log(2D)R_J/n \le
+\Lambda\mu^{\Gcal}_{J}$, because
+$R_J = pB_X^{2}(1 + qC_\psi2^{J}) \le pB_X^{2}(1+qC_\psi)2^{J}$. Hence
+$\Prob(\Acal^{++}) \ge 1 - 1/d - 1/(2D) \to 1$, with no condition on $J_n$.
+Both bounds use only $|X_{\cv}| \le B_X$, $p_{\bU} \le C_U$ and
+$\lmaxx(\Gram) \le \kappa_2C_U$.
+
+\emph{The general bound.} On $\Acal^{++}$ the two bounds in the proof of
+Lemma~\ref{lem:calib-blocks}(ii), $\mathrm{tr}(\Psitil_{G}) \le |G|\smax^{2}$
+and $\opnorm{\Psitil_{G}} \le \lmaxx(\Gramhat)$, give
+$\lamz{G} \le (\mu^{\Gcal}_{J})^{1/2}\lamzbar{G}$ for every $G$, so that
+$\lamGp \ge \pen_{w}$ and $\Ecal \subseteq \Tw$, and the proof of
+Proposition~3 goes through with $\lamGp$ in place of $\lamG$ and $\Acal^{++}$
+in place of $\Acal^{+}$; the chain gives
+$\lamGp\nGw{\thetastar} \le \bar\varrho(\mu^{\Gcal}_{J_n})^{1/2}
+\lamGone\nGone{\thetastar}$. With $2^{J_n} \le n^{2}$,
+$|\Gcal_{n}| \le pq(1 + n^{2}/\bn) \le pqn^{2}$ and
+$\log(|\Gcal_{n}|/\alpha) \le \log(2pq/\alpha) + 2\bn$, and the computation in
+the proof of Lemma~\ref{lem:regime} gives
+$(\lamGone)^{2} \le (16\sigma^{2}/n)\{(2B_X^{2}C_U + 2\Lambda)\bn +
+\Lambda\log(2pq/\alpha)\} \le (C_{\pen} + 16\Lambda)\sigma^{2}\bn/n$. Since
+$\log(2D_n) \asymp \log n \asymp \bn$,
+\begin{equation}
+  \label{eq:lam-plus-blocks}
+  (\mu^{\Gcal}_{J_n})^{1/2}\lamGone \;\asymp\;
+  \Bigl(\frac{\log n}{n}\Bigr)^{1/2}
+  \Bigl(1 + \frac{2^{J_n}\log n}{n}\Bigr)^{1/2},
+\end{equation}
+which is of order $2^{J_n/2}\log n/n$ when $2^{J_n} \gtrsim n/\log n$.
+
+\emph{Part (iii)(a).} With $s > 1/2$, $\nGone{\thetastar} = O(1)$ as in the
+proof of Proposition~3(i). With
+$2^{J_n} \asymp (n/\log n)^{2/(1+4\seff)} \gtrsim n/\log n$, because
+$\seff \le 1/4$, \eqref{eq:lam-plus-blocks} gives the estimation term
+$(\log n/n)(n/\log n)^{1/(1+4\seff)} = (\log n/n)^{4\seff/(1+4\seff)}$, the
+order of the bias $2^{-2J_n\seff}$; $p/n$ is of smaller order.
+
+\emph{Part (iii)(b).} With $s < 1/2$ and $\pi < 2$,
+$\vartheta_{\pi} = 1 - 1/\pi$ and
+$\nGone{\thetastar} = O\{1 + \bn^{-\vartheta_{\pi}}2^{J_n(1/2-s)}\}$ as in the
+proof of Proposition~3(ii). With
+$2^{J_n} \asymp (n/\bn^{1/\pi})^{1/(1-s+2\seff)}$, which exceeds $n/\bn$ for
+$n$ large, because the exponent is at least $1$ and $1/\pi \le 1$, and which is
+at most $n^{2}$, because $1-s+2\seff > 1/2$, \eqref{eq:lam-plus-blocks} gives
+the estimation term
+\[
+  2^{J_n/2}\frac{\log n}{n}\bigl\{1 + \bn^{-(1-1/\pi)}2^{J_n(1/2-s)}\bigr\}
+  \;\asymp\; 2^{J_n/2}\frac{\log n}{n} +
+  2^{J_n(1-s)}\frac{(\log n)^{1/\pi}}{n},
+\]
+whose second term dominates and, at the choice of the statement, equals
+$(\bn^{1/\pi}/n)^{1-(1-s)/(1-s+2\seff)} =
+(\bn^{1/\pi}/n)^{2\seff/(1-s+2\seff)}$, the order of the bias
+$2^{-2J_n\seff}$.
+
+\emph{Part (iv).} With $s = 1/2$, the sum in \eqref{eq:count} is at most
+$J_n$, which gives the bound on $\nGone{\thetastar}$ of the statement, and
+$J_n \asymp \log n \asymp \bn$ in both choices, so that
+$\nGone{\thetastar} \asymp (\log n)^{1-\vartheta_{\pi}}$, since
+$\vartheta_{\pi} \le 1/2$. If $\seff \ge 1/4$,
+$2^{J_n} \asymp (n/\bn)^{1/(4\seff)} \lesssim n/\log n$,
+$\mu^{\Gcal}_{J_n}$ is bounded, the estimation term is
+$(\log n/n)^{1/2}(\log n)^{1-\vartheta_{\pi}}$, and the bias, of order
+$(\bn/n)^{1/2}$, is of smaller order. If $\seff < 1/4$, then $\pi < 4/3$ and
+$\vartheta_{\pi} = 1 - 1/\pi$; with
+$2^{J_n} \asymp (n/\bn^{1+1/\pi})^{2/(1+4\seff)}$, which exceeds $n/\log n$,
+the estimation term is $2^{J_n/2}(\log n)^{1+1/\pi}/n \asymp
+\{(\log n)^{1+1/\pi}/n\}^{4\seff/(1+4\seff)}$, the order of the bias. \qed
+
+% derivations/08-blocos.tex, prova do Teorema 4 (numeracao global).
+\subsection*{Proof of Theorem 3}
+
+By the definition of $J_n$, $n^{1/(2\seff+1)} \le 2^{J_n} <
+2n^{1/(2\seff+1)} \le 2n$, so the setting of this section holds, and
+$pq2^{J_n}\log(pq2^{J_n})/n \asymp n^{1/(2\seff+1)-1}\log n =
+n^{-2\seff/(2\seff+1)}\log n \to 0$, which is the requirement of
+Proposition~2(ii); by Lemma~\ref{lem:regime}, $\Prob(\Acal) \to 1$. Fix
+$\epsilon > 0$, take $\alpha = \alpha' = \alpha'' = \epsilon/4$, and intersect
+$\Acal$, the event $\Ecal$ of Lemma~\ref{lem:calib-blocks}(i),
+$\{\normn{\bb}^{2} \le \mathcal{B}_{J_n}^{2}/\alpha'\}$ (Markov's inequality,
+since $\E\normn{\bb}^{2} = \norm{f-f_{J_n}}_{L_2(P)}^{2} \le
+\mathcal{B}_{J_n}^{2}$ by Lemma~2) and
+$\{\normn{\PA\bveps}^{2} \le \sigma^{2}p/(n\alpha'')\}$ (Markov's inequality and
+Theorem~2(iii)); for $n$ large the intersection has probability at least
+$1-\epsilon$. On it $\Tw$ holds, and \eqref{eq:oracle-min-blocks} with
+$\bar\bbeta = \betastar$ gives
+\[
+  \normn{\widehat{f}-f}^{2} \;\le\;
+  \frac{192(\lamG)^{2}\Wcal(\Gzero(\thetastar))}{\gtil}
+  + 60\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}.
+\]
+By Lemma~\ref{lem:calib-blocks}(iii), Lemma~\ref{lem:regime} and
+Proposition~\ref{prop:balanced}(ii), with $\gtil > \gamma/2$,
+\[
+  \frac{192(\lamG)^{2}\Wcal(\Gcal_{n})}{\gtil}
+  \;\le\; \frac{384\bar\varrho^{2}(\lamGone)^{2}|\Gcal_{n}|}{\gamma}
+  \;\le\; \frac{384\bar\varrho^{2}C_{\pen}\sigma^{2}pq(\bn + 2^{J_n})}{\gamma n},
+\]
+which is of order $n^{-2\seff/(2\seff+1)}$, because
+$2^{J_n} \asymp n^{1/(2\seff+1)}$ dominates $\bn \asymp \log n$. The bias term
+is $60\mathcal{B}_{J_n}^{2}/\alpha' \asymp 2^{-2J_n\seff} \le
+n^{-2\seff/(2\seff+1)}$, by the lower bound on $2^{J_n}$, and the last term is
+$O(1/n)$, of strictly smaller order. Hence
+$\Prob\{\normn{\widehat{f}-f}^{2} > M_\epsilon n^{-2\seff/(2\seff+1)}\} <
+\epsilon$ for a constant $M_\epsilon$. \qed
+
+% derivations/08-blocos.tex, prova do Corolario 10 (numeracao global).
+\subsection*{Proof of Corollary 1}
+
+By the orthonormality of the wavelets of level below $J_n$ in $L_2[0,1]$ and
+Lemma~2,
+$\sum_{\cv,\md}\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}\rVert^{2}_{L_2[0,1]}
+\le 2\norm{\thetahat-\thetastar}_{2}^{2} +
+2pqC_g^{2}(1-2^{-2\seff})^{-1}2^{-2J_n\seff}$. On the event of the proof of
+Theorem~3, Theorem~2(ii) with $\bar\bbeta = \betastar$ gives
+$\norm{\thetahat-\thetastar}_{2}^{2} \le
+64(\lamG)^{2}\Wcal(\Gcal_{n})/\gtil^{2} + 16\normn{\bb}^{2}/\gtil$, with
+$\gtil > \gamma/2$: the two terms have the order of those of Theorem~3, with
+$\gamma^{-2}$ in place of $\gamma^{-1}$. For the levels,
+Lemma~\ref{lem:profile} with $\bar\bbeta = \betastar$ gives
+$\Amat(\chat-\bc) = \PA(\bb+\bveps) - \PA\Bmat v$, so that
+$\normn{\Amat(\chat-\bc)} \le \normn{\bb} + \normn{\PA\bveps} +
+\Lambda^{1/2}\norm{v}_{2}$, and $\lmin(\Amat\T\Amat/n) > \gamma/2$ gives
+$\norm{\chat-\bc}_{2}^{2} \le 2\normn{\Amat(\chat-\bc)}^{2}/\gamma$. Finally the
+components of a functional coefficient depend on distinct coordinates of $u$
+and the basis is orthonormal, so that
+$\lVert\widehat{\fcoef{\cv}}-\fcoef{\cv}\rVert_{L_2([0,1]^q)} \le
+|\widehat{c}_{\cv}-\lvl{\cv}| + \sum_{\md}\lVert\widehat{g}_{\cv\md}-
+\gcomp{\cv}{\md}\rVert_{L_2[0,1]}$, with $q$ fixed. \qed
+
+% derivations/08-blocos.tex, prova do Corolario 11 (numeracao global); D47(a).
+\subsection*{Proof of Theorem 1}
+
+\emph{The window.} Since $\seff \le s$,
+$s/\{(2s+1)\seff\} \ge 1/(2s+1)$, and the window is nonempty if and only if
+$s/\{(2s+1)\seff\} < 1$, that is $\seff > s/(2s+1)$. With $c < 1$,
+$2^{J_n} \le 2n^{c} \le 2n$, so the setting of this section holds; the
+requirement of Proposition~2(ii) is $pq2^{J_n}\log(pq2^{J_n})/n \asymp
+n^{c-1}\log n \to 0$, and $\Prob(\Acal) \to 1$ by Lemma~\ref{lem:regime}.
+
+\emph{The rate.} Fix $\epsilon > 0$ and the event of the proof of Theorem~3.
+On it, Corollary~\ref{cor:ideal} with $\Lambda' = \Lambda$ gives
+$\normn{\widehat{f}-f}^{2} \le 120\Lambda\Rid(\thetastar;\eta) +
+120\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2}$, and, by
+Lemma~\ref{lem:calib-blocks}(iii), \eqref{eq:order-lambda} and
+$\gtil > \gamma/2$,
+\[
+  \eta \;=\; \frac{1.6\max_{G}(\lamG w_{G})^{2}}{\Lambda\gtil}
+  \;\le\; \frac{3.2\bar\varrho^{2}(\lamGone)^{2}}{\Lambda\gamma}
+  \;\le\; \bar\eta_{n} := \kappa\,\frac{\bn}{n},
+  \qquad
+  \kappa = \frac{3.2\bar\varrho^{2}C_{\pen}\sigma^{2}}{\Lambda\gamma}.
+\]
+Since $\Rid$ is nondecreasing in $\eta$, Lemma~3 with $b = \bn$ gives
+\[
+  \Rid(\thetastar;\eta) \;\le\; \Rid(\thetastar;\bar\eta_{n})
+  \;\le\; pq\Bigl\{\AG C_g^{\tau}\kappa^{2s/(2s+1)}\,n^{-2s/(2s+1)}
+  \bn^{(2/\pi-1)_{+}/(2s+1)} + \kappa\frac{\bn}{n}\Bigr\},
+\]
+with $\bn \asymp \log n$; the second term is of smaller order because
+$2s/(2s+1) < 1$. The bias is $O(2^{-2J_n\seff}) = O(n^{-2c\seff})$, and
+$2c\seff \ge 2s/(2s+1)$ by the window; the term $\sigma^{2}p/n$ is of smaller
+order. For the components, the second bound of Corollary~\ref{cor:ideal} and
+Lemma~2 give the same rate, as in the proof of Corollary~1.
+
+% E5g (pergunta 51(c), D57): a uniformidade do O_p, lida na prova do
+% Corolario 16 de derivations/09-cota-inferior.tex; sem ela, "minimax optimal"
+% no corpo fica no sentido ponto a ponto.
+\emph{Uniformity over the class.} The events $\Acal$ and $\Ecal$ and the
+event for $\normn{\PA\bveps}^{2}$ do not depend on $f$; the event for
+$\normn{\bb}^{2}$ does, but its probability is at least $1-\alpha'$ for every
+$f$ whose components satisfy Assumption~5, because the bound
+$\mathcal{B}_{J_n}^{2}$ on $\E\normn{\bb}^{2}$ of Lemma~2 depends on $f$ only
+through $C_g$. On the event, the bound depends on $f$ only through $C_g$, by
+Lemmas~2 and~3, and not on the levels $\bc$, since $\bb = f - f_{J_n}$ does
+not involve them. Hence
+$\sup_{f}\Prob_{f}\{\normn{\widehat{f}-f}^{2} > M_\epsilon r_n\} < \epsilon$
+for $n$ large, with $\Prob_{f}$ the law of the sample when the regression
+function is $f$ and the supremum over the functions of Assumption~5 with any
+levels, and the same holds for the components: the bound of Theorem~1 is
+uniform over the class, which is the form that Theorem~\ref{thm:lower} below
+is compared with.
+
+\emph{Two readings.} The constant grows with the weights at most as
+$\bar\varrho^{\,4s/(2s+1)}$ in the leading term, through
+$\kappa^{2s/(2s+1)}$. The gain over the rate $(\log n/n)^{2s/(2s+1)}$ of the
+lasso (Theorem~\ref{thm:lasso-main}) is the factor $(\log n)^{2\seff/(2s+1)}$,
+because $2s/(2s+1) - (2/\pi-1)_{+}/(2s+1) = 2\seff/(2s+1)$: when $\pi < 2$,
+$2s - 2/\pi + 1 = 2(s - 1/\pi + 1/2) = 2\seff$, and when $\pi \ge 2$,
+$\seff = s$. The logarithm of the union bound over the columns is absorbed by
+the size of the chunks, which is why they must have at least of the order of
+$\log|\Gcal_{n}|$ coefficients. \qed
+
+% derivations/08-blocos.tex, Observacao rem:inferior.
+% E5g (D57): removida inteira e substituida pelo Theorem S6.1 abaixo; fica no
+% lugar em cinza e sem numero (D51(b)), sem o rotulo rem:lower, que nada cita.
+
+
+% E5g (E1.9; D57): derivations/09-cota-inferior.tex, Teorema 5 e Lema 17
+% (numeracao global), nas tres perdas, com as provas; dentro do grupo azul de
+% k = 4. Os simbolos locais do 09 (o hipercubo C, Omega, zeta, d_H, a funcao
+% de limiar) ficam escritos no texto; |C| no lugar do M do 09, que colide com
+% M_epsilon e com o M da S8; L_n e L_P escritos por extenso, porque L_n e o
+% logaritmo da S8.
+\subsection*{A minimax lower bound}
+
+The rates of this section are upper bounds. For a lower bound, fix any law
+$P$ of $(\bX,\bU)$ that satisfies Assumptions~2 and~3, with $\bX$ allowed to
+depend on $\bU$, and let the errors be Gaussian,
+\begin{equation}
+  \label{eq:gauss}
+  \varepsilon_i \sim N(0,\sigma^{2}),\ \text{independent of } (\bX_i,\bU_i),
+\end{equation}
+which satisfy Assumption~1. Write $\Prob_f$ and $\E_f$ for the law and the
+expectation of the sample when the regression function is $f$, and
+$\mathcal{F} = \mathcal{F}(s,\pi,C_g)$ for the set of the functions
+$f(x,u) = \sum_{\cv}x_{\cv}\{\lvl{\cv} + \sum_{\md}\gcomp{\cv}{\md}(u_{\md})\}$
+with $\bc \in \R^{p}$ arbitrary and every component satisfying the centering
+and the bound of Assumption~5; by Proposition~1, $f$ determines its levels and
+its components. An estimator is any measurable function of the sample: for
+prediction, $\widehat{f}$ with values in $L_2(P)$, or only its values
+$\widehat{f}(\bX_i,\bU_i)$, and for the components,
+$\widehat{g} = (\widehat{g}_{\cv\md})$ with $\widehat{g}_{\cv\md} \in
+L_2[0,1]$. For a nonempty set $\Kcal$ of blocks $(\cv,\md)$, the loss for the
+components in $\Kcal$ is
+\[
+  L_{\Kcal}(\widehat{g},f) \;=\; \sum_{(\cv,\md)\in\Kcal}
+  \lVert\widehat{g}_{\cv\md} - \gcomp{\cv}{\md}\rVert_{L_2[0,1]}^{2} .
+\]
+With $\gamma = \kappa_1c_U$ as in Section~S1 and
+$\cA = (1-2^{-1/2})/2 \approx 0.146$, put, for
+$n \ge n_{0} = \lceil 2\sigma^{2}/(C_g^{2}B_X^{2}C_U)\rceil$,
+\begin{equation}
+  \label{eq:lower-choices}
+  \begin{gathered}
+  \zeta_n^{2} = \frac{2\sigma^{2}}{nB_X^{2}C_U},
+  \qquad
+  \lev_n = \max\Bigl\{\lev \ge 0 : 2^{\lev(2s+1)} \le \frac{C_g^{2}}{\zeta_n^{2}}\Bigr\},
+  \\
+  \rlow^{2} = C_g^{2/(2s+1)}\Bigl(\frac{\sigma^{2}}{nB_X^{2}C_U}\Bigr)^{2s/(2s+1)} ;
+  \end{gathered}
+\end{equation}
+$\lev_n$ exists because $C_g^{2}/\zeta_n^{2} \ge 1$ when $n \ge n_{0}$, and
+$\rlow^{2}$, of order $n^{-2s/(2s+1)}$, is the rate of the lower bound.
+
+\begin{theorem}[Minimax lower bound]
+\label{thm:lower}
+Let $P$ be any law of $(\bX,\bU)$ that satisfies Assumptions~2 and~3, with
+$q \ge 1$ and $\bX$ possibly dependent on $\bU$, let the basis satisfy
+Assumption~4, and let the errors be Gaussian, as in \eqref{eq:gauss}. For
+every $s > 0$, every $1 \le \pi \le \infty$, every nonempty set $\Kcal$ of
+blocks and every $n \ge n_{0}$, with $\rlow$ as in \eqref{eq:lower-choices}:
+\begin{enumerate}
+\item[(i)] (components)
+\begin{gather*}
+  \inf_{\widehat{g}}\sup_{f\in\mathcal{F}}\E_{f}L_{\Kcal}(\widehat{g},f)
+  \;\ge\; \frac{\cA}{8}\,|\Kcal|\,\rlow^{2},
+  \\
+  \inf_{\widehat{g}}\sup_{f\in\mathcal{F}}\Prob_{f}\Bigl\{L_{\Kcal}(\widehat{g},f)
+  \ge \frac{\cA}{16}\,|\Kcal|\,\rlow^{2}\Bigr\} \;\ge\; \frac{\cA}{2} ;
+\end{gather*}
+\item[(ii)] (prediction, population norm) the same holds for
+$\norm{\widehat{f}-f}_{L_2(P)}^{2}$, with $\gamma|\Kcal|\rlow^{2}$ in place of
+$|\Kcal|\rlow^{2}$;
+\item[(iii)] (prediction, empirical norm) if moreover $n \ge n_{1}$, the
+smallest integer from which on
+$2D\exp[-n\gamma^{2}/\{8R_{J}(\kappa_2C_U + \gamma/3)\}] \le \cA/4$, with
+$J = \lev_n + 1$ and $D = p + pq\NJ$ and $R_J$ as in Proposition~2(ii), then
+\begin{gather*}
+  \inf_{\widehat{f}}\sup_{f\in\mathcal{F}}\E_{f}\normn{\widehat{f}-f}^{2}
+  \;\ge\; \frac{\cA}{32}\,\gamma|\Kcal|\,\rlow^{2},
+  \\
+  \inf_{\widehat{f}}\sup_{f\in\mathcal{F}}\Prob_{f}\Bigl\{\normn{\widehat{f}-f}^{2}
+  \ge \frac{\cA}{32}\,\gamma|\Kcal|\,\rlow^{2}\Bigr\} \;\ge\; \frac{\cA}{4} .
+\end{gather*}
+\end{enumerate}
+The constants depend neither on $\pi$, $r$, $p$ or $q$, nor on $P$ beyond
+$(B_X,C_U)$ in $\rlow$ and $\gamma = \kappa_1c_U$; $n_{0}$ depends only on
+$(\sigma,C_g,B_X,C_U)$, and $n_{1}$, which is finite, also on
+$(p,q,s,\kappa_1,\kappa_2,c_U)$ and the wavelet family. In particular, with
+$\Kcal$ a single block, every component and the prediction have minimax risk
+of order at least $n^{-2s/(2s+1)}$, and with $\Kcal$ all the blocks, so that
+$|\Kcal| = pq$, the bound is proportional to $pq$.
+\end{theorem}
+
+The bound is not asymptotic, and it holds for every pair $(s,\pi)$, in
+particular for every pair that Assumption~5 allows. It has the form of the
+lower bound of \citet[Theorem~5]{Donoho-Johnstone-1998} for Besov bodies in
+the Gaussian sequence model, with radius $C_g$ and noise level
+$\sigma(nB_X^{2}C_U)^{-1/2}$ per coordinate. Since Gaussian errors satisfy
+Assumption~1, it holds a fortiori over the models of Assumptions~1 to~5, and
+the form in probability is the one to compare with the upper bounds, which are
+stated in $O_p$ and are uniform over the class (proof of Theorem~1 above).
+Hence, when $\pi \ge 2$, $n^{-2s/(2s+1)}$ is the minimax rate in the
+prediction norm and for the components, for every $q$ and with covariates
+that depend on the modulators, and the estimator of Theorem~1 attains it
+uniformly over the class; when $\pi < 2$ and $\seff > s/(2s+1)$ it attains it
+up to the factor $(\log n)^{(2/\pi-1)/(2s+1)}$, which the lower bound does not
+carry
+% D58 (pergunta 52(f)): a condicao de Cai (1999), que saiu com a Remark S6.1.
+(the same factor as in the rate of block thresholding in the sequence model,
+\citealp[Theorem~4]{Cai-1999}, which holds for $s \ge 1/\pi$, a condition
+strictly stronger than $\seff > s/(2s+1)$), and the coordinatewise lasso, at the rate $(\log n/n)^{2s/(2s+1)}$ of
+Theorem~\ref{thm:lasso-main}, stays above it by the factor
+$(\log n)^{2s/(2s+1)}$ for every $\pi$. When $q = 1$ and $\bX$ is independent
+of $U_1$, part (i) with $\Kcal$ all the blocks is, up to the constants, the
+nonparametric term of the lower bound of
+\citet[Theorem~1, eqs.~3.6 and~3.7]{Klopp-Pensky-2015} with a fixed number of
+covariates.
+
+The proof applies Assouad's lemma to a hypercube of wavelets at a single
+level. Fix $\Kcal$, a level $\lev \ge 0$ and a height $\zeta > 0$; let
+\[
+  \mathcal{C} = \bigl\{(\cv,\md,\tsl) : (\cv,\md)\in\Kcal,\ 0 \le \tsl < 2^{\lev}\bigr\},
+  \qquad |\mathcal{C}| = |\Kcal|\,2^{\lev},
+\]
+and $\Omega = \{0,1\}^{\mathcal{C}}$. For $\omega \in \Omega$ the components
+are $\gcomp{\cv}{\md}^{\omega} =
+\zeta\sum_{\tsl}\omega_{\cv\md,\tsl}\wav{\lev}{\tsl}$ for
+$(\cv,\md) \in \Kcal$ and zero otherwise, the levels are zero, and
+\[
+  f_{\omega}(x,u) \;=\; \zeta\,z_{\mathcal{C}}(x,u)\T\omega,
+  \qquad
+  z_{\mathcal{C}}(x,u) = \bigl(x_{\cv}\wav{\lev}{\tsl}(u_{\md})\bigr)_{(\cv,\md,\tsl)\in\mathcal{C}} ,
+\]
+whose entries are columns of the design at resolution $J = \lev + 1$. Write
+$\Gram_{\mathcal{C}\mathcal{C}}$ and $\Gramhat_{\mathcal{C}\mathcal{C}}$ for
+the principal submatrices of $\Gram$ and $\Gramhat$ at that resolution on the
+columns in $\mathcal{C}$, $\bZ_{\mathcal{C}}$ for those columns of $\bZ$,
+$d_{H}(\omega,\omega') = \sum_{(\cv,\md,\tsl)\in\mathcal{C}}
+\mathbf{1}\{\omega_{\cv\md,\tsl} \ne \omega'_{\cv\md,\tsl}\}$ for the Hamming
+distance, and $\Prob_{\omega}$ and $\E_{\omega}$ for $\Prob_{f_{\omega}}$ and
+$\E_{f_{\omega}}$. The form of Assouad's lemma that we use is
+\citet[Theorem~2.12(iv)]{Tsybakov-2009} with the Kullback--Leibler divergence
+bounded by one: if $\operatorname{KL}(\Prob_{\omega},\Prob_{\omega'}) \le 1$
+whenever $d_{H}(\omega,\omega') = 1$, then
+\begin{equation}
+  \label{eq:assouad}
+  \inf_{\widehat\omega}\max_{\omega\in\Omega}\E_{\omega}d_{H}(\widehat\omega,\omega)
+  \;\ge\; \frac{|\mathcal{C}|}{2}\max\Bigl(\frac{e^{-1}}{2},\,1-2^{-1/2}\Bigr)
+  \;=\; \cA|\mathcal{C}| ,
+\end{equation}
+the infimum being over all the estimators with values in $\Omega$.
+
+\begin{lemma}[A hypercube of wavelets]
+\label{lem:hypercube}
+In the setting of Theorem~\ref{thm:lower}, for every nonempty $\Kcal$, every
+$\lev \ge 0$ and every $\zeta > 0$:
+\begin{enumerate}
+\item[(i)] $f_{\omega} \in \mathcal{F}$ for every $\omega \in \Omega$ if and
+only if $\zeta2^{\lev(s+1/2)} \le C_g$, for every $s > 0$ and every
+$1 \le \pi \le \infty$;
+\item[(ii)] for every pair,
+$\operatorname{KL}(\Prob_{\omega},\Prob_{\omega'}) =
+\{n\zeta^{2}/(2\sigma^{2})\}(\omega-\omega')\T\Gram_{\mathcal{C}\mathcal{C}}(\omega-\omega')$,
+and, if $\omega$ and $\omega'$ differ only in the coordinate $(\cv,\md,\tsl)$,
+\[
+  \operatorname{KL}(\Prob_{\omega},\Prob_{\omega'})
+  \;=\; \frac{n\zeta^{2}}{2\sigma^{2}}\,\E\bigl\{X_{\cv}^{2}\wav{\lev}{\tsl}(U_{\md})^{2}\bigr\}
+  \;\le\; \frac{n\zeta^{2}}{2\sigma^{2}}\,\min(B_X^{2},\kappa_2)\,C_U ;
+\]
+\item[(iii)] $\lmin(\Gram_{\mathcal{C}\mathcal{C}}) \ge \gamma$, so that
+\begin{gather*}
+  \norm{f_{\omega}-f_{\omega'}}_{L_2(P)}^{2} \ge \gamma\zeta^{2}d_{H}(\omega,\omega'),
+  \\
+  \sum_{(\cv,\md)\in\Kcal}\lVert\gcomp{\cv}{\md}^{\omega} -
+  \gcomp{\cv}{\md}^{\omega'}\rVert_{L_2[0,1]}^{2} = \zeta^{2}d_{H}(\omega,\omega') ;
+\end{gather*}
+with a single block $(\cv,\md)$, the first statement uses only
+$\E(X_{\cv}^{2}\mid\bU) \ge \kappa_1$ and the lower bound $c_U$ on the
+density of $U_{\md}$;
+\item[(iv)] for each of the three losses and every estimator there is a
+measurable function $\widehat\omega$ of the sample with values in $\Omega$
+such that, for every $\omega \in \Omega$,
+\begin{enumerate}
+\item[(a)] $L_{\Kcal}(\widehat{g},f_{\omega}) \ge (\zeta^{2}/4)\,d_{H}(\widehat\omega,\omega)$,
+\item[(b)] $\norm{\widehat{f}-f_{\omega}}_{L_2(P)}^{2} \ge (\gamma\zeta^{2}/4)\,d_{H}(\widehat\omega,\omega)$,
+\item[(c)] $\normn{\widehat{f}-f_{\omega}}^{2} \ge (\gamma\zeta^{2}/8)\,
+d_{H}(\widehat\omega,\omega)\,\mathbf{1}_{\mathcal{E}_{\mathcal{C}}}$, where
+$\mathcal{E}_{\mathcal{C}} = \{\lmin(\Gramhat_{\mathcal{C}\mathcal{C}}) \ge \gamma/2\}$
+depends only on the $(\bX_i,\bU_i)$ and has, with $J = \lev+1$ and $D$ and
+$R_J$ as in Theorem~\ref{thm:lower}(iii),
+\[
+  \Prob(\mathcal{E}_{\mathcal{C}}^{c}) \;\le\;
+  2D\exp\Bigl\{-\frac{n\gamma^{2}}{8R_{J}(\kappa_2C_U + \gamma/3)}\Bigr\} .
+\]
+\end{enumerate}
+\end{enumerate}
+\end{lemma}
+
+The Kullback--Leibler divergence uses only upper bounds on the design, and
+through the conditional second moment $\E(X_{\cv}^{2}\mid\bU)$, which is why
+the covariates may depend on the modulators at no cost. The separation of the
+components uses no property of the design; that of the prediction uses the
+smallest eigenvalue, and it is there that the cross terms between modulators
+and between covariates enter, through Proposition~2(i).
+
+\subsection*{Proof of Lemma~\ref{lem:hypercube}}
+
+\emph{Part (i).} By the orthonormality of $\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$
+in $L_2[0,1]$ (Section~S2), the coefficients of $\gcomp{\cv}{\md}^{\omega}$
+are $\theta_{\cv\md,\lev'\tsl} = \zeta\omega_{\cv\md,\tsl}\mathbf{1}\{\lev' =
+\lev\}$, and $\int_0^1\gcomp{\cv}{\md}^{\omega} = 0$ because
+$\int_0^1\wav{\lev}{\tsl} = 0$. Only the level $\lev$ is nonzero, so the bound
+of Assumption~5 reduces to that level, whatever the index $r$. For
+$\pi < \infty$, $\norm{\theta_{\cv\md,\lev\cdot}}_{\pi} =
+\zeta(\sum_{\tsl}\omega_{\cv\md,\tsl})^{1/\pi} \le \zeta2^{\lev/\pi}$, with
+equality at $\omega \equiv 1$; for $\pi = \infty$ it is $\zeta$ if
+$\omega_{\cv\md,\cdot} \ne 0$. In both cases the maximum over $\Omega$ of
+$2^{\lev(s+1/2-1/\pi)}\norm{\theta_{\cv\md,\lev\cdot}}_{\pi}$ is
+$\zeta2^{\lev(s+1/2)}$. The components outside $\Kcal$ and the levels are
+zero.
+
+\emph{Part (ii).} Under $\Prob_{\omega}$ the pairs $(\bX_i,\bU_i)$ have the
+law $P$, the same for every $\omega$, and, given them, the $Y_i$ are
+independent with $Y_i \sim N\{f_{\omega}(\bX_i,\bU_i),\sigma^{2}\}$. The
+divergence between product laws is the sum of the divergences, and that
+between two laws with the same marginal is the mean of the divergence between
+the conditionals, so that
+$\operatorname{KL}(\Prob_{\omega},\Prob_{\omega'}) =
+n\E\{(f_{\omega}-f_{\omega'})^{2}(\bX,\bU)\}/(2\sigma^{2})$, and
+$f_{\omega}-f_{\omega'} = \zeta z_{\mathcal{C}}\T(\omega-\omega')$ gives the
+quadratic form. For a neighbor, $\E\{(f_{\omega}-f_{\omega'})^{2}\} =
+\zeta^{2}\E\{\E(X_{\cv}^{2}\mid\bU)\wav{\lev}{\tsl}(U_{\md})^{2}\}$, with
+$\E(X_{\cv}^{2}\mid\bU) \le B_X^{2}$ and $\E(X_{\cv}^{2}\mid\bU) =
+e_{\cv}\T\E(\bX\bX\T\mid\bU)e_{\cv} \le \kappa_2$ by Assumption~2, and
+$\E\{\wav{\lev}{\tsl}(U_{\md})^{2}\} \le C_U\int_0^1\wav{\lev}{\tsl}^{2} = C_U$,
+because the density of $U_{\md}$ inherits the bound $C_U$ of Assumption~3.
+
+\emph{Part (iii).} For $v \in \R^{\mathcal{C}}$ and $\tilde v$ its completion
+with zeros, $v\T\Gram_{\mathcal{C}\mathcal{C}}v = \tilde v\T\Gram\tilde v \ge
+\lmin(\Gram)\norm{v}_{2}^{2} \ge \gamma\norm{v}_{2}^{2}$, by
+Proposition~2(i). Since $\omega-\omega' \in \{-1,0,1\}^{\mathcal{C}}$,
+$\norm{\omega-\omega'}_{2}^{2} = d_{H}(\omega,\omega')$, and
+$\norm{f_{\omega}-f_{\omega'}}_{L_2(P)}^{2} =
+\zeta^{2}(\omega-\omega')\T\Gram_{\mathcal{C}\mathcal{C}}(\omega-\omega') \ge
+\gamma\zeta^{2}d_{H}(\omega,\omega')$. The identity for the components is
+Parseval's. With a single block,
+\begin{align*}
+  v\T\Gram_{\mathcal{C}\mathcal{C}}v &=
+  \E\Bigl[\E(X_{\cv}^{2}\mid\bU)\Bigl\{\sum_{\tsl}v_{\tsl}\wav{\lev}{\tsl}(U_{\md})\Bigr\}^{2}\Bigr]
+  \\
+  &\ge \kappa_1c_U\int_0^1\Bigl(\sum_{\tsl}v_{\tsl}\wav{\lev}{\tsl}\Bigr)^{2} =
+  \gamma\norm{v}_{2}^{2} .
+\end{align*}
+
+\emph{Part (iv).} Let $\varpi(y) = \mathbf{1}\{y \ge \zeta/2\}$ for real $y$.
+For $\omega_{\cv\md,\tsl} \in \{0,1\}$,
+\begin{equation}
+  \label{eq:hypercube-threshold}
+  |y - \zeta\omega_{\cv\md,\tsl}| \;\ge\; \frac{\zeta}{2}\,
+  |\varpi(y) - \omega_{\cv\md,\tsl}| ,
+\end{equation}
+because if $\varpi(y) \ne \omega_{\cv\md,\tsl}$ then $y$ and
+$\zeta\omega_{\cv\md,\tsl}$ lie on opposite sides of $\zeta/2$. Applied
+coordinatewise to a vector $a \in \R^{\mathcal{C}}$, it gives
+\[
+  \norm{a-\zeta\omega}_{2}^{2} \;\ge\; \frac{\zeta^{2}}{4}\,d_{H}(\varpi(a),\omega) .
+\]
+For
+(a), take $a_{\cv\md,\tsl} = \inner{\widehat{g}_{\cv\md}}{\wav{\lev}{\tsl}}$
+and $\widehat\omega = \varpi(a)$: by Bessel's inequality,
+$\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}^{\omega}\rVert_{L_2[0,1]}^{2} \ge
+\sum_{\tsl}(a_{\cv\md,\tsl}-\zeta\omega_{\cv\md,\tsl})^{2}$ for each
+$(\cv,\md) \in \Kcal$, and it remains to sum over $\Kcal$. For (b), let
+$\Pi_{\mathcal{C}}$ be the orthogonal projection of $L_2(P)$ onto the span of
+the entries of $z_{\mathcal{C}}$, of dimension $|\mathcal{C}|$ because
+$\Gram_{\mathcal{C}\mathcal{C}}$ is positive definite by (iii):
+$\Pi_{\mathcal{C}}\widehat{f} = z_{\mathcal{C}}\T a$ with
+$a = \Gram_{\mathcal{C}\mathcal{C}}^{-1}\E\{z_{\mathcal{C}}(\bX,\bU)\widehat{f}(\bX,\bU)\}$,
+the expectation being over a new $(\bX,\bU)$ with $\widehat{f}$ fixed, so that
+$a$ is a measurable function of the sample, $P$ being fixed. Since $f_{\omega}$
+lies in the span, Pythagoras' theorem gives
+$\norm{\widehat{f}-f_{\omega}}_{L_2(P)}^{2} \ge
+\norm{\Pi_{\mathcal{C}}\widehat{f}-f_{\omega}}_{L_2(P)}^{2} =
+(a-\zeta\omega)\T\Gram_{\mathcal{C}\mathcal{C}}(a-\zeta\omega) \ge
+\gamma\norm{a-\zeta\omega}_{2}^{2}$; take $\widehat\omega = \varpi(a)$. For
+(c), write $\widehat{\mathbf{F}} = (\widehat{f}(\bX_i,\bU_i))_{i\le n}$. On
+$\mathcal{E}_{\mathcal{C}}$, $\bZ_{\mathcal{C}}$ has rank $|\mathcal{C}|$; take
+$a = (\bZ_{\mathcal{C}}\T\bZ_{\mathcal{C}})^{-1}\bZ_{\mathcal{C}}\T\widehat{\mathbf{F}}$
+and $\widehat\omega = \varpi(a)$ there, and $\widehat\omega = 0$ off it. On
+$\mathcal{E}_{\mathcal{C}}$, since $\zeta\bZ_{\mathcal{C}}\omega$ is the vector
+of the values of $f_{\omega}$ and lies in the column space of
+$\bZ_{\mathcal{C}}$,
+$n\normn{\widehat{f}-f_{\omega}}^{2} =
+\norm{\widehat{\mathbf{F}}-\zeta\bZ_{\mathcal{C}}\omega}_{2}^{2} \ge
+\norm{\bZ_{\mathcal{C}}(a-\zeta\omega)}_{2}^{2} =
+n(a-\zeta\omega)\T\Gramhat_{\mathcal{C}\mathcal{C}}(a-\zeta\omega) \ge
+n(\gamma/2)\norm{a-\zeta\omega}_{2}^{2}$; off it the right side of (c) is
+zero. Finally $\Gramhat_{\mathcal{C}\mathcal{C}}$ is a principal submatrix of
+$\Gramhat$ at resolution $J = \lev+1$, so that
+$\lmin(\Gramhat_{\mathcal{C}\mathcal{C}}) \ge \lmin(\Gramhat)$, and
+$\mathcal{E}_{\mathcal{C}}$ contains the event of Proposition~2(ii), which
+gives the bound on its complement. \qed
+
+\subsection*{Proof of Theorem~\ref{thm:lower}}
+
+\emph{The hypercube.} Take $\zeta = \zeta_n$ and $\lev = \lev_n$ of
+\eqref{eq:lower-choices}. Since $2^{\lev_n(2s+1)} \le C_g^{2}/\zeta_n^{2}$,
+$\zeta_n2^{\lev_n(s+1/2)} \le C_g$, and Lemma~\ref{lem:hypercube}(i) gives
+$f_{\omega} \in \mathcal{F}$ for every $\omega$. By
+Lemma~\ref{lem:hypercube}(ii), the divergence between neighbors is at most one,
+because $n\zeta_n^{2}B_X^{2}C_U = 2\sigma^{2}$, and
+\eqref{eq:assouad} gives, for every $\widehat\omega$ with values in $\Omega$,
+\begin{equation}
+  \label{eq:assouad-n}
+  \max_{\omega\in\Omega}\E_{\omega}d_{H}(\widehat\omega,\omega)
+  \;\ge\; \cA|\mathcal{C}|,
+  \qquad |\mathcal{C}| = |\Kcal|\,2^{\lev_n} .
+\end{equation}
+
+\emph{The scale.} By the maximality of $\lev_n$,
+$2^{(\lev_n+1)(2s+1)} > C_g^{2}/\zeta_n^{2}$, so that
+$2^{\lev_n} > (C_g/\zeta_n)^{2/(2s+1)}/2$ and
+\begin{align*}
+  2^{\lev_n}\zeta_n^{2} \;&>\; \frac12\,C_g^{2/(2s+1)}(\zeta_n^{2})^{2s/(2s+1)}
+  = \frac12\,C_g^{2/(2s+1)}\Bigl(\frac{2\sigma^{2}}{nB_X^{2}C_U}\Bigr)^{2s/(2s+1)}
+  \\
+  &= 2^{-1/(2s+1)}\rlow^{2} \;\ge\; \frac12\,\rlow^{2},
+\end{align*}
+that is, $\zeta_n^{2}|\mathcal{C}| \ge |\Kcal|\rlow^{2}/2$.
+
+\emph{Expectation.} The supremum over $\mathcal{F}$ is at least the maximum
+over the hypercube. With the $\widehat\omega$ of
+Lemma~\ref{lem:hypercube}(iv)(a) and \eqref{eq:assouad-n},
+\[
+  \max_{\omega}\E_{\omega}L_{\Kcal}(\widehat{g},f_{\omega}) \;\ge\;
+  \frac{\zeta_n^{2}}{4}\,\cA|\mathcal{C}| \;\ge\; \frac{\cA}{8}\,|\Kcal|\,\rlow^{2} ;
+\]
+with that of (iv)(b), the same with the factor $\gamma$. For (iii), since
+$d_{H} \le |\mathcal{C}|$ and the law of the $(\bX_i,\bU_i)$ does not depend
+on $\omega$, $\E_{\omega}\{d_{H}(\widehat\omega,\omega)\mathbf{1}_{\mathcal{E}_{\mathcal{C}}}\}
+\ge \E_{\omega}d_{H}(\widehat\omega,\omega) -
+|\mathcal{C}|\Prob(\mathcal{E}_{\mathcal{C}}^{c})$, and for $n \ge n_{1}$
+\[
+  \max_{\omega}\E_{\omega}\normn{\widehat{f}-f_{\omega}}^{2}
+  \;\ge\; \frac{\gamma\zeta_n^{2}}{8}\Bigl(\cA|\mathcal{C}| -
+  \frac{\cA}{4}|\mathcal{C}|\Bigr)
+  = \frac{3\cA}{32}\,\gamma\zeta_n^{2}|\mathcal{C}|
+  \;\ge\; \frac{\cA}{32}\,\gamma|\Kcal|\,\rlow^{2} .
+\]
+
+\emph{Probability.} Let $\omega^{*}$ attain the maximum in
+\eqref{eq:assouad-n}, which exists because $\Omega$ is finite. Since
+$0 \le d_{H} \le |\mathcal{C}|$,
+$\cA|\mathcal{C}| \le \E_{\omega^{*}}d_{H} \le \cA|\mathcal{C}|/2 +
+|\mathcal{C}|\Prob_{\omega^{*}}(d_{H} \ge \cA|\mathcal{C}|/2)$, so that
+$\Prob_{\omega^{*}}(d_{H} \ge \cA|\mathcal{C}|/2) \ge \cA/2$. On that event,
+(iv)(a) gives $L_{\Kcal} \ge (\zeta_n^{2}/4)\cA|\mathcal{C}|/2 \ge
+(\cA/16)|\Kcal|\rlow^{2}$, and (iv)(b) the same with the factor $\gamma$; on
+its intersection with $\mathcal{E}_{\mathcal{C}}$, of probability at least
+$\cA/2 - \cA/4$ when $n \ge n_{1}$, (iv)(c) gives
+$\normn{\widehat{f}-f_{\omega^{*}}}^{2} \ge
+(\gamma\zeta_n^{2}/8)\cA|\mathcal{C}|/2 \ge (\cA/32)\gamma|\Kcal|\rlow^{2}$.
+The estimator being arbitrary, the infima follow.
+
+\emph{The integer $n_{1}$ is finite.} Since $2^{\lev_n+1} \le
+2(C_g/\zeta_n)^{2/(2s+1)}$, of order $n^{1/(2s+1)}$, $D$ and $R_J$ with
+$J = \lev_n + 1$ are of order $n^{1/(2s+1)}$, and the bound of
+Lemma~\ref{lem:hypercube}(iv)(c) is of order
+$n^{1/(2s+1)}\exp(-cn^{2s/(2s+1)})$ for a constant $c > 0$, which tends to
+zero. The two particular cases are $\Kcal$ a single block and $\Kcal$ all the
+blocks. \qed
+
+% E5f (E1.15; D54): derivations/08-blocos.tex, Corolario 15 (numeracao global;
+% cor:truncada-blocos) e a sua prova, dentro do grupo azul de k = 4.
+\subsection*{The slow rate through a truncated comparator}
+
+Proposition~3 reads Theorem~2(i) at the comparator $\betastar$ only, and pays
+$\pen w_{G}\norm{\thetastar_{G}}_{2}$ for every chunk, including the chunks
+whose energy would cost less as bias. Theorem~2 holds for every comparator on
+the same event, and the comparator truncated chunk by chunk,
+\begin{equation}
+  \label{eq:truncated-blocks}
+  \thbar_{G} \;=\; \thetastar_{G}\,\mathbf{1}\bigl\{\norm{\thetastar_{G}}_{2}
+  > \pen w_{G}\bigr\},
+  \qquad G \in \Gcal,
+\end{equation}
+charges the penalty only for the chunks above their own level and sends the
+others to the bias. What remains is
+\begin{equation}
+  \label{eq:RG}
+  \RGw(\btheta;\pen) = \sum_{G\in\Gcal}
+  \min\bigl(\pen w_{G}\norm{\btheta_{G}}_{2},\,\norm{\btheta_{G}}_{2}^{2}\bigr),
+  \qquad
+  \RGone(\btheta;t) = \sum_{G\in\Gcal}
+  \min\bigl(t\norm{\btheta_{G}}_{2},\,\norm{\btheta_{G}}_{2}^{2}\bigr),
+\end{equation}
+the counterparts in the group norm of the ideal risk $\Rid$, with
+$\RGone(\btheta;t) \le t\nGone{\btheta}$.
+
+\begin{proposition}[Slow rate through the truncated comparator]
+\label{prop:truncated}
+Let the assumptions of Proposition~3 hold; in the statements with $\lamGp$
+in the estimator, the conditions on $J_n$ are replaced by $2^{J_n} \le n^{2}$,
+as in Proposition~\ref{prop:slow-ceiling}.
+\begin{enumerate}
+\item[(i)] On the event $\Tw$, with $\thbar$ of \eqref{eq:truncated-blocks},
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;\le\; 18\pen\nGw{\thbar} + 48\normn{\Bmat(\thetastar-\thbar)}^{2}
+  + 48\normn{\bb}^{2} + 3\normn{\PA\bveps}^{2} .
+\]
+If $\pen$ and $w$ are deterministic,
+$\E\normn{\Bmat(\thetastar-\thbar)}^{2} \le
+\kappa_2C_U\norm{\thetastar-\thbar}_{2}^{2}$,
+\[
+  18\pen\nGw{\thbar} + 48\kappa_2C_U\norm{\thetastar-\thbar}_{2}^{2}
+  \;\le\; \max(18,48\kappa_2C_U)\,\RGw(\thetastar;\pen),
+\]
+and $\RGw(\thetastar;\lamG) \le \bar\varrho\,\RGone(\thetastar;\lamGone)$.
+Consequently, with deterministic weights,
+\[
+  \normn{\widehat{f}-f}^{2} \;=\; O_p\bigl\{\RGone(\thetastar;\lamGone)
+  + \mathcal{B}_{J_n}^{2} + p/n\bigr\},
+\]
+and, with $\lamGp$ in the estimator, the same holds with
+$(\mu^{\Gcal}_{J_n})^{1/2}\lamGone$ in place of $\lamGone$, for every sequence
+$J_n$.
+\item[(ii)] For every $J$, every $b \ge 2$ and every $t > 0$, with
+$\tau = (s+1/2)^{-1}$: if $s < 1/2$,
+\begin{equation}
+  \label{eq:count-truncated}
+  \RGone(\thetastar;t) \;\le\; pq\Bigl\{\frac{C_g\,t}{1-2^{-\seff}}
+  + C_g^{\tau}\,t^{4s/(2s+1)}\,b^{\{(2/\pi-1)_{+}-2s\}/(2s+1)}
+  \Bigl(\frac{1}{1-2^{s-1/2}} + \frac{1}{1-2^{-\min(\pi,2)\seff}}\Bigr)\Bigr\};
+\end{equation}
+if $s \ge 1/2$, nothing is gained in order: $\RGone(\thetastar;t) \le
+t\nGone{\thetastar}$, and for $t \le C_g$ the class of Assumption~5 contains a
+$\thetastar$ with $\RGone(\thetastar;t) \ge tC_g$ if $s > 1/2$, and, if
+$s = 1/2$, one in which every fine level $\lev < J$ with
+$2^{\lev} \le C_gb^{1-\vartheta_{\pi}}/t$ contributes at least
+$tC_gb^{-\vartheta_{\pi}}/2$ to $\RGone(\thetastar;t)$, the order of
+Lemma~\ref{lem:count}.
+\item[(iii)] If $s < 1/2$ and $\seff > s/(2s+1)$, then with
+$J_n = \lceil c\log_2 n\rceil$ and $c$ in the window (3.2) of Theorem~1,
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\bigl\{n^{-2s/(2s+1)}(\log n)^{(2/\pi-1)_{+}/(2s+1)}\bigr\},
+\]
+the prediction rate of Theorem~1.
+\item[(iv)] If $s < 1/2$ and $\seff \le s/(2s+1)$, which forces $\pi < 2$,
+then with $\lamGp$ in the estimator and the choice
+$2^{J_n} \asymp \{n^{2s}\bn^{-(2s+2/\pi-1)/2}\}^{1/\{s+\seff(2s+1)\}}$, which
+exceeds $n/\bn$,
+\[
+  \normn{\widehat{f}-f}^{2}
+  \;=\; O_p\bigl\{n^{-e}(\log n)^{e(2s+2/\pi-1)/(4s)}\bigr\},
+  \qquad e = \frac{4s\seff}{s+\seff(2s+1)} ;
+\]
+at $\seff = s/(2s+1)$ this is
+$n^{-2s/(2s+1)}(\log n)^{(2s+2/\pi-1)/\{2(2s+1)\}}$.
+\end{enumerate}
+\end{proposition}
+
+Proposition~\ref{prop:truncated} is a statement on prediction. Like
+Proposition~3, it uses no lower bound on $\Gramhat$: besides the upper bound
+on $\lmaxx(\Gramhat)$ that makes the level admissible, it uses only
+$\lmaxx(\Gram) \le \kappa_2C_U$, in the new bias, and the components still
+need the design condition (Corollary~1). When $s < 1/2$ and $\pi < 2$ it
+improves on Proposition~3(ii) and on Proposition~\ref{prop:slow-ceiling}(iii)(b)
+in every pair: (iii) gives the rate of Theorem~1 in the window of that
+theorem, and (iv) replaces Proposition~\ref{prop:slow-ceiling}(iii)(b) and the
+part of Proposition~3(ii) with $s/2 < \seff \le s/(2s+1)$. When $\pi \ge 2$
+the rate is that of Proposition~3(ii), $n^{-2s/(2s+1)}$, now for every
+$c \in [1/(2s+1),1)$. When $s \ge 1/2$ nothing changes: a coarse chunk of
+norm $C_g$, which the class allows, costs $\pen C_g$ in the penalty or $C_g^{2}$ in the bias, and
+the slow route does not go below $\lamGone \asymp (\log n/n)^{1/2}$;
+Proposition~3(i) and Proposition~\ref{prop:slow-ceiling}(iii)(a) and (iv)
+remain the statements with no design condition in those pairs. Against the
+lasso read at its own truncated comparator
+(Proposition~\ref{prop:lasso-truncated}), the chunks remove the factor
+$(\log n)^{2\seff/(2s+1)}$ in (iii), the gain of Theorem~1 over
+Theorem~\ref{thm:lasso-main}, and $(\log n)^{e\seff/(2s)}$ in (iv). The
+proposition is stated for the estimator (2.5) and not for the one that the
+software computes (Remark~\ref{rem:white}); for the latter the comparator
+would truncate at $\pen w_{G}\Lambda^{1/2}$ on the event $q_{\max} \le \Lambda$,
+and we do not pursue it.
+
+\subsection*{Proof of Proposition~\ref{prop:truncated}}
+
+\emph{Part (i).} Theorem~2(i) and (iii) with $\bar\bbeta = (\bc,\thbar)$ give,
+as in the proof of \eqref{eq:slow-nonasymptotic},
+$\normn{\widehat{f}-f}^{2} \le 18\pen\nGw{\thbar} + 24\normn{\bbar}^{2} +
+3\normn{\PA\bveps}^{2}$, and $\bbar = f - \Amat\bc - \Bmat\thbar = \bb +
+\Bmat(\thetastar-\thbar)$ gives $\normn{\bbar}^{2} \le 2\normn{\bb}^{2} +
+2\normn{\Bmat(\thetastar-\thbar)}^{2}$. If $\pen$ and $w$ are deterministic,
+so is $u = \thetastar-\thbar$, and $\E\normn{\Bmat u}^{2} =
+u\T\E(\Bmat\T\Bmat/n)u \le \lmaxx(\Gram)\norm{u}_{2}^{2} \le
+\kappa_2C_U\norm{u}_{2}^{2}$, because $\E(\Bmat\T\Bmat/n)$ is a principal
+submatrix of $\Gram$, by the upper half of Proposition~2(i). On the chunks with
+$\norm{\thetastar_{G}}_{2} > \pen w_{G}$ the minimum in \eqref{eq:RG} is
+$\pen w_{G}\norm{\thetastar_{G}}_{2}$, and on the others it is
+$\norm{\thetastar_{G}}_{2}^{2}$; summing gives the bound by
+$\max(18,48\kappa_2C_U)\RGw(\thetastar;\pen)$. By
+Lemma~\ref{lem:calib-blocks}(iii), $\lamG w_{G} \le \varrho\lamGone$, and
+$\min(\varrho x,y) \le \varrho\min(x,y)$ for $\varrho \ge 1$ gives
+$\RGw(\thetastar;\lamG) \le \varrho\,\RGone(\thetastar;\lamGone)$; with
+$\lamGp$, the same with $(\mu^{\Gcal}_{J})^{1/2}\lamGone$. The form in $O_p$
+is obtained as in the proof of Proposition~3, on the intersection of
+$\Acal^{+}$ below the ceiling, or of $\Acal^{++}$ of the proof of
+Proposition~\ref{prop:slow-ceiling} for every $J_n$, with $\Ecal$ and with
+the events given by Markov's inequality for $\normn{\bb}^{2}$,
+$\normn{\Bmat(\thetastar-\thbar)}^{2}$ and $\normn{\PA\bveps}^{2}$.
+
+\emph{Part (ii), $s < 1/2$.} Fix a block. The coarse chunk contributes at most
+$t\norm{\theta_{\mathrm{coarse}}}_{2} \le tC_g(1-2^{-\seff})^{-1}$, by the
+proof of Lemma~\ref{lem:count}. At a fine level $\lev$, with $\Gcal_{\lev}$
+its chunks and $v_{\lev} = \sum_{G\in\Gcal_{\lev}}\min(t\norm{\theta_{G}}_{2},
+\norm{\theta_{G}}_{2}^{2})$, there are two bounds. The first is in the group
+norm: $v_{\lev} \le t\sum_{G}\norm{\theta_{G}}_{2} \le
+tC_gb^{-\vartheta_{\pi}}2^{\lev(1/2-s)} =: A_{\lev}$, by the proof of
+Lemma~\ref{lem:count}. The second is the tail. If $\pi \le 2$,
+$\min(ty,y^{2}) \le t^{2-\pi}y^{\pi}$ for $y \ge 0$ (if $y \le t$,
+$y^{2} = y^{\pi}y^{2-\pi} \le y^{\pi}t^{2-\pi}$; if $y > t$,
+$ty = t^{2-\pi}t^{\pi-1}y \le t^{2-\pi}y^{\pi}$, because $\pi \ge 1$), and
+$\norm{\theta_{G}}_{2} \le \norm{\theta_{G}}_{\pi}$ gives
+$v_{\lev} \le t^{2-\pi}\sum_{G}\norm{\theta_{G}}_{\pi}^{\pi} =
+t^{2-\pi}\norm{\theta_{\lev}}_{\pi}^{\pi} \le
+t^{2-\pi}C_g^{\pi}2^{-\lev\pi\seff}$, since $\pi(s+1/2-1/\pi) = \pi\seff$; if
+$\pi \ge 2$, $v_{\lev} \le \norm{\theta_{\lev}}_{2}^{2} \le C_g^{2}2^{-2\lev s}$.
+Call this second bound $B_{\lev}$. With
+\[
+  2^{x} = \bigl\{(C_g/t)\,b^{1-\vartheta_{\pi}}\bigr\}^{\tau},
+  \qquad
+  h = C_g^{\tau}\,t^{2-\tau}\,b^{\tau(1-\vartheta_{\pi})-1},
+\]
+one has $A_{\lev} = h2^{(\lev-x)(1/2-s)}$ and
+$B_{\lev} = h2^{-(\lev-x)\min(\pi,2)\seff}$. Indeed, at $\lev = x$,
+$A_{x} = C_g^{\tau}t^{2-\tau}b^{-\vartheta_{\pi}+(1-\vartheta_{\pi})(\tau-1)}$,
+because $\tau(1/2-s) = \tau-1$, and the exponent of $b$ is
+$\tau(1-\vartheta_{\pi})-1$; if $\pi \le 2$, $1-\vartheta_{\pi} = 1/\pi$ and
+$B_{x} = t^{2-\pi}C_g^{\pi}\{(C_g/t)b^{1/\pi}\}^{-(\pi-\tau)} =
+C_g^{\tau}t^{2-\tau}b^{\tau/\pi-1}$, because $\tau\pi\seff = \pi-\tau$; if
+$\pi \ge 2$, $1-\vartheta_{\pi} = 1/2$ and
+$B_{x} = C_g^{2}\{(C_g/t)b^{1/2}\}^{-(2-\tau)} =
+C_g^{\tau}t^{2-\tau}b^{\tau/2-1}$, because $2s\tau = 2-\tau$. For every $\pi$,
+$\tau(1-\vartheta_{\pi})-1 = \{(2/\pi-1)_{+}-2s\}/(2s+1)$ and
+$2-\tau = 4s/(2s+1)$. Summing $A_{\lev}$ over the fine levels with
+$\lev \le x$ and $B_{\lev}$ over those with $\lev > x$, two geometric series
+of ratios $2^{-(1/2-s)}$ and $2^{-\min(\pi,2)\seff}$ that start from at most
+$h$, gives at most $h\{(1-2^{s-1/2})^{-1} + (1-2^{-\min(\pi,2)\seff})^{-1}\}$
+per block. Truncating at $\lev < J$ only removes terms, and summing over the
+$pq$ blocks gives \eqref{eq:count-truncated}.
+
+\emph{Part (ii), $s \ge 1/2$.} The first statement is
+$\min(ty,y^{2}) \le ty$. If $s > 1/2$, the block with
+$\theta^{*}_{\cv\md,00} = C_g$ and all its other coefficients zero satisfies
+Assumption~5, and its coarse chunk, of norm $C_g$, contributes
+$\min(tC_g,C_g^{2}) = tC_g$. If $s = 1/2$, take a fine level $\lev$ with
+$2^{\lev} \le C_gb^{1-\vartheta_{\pi}}/t$, and let $k_{\lev}$ be the number of
+its chunks, so that $2^{\lev}/(2b) \le k_{\lev} \le 2^{\lev}/b$. If
+$\pi \le 2$, put a spike of height
+$y_{\lev} = C_g2^{-\lev(1-1/\pi)}k_{\lev}^{-1/\pi}$ in each chunk, which
+saturates Assumption~5 at that level; since $k_{\lev} \le 2^{\lev}/b$,
+$y_{\lev} \ge C_g2^{-\lev}b^{1/\pi} \ge t$, and the level contributes
+$k_{\lev}ty_{\lev} = tC_g2^{-\lev(1-1/\pi)}k_{\lev}^{1-1/\pi} \ge
+tC_g(2b)^{-(1-1/\pi)}$. If $\pi \ge 2$, set all the coefficients of the level
+equal to $C_g2^{-\lev}$, which again saturates Assumption~5: each chunk has
+norm $|G|^{1/2}C_g2^{-\lev} \ge b^{1/2}C_g2^{-\lev} \ge t$, and the level
+contributes $tC_g2^{-\lev}\sum_{G}|G|^{1/2} \ge tC_g2^{-\lev}k_{\lev}b^{1/2}
+\ge tC_gb^{-1/2}/2$. In both cases the contribution is at least
+$tC_gb^{-\vartheta_{\pi}}/2$.
+
+\emph{Part (iii).} With $\pen = \lamG$ and
+$(\lamGone)^{2} \le C_{\pen}\sigma^{2}\bn/n$ by \eqref{eq:order-lambda},
+\eqref{eq:count-truncated} with $b = \bn$ gives
+$\RGone(\thetastar;\lamGone) \lesssim (\bn/n)^{1/2} +
+(\bn/n)^{2s/(2s+1)}\bn^{\{(2/\pi-1)_{+}-2s\}/(2s+1)} = (\bn/n)^{1/2} +
+n^{-2s/(2s+1)}\bn^{(2/\pi-1)_{+}/(2s+1)}$, and the first term is of smaller
+order because $2s/(2s+1) < 1/2$. The bias and the conditions on $J_n$ are
+those of the proof of Theorem~1: $c \ge s/\{(2s+1)\seff\}$ gives
+$\mathcal{B}_{J_n}^{2} \lesssim n^{-2s/(2s+1)}$, and $c < 1$ gives
+$2^{J_n} \le 2n$ and $pq2^{J_n}\log(pq2^{J_n})/n \to 0$.
+
+\emph{Part (iv).} Write $\eta = 2s/\{s+\seff(2s+1)\} \in [1,2)$ and
+$\beta = (2s+2/\pi-1)/(2s+1)$, which lies in $(0,\,4s/(2s+1))$ because
+$\pi < 2$ and $2\seff = 2s+1-2/\pi > 0$. The choice of the statement is
+$2^{J_n} \asymp n^{\eta}\bn^{-\eta\beta(2s+1)/(4s)}$, which exceeds $n/\bn$
+because $\beta(2s+1)/(4s) < 1$, and is at most $n^{2}$. By
+\eqref{eq:lam-plus-blocks}, $t = (\mu^{\Gcal}_{J_n})^{1/2}\lamGone \asymp
+2^{J_n/2}\bn/n$, and \eqref{eq:count-truncated} gives
+\[
+  t^{4s/(2s+1)}\bn^{\beta-4s/(2s+1)}
+  \;\asymp\; 2^{J_n\cdot 2s/(2s+1)}\,n^{-4s/(2s+1)}\,\bn^{\beta},
+\]
+which, equated with the bias $2^{-2J_n\seff}$, gives
+$2^{J_n\{2s/(2s+1)+2\seff\}} = n^{4s/(2s+1)}\bn^{-\beta}$; this is the choice
+of the statement, because $\{2s/(2s+1)+2\seff\}(2s+1) = 2\{s+\seff(2s+1)\}$.
+The common value is $2^{-2J_n\seff} =
+\{\bn^{\beta}/n^{4s/(2s+1)}\}^{2\seff/\{2s/(2s+1)+2\seff\}} =
+n^{-e}\bn^{e\beta(2s+1)/(4s)}$, and $\beta(2s+1)/(4s) = (2s+2/\pi-1)/(4s)$.
+The term of the coarse chunk, of order $t$, is polynomially smaller, because
+$t \to 0$ and $4s/(2s+1) < 1$. \qed
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/06-selecao-limiar.tex (Lema 13 e Corolario 8 na numeracao
+% global; a Hipotese S e a Assumption 6 do artigo). Entrou em k = 2 (E5c).
+

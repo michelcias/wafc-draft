@@ -1,0 +1,200 @@
+% k = 7 nasce em 2026-11-16 da k = 6 com a rodada colR1 aceita (insercoes mantidas, remocoes apagadas);
+% a marcacao seguinte e colR2.
+% WAFC -- suplemento, versao k = 6 (E5b, 2026-10-12; copia de supp_5.tex, que fica
+% intacta; marcacao em colR1). Os \input de tables/ e figures/ que a k = 6 muda ganham o
+% sufixo _6 (o primeiro: tables/app-tuning_6.tex, pergunta 68(i)).
+% (Cabecalho da k = 5, mantido:) versao k = 5 (E5h, 2026-10-06; copia de supp_4.tex, que fica
+% intacta). A E5h acrescenta as Secoes S9 (o estudo de simulacao: funcoes de teste,
+% o modelo maior e os lugares das tabelas) e S10 (as aplicacoes: os lugares das
+% tabelas e a segunda aplicacao, Beijing), sem numeros, com os marcadores [E4.3],
+% [E4.4] e [E6.2]; tabelas e figura por \input de tables/ e figures/ (D21).
+% Cabecalho da k = 4, mantido:
+% WAFC -- suplemento, versao k = 4 (E5d; copia de k = 3, alteracoes marcadas em colR1; a
+% rodada nao foi aceita). Template da Statistica Sinica
+% (manuscript/ss-template/supp-temp_20240820.tex). Traz as provas dos
+% resultados de ms_4.tex e os lemas auxiliares. As fontes sao
+% derivations/01 a 08; o comentario acima de cada secao diz qual.
+% Em k = 4 (D44 a D51): S5 a S7 passam ao block lasso balanceado (E1.12, E1.13),
+% e o material do lasso coordenado que estava em S5 a S7 vai, com os enunciados
+% que estavam no corpo, para a Secao S8 nova (D51(a)). O material deslocado nao
+% e repetido em cinza no lugar antigo: uma linha cinza no inicio de cada secao
+% diz o que saiu e para onde (ver docs/handoff-E5d.md).
+% E5f (E1.15, L10; D54): a Proposition S6.2 (Corolario 15 do 08) no fim de S6, a
+% Proposition S8.2 (Proposicao 8 do 05) em S8, com as provas; cada insercao em
+% grupo ja azul leva o comentario % E5f.
+% E5g (E1.9; D57): o Teorema 5 e o Lema 17 de derivations/09-cota-inferior.tex
+% (Theorem S6.1, thm:lower; Lemma S6.3, lem:hypercube), com a prova, no lugar
+% da Remark S6.1 (rem:lower), que fica em cinza (D51(b)) e vira uma frase; a
+% uniformidade na prova do Theorem 1; cada insercao leva o comentario % E5g.
+\documentclass[10pt]{book}
+\usepackage[sectionbib]{natbib}
+\usepackage{array,epsfig,fancyheadings,rotating}
+\usepackage{hyperref}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textwidth=31.9pc
+\textheight=46.5pc
+\oddsidemargin=1pc
+\evensidemargin=1pc
+\headsep=15pt
+\topmargin=.6cm
+\parindent=1.7pc
+\parskip=0pt
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\definecolor{colR1}{RGB}{0,90,200}
+\definecolor{colR2}{RGB}{0,90,200}
+
+\setcounter{page}{1}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{corollary}{Corollary}[section]
+\newtheorem{proposition}{Proposition}[section]
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\newtheorem{example}{Example}[section]
+\newtheorem{remark}{Remark}[section]
+\newtheorem*{remarkold}{Remark}   % E5g: a Remark S6.1 removida (D51(b))
+% E5h: tabelas e figuras do supp numeradas S1, S2, ..., como as secoes.
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\pagestyle{fancy}
+
+% --- macros: as mesmas de ms_3.tex (docs/notacao.md) ---------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Prob}{\mathrm{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\T}{^{\top}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\normn}[1]{\left\lVert #1 \right\rVert_{n}}
+\newcommand{\inner}[2]{\langle #1, #2 \rangle}
+\newcommand{\cv}{\ell}
+\newcommand{\md}{m}
+\newcommand{\lev}{j}
+\newcommand{\tsl}{k}
+\newcommand{\jzero}{j_{0}}
+\newcommand{\NJ}{N_{J}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\fcoef}[1]{\beta_{#1}}
+\newcommand{\lvl}[1]{c_{#1}}
+\newcommand{\gcomp}[2]{g_{#1#2}}
+\newcommand{\wav}[2]{\psi_{#1#2}}
+\newcommand{\VJ}{V_{J}}
+\newcommand{\WJ}{W_{J}}
+\newcommand{\PiJ}{\Pi_{J}}
+\newcommand{\coef}[4]{\theta_{#1#2,#3#4}}
+\newcommand{\coefs}[4]{\theta^{*}_{#1#2,#3#4}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\thetastar}{\btheta^{*}}
+\newcommand{\thetahat}{\widehat{\btheta}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\betahat}{\widehat{\bbeta}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\chat}{\widehat{\mathbf{c}}}
+\newcommand{\Gram}{\Sigma}
+\newcommand{\Gramhat}{\widehat{\Sigma}}
+\newcommand{\pen}{\lambda}
+\newcommand{\penn}{\lambda_{n}}
+\newcommand{\Szero}{S_{0}}
+\newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
+\newcommand{\seff}{s'}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\MA}{M_{\Amat}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\Mstar}{M^{\star}}
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+\newcommand{\compat}{\phi_{0}}
+\newcommand{\GBA}{\Gramhat_{\Bmat\mid\Amat}}
+\newcommand{\thbar}{\bar{\btheta}}
+\newcommand{\bbar}{\bar{\bb}}
+\newcommand{\thstarM}[1]{\btheta^{*,(#1)}}
+\DeclareMathOperator{\vecop}{vec}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\supp}{supp}
+% --- a penalidade em blocos (docs/notacao.md, S10), as mesmas de ms_4.tex -----
+\newcommand{\vbar}{\bar{v}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Gzero}{\mathcal{G}_{0}}
+\newcommand{\Gbar}{\bar{\mathcal{G}}}
+\newcommand{\Hcal}{\mathcal{H}}
+\newcommand{\Wcal}{\mathcal{W}}
+\newcommand{\bn}{b_{n}}
+\newcommand{\jst}{j^{*}}
+\newcommand{\nGw}[1]{\lVert #1\rVert_{\mathcal{G},w}}
+\newcommand{\nGone}[1]{\lVert #1\rVert_{\mathcal{G},1}}
+\newcommand{\Psitil}{\widetilde{\Psi}}
+\newcommand{\Rid}{R_{\mathcal{G}}}
+\newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
+\newcommand{\lamGone}{\lambda^{\mathcal{G}}_{n,1}}
+\newcommand{\lamGp}{\lambda^{\mathcal{G},+}_{n}}   % E1.14 (E5e): \lamG inflado acima do teto
+\newcommand{\lamz}[1]{\lambda_{0,#1}}
+\newcommand{\lamzbar}[1]{\bar{\lambda}_{0,#1}}
+\newcommand{\rhoG}{\rho^{\mathcal{G}}_{n}}
+\newcommand{\rhoGt}{\tilde{\rho}^{\mathcal{G}}_{n}}
+\newcommand{\Tw}{\mathcal{T}_{\mathcal{G},w}}
+\newcommand{\Ecal}{\mathcal{E}}
+\newcommand{\ESig}{\mathcal{E}_{\Sigma}}
+\newcommand{\Acal}{\mathcal{A}_{n}}
+\newcommand{\AG}{A^{\mathcal{G}}_{s,\pi}}
+\newcommand{\Dbl}{\Delta_{\cv\md}}
+% E1.15 (E5f, D54): os pares em norma l1 e de grupos do risco ideal
+% (docs/notacao.md, S10); \mathcal{R}, sem uso anterior.
+\newcommand{\Rone}{\mathcal{R}_{1}}
+\newcommand{\RGw}{\mathcal{R}_{\mathcal{G},w}}
+\newcommand{\RGone}{\mathcal{R}_{\mathcal{G},1}}
+% E5g (E1.9; D57): os simbolos da cota inferior que chegam ao manuscrito
+% (docs/notacao.md, S10). O K = |K| do notacao.md fica escrito |\Kcal|, porque
+% K ja e a dimensao de Psi(u) em S4 e uma constante em S6; os demais simbolos
+% de derivations/09-cota-inferior.tex ficam locais, escritos no texto.
+\newcommand{\Kcal}{\mathcal{K}}
+\newcommand{\rlow}{\underline{\rho}_{n}}
+\newcommand{\cA}{c_{\mathrm{A}}}
+% E5g (D51(b)): a Remark S6.1 removida inteira fica no lugar, em cinza e sem
+% numero, como os enunciados removidos do ms_4.tex.
+\newcommand{\removedk}{\par\noindent[removed in k = 4]\par}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\def\n{\noindent}
+\lhead[\fancyplain{} \leftmark]{}
+\chead[]{}
+\rhead[]{\fancyplain{}\rightmark}
+\cfoot{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\input{k7/supp-0-front}
+\input{k7/supp-S01-notation-objects}
+\input{k7/supp-S02-identification-periodized-basis}
+\input{k7/supp-S03-approximation-wavelet-spaces}
+\input{k7/supp-S04-gram-matrix-product-design}
+\input{k7/supp-S05-oracle-inequality}
+\input{k7/supp-S06-rates}
+\input{k7/supp-S07-recovery-block-structure-thresholding}
+\input{k7/supp-S08-coordinatewise-lasso}
+\input{k7/supp-S09-simulation-study-details-further}
+\input{k7/supp-S10-applications-further-results}
+\bibliographystyle{chicago}
+\bibliography{references_7}
+
+\end{document}

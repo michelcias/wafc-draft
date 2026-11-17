@@ -19,10 +19,20 @@ reserva: *Electronic Journal of Statistics*. Detalhe em
    reimprimir contexto que o autor já tem, enumerar alternativas descartadas
    ou anunciar o que vai fazer antes de fazer.
 
-Depois disso, leia [`docs/ESTADO.md`](docs/ESTADO.md) (onde o trabalho parou e
-o que já foi decidido) e [`docs/instrucoes.md`](docs/instrucoes.md) (o
-documento normativo: fluxo, escrita, marcação, git). Em caso de conflito, o
-`instrucoes.md` manda.
+Depois disso, depende do papel da conversa (`docs/instrucoes.md`, §7):
+
+- **Orquestrador** (o chat principal): leia [`docs/ESTADO.md`](docs/ESTADO.md),
+  que é uma cabeça curta (onde o trabalho está, o quadro da fase, o próximo
+  passo), e do [`docs/instrucoes.md`](docs/instrucoes.md) as seções do que for
+  fazer.
+- **Executor de uma tarefa:** leia [`docs/TAREFA.md`](docs/TAREFA.md) e o
+  cartão indicado (`docs/tarefas/<ID>.md`). O cartão é a tarefa inteira; o
+  estado não se lê.
+
+O arquivo morto (`docs/estado/`: diário, decisões, perguntas fechadas) se
+consulta por `grep` do identificador, nunca inteiro. O `instrucoes.md` é o
+documento normativo (fluxo, escrita, marcação, git); em caso de conflito,
+ele manda.
 
 ## Resumo das demais regras
 
@@ -40,12 +50,25 @@ documento normativo: fluxo, escrita, marcação, git). Em caso de conflito, o
 
 ### Continuidade
 
-- **Etapa fechada é etapa registrada** no `docs/ESTADO.md`, com os números
-  que a fecharam, antes de a rodada terminar. Dependência nova de script
+- **Etapa fechada é etapa registrada**, com os números que a fecharam, antes
+  de a rodada terminar: um bloco em `docs/estado/diario-AAAA-MM.md` e a
+  linha do quadro na cabeça do `docs/ESTADO.md`. Dependência nova de script
   entra no `docs/CONTINUAR.md` na mesma rodada. Regra completa em
   [`docs/instrucoes.md`](docs/instrucoes.md), §8.
 - Edição nesses arquivos é **verificada**: substituição por âncora falha em
   silêncio quando a âncora mudou.
+
+### Execução e economia de contexto (fase 2, D83)
+
+- **Orquestrador e executores são no máximo Opus.** O modelo e o esforço de
+  cada tarefa são os do cartão; os papéis estão em `.claude/agents/`.
+- **Lê-se por lista fechada:** o cartão diz os arquivos e os intervalos de
+  linha. Não se leem versões `k` anteriores do manuscrito, PDFs compilados,
+  `wafc/cache/` nem CSV de réplicas.
+- **Saída de comando no contexto: até 50 linhas.** Tabela de resultados se
+  lê por `Rscript wafc/scripts/15-digest.R`.
+- **Rodada longa é script**, com o aviso do autor antes; nenhum modelo fica
+  à espera.
 
 ### Manuscrito
 

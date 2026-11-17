@@ -32,12 +32,17 @@ wafc-draft/
 ├── CLAUDE.md                    # regras da sessão (leia primeiro)
 ├── README.md
 ├── docs/                        # documentos de trabalho
-│   ├── ESTADO.md                #   handoff: estado atual e próximos passos
+│   ├── ESTADO.md                #   cabeça curta: onde o trabalho está, quadro da fase, próximo passo
+│   ├── estado/                  #   arquivo morto, consultado por grep: diário por mês, decisões, perguntas fechadas
+│   ├── tarefas/                 #   um cartão por tarefa aberta (modelo, esforço, o que ler e escrever, critério de saída)
+│   ├── plano-fase2.md           #   fase 2: resposta ao parecer, gates G1 a G4, rota, tarefas E8 a E12
+│   ├── parecer-wafc.html        #   parecer interno, no papel de referee, sobre a k = 6
+│   ├── numeracao-resultados.md  #   mapa da numeração global dos resultados das derivações
 │   ├── instrucoes.md            #   normativo: fluxo, escrita, marcação, git, chats paralelos
-│   ├── TAREFA.md                #   abertura de um chat de tarefa: o que ler, catálogo, regras
+│   ├── TAREFA.md                #   protocolo do executor de uma tarefa: lê o cartão, não o estado
 │   ├── CONTINUAR.md             #   retomar de outra máquina: pastas, ferramentas, o que não viaja
 │   ├── MENSAGENS.md             #   cola do autor: como abrir conversa principal, de tarefa e em outra máquina
-│   ├── plano-projeto.md         #   etapas E0 a E7 (+ L1, L2), dependências, entregáveis, critérios de saída
+│   ├── plano-projeto.md         #   fase 1 (congelado): etapas E0 a E7 (+ L1, L2), dependências, entregáveis
 │   ├── proposta-metodo.md       #   a ideia inicial: modelo, estimador, teoria esperada, riscos
 │   ├── alvo-revista.md          #   escolha da revista e o que ela pede
 │   ├── ss-instrucoes-autores.md #   instruções da Statistica Sinica, transcritas
@@ -73,7 +78,7 @@ Nenhuma edição em `.tex` é silenciosa a partir de `k = 2`.
 | Finalidade | Comando | Cor |
 |---|---|---|
 | Remoção sugerida | `\textcolor{gray}{\sout{...}}` | cinza tachado |
-| Inserção da rodada corrente | `\textcolor{colR1}{...}` | azul |
+| Inserção da rodada corrente | `\textcolor{colR2}{...}` | azul |
 
 O índice da cor (`colR1`, `colR2`, ...) avança a cada rodada aceita; a rodada
 corrente é registrada em `docs/ESTADO.md`.

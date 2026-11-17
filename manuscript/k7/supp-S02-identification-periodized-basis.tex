@@ -1,0 +1,109 @@
+\section{Identification and the periodized basis}
+\setcounter{equation}{0}
+
+\subsection*{Proof of Proposition 1}
+
+\emph{Levels and components are determined by the coefficients.} Let $\beta$
+and $\tilde\beta$ be measurable maps from $[0,1]^q$ to $\R^p$ with
+$\sum_{\cv}\fcoef{\cv}(\bU)X_{\cv} = \sum_{\cv}\tilde\beta_{\cv}(\bU)X_{\cv}$
+almost surely, and put $\delta(u) = \beta(u)-\tilde\beta(u)$. Then
+$\{\delta(\bU)\T\bX\}^2 = 0$ almost surely, and since $\delta(\bU)$ is
+measurable with respect to $\bU$ and $\E\norm{\bX}_2^2 < \infty$,
+\[
+  0 \;=\; \E\bigl[\{\delta(\bU)\T\bX\}^2 \mid \bU\bigr]
+  \;=\; \delta(\bU)\T\,\E(\bX\bX\T\mid\bU)\,\delta(\bU)
+  \qquad \text{almost surely.}
+\]
+The conditional second moment matrix is positive definite almost surely, and a
+positive definite quadratic form vanishes only at the origin, so
+$\delta(\bU) = 0$ almost surely.
+
+\emph{Levels and components are determined within a coefficient.} Because the
+density of $\bU$ is positive Lebesgue almost everywhere, a set is null for the
+law of $\bU$ if and only if it is Lebesgue null, so the identity
+$\lvl{\cv} + \sum_{\md}\gcomp{\cv}{\md}(u_{\md}) =
+\tilde{c}_{\cv} + \sum_{\md}\tilde{g}_{\cv\md}(u_{\md})$ holds Lebesgue almost
+everywhere on $[0,1]^q$. Write $\Delta = \lvl{\cv}-\tilde{c}_{\cv}$ and
+$\delta_{\md} = \gcomp{\cv}{\md}-\tilde{g}_{\cv\md} \in L_2[0,1] \subset
+L_1[0,1]$, so that $\Delta + \sum_{\md}\delta_{\md}(u_{\md}) = 0$ almost
+everywhere. Each summand is integrable on the cube by Tonelli's theorem.
+Integrating in all coordinates and using $\int_0^1\delta_{\md} = 0$, which
+holds because both parametrizations satisfy (2.2), gives $\Delta = 0$; fixing
+$\md$ and integrating in the remaining coordinates gives
+$\delta_{\md}(u_{\md}) = 0$ for almost every $u_{\md}$. \qed
+
+\begin{remark}
+\label{rem:centering}
+If the centering $\int_0^1 \gcomp{\cv}{\md} = 0$ is replaced by
+$\E\{\gcomp{\cv}{\md}(U_{\md})\} = 0$, the same proof applies under the
+two sided density bound of Assumption 3, since then $L_2[0,1]$ and
+$L_2(P_{U_{\md}})$ coincide as sets: the step that uses Fubini's theorem
+yields $\delta_{\md}$ constant almost everywhere, and the constant is its
+mean, which is zero. The two parametrizations are related by
+$\lvl{\cv} \mapsto \lvl{\cv} + \sum_{\md}\E\{\gcomp{\cv}{\md}(U_{\md})\}$, as
+stated in Section 2.1 of the paper. The difference is not cosmetic for the
+estimator: the design of Section 2.3, which omits the constant scaling
+function, estimates the version centered with respect to Lebesgue measure.
+\end{remark}
+
+\subsection*{Proof of Lemma 1}
+
+\emph{The basis.} The periodization of the scaling function is
+$\phi^{\rm per}_{00}(u) = \sum_{\iota}\phi(u+\iota)$, a finite sum at each $u$
+because the support is compact, and it equals the constant function one, since
+the integer translates of an orthonormal scaling function with
+$\int\phi = 1$ form a partition of unity \citep[Section~7.5.1]{Mallat-2009}. For a wavelet, exchanging the finite
+sum with the integral,
+$\int_0^1\wav{\lev}{\tsl} = \int_{\R}2^{\lev/2}\psi(2^{\lev}y-\tsl)\,dy =
+2^{-\lev/2}\int_{\R}\psi = 0$ by the vanishing moment of order zero. That
+$\{\mathbf{1}\}\cup\{\wav{\lev}{\tsl}\}$ is an orthonormal basis of $L_2[0,1]$
+is the standard construction of the periodized multiresolution analysis
+\citep[Section 9.3]{Daubechies-1992}. Since $\dim\VJ = 2^J$ and the $2^J-1$
+wavelets of level below $J$ are orthogonal to the constant, $\WJ$ is exactly
+the set of elements of $\VJ$ with zero integral.
+
+\emph{Injectivity.} Suppose two parameter vectors give the same regression
+function almost surely. The functions
+$\beta^J_{\cv}(u) = \lvl{\cv}+\sum_{\md}g^J_{\cv\md}(u_{\md})$, with
+$g^J_{\cv\md} = \sum_{\lev\tsl}\coef{\cv}{\md}{\lev}{\tsl}\wav{\lev}{\tsl}$,
+are measurable and bounded, so the first part of Proposition 1 gives
+$\beta^J_{\cv} = \tilde\beta^J_{\cv}$ almost surely; each $g^J_{\cv\md}$ has
+zero integral by the previous paragraph, so the second part gives
+$\lvl{\cv} = \tilde{c}_{\cv}$ and
+$\sum_{\lev\tsl}(\btheta-\tilde\btheta)_{\cv\md,\lev\tsl}\wav{\lev}{\tsl} = 0$
+almost everywhere, whence $\btheta = \tilde\btheta$ by orthonormality. For the
+Gram matrix, $\E\norm{\bZ}_2^2 < \infty$ because $\E\norm{\bX}_2^2 < \infty$
+and each wavelet is bounded, and for $a \ne 0$,
+$a\T\Gram a = \E\{(a\T\bZ)^2\} = \norm{f_a}^2_{L_2(P)} > 0$ by injectivity,
+where $f_a$ is the regression function with parameter $a$.
+
+\emph{Nullity when the scaling column is kept.} With $\phi_{00}\equiv 1$ the
+column $X_{\cv}\phi_{00}(U_{\md})$ coincides with the unpenalized column
+$X_{\cv}$, for each of the $pq$ pairs, so the $pq$ vectors that oppose one to
+the other lie in the kernel and are linearly independent. There are no others:
+a kernel vector defines
+$\sum_{\cv}X_{\cv}\{a_{\cv} + \sum_{\md}(\alpha_{\cv\md} +
+\sum_{\lev\tsl}a_{\cv\md,\lev\tsl}\wav{\lev}{\tsl}(U_{\md}))\} = 0$ almost
+surely; by Proposition 1 applied to the part with zero integral,
+$a_{\cv\md,\lev\tsl} = 0$ and $a_{\cv}+\sum_{\md}\alpha_{\cv\md} = 0$, which
+is the space of dimension $pq$ spanned by those vectors. \qed
+
+\begin{remark}[The interval basis]
+\label{rem:cdv}
+With the basis of \citet*{cohen1993wavelets} the wavelets of level
+$\lev \ge \jzero$ are orthogonal to $V_{\jzero}$, which contains the
+constants, so they still have zero integral and the penalized part of each
+block satisfies (2.2) with no restriction. The $2^{\jzero}$ scaling functions
+do not: the constant is the combination $1 = \sum_{\tsl}\mu_{\tsl}
+\phi^{\rm int}_{\jzero\tsl}$ with
+$\mu_{\tsl} = \int_0^1\phi^{\rm int}_{\jzero\tsl}$, and the subspace with zero
+integral is $\{\mu\T\alpha = 0\}$. Keeping the $2^{\jzero}$ scaling columns of
+each block unrestricted repeats the constant and makes $\Gram$ singular with
+nullity $pq$, as in the last part of Lemma 1; reparametrizing
+$\alpha_{\cv\md} = Q\gamma_{\cv\md}$ with $Q$ an orthonormal basis of
+$\{\mu\T\alpha = 0\}$ restores injectivity, at the price of
+$pq(2^{\jzero}-1)$ unpenalized parameters.
+\end{remark}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/02-aproximacao-besov.tex

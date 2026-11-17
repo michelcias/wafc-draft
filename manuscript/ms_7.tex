@@ -1,0 +1,243 @@
+% k = 7 nasce em 2026-11-16 da k = 6 com a rodada colR1 aceita (insercoes mantidas, remocoes apagadas);
+% a marcacao seguinte e colR2.
+% WAFC -- manuscrito, versao k = 6 (E5b, 2026-10-12; copia de ms_5.tex, que fica
+% intacta; a rodada nao foi aceita, entao a marcacao segue em colR1). A k = 6 traz os
+% numeros do estudo de simulacao (E4.4, D81, D82), a Secao 7 e a pergunta 68 aplicada.
+% As tabelas e figuras de tables/ e figures/ que a k = 6 muda ganham o sufixo _6, para
+% a k = 5 compilar como estava.
+% (Cabecalho da k = 5, mantido:) versao k = 5 (E5h, 2026-10-06; copia de ms_4.tex, que fica
+% intacta; a rodada nao foi aceita, entao a marcacao de k = 2 a k = 5 segue em colR1).
+% Template da Statistica Sinica (manuscript/ss-template/SS-template-bib.tex), decisao D5.
+% Secoes 1 a 6; as Secoes 5 (Simulation) e 6 (Application) entraram na E5h sem os
+% numeros, com marcadores [E4.3], [E4.4] e [E6.2] no lugar deles; a tabela e as figuras
+% vem por \input de tables/ e figures/ (D21). A Secao 7 (Discussion) e da E5b.
+% As provas estao em supp_6.tex.
+% (Cabecalho da k = 4, mantido: versao k = 4 (E5d; copia de k = 3, alteracoes marcadas
+% em colR1). Secoes 1 a 4; as Secoes 5 a 7 entram em E5b.)
+% Notacao: docs/notacao.md (congelada em E1.1; a penalidade em blocos no seu S10).
+% Os enunciados vem de derivations/01 a 08; o comentario acima de cada um diz de onde.
+% Em k = 4 (D44 a D51) o estimador passa a ser o block lasso balanceado, e a teoria
+% do lasso coordenado sai do corpo para a Secao S8 do supp (D51(a)). Enunciado,
+% prova ou matematica deslocada que sai inteiro fica no lugar, em cinza e sem
+% numero, aberto por "[removed in k = 4]" (D51(b)); o novo vem logo depois.
+%
+% Mapa da numeracao global (docs/TAREFA.md, S5) para os rotulos deste arquivo, k = 4:
+%   Proposicao 1            -> Proposition 1  (prop:identif)
+%   Lema 1                  -> Lemma 1        (lem:basis)
+%   Lema 2 e Corolario 1    -> Lemma 2        (lem:bias)
+%   Proposicao 3            -> Proposition 2  (prop:gram)
+%   Corolario 11            -> Theorem 1      (thm:main; D47(a), emenda D16)
+%   Teorema 3               -> Theorem 2      (thm:oracle); o Lema 14 e o Lemma S5.2
+%                              do supp (lem:calib-blocks), a Observacao 2 (variante
+%                              branca) e a Remark S5.2, o Corolario 9 e o
+%                              Corollary S5.1, a Proposicao 7 e a Proposition S5.1
+%   Teorema 4               -> Theorem 3      (thm:sieve)
+%   Corolario 10            -> Corollary 1    (cor:components)
+%   Corolario 14            -> Proposition 3  (prop:slow; D47(c), D49(b)); os itens
+%                              (iii) e (iv) de E1.14 sao a Proposition S6.1 do supp
+%                              (prop:slow-ceiling; E5e, D52)
+%   Corolario 15            -> Proposition S6.2 do supp (prop:truncated; E5f, D54),
+%                              citada numa frase depois da Proposition 3
+%   Teorema 5 e Lema 17     -> Theorem S6.1 (thm:lower) e Lemma S6.3 (lem:hypercube)
+%                              do supp (E5g, D57), no lugar da Remark S6.1
+%                              (rem:lower, em cinza); citado na terceira leitura
+%                              do Theorem 1 e na introducao. O Corolario 16 nao
+%                              entra como enunciado: e a leitura depois do
+%                              Theorem S6.1, com a uniformidade lida na prova do
+%                              Theorem 1 no supp
+%   Lema 15                -> Lemma 3        (lem:weak; o rotulo ficou com o nome antigo)
+%   Corolario 12, Hipotese S com rho_n^G
+%                           -> Corollary 2 (cor:threshold), Assumption 6 (ass:sep);
+%                              o Lema 13 e o Lemma S7.1 do supp (lem:sandwich)
+%   Corolario 13            -> Corollary 3    (cor:thrisk; D45); o Lema 16 e o
+%                              Lemma S7.2 do supp (lem:thrisk)
+%   Teoria do lasso coordenado (Corolario 5, Teorema 1, Teorema 2, Corolario 4,
+%   Proposicao 4 emendada por D49 e com os itens (iii) e (iv) de E1.14 (E5e),
+%   Lema 9, Corolario 8): Secao S8 do supp,
+%   como Theorems S8.1 a S8.3, Corollaries S8.1 e S8.2, Proposition S8.1 e
+%   Lemma S8.1 (D51(a)). A Proposicao 8 (E1.15) e a Proposition S8.2
+%   (prop:lasso-truncated; E5f, D54).
+%   Os rotulos sec:sieve, thm:sieve e lem:weak ficaram com o nome antigo (D33 muda
+%   o texto, nao os rotulos; em k = 4 o conteudo de thm:sieve e lem:weak mudou).
+\documentclass[12pt]{article} %***
+\usepackage[sectionbib]{natbib}
+\usepackage{array,epsfig,fancyheadings,rotating}
+\usepackage[]{hyperref}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{sectsty, secdot}
+\sectionfont{\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont}
+\renewcommand{\theequation}{\thesection\arabic{equation}}
+\subsectionfont{\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\textwidth=31.9pc
+\textheight=46.5pc
+\oddsidemargin=1pc
+\evensidemargin=1pc
+\headsep=15pt
+\topmargin=.6cm
+\parindent=1.7pc
+\parskip=0pt
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{multirow}
+\usepackage{amsthm}
+
+% Marcacao de alteracoes a partir de k = 2 (docs/instrucoes.md, S3): a cor da
+% rodada corrente e colR1, e o ulem fornece o \sout das remocoes sugeridas.
+% A versao k = 1 nao leva marcacao, porque nao ha versao anterior.
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\definecolor{colR1}{RGB}{0,90,200}
+\definecolor{colR2}{RGB}{0,90,200}
+
+\setcounter{page}{1}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+\newtheorem{proposition}{Proposition}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{example}{Example}
+\newtheorem{remark}{Remark}
+\newtheorem{assumption}{Assumption}
+% Enunciados removidos em k = 4 (D51(b)): os mesmos ambientes, sem numero, para
+% que o texto antigo fique no lugar sem deslocar a numeracao do novo.
+\newtheorem*{assumptionold}{Assumption}
+\theoremstyle{plain}
+\newtheorem*{theoremold}{Theorem}
+\newtheorem*{lemmaold}{Lemma}
+\newtheorem*{corollaryold}{Corollary}
+\newtheorem*{propositionold}{Proposition}
+\pagestyle{fancy}
+
+% --- macros -------------------------------------------------------------
+% Implementam docs/notacao.md, como derivations/macros.tex, com tres
+% diferencas exigidas pelo estilo da revista (S5 de ss-instrucoes-autores.md):
+% E(.) e P(.) em romano e com parenteses, no lugar do \mathbb{E}[.] das
+% derivacoes, e B_X no lugar dos dois simbolos C_X (E1.3) e B_X (E1.4) para a
+% cota das covariaveis lineares.
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\E}{\mathrm{E}}
+\newcommand{\Prob}{\mathrm{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\T}{^{\top}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+\newcommand{\normn}[1]{\left\lVert #1 \right\rVert_{n}}
+\newcommand{\normL}[1]{\left\lVert #1 \right\rVert_{L_2(P)}}
+\newcommand{\inner}[2]{\langle #1, #2 \rangle}
+\newcommand{\cv}{\ell}
+\newcommand{\md}{m}
+\newcommand{\lev}{j}
+\newcommand{\tsl}{k}
+\newcommand{\jzero}{j_{0}}
+\newcommand{\NJ}{N_{J}}
+\newcommand{\bX}{\mathbf{X}}
+\newcommand{\bU}{\mathbf{U}}
+\newcommand{\bZ}{\mathbf{Z}}
+\newcommand{\fcoef}[1]{\beta_{#1}}
+\newcommand{\lvl}[1]{c_{#1}}
+\newcommand{\gcomp}[2]{g_{#1#2}}
+\newcommand{\wav}[2]{\psi_{#1#2}}
+\newcommand{\VJ}{V_{J}}
+\newcommand{\WJ}{W_{J}}
+\newcommand{\PiJ}{\Pi_{J}}
+\newcommand{\coef}[4]{\theta_{#1#2,#3#4}}
+\newcommand{\coefs}[4]{\theta^{*}_{#1#2,#3#4}}
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\newcommand{\thetastar}{\btheta^{*}}
+\newcommand{\thetahat}{\widehat{\btheta}}
+\newcommand{\bbeta}{\boldsymbol{\beta}}
+\newcommand{\betastar}{\bbeta^{*}}
+\newcommand{\bc}{\mathbf{c}}
+\newcommand{\chat}{\widehat{\mathbf{c}}}
+\newcommand{\Gram}{\Sigma}
+\newcommand{\Gramhat}{\widehat{\Sigma}}
+\newcommand{\pen}{\lambda}
+\newcommand{\penn}{\lambda_{n}}
+\newcommand{\Szero}{S_{0}}
+\newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
+\newcommand{\seff}{s'}
+\newcommand{\Amat}{\mathbf{A}}
+\newcommand{\Bmat}{\mathbf{B}}
+\newcommand{\Btil}{\widetilde{\Bmat}}
+\newcommand{\PA}{\Pi_{\Amat}}
+\newcommand{\MA}{M_{\Amat}}
+\newcommand{\bveps}{\boldsymbol{\varepsilon}}
+\newcommand{\bb}{\mathbf{b}}
+\newcommand{\bY}{\mathbf{Y}}
+\newcommand{\bPsi}{\boldsymbol{\Psi}}
+\newcommand{\smax}{\widehat{\sigma}_{\max}}
+\newcommand{\gtil}{\widetilde{\gamma}}
+\newcommand{\Mstar}{M^{\star}}
+\newcommand{\lmin}{\lambda_{\min}}
+\newcommand{\lmaxx}{\lambda_{\max}}
+\newcommand{\opnorm}[1]{\left\lVert #1 \right\rVert_{\mathrm{op}}}
+% --- a penalidade em blocos (docs/notacao.md, S10; copiadas das macros locais
+% de derivations/08-blocos.tex e 06-selecao-limiar.tex em k = 4) ---------------
+\newcommand{\thbar}{\bar{\btheta}}
+\newcommand{\bbar}{\bar{\bb}}
+\newcommand{\vbar}{\bar{v}}
+\newcommand{\Gcal}{\mathcal{G}}
+\newcommand{\Gzero}{\mathcal{G}_{0}}
+\newcommand{\Gbar}{\bar{\mathcal{G}}}
+\newcommand{\Hcal}{\mathcal{H}}
+\newcommand{\Wcal}{\mathcal{W}}
+\newcommand{\bn}{b_{n}}
+\newcommand{\jst}{j^{*}}
+\newcommand{\nGw}[1]{\lVert #1\rVert_{\mathcal{G},w}}
+\newcommand{\nGone}[1]{\lVert #1\rVert_{\mathcal{G},1}}
+\newcommand{\Psitil}{\widetilde{\Psi}}
+\newcommand{\Rid}{R_{\mathcal{G}}}
+\newcommand{\lamG}{\lambda^{\mathcal{G}}_{n}}
+\newcommand{\lamGone}{\lambda^{\mathcal{G}}_{n,1}}
+\newcommand{\lamGp}{\lambda^{\mathcal{G},+}_{n}}   % E1.14 (E5e): \lamG inflado acima do teto
+\newcommand{\lamz}[1]{\lambda_{0,#1}}
+\newcommand{\lamzbar}[1]{\bar{\lambda}_{0,#1}}
+\newcommand{\rhoG}{\rho^{\mathcal{G}}_{n}}
+\newcommand{\rhoGt}{\tilde{\rho}^{\mathcal{G}}_{n}}
+\newcommand{\Tw}{\mathcal{T}_{\mathcal{G},w}}
+\newcommand{\AG}{A^{\mathcal{G}}_{s,\pi}}
+% grupos de marcacao de D51(b): o texto antigo, inteiro, em cinza e sem tachado
+\newcommand{\removedk}{\par\noindent[removed in k = 4]\par}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\pagestyle{fancy}
+\def\n{\noindent}
+\lhead[\fancyplain{} \leftmark]{}
+\chead[]{}
+\rhead[]{\fancyplain{}\rightmark}
+\cfoot{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\input{k7/ms-0-front}
+\input{k7/ms-1-introduction}
+\input{k7/ms-2-model}
+\input{k7/ms-3-theory}
+\input{k7/ms-4-computation}
+\input{k7/ms-5-simulation}
+\input{k7/ms-6-application}
+\input{k7/ms-7-discussion}
+\input{k7/ms-8-back}
+\bibliographystyle{chicago}
+\bibliography{references_7}
+
+%-------------------------------------------
+\vskip .65cm
+\noindent
+first author affiliation
+\vskip 2pt
+\noindent
+E-mail: (first author email)
+\vskip 2pt
+
+\noindent
+second author affiliation
+\vskip 2pt
+\noindent
+E-mail: (second author email)
+
+\end{document}

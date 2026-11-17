@@ -1,0 +1,177 @@
+\section{Computation and Tuning}
+\label{sec:computation}
+
+\subsection{The design matrix and the solver}
+\label{sec:solver}
+
+The design \eqref{eq:design} is built one block at a time: the $n \times \NJ$
+matrix of the wavelets of $U_{\md}$ is evaluated once per modulator, by the
+cascade algorithm of \citet{Daubechies-Lagarias-1991} as implemented in
+the \texttt{WaveBased} package \citep{Montoril-WaveBased-2026}, and then multiplied
+rowwise by $X_{\cv}$. Since a compactly supported wavelet of level $\lev$ is
+nonzero on an interval of length $(L-1)2^{-\lev}$, at most $L-1$ of the
+$2^{\lev}$ columns of a level are nonzero at a given observation, so a block
+has at most $n(L-1)J$ nonzero entries out of $n\NJ$ and the design is stored in
+sparse form as soon as $J$ is moderate. Evaluating the basis once on a grid and
+looking the values up removes the cascade from the inner loop of a
+simulation.
+
+Problem \eqref{eq:estimator} is then a group lasso with $p$ unpenalized coordinates,
+% E5f (L10; D54): as duas citacoes do grpreg dentro dos grupos azuis de k = 4;
+% a nota [VERIFICAR] de E5d saiu sem cinza, por ser nota de trabalho.
+which group descent \citep{Breheny-Huang-2015} solves along a path of penalty levels; we use the
+\texttt{grpreg} package \citep{Breheny-Miller-grpreg-2026} of R
+\citep{RCoreTeam-2026}. Two points of scale deserve care, because they are
+what ties the software to the theory. First, the solver standardizes
+the columns and orthonormalizes each chunk before penalizing it
+% L11 (D55, pergunta 49(b)): Simon & Tibshirani (2012), eq. (1.4) e Section 2.
+\citep{Simon-Tibshirani-2012}, so that what
+it computes is \eqref{eq:estimator} with $\norm{\btheta_{G}}_{2}$ replaced by
+$\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$, where $Q_{G}$ is the Gram matrix of the
+columns of the chunk after centering, which is the estimator of Remark~S5.2 in
+the Supplementary Material; and its objective,
+$(2n)^{-1}\norm{\bY - \Amat\bc - \Bmat\btheta}_{2}^{2} +
+\pen\sum_{G}w_{G}\norm{Q_{G}^{1/2}\btheta_{G}}_{2}$, is half that of
+\eqref{eq:estimator}, so that the penalty level it reports is the $\pen$ of
+\eqref{eq:estimator}, with no conversion. Second, the solver always fits an
+intercept of its own, which carries the level of the constant covariate when
+there is one. For the lasso option, solved by coordinate descent with the
+\texttt{glmnet} package \citep{friedman2010regularization}, the penalty level reported for a
+fit is the $\pen$ of the lasso problem and not the one of the solver, which
+rescales its own by the ratio between the total number of columns and the
+number of penalized ones when some coordinates carry zero penalty, and when one linear
+covariate is the constant, its column has zero variance, and the solver may
+either drop it or share the level with its own intercept; the fit is the same
+either way, but the level $\lvl{\cv}$ of the constant covariate is only
+recovered after the intercept is added back to it. For both
+penalties the scale is checked by verifying the Karush-Kuhn-Tucker conditions
+of the problem at every point of the path.
+
+\subsection{Rescaling and the boundary}
+\label{sec:boundary}
+
+The theory places $\bU$ in $[0,1]^q$ by assumption. In practice each modulator
+is mapped to that interval by a monotone transformation.
+By default the image is $[0,1]$ itself, which is the setting of
+Section~\ref{sec:theory}. Optionally, as in the
+wavelet estimators of \citet*{Montoril-Chang-Vidakovic-2019}, the image is
+$[\epsilon, 1-\epsilon]$ with $\epsilon$ fixed, which keeps the
+observations away from the point where the periodization of
+\eqref{eq:periodized} joins the two ends of the interval; the price is that the fitted
+component integrates to zero over the rescaled range and not over $[0,1]$, a
+shift of level and not of shape. The margin is a finite sample
+device, and the reason to allow it is approximation: with the data away from
+the ends, a component needs to be regular only on its support, where it can be
+replaced by a periodic extension that matches at $0 \equiv 1$, built from a
+bounded extension operator \citep[Chapter~3]{Triebel-1983}. This removes the
+stall of Proposition~S3.1 and restores the bias of Lemma~\ref{lem:bias}, with
+a Besov constant of order $\epsilon^{-(s-1/\pi)}$, an order that, by the
+embedding of Besov into H\"older spaces, cannot be improved when the component
+takes different values at the two ends of its support. Two features keep the
+margin out of the theory. It has to be fixed, since with $\epsilon$ of the
+order $2^{-J}$ the exponent guaranteed for the bias is no better than that of
+periodization without a margin; and it degrades the design, since the
+wavelets supported inside the margin are invisible to the data, and the
+smallest eigenvalue of the Gram matrix of the basis restricted to the support
+of the data vanishes as soon as $2^{J} \ge (L-1)/(2\epsilon)$, so that
+Proposition~\ref{prop:gram} does not hold as stated. The alternative is the basis adapted to the
+interval of \citet*{cohen1993wavelets}, which reproduces polynomials on $[0,1]$
+and characterizes Besov regularity without any periodicity
+\citep[Section 3.9]{Cohen-2003}, so that Lemma~\ref{lem:bias} holds with the
+Besov space of the interval and the same proof. Its cost is structural: the
+coarsest level must be large enough for the two boundary zones to be disjoint,
+the constant is no longer a single column but a combination of the scaling
+functions, and the constraint of \eqref{eq:additive} has to be imposed by
+reparametrization, which leaves $pq(2^{\jzero}-1)$ unpenalized parameters
+instead of none. We therefore keep the periodized basis as the default and
+offer the interval basis as an option.
+
+\subsection{Choosing the resolution and the penalty}
+\label{sec:tuning}
+
+The pair $(J,\pen)$ is chosen jointly. The default is $K$-fold cross-validation on a grid of resolutions, with the folds drawn once and reused for
+every $J$, one design and one penalty path per resolution, and the usual two
+readings of the curve: the minimizer of the cross-validated error and the
+largest penalty within one standard error of it; the threshold
+of Section~\ref{sec:threshold} is applied to the fit at the minimizer. In the
+software the whole procedure, from the cross-validation over $(J,\pen)$ to the
+threshold, is the single call \texttt{cv.wafc(x, u, y)}. Two cheaper rules are also
+available for the lasso option, the Bayesian information criterion and its extended version, with
+degrees of freedom equal to the number of nonzero coefficients plus the $p$
+levels, which is the usual unbiased count for the lasso.
+
+The theory supplies a fourth rule, since \eqref{eq:Jn} and \eqref{eq:lambda}
+are explicit. It is not a practical competitor as it stands, because it needs
+$\sigma$, which has to be estimated, and $\seff$, which is unknown, and
+because it is a statement about order. In our experiments with the
+lasso option the penalty
+ of its theory is 7 to 13 times the one that minimizes the realized error,
+and it is the penalty, more than the resolution, that makes the rule costly;
+the resolution
+ of its theory misses the best one by up to two levels, above
+or below according to $\seff$.
+% E5d: os numeros acima sao do lasso (E2.3, E1.6); com o bloco como padrao,
+% passaram a dizer isso. Uma medida equivalente para o block lasso e da E5b.
+% E5b: ancorar os numeros acima numa tabela da Secao 5 ou do suplemento
+% (E2.3: lambda_n de 7 a 13 vezes o otimo; no nao homogeneo, J_n sozinho
+% custa 2% e 18%, lambda_n sozinho 30% e 54%; J_n dois niveis abaixo com
+% s' = 3/2, dois acima com s' = 1/4 em E1.6).
+Its interest is as a reference for
+what the cross-validated choice ought to approach.
+% E5i (D68(a)): a frase das quatro regras saiu, porque o estudo da Secao 5 (D60)
+% roda so a validacao cruzada do WAFC; o comentario E5b logo acima segue com a E5b.
+% E5j (D72(a)): a oracao "worth measuring" saiu pelo mesmo motivo.
+% E5j (D72(b)): o "$K$-fold" do 4.3 marca so o hifen em colR1; com "fold" tachado e
+% "-fold" inserido, a linha passava 17 pt da margem na versao marcada.
+
+A remark on the other penalties. The lasso option, with
+$\norm{\btheta}_1$ in place of $\nGw{\btheta}$, is fit by \texttt{glmnet}; its
+theory is in Section~S8 of the Supplementary Material, where its rates carry
+an extra logarithmic factor, and the threshold of Section~\ref{sec:threshold}
+applies to it unchanged. Replacing $\nGw{\btheta}$ in
+\eqref{eq:estimator} by the sparse group lasso penalty of
+\citet{Simon-Friedman-Hastie-Tibshirani-2013}, with one group per block
+$(\cv,\md)$ and fit with the \texttt{sparsegl} package
+\citep{Liang-Cohen-SolonHeinsfeld-Pestilli-McDonald-2024}, adds a second tuning parameter and removes entire components
+rather than isolated chunks, which is what a reader interested in
+knowing which modulators act on which coefficients would want, although for
+ \eqref{eq:estimator} that question is already answered by thresholding the block
+norms (Corollary~\ref{cor:threshold}). It is a
+different estimator, with a different oracle inequality
+\citep{Lounici-Pontil-vandeGeer-Tsybakov-2011}, and the theory above does not
+cover it; the choice between the two is settled empirically.
+
+% derivations/06-selecao-limiar.tex, adendo de E1.12; D45. A regra e a
+% wafc_threshold(rule = "cv1se") de wafc/R/threshold.R, padrao do cv.wafc() (D48).
+
+\subsection{Choosing the threshold}
+\label{sec:threshold}
+
+The threshold is chosen on the folds of Section~\ref{sec:tuning}, at the pair
+$(J,\pen)$ already selected: each fold is refitted at that pair, with no new
+search, thresholded at every candidate $t$ and scored on the observations it
+left out. A thresholded fit is constant in $t$ between two consecutive block
+norms, so the candidates are exhaustive and not a grid. The default is the
+largest $t$ whose cross-validated error is within one standard error, between
+folds, of the smallest, the one standard error rule of the penalty carried to
+the threshold; the minimizer of the cross-validated error is available as an
+option aimed at prediction. The fit is not refitted after the threshold: the
+levels and the blocks kept are those of the fit, which is the estimator of
+Corollaries~\ref{cor:threshold} and~\ref{cor:thrisk}. Neither rule has a
+theorem here: Corollary~\ref{cor:threshold} gives the window of thresholds
+that recovers the structure, and Corollary~\ref{cor:thrisk} what any threshold
+costs.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% E5h (k = 5): a Secao 5 sem os resultados. O desenho e o de D60, D62 e D63
+% (docs/plano-projeto.md, E4.2), como o compendio wafc-studies/ o executa
+% (config/study.yaml, core.yaml, arms.yaml, scale.yaml; R/data.R, R/methods.R,
+% R/metrics.R; o gerador e wafc/R/dgp.R); os metodos e as grades sao os de D34,
+% D41, D44 a D46, D56 e D63. O VCBART roda no compendio e nao entra no texto
+% (D60(d)). [E4.3] espera o piloto (o modelo maior; a grade de n = 2000 e a de D69,
+% aplicada na E5i);
+% [E4.4], a producao. A frase do terceiro braco e a da E4.1b (ESTADO.md), com o
+% pareamento escrito para p - 1 <= q, que cobre as duas celulas; a das
+% covariaveis gaussianas e a de D62.
+

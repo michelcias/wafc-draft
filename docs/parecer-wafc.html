@@ -1,0 +1,533 @@
+<title>Parecer crítico do WAFC</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=STIX+Two+Text:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: dossie de parecer; indice fixo a esquerda em tela larga, coluna de leitura de ~70 caracteres. */
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --ink: #14181f;
+  --ink-2: #47505e;
+  --ink-3: #6a7381;
+  --rule: #dce0e6;
+  --accent: #005ac8;            /* o colR1 do manuscrito */
+  --accent-soft: #e7effb;
+  --crit: #a8261d;  --crit-soft: #fbeceb;
+  --warn: #855600;  --warn-soft: #fbf1dc;
+  --good: #176f43;  --good-soft: #e4f4eb;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --font-display: "STIX Two Text", "Times New Roman", Georgia, serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1216; --surface: #171b21; --ink: #e9ecf1; --ink-2: #b6bdc9; --ink-3: #8b94a2;
+    --rule: #2a313b; --accent: #76adff; --accent-soft: #15253d;
+    --crit: #ff9a90; --crit-soft: #3a1917;
+    --warn: #f0bd5e; --warn-soft: #33270f;
+    --good: #68d6a0; --good-soft: #12301f;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1216; --surface: #171b21; --ink: #e9ecf1; --ink-2: #b6bdc9; --ink-3: #8b94a2;
+  --rule: #2a313b; --accent: #76adff; --accent-soft: #15253d;
+  --crit: #ff9a90; --crit-soft: #3a1917;
+  --warn: #f0bd5e; --warn-soft: #33270f;
+  --good: #68d6a0; --good-soft: #12301f;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.page {
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 96px;
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px;
+  max-width: 1120px; margin: 0 auto;
+}
+@media (min-width: 1040px) {
+  .page { grid-template-columns: 208px minmax(0, 760px); gap: 64px; }
+  .toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 32px); align-self: start; }
+}
+main { min-width: 0; display: flex; flex-direction: column; gap: 56px; }
+
+/* indice */
+.toc { font-size: 13.5px; }
+.toc-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 10px; }
+.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.toc a { display: block; padding: 5px 0; color: var(--ink-2); text-decoration: none; border-bottom: 1px solid transparent; }
+.toc a:hover { color: var(--accent); }
+.toc a:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+@media (max-width: 1039px) {
+  .toc ol { flex-direction: row; flex-wrap: wrap; gap: 4px 16px; }
+}
+
+/* tipografia */
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; color: var(--ink); }
+h1 { font-size: clamp(30px, 5vw, 44px); line-height: 1.12; letter-spacing: -.01em; }
+h2 { font-size: 26px; line-height: 1.2; }
+h3 { font-size: 19px; line-height: 1.3; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--font-mono); font-size: .88em; }
+code { background: var(--accent-soft); padding: 1px 5px; border-radius: 3px; overflow-wrap: anywhere; }
+sup { font-size: .72em; line-height: 0; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.lede { font-size: 18px; color: var(--ink-2); max-width: 62ch; }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.stack-lg { display: flex; flex-direction: column; gap: 28px; }
+.note { font-size: 14px; color: var(--ink-3); }
+ul.plain { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; max-width: 68ch; }
+ul.plain li::marker { color: var(--ink-3); }
+
+header.top { display: flex; flex-direction: column; gap: 18px; padding-bottom: 28px; border-bottom: 2px solid var(--ink); }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 20px; font-family: var(--font-mono); font-size: 12.5px; color: var(--ink-3); }
+
+/* respostas diretas */
+.answers { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; }
+.answer { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 22px 24px; }
+.answer + .answer { border-top: 1px solid var(--rule); }
+.answer .q { font-size: 14px; color: var(--ink-3); }
+.answer .v { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 14px; }
+.answer .v strong { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1.25; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .04em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.chip svg { width: 11px; height: 11px; flex: none; }
+.chip.crit { color: var(--crit); background: var(--crit-soft); }
+.chip.warn { color: var(--warn); background: var(--warn-soft); }
+.chip.good { color: var(--good); background: var(--good-soft); }
+.chip.info { color: var(--accent); background: var(--accent-soft); }
+
+/* objecoes */
+.concern { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding-top: 24px; border-top: 1px solid var(--rule); }
+.concern-head { display: flex; align-items: baseline; gap: 14px; }
+.concern-id { font-family: var(--font-mono); font-size: 13px; color: var(--accent); flex: none; width: 28px; }
+.ask { font-size: 15px; color: var(--ink-2); padding: 12px 16px; background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; max-width: 68ch; }
+.ask b { font-weight: 600; color: var(--ink); }
+
+/* tabelas */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; font-size: 14.5px; }
+th, td { text-align: left; padding: 10px 14px; vertical-align: top; border-bottom: 1px solid var(--rule); }
+tr:last-child td { border-bottom: 0; }
+th { font-family: var(--font-mono); font-size: 11.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); white-space: nowrap; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td .mono { color: var(--ink-2); }
+table.wide { min-width: 640px; }
+
+/* grafico */
+.viz { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 20px 20px 14px; display: flex; flex-direction: column; gap: 12px; }
+.viz h3 { font-family: var(--font-body); font-size: 15px; font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.plot { overflow-x: auto; }
+.plot-inner { position: relative; min-width: 560px; }
+.plot svg { display: block; width: 100%; height: auto; }
+.viz .sub { font-size: 13.5px; color: var(--ink-2); }
+.plot text { font-family: var(--font-body); font-size: 12px; fill: var(--ink-3); }
+.plot text.lab { fill: var(--ink); font-size: 12.5px; }
+.plot .grid { stroke: var(--rule); stroke-width: 1; }
+.plot .ref { stroke: var(--ink-3); stroke-width: 1; }
+.plot .line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.plot .dot { stroke: var(--surface); stroke-width: 2; }
+.plot .cross { stroke: var(--ink-3); stroke-width: 1; }
+.tip { position: absolute; top: 8px; pointer-events: none; background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 8px 10px; font-size: 12.5px; line-height: 1.5; box-shadow: 0 2px 10px rgba(0,0,0,.12); min-width: 168px; color: var(--ink); }
+.tip b { font-weight: 600; }
+.tip div { display: flex; justify-content: space-between; gap: 14px; font-variant-numeric: tabular-nums; }
+.tip span { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); }
+.tip i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+details { font-size: 14px; }
+summary { cursor: pointer; color: var(--accent); }
+
+/* rotas */
+.routes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+.route .chip { align-self: flex-start; }
+.route { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 18px 20px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.route h3 { font-size: 18px; }
+.route p { font-size: 14.5px; color: var(--ink-2); }
+.route dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 12px; font-size: 13.5px; }
+.route dt { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--ink-3); padding-top: 2px; }
+.route dd { margin: 0; color: var(--ink-2); }
+ol.fixes { margin: 0; padding: 0; list-style: none; counter-reset: fix; display: flex; flex-direction: column; }
+ol.fixes li { counter-increment: fix; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; padding: 14px 0; border-top: 1px solid var(--rule); }
+ol.fixes li::before { content: counter(fix); font-family: var(--font-mono); font-size: 13px; color: var(--accent); padding-top: 2px; }
+ol.fixes b { font-weight: 600; }
+ol.fixes span { color: var(--ink-2); }
+.callout { border-left: 3px solid var(--accent); padding: 4px 0 4px 18px; max-width: 68ch; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+section { scroll-margin-top: 24px; }
+</style>
+
+<div class="page">
+  <nav class="toc" aria-label="Seções">
+    <p class="toc-label">Neste parecer</p>
+    <ol>
+      <li><a href="#respostas">Respostas diretas</a></li>
+      <li><a href="#fortes">O que está bem feito</a></li>
+      <li><a href="#objecoes">Objeções de um referee</a></li>
+      <li><a href="#aplicabilidade">Aplicabilidade</a></li>
+      <li><a href="#afirmacoes">Afirmações e evidência</a></li>
+      <li><a href="#rota">Mudança de rota</a></li>
+      <li><a href="#revista">Revista-alvo</a></li>
+      <li><a href="#limites">Limites desta leitura</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <header class="top">
+      <span class="eyebrow">Parecer interno, no papel de referee</span>
+      <h1>O WAFC passaria por um referee cuidadoso?</h1>
+      <p class="lede">Leitura crítica do manuscrito <span class="mono">k = 6</span>, do suplemento, das tabelas de resultados, do código do método e do histórico de decisões do repositório, feita como a faria um revisor da <em>Statistica Sinica</em>.</p>
+      <div class="meta">
+        <span>wafc-draft @ 67e45f5</span>
+        <span>ms_6.tex · supp_6.tex · results/tables · docs/ESTADO.md</span>
+        <span>16 nov 2026</span>
+      </div>
+    </header>
+
+    <section id="respostas" class="stack-lg">
+      <h2>Respostas diretas</h2>
+      <div class="answers">
+        <div class="answer">
+          <span class="q">No rumo em que está, seria rejeitado?</span>
+          <div class="v">
+            <strong>Na <em>Statistica Sinica</em>, provavelmente sim.</strong>
+            <span class="chip crit"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 2l8 8M10 2l-8 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>Rejeição provável</span>
+          </div>
+          <p>O motivo não é erro: não achei erro nas provas que conferi, e o texto é honesto sobre onde o método perde. O motivo é a soma de três coisas. A teoria é um passo curto além de Klopp e Pensky (2015), num regime mais simples que o deles. O ganho numérico sobre o spline é pequeno, aparece só numa faixa de <i>n</i> e se inverte em <i>n</i> = 2000. E as aplicações não mostram vantagem sobre o <code>mgcv</code>. Antes de tudo isso há um risco de triagem: o manuscrito tem 78 páginas contra o teto de 40.</p>
+        </div>
+        <div class="answer">
+          <span class="q">A aplicabilidade justifica a publicação?</span>
+          <div class="v">
+            <strong>Como está demonstrada, não.</strong>
+            <span class="chip warn"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1.5l5 9H1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 5v2.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Nicho existe, falta mostrar</span>
+          </div>
+          <p>Nas sete bases reais testadas, o WAFC não venceu em nenhuma um spline cuja dimensão é escolhida pela mesma validação cruzada em blocos (registro da E6.1b: “nenhuma base passa”). Na aplicação principal o achado sai igual no GAM, que ajusta em 9 segundos contra 36 minutos. O método tem um nicho real, coeficientes com saltos ou picos, moduladoras periódicas e muitos blocos a selecionar, mas nenhum dado real do repositório o exibe ainda.</p>
+        </div>
+        <div class="answer">
+          <span class="q">Precisa de mudança de rota?</span>
+          <div class="v">
+            <strong>Sim: correção de rumo, não recomeço.</strong>
+            <span class="chip info"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h7M6.5 3l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>Sete correções, depois uma escolha</span>
+          </div>
+          <p>Sete correções baratas removem as objeções que derrubam o artigo sozinhas, e o resultado delas decide o passo seguinte: reforçar a teoria (blocos esparsos com <i>p</i> e <i>q</i> crescentes) ou reforçar o lado aplicado (moduladoras periódicas, fronteira resolvida, inferência). O código, o compêndio e a teoria atual servem às duas saídas.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="fortes" class="stack">
+      <h2>O que está bem feito</h2>
+      <p>Um referee começa por aqui, e há o que dizer.</p>
+      <ul class="plain">
+        <li><b>Cadeia teórica completa e não assintótica.</b> Identificação, viés, condição de desenho, desigualdade oráculo, taxas, cota inferior e seleção, com constantes explícitas. A prova da Proposição 2 e a construção da cota inferior, que conferi, estão corretas.</li>
+        <li><b>A teoria cobre o estimador que o software calcula.</b> A Remark S5.2 trata a padronização e a ortonormalização por pedaço do <code>grpreg</code>. É raro um artigo fechar essa distância.</li>
+        <li><b>Estudo de simulação bem desenhado.</b> Sementes independentes dos pilotos, concorrentes sintonizados nos próprios critérios, grades estendidas quando o seletor bate no topo, comparações pareadas, 26 200 unidades sem falha.</li>
+        <li><b>Relato honesto.</b> A Seção 7 diz onde o método perde, e os braços que saem das hipóteses são declarados como tais.</li>
+        <li><b>Reprodutibilidade acima da média.</b> Compêndio, <code>renv.lock</code>, proveniência por rodada, 174 blocos de teste.</li>
+        <li><b>Escala no número de blocos.</b> Com 16 blocos o WAFC ajusta em 79 s (<i>n</i> = 1000) e 246 s (<i>n</i> = 2000), contra 430 s e 3 806 s do GAM (REML), e recupera a estrutura que o GAM não recupera.</li>
+      </ul>
+    </section>
+
+    <section id="objecoes" class="stack-lg">
+      <div class="stack">
+        <h2>Objeções de um referee</h2>
+        <p>Recomendação que eu escreveria: <b>rejeitar na forma atual, com incentivo a ressubmeter</b>. Oito objeções a sustentam, em ordem de peso.</p>
+      </div>
+
+      <article class="concern">
+        <div class="concern-head"><span class="concern-id">M1</span><h3>A novidade teórica é estreita, e o regime é mais fácil que o de Klopp e Pensky</h3></div>
+        <p>O teorema principal vale com <i>p</i> e <i>q</i> fixos e <i>pq</i>·2<sup><i>J</i></sup>·log(<i>pq</i>·2<sup><i>J</i></sup>)/<i>n</i> → 0. Nesse regime o número de colunas é menor que <i>n</i> e o mínimos quadrados no espaço de aproximação existe. A desigualdade oráculo “sem condição de cone” decorre de λ<sub>min</sub>(Σ) ≥ κ<sub>1</sub><i>c<sub>U</sub></i>, que é uma hipótese forte num problema de baixa dimensão; perfilar os níveis é o passo de Frisch e Waugh, não uma técnica nova.</p>
+        <p>A Proposição 2(i), apresentada como a primeira contribuição, tem prova de dez linhas: ortogonalidade das wavelets sob a medida de Lebesgue e densidade conjunta limitada. É o argumento clássico dos modelos aditivos (Stone, 1985 <span class="mono">[VERIFICAR]</span>). O “termo cruzado entre moduladoras” não pede ferramenta nova enquanto <i>q</i> é fixo.</p>
+        <p>A cota inferior, com <i>p</i> e <i>q</i> fixos, é a de regressão não paramétrica usual (Assouad num único nível). E a otimalidade fica provada onde a esparsidade não é necessária: com π ≥ 2 um estimador linear com <i>J</i> bem escolhido já atinge <i>n</i><sup>−2<i>s</i>/(2<i>s</i>+1)</sup>, e o bloco compra ali só a adaptação a <i>s</i>. Onde a esparsidade é a razão de ser do método (π &lt; 2), sobra o fator (log <i>n</i>)<sup>(2/π−1)/(2<i>s</i>+1)</sup>, e o texto admite que não sabe se ele é necessário.</p>
+        <p class="ask"><b>O referee diria:</b> “holds under weaker conditions than theirs: the number of covariates is fixed” se lê ao contrário. Klopp e Pensky tratam <i>p</i> crescente com esparsidade; fixar <i>p</i> é restringir o problema, não enfraquecer a hipótese.</p>
+      </article>
+
+      <article class="concern">
+        <div class="concern-head"><span class="concern-id">M2</span><h3>Nenhum teorema cobre o procedimento que é usado de fato</h3></div>
+        <p>O par (<i>J</i>, λ) sai de validação cruzada e o limiar sai da regra de um erro-padrão; nenhum dos dois tem teoria. O λ teórico é de 7 a 13 vezes o que minimiza o erro (§4.3, medido no lasso coordenado).</p>
+        <p>O ajuste relatado opera fora do regime da teoria. Na célula <span class="mono">mixed</span> em <i>n</i> = 1000 o <i>J</i> médio escolhido é 6,9: com <i>J</i> = 7 são 16 × 127 = 2 032 colunas penalizadas para 1 000 observações, e já são 1 008 com <i>J</i> = 6. A Gram empírica é singular, e a parte (ii) do Teorema 2 e os corolários de componentes e de seleção não se aplicam a esse ajuste.</p>
+        <p>O Corolário 2 é um sanduíche determinístico: qualquer estimador consistente por componente, seguido de um limiar, recupera a estrutura sob separação, e sob alvo fixo a separação vale por definição. É a ideia do lasso limiarizado (Meinshausen e Yu, 2009; van de Geer, Bühlmann e Zhou, 2011 <span class="mono">[VERIFICAR]</span>).</p>
+        <p>As hipóteses não são satisfeitas em nenhum experimento: covariáveis limitadas (a simulação usa gaussianas), densidade conjunta limitada inferiormente (o braço da cópula a viola), amostra iid (as duas aplicações são séries horárias).</p>
+      </article>
+
+      <article class="concern">
+        <div class="concern-head"><span class="concern-id">M3</span><h3>A comparação de estrutura está confundida com o limiar</h3></div>
+        <p>A Tabela 1(b) dá 1,00 ao WAFC contra 0,02 a 0,36 do GAM (REML) e 0,00 do grupo-lasso em B-splines. Só o WAFC e o lasso recebem o passo de limiar, e “Lasso + threshold” também marca 1,00 em todas as células em <i>n</i> = 1000. O que recupera a estrutura é o limiar pela regra de um erro-padrão, não a base de wavelets nem a penalidade em pedaços.</p>
+        <p>Os concorrentes são lidos por regras que não são regras de seleção: <code>edf &gt; 0.1</code> no <code>mgcv</code>, e bloco não nulo num grupo-lasso com λ de validação cruzada, que é sabidamente liberal. E não existe nas tabelas a linha “WAFC sem limiar” (os métodos rodados são <code>wafc.cv</code> e <code>wafc.cv1se</code>), de modo que não se separa o efeito do limiar do efeito do estimador.</p>
+        <p class="ask"><b>O referee pediria:</b> o mesmo limiar aplicado ao GAM, ao grupo-lasso em B-splines e ao block lasso de K&amp;P; um grupo-lasso adaptativo ou grupo-MCP com BIC, que é o padrão para esta pergunta desde Huang, Horowitz e Wei (2010) e Ma, Carroll, Liang e Xu (2015); e o WAFC sem limiar.</p>
+      </article>
+
+      <article class="concern">
+        <div class="concern-head"><span class="concern-id">M4</span><h3>O ganho de predição é pequeno, vive numa faixa de <i>n</i> e não cresce com <i>n</i></h3></div>
+
+        <div class="viz">
+          <h3>Erro de predição do WAFC dividido pelo do GAM (REML), por tamanho de amostra</h3>
+          <p class="sub">Abaixo de 1,00 o WAFC erra menos; acima, o GAM (REML).</p>
+          <div class="legend" aria-hidden="true">
+            <span><i style="background:var(--s1)"></i>Inhomogeneous</span>
+            <span><i style="background:var(--s2)"></i>Mixed</span>
+            <span><i style="background:var(--s3)"></i>Smooth</span>
+            <span><i style="background:var(--s4)"></i>Uneven</span>
+          </div>
+          <div class="plot"><div class="plot-inner" id="plot">
+            <svg viewBox="0 0 660 330" role="img" aria-label="Razão entre o erro de predição do WAFC e o do GAM (REML) em quatro células, para n igual a 250, 500, 1000 e 2000. Abaixo de 1 o WAFC é melhor.">
+              <line class="grid" x1="46" x2="490" y1="276.4" y2="276.4"/>
+              <line class="grid" x1="46" x2="490" y1="140.4" y2="140.4"/>
+              <line class="grid" x1="46" x2="490" y1="72.4" y2="72.4"/>
+              <line class="ref" x1="46" x2="490" y1="208.4" y2="208.4"/>
+              <text x="38" y="280.4" text-anchor="end">0,90</text>
+              <text x="38" y="212.4" text-anchor="end">1,00</text>
+              <text x="38" y="144.4" text-anchor="end">1,10</text>
+              <text x="38" y="76.4" text-anchor="end">1,20</text>
+              <text x="46" y="312" text-anchor="middle">250</text>
+              <text x="194" y="312" text-anchor="middle">500</text>
+              <text x="342" y="312" text-anchor="middle">1000</text>
+              <text x="490" y="312" text-anchor="middle">2000</text>
+              <text x="268" y="328" text-anchor="middle">n</text>
+              <line class="cross" id="cross" x1="0" x2="0" y1="18" y2="290" visibility="hidden"/>
+              <polyline class="line" stroke="var(--s3)" points="46.0,51.3 194.0,43.8 342.0,34.3 490.0,89.4"/>
+              <polyline class="line" stroke="var(--s4)" points="46.0,95.5 194.0,135.6 342.0,137.0 490.0,119.3"/>
+              <polyline class="line" stroke="var(--s2)" points="46.0,202.3 194.0,228.8 342.0,235.6 490.0,167.6"/>
+              <polyline class="line" stroke="var(--s1)" points="46.0,213.2 194.0,258.7 342.0,263.5 490.0,198.2"/>
+              <g fill="var(--s3)"><circle class="dot" cx="46" cy="51.3" r="4.5"/><circle class="dot" cx="194" cy="43.8" r="4.5"/><circle class="dot" cx="342" cy="34.3" r="4.5"/><circle class="dot" cx="490" cy="89.4" r="4.5"/></g>
+              <g fill="var(--s4)"><circle class="dot" cx="46" cy="95.5" r="4.5"/><circle class="dot" cx="194" cy="135.6" r="4.5"/><circle class="dot" cx="342" cy="137.0" r="4.5"/><circle class="dot" cx="490" cy="119.3" r="4.5"/></g>
+              <g fill="var(--s2)"><circle class="dot" cx="46" cy="202.3" r="4.5"/><circle class="dot" cx="194" cy="228.8" r="4.5"/><circle class="dot" cx="342" cy="235.6" r="4.5"/><circle class="dot" cx="490" cy="167.6" r="4.5"/></g>
+              <g fill="var(--s1)"><circle class="dot" cx="46" cy="213.2" r="4.5"/><circle class="dot" cx="194" cy="258.7" r="4.5"/><circle class="dot" cx="342" cy="263.5" r="4.5"/><circle class="dot" cx="490" cy="198.2" r="4.5"/></g>
+              <text class="lab" x="502" y="93.4">Smooth 1,18</text>
+              <text class="lab" x="502" y="123.3">Uneven 1,13</text>
+              <text class="lab" x="502" y="171.6">Mixed 1,06</text>
+              <text class="lab" x="502" y="202.2">Inhomogeneous 1,02</text>
+            </svg>
+            <div class="tip" id="tip" hidden></div>
+          </div></div>
+          <details>
+            <summary>Ver os números</summary>
+            <div class="tbl-wrap" style="margin-top:10px">
+              <table>
+                <thead><tr><th>Célula</th><th class="num">n = 250</th><th class="num">500</th><th class="num">1000</th><th class="num">2000</th></tr></thead>
+                <tbody>
+                  <tr><td>Inhomogeneous</td><td class="num">0,993</td><td class="num">0,926</td><td class="num">0,919</td><td class="num">1,015</td></tr>
+                  <tr><td>Mixed</td><td class="num">1,009</td><td class="num">0,970</td><td class="num">0,960</td><td class="num">1,060</td></tr>
+                  <tr><td>Smooth</td><td class="num">1,231</td><td class="num">1,242</td><td class="num">1,256</td><td class="num">1,175</td></tr>
+                  <tr><td>Uneven</td><td class="num">1,166</td><td class="num">1,107</td><td class="num">1,105</td><td class="num">1,131</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+          <p class="note">Fonte: <span class="mono">results/tables/core/summary.csv</span>, <span class="mono">rmse_f_mean</span> de <span class="mono">wafc.cv1se</span> sobre <span class="mono">gam.reml</span>, 100 réplicas por ponto.</p>
+        </div>
+
+        <p>Onde as componentes são não homogêneas, o WAFC ganha de 3% a 8% em <i>n</i> = 500 e 1000, empata em 250 e perde em 2000 (2% e 6%), quando a grade do GAM chega a <i>k</i> = 240. Contra o GAM (GCV) na mesma célula, perde 6% em <i>n</i> = 250 e 500 e ganha 2% a 3% depois. Onde as componentes são suaves, perde de 10% a 26% em todo <i>n</i>.</p>
+        <p>Dois números pesam mais que a tabela principal. Em <i>n</i> = 2000 o GAM (REML) fica a 1,6% e 2,6% do “oracle support”, que é o WAFC informado da estrutura verdadeira, mesmo carregando blocos nulos. E na célula suave o GAM vence esse oráculo por 10% a 17%: a diferença ali é da base, não da estrutura.</p>
+        <p>As inclinações empíricas não separam os métodos: −0,71 para o WAFC e −0,73 e −0,75 para o GAM (REML) nas células não homogêneas. A separação de taxas que motiva o artigo, 2<i>s</i>/(2<i>s</i>+1) contra 2<i>s′</i>/(2<i>s′</i>+1), não aparece nos dados.</p>
+      </article>
+
+      <article class="concern">
+        <div class="concern-head"><span class="concern-id">M5</span><h3>Todas as funções de teste valem o mesmo nas duas pontas do intervalo</h3></div>
+        <p>O seno e o cosseno são periódicos. A cúbica <i>u</i>(<i>u</i> − 1)(<i>u</i> − 0,4) zera em 0 e em 1. As duas funções da célula <span class="mono">uneven</span> são multiplicadas por uma janela que zera nas pontas. Bumps, blocks e heavisine valem zero em 0 e em 1. Não há uma única componente monótona ou com tendência.</p>
+        <p>A Proposição S3.1 do próprio suplemento diz o que acontece no caso contrário: com valores diferentes nas pontas, o viés da base periodizada trava na ordem 2<sup>−<i>J</i>/2</sup>, qualquer que seja a regularidade no interior. Esse é o caso genérico em dado real (data, velocidade do vento, umidade), e é onde o spline está em casa. O estudo, portanto, compara os métodos no terreno mais favorável à base periodizada.</p>
+        <p>O §4.2 afirma “we keep the periodized basis as the default and offer the interval basis as an option”, mas <code>wafc_design()</code> para com erro em <code>boundary = "interval"</code> (<span class="mono">wafc/R/design.R:261</span>). Na aplicação a saída foi não ler os 60 dias de cada ponta da série.</p>
+      </article>
+
+      <article class="concern">
+        <div class="concern-head"><span class="concern-id">M6</span><h3>As aplicações não exercem o que o artigo propõe</h3></div>
+        <p><b>Marylebone Road (corpo).</b> O WAFC padrão zera <span class="mono">NOx × vento</span> nas 20 partições e, no ajuste à amostra inteira, também <span class="mono">fundo × vento</span>. O modelo que a figura mostra tem uma moduladora só, a data: é o caso <i>q</i> = 1, que Klopp e Pensky e Zhou e You já cobrem, e a aditividade em várias moduladoras não é exercida. O degrau de 2003 é conhecido desde Carslaw (2005), e o GAM (REML) dá a mesma curva (subida de 10,3 pontos). Na predição o WAFC fica 2,5% atrás (11,75 contra 11,47 ppb), ou empata com o outro limiar.</p>
+        <p><b>Dongsi (suplemento, e “8% better in Beijing” no resumo).</b> O WAFC escolhe <i>J</i> = 4, quinze wavelets por bloco e todos os coeficientes não nulos; o GAM escolhe <i>k</i> = 80, o topo da grade, nos 21 ajustes, com o <code>k.check</code> marcando de 4 a 8 das 8 suavizações. O WAFC vence por ajustar mais suave, não por adaptar a regularidade local: REML e GCV subsuavizam quando o erro é autocorrelacionado. O registro interno confirma. Com <i>k</i> escolhido pela mesma validação cruzada por semana (<span class="mono">gam.cv</span>, E6.1b), o spline fica de 2,0% a 2,6% à frente nessa base, e a decisão D56 deixou essa linha fora do artigo.</p>
+        <p class="ask"><b>O referee pediria</b> na primeira rodada um spline com erro AR(1), via <code>bam(..., rho = )</code> ou <code>gamm</code>, ou <i>k</i> por validação cruzada em blocos. O número do resumo não sobrevive a esse pedido, e o repositório já sabe disso. É o ponto mais frágil do manuscrito.</p>
+      </article>
+
+      <article class="concern">
+        <div class="concern-head"><span class="concern-id">M7</span><h3>Faltam os concorrentes localmente adaptativos</h3></div>
+        <p>A pergunta do artigo é a adaptação a regularidade não homogênea, e os concorrentes diretos nessa pergunta não são splines com suavização global. Faltam o suavizador adaptativo do próprio <code>mgcv</code> (<code>bs = "ad"</code>), os modelos aditivos com <i>trend filtering</i> (Sadhanala e Tibshirani, 2019 <span class="mono">[VERIFICAR]</span>), o <i>fused lasso additive model</i> (Petersen, Witten e Simon, 2016, visto e descartado na L2) e o waveMesh (Haris, Simon e Shojaie, 2018), ao menos no caso <i>p</i> = 1.</p>
+        <p>A linha “Adaptive spline” é um substituto escrito para o estudo, e o texto diz que ela “stands in for their method and does not implement it”. Um referee não aceita o rótulo com o nome de Wang, Jiang e Liu ao lado. O VCBART rodou, perde em todas as células do núcleo (0,900 contra 0,768 na não homogênea em <i>n</i> = 1000) e ficou fora do texto; incluí-lo é barato e ajuda o argumento da aditividade.</p>
+      </article>
+
+      <article class="concern">
+        <div class="concern-head"><span class="concern-id">M8</span><h3>Custo, inferência e forma</h3></div>
+        <ul class="plain">
+          <li><b>Extensão.</b> 78 páginas no corpo e 114 no suplemento com a marcação; 66 no corpo sem o texto removido. O teto é 40, referências incluídas, e a revista confere o formato na recepção.</li>
+          <li><b>Tempo com <i>n</i> grande.</b> Nas aplicações, de 29 a 147 minutos por ajuste do WAFC contra 7 a 28 segundos do GAM (REML) (Table S7), com pico de 5 GB por processo.</li>
+          <li><b>Sem medida de incerteza.</b> Quem pergunta “qual moduladora age sobre qual coeficiente” quer uma banda ou um teste. A Discussão reconhece a lacuna.</li>
+          <li><b>“Levels” em dois sentidos.</b> No resumo a palavra nomeia as constantes <i>c</i><sub>ℓ</sub> e, na mesma frase, os níveis de resolução.</li>
+          <li><b>Uma razão invertida.</b> O §5.4 diz que o erro do WAFC fica “9% and 4% below” o do GAM (REML); pela Tabela 1 fica 8% e 4% abaixo (0,768 sobre 0,836), e é o GAM que fica 9% acima.</li>
+          <li><b>Sensibilidade não estudada.</b> Só uma família de wavelets (fase extrema, <i>N</i> = 4) e um tamanho de pedaço.</li>
+          <li><b>Verificação das provas.</b> O suplemento de 114 páginas foi produzido em 24 dias (18 de setembro a 12 de outubro). As conferências numéricas ajudam, mas não substituem a leitura linha a linha por um coautor.</li>
+        </ul>
+      </article>
+    </section>
+
+    <section id="aplicabilidade" class="stack-lg">
+      <div class="stack">
+        <h2>Aplicabilidade</h2>
+        <p>O repositório fez duas buscas de aplicação e registrou o resultado com franqueza. Contra o spline com dimensão escolhida por validação cruzada em blocos, o WAFC fica atrás em todas as bases, e vence em 0 a 6 das 20 partições.</p>
+      </div>
+      <div class="tbl-wrap">
+        <table class="wide">
+          <thead><tr><th>Base</th><th class="num">n</th><th class="num">WAFC / melhor spline</th><th>O que a estrutura mostrou</th></tr></thead>
+          <tbody>
+            <tr><td>bike</td><td class="num">17 379</td><td class="num">1,030 a 1,036</td><td>moduladora discreta (24 horas) deixa o bloco não identificado</td></tr>
+            <tr><td>beijing</td><td class="num">34 287</td><td class="num">1,006 a 1,010</td><td>sem estrutura abrupta</td></tr>
+            <tr><td>beijing.heat</td><td class="num">34 287</td><td class="num">1,020 a 1,026</td><td>todos os blocos mantidos; “vence” só contra REML e GCV no topo da grade</td></tr>
+            <tr><td>housing</td><td class="num">20 640</td><td class="num">1,041 a 1,066</td><td>energia por nível não decai; sem licença</td></tr>
+            <tr><td>marylebone</td><td class="num">60 780</td><td class="num">1,019 a 1,040</td><td>degrau de 2003, igual ao do spline</td></tr>
+            <tr><td>kelmarsh</td><td class="num">51 185</td><td class="num">1,033 a 1,072</td><td>o limiar zera a direção do vento, que o spline mantém</td></tr>
+            <tr><td>marylebone.ukair</td><td class="num">61 280</td><td class="num">≈ 1,018</td><td>a versão que foi ao artigo</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">Fonte: <span class="mono">docs/ESTADO.md</span>, blocos da E6.1b e da E6.1c. A faixa vai do limiar de menor erro ao de um erro-padrão; o melhor spline é o <span class="mono">gam.cv</span> em dobras por semana.</p>
+      <div class="stack">
+        <h3>Onde a relevância prática pode existir</h3>
+        <ul class="plain">
+          <li><b>Moduladoras periódicas.</b> Hora do dia, dia do ano, direção do vento, fase. A base periodizada é nativa nesses casos, e o problema da M5 desaparece.</li>
+          <li><b>Coeficientes com mudança abrupta documentada.</b> Limiares administrativos ou regulatórios, quebras datadas, regimes físicos. O próprio registro da E6.1a chegou a essa lista.</li>
+          <li><b>Muitos blocos a selecionar.</b> No modelo maior e na célula mista o WAFC é de 5 a 15 vezes mais rápido que o GAM (REML) e devolve uma estrutura esparsa. Esse é o único cenário em que ele já vence em custo e em leitura.</li>
+        </ul>
+        <p class="callout">Uma hipótese a testar, e só isso: Marylebone Road é um cânion urbano, e a dependência da concentração na direção do vento costuma ser abrupta por setor. Direção do vento e hora do dia como moduladoras são periódicas e plausivelmente não homogêneas, o que juntaria os dois primeiros itens numa base que o projeto já tem licenciada.</p>
+      </div>
+    </section>
+
+    <section id="afirmacoes" class="stack-lg">
+      <div class="stack">
+        <h2>Afirmações e evidência</h2>
+        <p>Seis frases do resumo e do corpo que um referee confrontaria com as tabelas. A terceira coluna diz a direção do ajuste; o texto em si fica para uma rodada de edição do <span class="mono">.tex</span>.</p>
+      </div>
+      <div class="tbl-wrap">
+        <table class="wide">
+          <thead><tr><th>O manuscrito diz</th><th>O repositório mostra</th><th>Direção</th></tr></thead>
+          <tbody>
+            <tr><td>“where the components are spatially inhomogeneous, predicts better than penalized splines”</td><td>Vale contra o REML em <i>n</i> = 500 e 1000. Perde do GCV em <i>n</i> ≤ 500 e do REML em <i>n</i> = 2000.</td><td>Qualificar por <i>n</i> e por critério</td></tr>
+            <tr><td>“8% better in Beijing”</td><td>Contra splines presos em <i>k</i> = 80 sob erro dependente. Com <i>k</i> por validação cruzada em blocos, 2,0% a 2,6% atrás.</td><td>Tirar do resumo, ou relatar o <span class="mono">gam.cv</span> e o AR(1)</td></tr>
+            <tr><td>“recovers the structure exactly in every replicate from <i>n</i> = 1000”</td><td>Verdade nas cinco células. Cai a 6% e 7% com razão sinal-ruído 1 e a 65% no modelo maior. O lasso com o mesmo limiar faz o mesmo.</td><td>Dizer a razão sinal-ruído e atribuir ao limiar</td></tr>
+            <tr><td>“holds under weaker conditions than theirs”</td><td><i>p</i> fixo é um regime mais restrito que o de K&amp;P.</td><td>Apresentar como regime diferente</td></tr>
+            <tr><td>“needs no cone condition, because the unpenalized levels are profiled out”</td><td>Dispensa o cone porque λ<sub>min</sub> é limitado inferiormente com menos colunas que observações.</td><td>Atribuir à condição de desenho</td></tr>
+            <tr><td>“offer the interval basis as an option”</td><td>Não implementada: o código para com erro.</td><td>Implementar ou cortar a frase</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="rota" class="stack-lg">
+      <div class="stack">
+        <h2>Mudança de rota</h2>
+        <h3>Primeiro: sete correções que valem em qualquer rota</h3>
+      </div>
+      <ol class="fixes">
+        <li><span><b>Igualar o limiar entre os métodos.</b> Aplicar a regra de um erro-padrão ao GAM, ao grupo-lasso em B-splines e ao block lasso de K&amp;P; acrescentar o WAFC sem limiar e um grupo-lasso adaptativo ou grupo-MCP com BIC. Reaproveita os ajustes já feitos.</span></li>
+        <li><span><b>Uma célula com componente não periódica</b> (tendência monótona), e um remédio de fronteira que exista no código: um termo polinomial não penalizado por bloco (tratamento polinomial de fronteira, Oh, Naveau e Lee, 2001 <span class="mono">[VERIFICAR]</span>) ou a base do intervalo.</span></li>
+        <li><span><b>Aplicação com o concorrente certo.</b> Incluir o <span class="mono">gam.cv</span> em blocos e o <code>bam</code> com AR(1), e tirar o “8%” do resumo se ele não se sustentar.</span></li>
+        <li><span><b>Um concorrente localmente adaptativo</b> (<code>bs = "ad"</code>; <i>trend filtering</i> aditivo no caso <i>p</i> = 1) e o VCBART no suplemento.</span></li>
+        <li><span><b>Requalificar as seis frases</b> da tabela anterior.</span></li>
+        <li><span><b>Chegar a 40 páginas.</b> O lasso coordenado, a taxa lenta (Proposição 3) e as variantes de penalidade saem do corpo; a Seção 3 fica com as hipóteses, o Teorema 1, a Proposição 2, o Teorema 2 e o Corolário 2.</span></li>
+        <li><span><b>Leitura independente das provas</b> por um coautor, linha a linha, e conferência da política da revista sobre uso de IA generativa na redação, com a declaração que ela pedir.</span></li>
+      </ol>
+      <p>As correções 1 e 2 são também um teste. Se, com o limiar nos concorrentes e uma componente não periódica, a vantagem de estrutura sumir e a de predição encolher, a tese “wavelets contra splines” não se sustenta e o artigo tem de mudar de argumento. Se a vantagem resistir no modelo maior e com sinal médio, há um artigo de método defensável.</p>
+
+      <div class="stack">
+        <h3>Depois: escolher um reforço</h3>
+        <div class="routes">
+          <div class="route">
+            <span class="chip info">Rota T</span>
+            <h3>Subir a teoria</h3>
+            <p><i>p</i> e <i>q</i> crescentes com poucos blocos ativos, penalidade em dois níveis (blocos e pedaços), taxa da forma <i>s</i><sub>0</sub>·<i>n</i><sup>−2<i>s</i>/(2<i>s</i>+1)</sup> + <i>s</i><sub>0</sub>·log(<i>pq</i>)/<i>n</i>. Aí o termo cruzado vira um problema de autovalor restrito de verdade. Somar um limiar com garantia dentro da janela do Corolário 2(iii).</p>
+            <dl>
+              <dt>Alvo</dt><dd>EJS, Bernoulli</dd>
+              <dt>Custo</dt><dd>meses; risco técnico alto</dd>
+              <dt>Ganha</dt><dd>responde à M1 e à M2</dd>
+            </dl>
+          </div>
+          <div class="route">
+            <span class="chip good">Rota A</span>
+            <h3>Subir o lado aplicado</h3>
+            <p>Aplicação com moduladoras periódicas e mudança abrupta; fronteira resolvida; bandas de confiança (reajuste pós-seleção com bootstrap em blocos, ou versão desviesada); tempo de ajuste reduzido em <i>n</i> grande.</p>
+            <dl>
+              <dt>Alvo</dt><dd>JCGS, Technometrics, CSDA, Statistics and Computing; a SS se a aplicação convencer</dd>
+              <dt>Custo</dt><dd>semanas a poucos meses</dd>
+              <dt>Ganha</dt><dd>responde à M5, à M6 e à M8</dd>
+            </dl>
+          </div>
+          <div class="route">
+            <span class="chip warn">Rota 0</span>
+            <h3>Manter e baixar o alvo</h3>
+            <p>Só as sete correções, com as afirmações requalificadas: um método competitivo, com garantia minimax e seleção de estrutura numa chamada.</p>
+            <dl>
+              <dt>Alvo</dt><dd>J. Nonparametric Statistics, CSDA, Statistical Papers, AISM</dd>
+              <dt>Custo</dt><dd>semanas</dd>
+              <dt>Ganha</dt><dd>publicação provável, impacto menor</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <p class="callout"><b>Minha recomendação:</b> fazer as sete correções e, se a vantagem resistir ao teste, seguir a Rota A. Ela usa o que o projeto já tem de melhor (código, compêndio, estudo de simulação) e ataca o que mais pesa contra o manuscrito na <em>Statistica Sinica</em>, que pede aplicação convincente. A Rota T é a única que muda o patamar teórico, mas é outro artigo.</p>
+    </section>
+
+    <section id="revista" class="stack-lg">
+      <h2>Revista-alvo</h2>
+      <div class="tbl-wrap">
+        <table class="wide">
+          <thead><tr><th>Revista</th><th>No estado atual</th><th>Com as correções e um reforço</th></tr></thead>
+          <tbody>
+            <tr><td><em>Statistica Sinica</em></td><td>Baixa. Risco de devolução pelo teto de páginas; depois, M1, M4 e M6.</td><td>Média, com a Rota A e uma aplicação que exerça <i>q</i> ≥ 2</td></tr>
+            <tr><td><em>Electronic Journal of Statistics</em></td><td>Baixa. A exigência de teoria é maior, e a M1 pesa mais.</td><td>Média a alta, só com a Rota T</td></tr>
+            <tr><td>JCGS, Technometrics</td><td>Baixa. Falta a evidência de ganho prático.</td><td>Média, com a Rota A</td></tr>
+            <tr><td>CSDA, Statistics and Computing</td><td>Média.</td><td>Média a alta, já com as sete correções</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">São julgamentos meus, não frequências. Se eu tivesse de pôr um número, daria menos de 15% de chance de aceitação final na <em>Statistica Sinica</em> ao manuscrito como está. Os quartis do SCImago não foram conferidos nesta leitura.</p>
+    </section>
+
+    <section id="limites" class="stack">
+      <h2>Limites desta leitura</h2>
+      <ul class="plain">
+        <li><b>Conferi:</b> a prova da Proposição 2, com as constantes da desigualdade de Bernstein matricial; a construção da cota inferior (o hipercubo num nível pertence à classe para todo π); os valores das funções de teste nas pontas; a Tabela 1 e as tabelas por tamanho de amostra contra <span class="mono">results/tables/core/summary.csv</span> nos casos citados acima; a parada do código em <code>boundary = "interval"</code>.</li>
+        <li><b>Não conferi:</b> as provas do Teorema 2, do Lema 3 e das Seções S6 a S8; não rodei o código nem os testes.</li>
+        <li><b>Citações de memória:</b> as marcadas <span class="mono">[VERIFICAR]</span> não foram verificadas e não devem ir ao <span class="mono">.bib</span> antes disso.</li>
+        <li><b>O que mudaria o veredito:</b> uma aplicação em que a seleção de estrutura responda a uma pergunta que o GAM não responde; ou a vantagem de estrutura resistindo ao limiar aplicado aos concorrentes.</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  var plot = document.getElementById('plot'), tip = document.getElementById('tip'), cross = document.getElementById('cross');
+  if (!plot || !tip || !cross) return;
+  var svg = plot.querySelector('svg');
+  var xs = [46, 194, 342, 490], ns = ['250', '500', '1000', '2000'];
+  var series = [
+    ['Smooth', '--s3', ['1,231', '1,242', '1,256', '1,175']],
+    ['Uneven', '--s4', ['1,166', '1,107', '1,105', '1,131']],
+    ['Mixed', '--s2', ['1,009', '0,970', '0,960', '1,060']],
+    ['Inhomogeneous', '--s1', ['0,993', '0,926', '0,919', '1,015']]
+  ];
+  function show(evt) {
+    var r = svg.getBoundingClientRect();
+    var x = (evt.clientX - r.left) / r.width * 660;
+    var i = 0, best = 1e9;
+    for (var k = 0; k < xs.length; k++) { var d = Math.abs(xs[k] - x); if (d < best) { best = d; i = k; } }
+    cross.setAttribute('x1', xs[i]); cross.setAttribute('x2', xs[i]); cross.setAttribute('visibility', 'visible');
+    var html = '<b>n = ' + ns[i] + '</b>';
+    series.forEach(function (s) {
+      html += '<div><span><i style="background:var(' + s[1] + ')"></i>' + s[0] + '</span><span>' + s[2][i] + '</span></div>';
+    });
+    tip.innerHTML = html; tip.hidden = false;
+    var px = xs[i] / 660 * r.width, w = tip.offsetWidth;
+    var left = px + 12; if (left + w > r.width) left = px - w - 12; if (left < 0) left = 0;
+    tip.style.left = left + 'px';
+  }
+  function hide() { tip.hidden = true; cross.setAttribute('visibility', 'hidden'); }
+  svg.addEventListener('pointermove', show);
+  svg.addEventListener('pointerdown', show);
+  svg.addEventListener('pointerleave', hide);
+})();
+</script>

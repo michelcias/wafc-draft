@@ -1,0 +1,276 @@
+\section{Recovery of the block structure by thresholding}
+\setcounter{equation}{0}
+
+Throughout this section $\nu_{\cv\md}$, $\widehat{\nu}_{\cv\md}$, $\mathcal{S}$,
+$\widehat{\mathcal{S}}(t)$,  $\rhoG$ and $\nu_{\min,n}$ are as in Section 3.6 of the paper,
+$\nu_{\min} = \min_{(\cv,\md)\in \mathcal{S}}\nu_{\cv\md}$ for a fixed sample size, and
+\[
+  \Delta \;=\; \max_{\cv,\md}\,
+  \bigl\lVert \widehat{g}_{\cv\md} - \gcomp{\cv}{\md} \bigr\rVert_{L_2[0,1]}
+\]
+is the largest error over the blocks. The first statement is deterministic
+and knows nothing about the  estimator.
+
+\begin{lemma}[Thresholding under a uniform block error]
+\label{lem:sandwich}
+Let $\{\gcomp{\cv}{\md}\}$ and $\{\widehat{g}_{\cv\md}\}$ be any two families
+of functions in $L_2[0,1]$ indexed by the blocks, with $\nu_{\cv\md}$,
+$\widehat{\nu}_{\cv\md}$, $\mathcal{S}$, $\widehat{\mathcal{S}}(t)$, $\Delta$ and $\nu_{\min}$ defined
+from them as above, and let $\bar{\Delta} \ge \Delta$. Then, for every $t \ge 0$,
+\begin{equation}
+  \label{eq:sandwich}
+  \bigl\{(\cv,\md) :\; \nu_{\cv\md} > t + \bar{\Delta}\bigr\}
+  \;\subseteq\; \widehat{\mathcal{S}}(t) \;\subseteq\;
+  \bigl\{(\cv,\md) :\; \nu_{\cv\md} > t - \bar{\Delta}\bigr\} .
+\end{equation}
+In particular: (i) if $t \ge \bar{\Delta}$, then $\widehat{\mathcal{S}}(t) \subseteq \mathcal{S}$, with no
+use of $\nu_{\min}$; (ii) if $t < \nu_{\min} - \bar{\Delta}$, then $\mathcal{S} \subseteq \widehat{\mathcal{S}}(t)$;
+and (iii) if $\bar{\Delta} \le t < \nu_{\min} - \bar{\Delta}$, then $\widehat{\mathcal{S}}(t) = \mathcal{S}$, and such a $t$
+exists if and only if $\nu_{\min} > 2\bar{\Delta}$.
+\end{lemma}
+
+\begin{proof}
+By the triangle inequality in $L_2[0,1]$, for every block,
+$|\widehat{\nu}_{\cv\md} - \nu_{\cv\md}| \le
+\lVert\widehat{g}_{\cv\md} - \gcomp{\cv}{\md}\rVert_{L_2[0,1]} \le \Delta \le \bar{\Delta}$.
+If $\nu_{\cv\md} > t + \bar{\Delta}$, then
+$\widehat{\nu}_{\cv\md} \ge \nu_{\cv\md} - \bar{\Delta} > t$, which is the left inclusion of
+\eqref{eq:sandwich}; if $\widehat{\nu}_{\cv\md} > t$, then
+$\nu_{\cv\md} \ge \widehat{\nu}_{\cv\md} - \bar{\Delta} > t - \bar{\Delta}$, which is the right one. For
+(i), $t - \bar{\Delta} \ge 0$ and the right inclusion give $\widehat{\mathcal{S}}(t) \subseteq
+\{\nu_{\cv\md} > 0\} = \mathcal{S}$. For (ii), every block of $\mathcal{S}$ has
+$\nu_{\cv\md} \ge \nu_{\min} > t + \bar{\Delta}$, and the left inclusion applies. Part (iii) is
+the conjunction of the two, and $[\bar{\Delta}, \nu_{\min} - \bar{\Delta})$ is nonempty exactly when
+$\bar{\Delta} < \nu_{\min} - \bar{\Delta}$.
+\end{proof}
+
+\begin{remark}[The window is exact]
+\label{rem:window}
+The condition $\nu_{\min} > 2\bar{\Delta}$ is not an artifact of the proof. Take two blocks,
+one active with $\nu_{11} = 2\bar{\Delta}$ and one null with $\nu_{21} = 0$, and fitted
+norms $\widehat{\nu}_{11} = \widehat{\nu}_{21} = \bar{\Delta}$, which is compatible with
+$\Delta \le \bar{\Delta}$: the two statistics tie and no threshold separates them. This
+says that the argument does not extend below $\nu_{\min} = 2\bar{\Delta}$, not that no
+procedure does, which would be a lower bound and is not proved here.
+\end{remark}
+
+% derivations/06-selecao-limiar.tex, Lema 16 (numeracao global; adendo de
+% E1.12); D45.
+\begin{lemma}[The risk of the thresholded estimator]
+\label{lem:thrisk}
+Let $\{\gcomp{\cv}{\md}\}$ and $\{\widehat{g}_{\cv\md}\}$ be any two families of
+functions in $L_2[0,1]$ indexed by the blocks and $t \ge 0$, with
+$\nu_{\cv\md}$, $\widehat{\nu}_{\cv\md}$, $\mathcal{S}$ and
+$\widehat{\mathcal{S}}(t)$ as above, $\Dbl = \lVert\widehat{g}_{\cv\md} -
+\gcomp{\cv}{\md}\rVert_{L_2[0,1]}$, and
+$\widehat{g}^{(t)}_{\cv\md} = \widehat{g}_{\cv\md}
+\mathbf{1}\{(\cv,\md)\in\widehat{\mathcal{S}}(t)\}$.
+\begin{enumerate}
+\item[(i)] With no assumption,
+\[
+  \sum_{\cv,\md}\bigl\lVert\widehat{g}^{(t)}_{\cv\md}-\gcomp{\cv}{\md}
+  \bigr\rVert_{L_2[0,1]}^{2}
+  = \sum_{(\cv,\md)\in\widehat{\mathcal{S}}(t)}\Dbl^{2}
+  + \sum_{(\cv,\md)\in\mathcal{S}\setminus\widehat{\mathcal{S}}(t)}\nu_{\cv\md}^{2},
+\]
+and every $(\cv,\md) \in \mathcal{S}\setminus\widehat{\mathcal{S}}(t)$ has
+$\nu_{\cv\md} \le t + \Dbl$; hence the left side is at most
+$2\sum_{\cv,\md}\Dbl^{2} + 2t^{2}|\mathcal{S}\setminus\widehat{\mathcal{S}}(t)|
+\le 2\sum_{\cv,\md}\Dbl^{2} + 2t^{2}|\mathcal{S}|$.
+\item[(ii)] If $\mathcal{S} \subseteq \widehat{\mathcal{S}}(t)$, the left side
+of (i) is $\sum_{\widehat{\mathcal{S}}(t)}\Dbl^{2} \le \sum_{\cv,\md}\Dbl^{2}$;
+if $\widehat{\mathcal{S}}(t) = \mathcal{S}$, it is $\sum_{\mathcal{S}}\Dbl^{2}$,
+and the null blocks no longer contribute.
+\item[(iii)] Let $\lmin(\Gramhat) > 0$, $\betastar = (\bc,\thetastar)$,
+$f_J = \bZ\betastar$, $\betahat = (\chat,\thetahat)$ any fit,
+$\widehat{\mathcal{S}}(t) = \{(\cv,\md) : \norm{\thetahat_{\cv\md,\cdot}}_{2} > t\}$,
+$\mathcal{S}_J = \{(\cv,\md) : \thetastar_{\cv\md,\cdot} \ne 0\}$,
+$\thetahat^{(t)}$ the vector $\thetahat$ with the blocks outside
+$\widehat{\mathcal{S}}(t)$ set to zero, and
+$\widehat{f}^{(t)} = \Amat\chat + \Bmat\thetahat^{(t)}$. Then
+\[
+  \normn{\widehat{f}^{(t)}-f_J}^{2} \;\le\;
+  \frac{2\lmaxx(\Gramhat)}{\lmin(\Gramhat)}\normn{\widehat{f}-f_J}^{2}
+  + 2\lmaxx(\Gramhat)\,t^{2}\,|\mathcal{S}_J\setminus\widehat{\mathcal{S}}(t)|,
+\]
+and, if $\mathcal{S}_J \subseteq \widehat{\mathcal{S}}(t)$,
+$\normn{\widehat{f}^{(t)}-f_J}^{2} \le
+\{\lmaxx(\Gramhat)/\lmin(\Gramhat)\}\normn{\widehat{f}-f_J}^{2}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\emph{(i).} If $(\cv,\md) \in \widehat{\mathcal{S}}(t)$, then
+$\widehat{g}^{(t)}_{\cv\md} = \widehat{g}_{\cv\md}$ and the error of the block
+is $\Dbl^{2}$; otherwise $\widehat{g}^{(t)}_{\cv\md} = 0$ and the error is
+$\nu_{\cv\md}^{2}$, which vanishes outside $\mathcal{S}$. Summing gives the
+identity. For $(\cv,\md) \notin \widehat{\mathcal{S}}(t)$,
+$\widehat{\nu}_{\cv\md} \le t$, and the triangle inequality gives
+$\nu_{\cv\md} \le \widehat{\nu}_{\cv\md} + \Dbl \le t + \Dbl$, hence
+$\nu_{\cv\md}^{2} \le 2t^{2} + 2\Dbl^{2}$; summing over
+$\mathcal{S}\setminus\widehat{\mathcal{S}}(t)$ and adding the sum over
+$\widehat{\mathcal{S}}(t)$, a disjoint set, gives the bound.
+\emph{(ii).} If $\mathcal{S} \subseteq \widehat{\mathcal{S}}(t)$, the second sum
+of (i) is empty.
+\emph{(iii).} The proof of (i) and (ii) uses only the triangle inequality in a
+norm; applied to the vectors $\thetahat_{\cv\md,\cdot}$ and
+$\thetastar_{\cv\md,\cdot}$ of $\R^{\NJ}$, with $\mathcal{S}_J$ in place of
+$\mathcal{S}$, it gives $\norm{\thetahat^{(t)}-\thetastar}_{2}^{2} \le
+2\norm{\thetahat-\thetastar}_{2}^{2} +
+2t^{2}|\mathcal{S}_J\setminus\widehat{\mathcal{S}}(t)|$, and
+$\norm{\thetahat^{(t)}-\thetastar}_{2}^{2} \le \norm{\thetahat-\thetastar}_{2}^{2}$
+when $\mathcal{S}_J \subseteq \widehat{\mathcal{S}}(t)$. Since $\chat$ does not
+change, the same bounds hold for $\betahat^{(t)} = (\chat,\thetahat^{(t)})$
+against $\betastar$. Finally
+$\normn{\widehat{f}^{(t)}-f_J}^{2} = (\betahat^{(t)}-\betastar)\T\Gramhat
+(\betahat^{(t)}-\betastar) \le
+\lmaxx(\Gramhat)\norm{\betahat^{(t)}-\betastar}_{2}^{2}$ and
+$\norm{\betahat-\betastar}_{2}^{2} \le
+\normn{\bZ(\betahat-\betastar)}^{2}/\lmin(\Gramhat) =
+\normn{\widehat{f}-f_J}^{2}/\lmin(\Gramhat)$. By the orthonormality of the
+basis, $\norm{\thetahat_{\cv\md,\cdot}}_{2} = \widehat{\nu}_{\cv\md}$, so that the
+$\widehat{\mathcal{S}}(t)$ of (iii) is that of (i).
+\end{proof}
+
+The factor $2$ in (i) is attained: an active block with
+$\widehat{g}_{\cv\md} = t\,\gcomp{\cv}{\md}/\nu_{\cv\md}$ and
+$\nu_{\cv\md} = 2t$ has $\widehat{\nu}_{\cv\md} = t$, is set to zero, and pays
+$\nu_{\cv\md}^{2} = 4t^{2} = 2\Dbl^{2} + 2t^{2}$. In (iii), the passage between
+the norm of the coefficients and the prediction norm uses the smallest
+eigenvalue of $\Gramhat$ to go from prediction to coefficients and the largest
+to come back, and the factor is the condition number of $\Gramhat$, which on
+$\ESig$ is smaller than $2\Lambda/\gamma$.
+
+
+
+
+% derivations/06-selecao-limiar.tex, provas do Corolario 12, da Observacao
+% rem:adaptativa-blocos e do Corolario 13 (adendo de E1.12).
+\subsection*{Proof of Corollary 2}
+
+\emph{A nonasymptotic bound on $\Delta$.} Work at $J = J_n$ and
+$\pen = \lamG$, and intersect $\Acal$, the event $\Ecal$ of
+Lemma~\ref{lem:calib-blocks}(i) and
+$\{\normn{\bb}^{2} \le \mathcal{B}_{J_n}^{2}/\alpha'\}$; the intersection has
+probability at least $1 - \alpha - \alpha' - \Prob(\Acal^{c})$, by
+Lemma~\ref{lem:calib-blocks}, Markov's inequality and Lemma~2. On $\Acal$,
+$\Ecal \subseteq \Tw$ and $\gtil > \gamma/2$ (Lemma~\ref{lem:regime}), and
+Theorem~2(ii) with the comparator $\betastar$ and
+$\Wcal(\Gzero(\thetastar)) \le \Wcal(\Gcal_{n})$ gives, with
+$v = \thetahat - \thetastar$,
+\[
+  \norm{v}_{2}^{2} \;\le\; \frac{64(\lamG)^{2}\Wcal(\Gcal_{n})}{\gtil^{2}}
+  + \frac{16\normn{\bb}^{2}}{\gtil}
+  \;\le\; \frac{256(\lamG)^{2}\Wcal(\Gcal_{n})}{\gamma^{2}}
+  + \frac{32\mathcal{B}^{2}_{J_n}}{\alpha'\gamma} .
+\]
+For a fixed block, the orthonormality of the wavelets of level below $J_n$
+gives $\lVert\widehat{g}_{\cv\md} - \PiJ\gcomp{\cv}{\md}\rVert_{L_2[0,1]} =
+\norm{v_{\cv\md,\cdot}}_2 \le \norm{v}_2$, and the first display of Lemma~2
+bounds $\lVert\PiJ\gcomp{\cv}{\md} - \gcomp{\cv}{\md}\rVert^2_{L_2[0,1]}$ by
+$C_g^2(1-2^{-2\seff})^{-1}2^{-2J_n\seff}$. By $(x+y)^2 \le 2x^2 + 2y^2$,
+\begin{equation}
+  \label{eq:Dn-blocks}
+  \Delta^{2} \;\le\; (\bar{\Delta}^{\Gcal}_n)^{2} \;=\;
+  \frac{512(\lamG)^{2}\Wcal(\Gcal_{n})}{\gamma^{2}}
+  + \frac{64\,\mathcal{B}^2_{J_n}}{\alpha'\gamma}
+  + \frac{2C_g^2}{1-2^{-2\seff}}\,2^{-2J_n\seff},
+\end{equation}
+with $(\lamG)^{2}\Wcal(\Gcal_{n}) \le \varrho^{2}(\lamGone)^{2}|\Gcal_{n}|$ by
+Lemma~\ref{lem:calib-blocks}(iii). The residual probability
+$\Prob(\Acal^{c})$ tends to zero by Lemma~\ref{lem:regime} and does not depend
+on the components; it is the $\omega_n$ of Corollary~2(iii), and by
+Lemma~S7.1(iii) this paragraph is the proof of that part. The bound
+$\bar{\Delta}^{\Gcal}_n$ depends on the components only through the constants
+of Assumption~5, so everything above holds uniformly over the class, which is
+what allows the target to vary with $n$ in Assumption~6.
+
+\emph{The order of $\bar{\Delta}^{\Gcal}_n$.} By the proof of Theorem~3,
+$(\lamG)^{2}\Wcal(\Gcal_{n}) \le \bar\varrho^{2}C_{\pen}\sigma^{2}pq(\bn +
+2^{J_n})/n \asymp n^{-2\seff/(2\seff+1)}$, and $2^{-2J_n\seff} \le
+n^{-2\seff/(2\seff+1)}$ by the definition of $J_n$. Hence
+$\bar{\Delta}^{\Gcal}_n \le c(\alpha,\alpha')\rhoG$ with
+$c(\alpha,\alpha') < \infty$. Given $\epsilon > 0$, take
+$\alpha = \alpha' = \epsilon/4$ and $n$ large enough that
+$\Prob(\Acal^{c}) < \epsilon/2$; then
+$\Prob\{\Delta > c(\epsilon/4,\epsilon/4)\rhoG\} < \epsilon$, that is
+$\Delta = O_p(\rhoG)$, uniformly over the class.
+
+\emph{Part (i).} If $t_n/\rhoG \to \infty$, then $\Prob(\Delta \le t_n) \to 1$,
+and on that event Lemma~S7.1(i) with $\bar{\Delta} = \Delta$ gives
+$\widehat{\mathcal{S}}(t_n) \subseteq \mathcal{S}$. No property of
+$\nu_{\min,n}$ has been used.
+
+\emph{Part (ii).} If $\mathcal{S}$ is empty, part (ii) is part (i). Otherwise,
+the condition $\limsup_n t_n/\nu_{\min,n} < 1$ gives $\eta > 0$ and $n_0$ with
+$\nu_{\min,n} - t_n \ge \eta\,\nu_{\min,n}$ for $n \ge n_0$, and Assumption~6
+gives $(\nu_{\min,n} - t_n)/\rhoG \ge \eta\,\nu_{\min,n}/\rhoG \to \infty$.
+Hence $\Prob(\Delta \le t_n) \to 1$ and
+$\Prob(\Delta < \nu_{\min,n} - t_n) \to 1$, and on the intersection of the two
+events Lemma~S7.1(iii) with $\bar{\Delta} = \Delta$ gives
+$\widehat{\mathcal{S}}(t_n) = \mathcal{S}$. For the existence,
+$t_n = (\rhoG\nu_{\min,n})^{1/2}$ has
+$t_n/\rhoG = (\nu_{\min,n}/\rhoG)^{1/2} \to \infty$ and
+$t_n/\nu_{\min,n} = (\rhoG/\nu_{\min,n})^{1/2} \to 0$. \qed
+
+\emph{At the resolution of Theorem~1.} Theorem~1 gives
+$\sum_{\cv,\md}\lVert\widehat{g}_{\cv\md}-\gcomp{\cv}{\md}\rVert^2_{L_2[0,1]}
+= O_p\{(\rhoGt)^{2}\}$, with $\rhoGt$ as in Section~3.6 of the paper, hence
+$\Delta = O_p(\rhoGt)$, and the bound in its proof depends on the components
+only through the constants of Assumption~5 and of the design, so that this
+holds uniformly over the class. The proofs of parts (i) and (ii) above use
+nothing about $\Delta$ beyond $\Delta = O_p(\rhoG)$ uniformly over the class,
+together with Lemma~S7.1 and Assumption~6, and they go through verbatim with
+$\rhoGt$ in place of $\rhoG$.
+
+\subsection*{Proof of Corollary 3}
+
+Write $r_n$ for the rate of the statement and $\Dbl$ as in
+Lemma~\ref{lem:thrisk}. For the fit of Theorem~3,
+$\normn{\widehat{f}-f}^{2} = O_p(r_n^{2})$ and
+$\sum_{\cv,\md}\Dbl^{2} = O_p(r_n^{2})$ by Theorem~3 and Corollary~1; for the
+lasso, by Theorem~\ref{thm:lasso-linear} and
+Corollary~\ref{cor:lasso-components}. In both cases
+$\Prob(\ESig) \to 1$, by the proofs of Theorems~3 and \ref{thm:lasso-linear},
+and $\normn{\bb}^{2} = O_p(\mathcal{B}_{J_n}^{2}) = O_p(r_n^{2})$, by the choice
+of $J_n$.
+
+\emph{Part (i).} The bound for the components is Lemma~\ref{lem:thrisk}(i)
+with $|\mathcal{S}| \le pq$. For prediction,
+$\normn{\widehat{f}^{(t)}-f}^{2} \le 2\normn{\widehat{f}^{(t)}-f_{J_n}}^{2} +
+2\normn{\bb}^{2}$, and on $\ESig$, $\lmaxx(\Gramhat) < \Lambda$ and
+$\lmin(\Gramhat) > \gamma/2$, so that Lemma~\ref{lem:thrisk}(iii) gives, for
+every $t$,
+\[
+  \normn{\widehat{f}^{(t)}-f}^{2} \;\le\;
+  \frac{8\Lambda}{\gamma}\normn{\widehat{f}-f_{J_n}}^{2}
+  + 4\Lambda t^{2}|\mathcal{S}_{J_n}\setminus\widehat{\mathcal{S}}(t)|
+  + 2\normn{\bb}^{2},
+\]
+with $\normn{\widehat{f}-f_{J_n}}^{2} \le 2\normn{\widehat{f}-f}^{2} +
+2\normn{\bb}^{2} = O_p(r_n^{2})$.
+
+\emph{Part (ii).} By Lemma~S7.1(ii), $\mathcal{S} \subseteq
+\widehat{\mathcal{S}}(t_n)$ whenever $t_n < \nu_{\min,n} - \Delta$. With
+$\limsup_n t_n/\nu_{\min,n} < 1$ there are $\eta > 0$ and $n_0$ with
+$\nu_{\min,n} - t_n \ge \eta\nu_{\min,n}$ for $n \ge n_0$, and since
+$\Delta^{2} \le \sum_{\cv,\md}\Dbl^{2} = O_p(r_n^{2})$ and
+$\nu_{\min,n}/r_n \to \infty$, $\Prob(\Delta < \nu_{\min,n} - t_n) \to 1$. On
+that event Lemma~\ref{lem:thrisk}(ii) holds and, since
+$\mathcal{S}_{J_n} \subseteq \mathcal{S}$, so does the second case of
+Lemma~\ref{lem:thrisk}(iii), which on $\ESig$ gives
+$\normn{\widehat{f}^{(t_n)}-f}^{2} \le
+(4\Lambda/\gamma)\normn{\widehat{f}-f_{J_n}}^{2} + 2\normn{\bb}^{2}$. If
+moreover $t_n/r_n \to \infty$, part (ii) of Corollary~2, or of
+Corollary~\ref{cor:lasso-threshold} for the lasso, gives
+$\Prob\{\widehat{\mathcal{S}}(t_n) = \mathcal{S}\} \to 1$, and
+Lemma~\ref{lem:thrisk}(ii) concludes. \qed
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/04-oraculo.tex, 05-taxas.tex e 06-selecao-limiar.tex (o lasso
+% coordenado). Secao nova em k = 4 (D51(a)): os enunciados estavam nas Secoes
+% 3.2 a 3.6 do ms_3 e as provas nas Secoes S5 a S7 do supp_3; a Proposicao 4
+% entra emendada por D49(a) (as condicoes s' > 1/4 em (i) e s' > s/2 em (ii)).
+

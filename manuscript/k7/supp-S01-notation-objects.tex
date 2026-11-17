@@ -1,0 +1,73 @@
+\section{Notation and objects}
+
+The model, the basis and the estimator are those of Sections 2.1 to 2.3 of the
+paper. We write $\bZ = [\Amat\;\Bmat]$ for the design matrix of equation
+(2.4), with $\Amat \in \R^{n\times p}$ the unpenalized block and
+$\Bmat \in \R^{n\times d}$, $d = pq\NJ$, the block of products; $\bY$, $f$ and
+$\bveps$ for the vectors with entries $Y_i$, $f(\bX_i,\bU_i)$ and
+$\varepsilon_i$; $\Gramhat = \bZ\T\bZ/n$ and $\Gram = \E(\bZ\bZ\T)$; and, for
+$a, h \in \R^n$, $\normn{a}^2 = n^{-1}\sum_i a_i^2$ and
+$\inner{a}{h}_n = n^{-1}\sum_i a_ih_i$.
+
+The oracle of the approximation space is $\betastar = (\bc,\thetastar)$, with
+$\coefs{\cv}{\md}{\lev}{\tsl} = \inner{\gcomp{\cv}{\md}}{\wav{\lev}{\tsl}}$
+for $\lev < J$, so that $f_J = \bZ\betastar$ is the best approximation of $f$
+in the approximation space in the sense of Lemma 2; the deterministic residual is
+$\bb = f - f_J$, the oracle support is $\Szero = \supp(\thetastar)$ and
+$s_0 = |\Szero|$, and $v = \thetahat - \thetastar$. When $\Amat$ has rank $p$
+we write $\PA = \Amat(\Amat\T\Amat)^{-1}\Amat\T$, $\MA = I_n - \PA$,
+$\Btil = \MA\Bmat$, $\GBA = \Btil\T\Btil/n$ and $\gtil = \lmin(\GBA)$, and
+finally $\smax^2 = \max_a(\Gramhat)_{aa}$, the maximum being over the $d$
+penalized columns.
+
+
+For the penalty of equation (2.5), $\Gcal$ is the partition of the $d$
+penalized coordinates into the chunks of Section 2.3 of the paper, $|\Gcal|$
+the number of chunks, $\btheta_{G}$ and $|G|$ the subvector and the size of a
+chunk $G$, $w_{G} > 0$ its weight and $\varrho = \max_{G}w_{G}/\min_{G}w_{G}$
+the ratio of the weights; $\nGw{\btheta} = \sum_{G}w_{G}\norm{\btheta_{G}}_{2}$,
+$\nGone{\btheta}$ is the same norm with unit weights, and, for
+$\Hcal \subseteq \Gcal$, $\nGw{\btheta_{\Hcal}} =
+\sum_{G\in\Hcal}w_{G}\norm{\btheta_{G}}_{2}$ and
+$\Wcal(\Hcal) = \sum_{G\in\Hcal}w_{G}^{2}$; $\Gzero(\btheta) =
+\{G : \btheta_{G} \ne 0\}$ are the active chunks of $\btheta$. With unit
+weights $\Wcal(\Gzero(\btheta))$ is the number of active chunks, and with
+$w_{G} = |G|^{1/2}$ it is the number of coordinates in them. A comparator is
+any $\bar\bbeta = (\bar\bc,\thbar) \in \R^{p}\times\R^{d}$, with
+deterministic residual $\bbar = f - \bZ\bar\bbeta$, active chunks
+$\Gbar = \Gzero(\thbar)$, $\bar\Wcal = \Wcal(\Gbar)$ and
+$\vbar = \thetahat - \thbar$. For a chunk, $\Bmat_{G}$ and $\Btil_{G}$ are the
+columns of $\Bmat$ and $\Btil$ in $G$, $\Psitil_{G} = \Btil_{G}\T\Btil_{G}/n$
+and $\Gramhat_{GG} = \Bmat_{G}\T\Bmat_{G}/n$. The ideal risk over chunks is
+$\Rid(\btheta;\eta) = \sum_{G}\min(\norm{\btheta_{G}}_{2}^{2},\eta)$, for
+$\eta > 0$; it is nondecreasing in $\eta$, and, since
+$\min(u,\kappa\eta) \le \kappa\min(u,\eta)$ for $\kappa \ge 1$,
+$\Rid(\btheta;\kappa\eta) \le \kappa\Rid(\btheta;\eta)$. Finally
+$\gamma = \kappa_{1}c_{U}$, $\Lambda = \kappa_{2}C_{U} + \gamma/2$ is the
+constant of equation (3.1), and
+\[
+  \ESig \;=\; \bigl\{\opnorm{\Gramhat - \Gram} < \gamma/2\bigr\};
+\]
+on $\ESig$, Weyl's inequality and Proposition 2(i) give
+$\lmin(\Gramhat) > \gamma/2$ and $\lmaxx(\Gramhat) < \Lambda$, and the matrix
+Bernstein bound in the proof of Proposition 2(ii), Section S4, gives
+$\Prob(\ESig) \to 1$ whenever $pq2^{J}\log(pq2^{J})/n \to 0$.
+
+
+For a support $S$ and a symmetric matrix $A$, the compatibility constant is
+\[
+  \compat^2(S;A) = \min\bigl\{|S|\,\delta\T A \delta :\;
+  \norm{\delta_S}_1 = 1,\; \norm{\delta_{S^c}}_1 \le 3 \bigr\},
+\]
+and the elementary bound
+$\delta\T A\delta \ge \lmin(A)\norm{\delta}_2^2 \ge
+\lmin(A)\norm{\delta_S}_1^2/|S|$ gives
+\begin{equation}
+  \label{eq:compat-lmin}
+  \compat^2(S;A) \;\ge\; \lmin(A) \qquad \text{for every } S,
+\end{equation}
+so that a lower bound on the smallest eigenvalue is a compatibility bound on
+every support, with the same constant and no cone restriction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% derivations/01-identificabilidade.md

@@ -1,0 +1,85 @@
+
+\renewcommand{\baselinestretch}{2}
+
+\markright{ \hbox{\footnotesize\rm Statistica Sinica
+  }\hfill\\[-13pt]
+  \hbox{\footnotesize\rm
+  }\hfill }
+
+\markboth{\hfill{\footnotesize\rm AUTHOR(S)} \hfill}
+{\hfill {\footnotesize\rm WAVELET ADDITIVE FUNCTIONAL COEFFICIENTS} \hfill}
+
+\renewcommand{\thefootnote}{}
+$\ $\par
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont \vspace{0.8pc}
+\centerline{\large\bf SPARSE WAVELET ESTIMATION OF}
+\vspace{2pt}
+\centerline{\large\bf ADDITIVE FUNCTIONAL COEFFICIENTS}
+\vspace{.4cm}
+\centerline{Author(s)}
+\vspace{.4cm}
+\centerline{\it Affiliation(s)}
+\vspace{.55cm} \fontsize{9}{11.5pt plus.8pt minus.6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{quotation}
+\noindent {\it Abstract:}
+We study a varying coefficient model in which the effect of each linear
+covariate is additive in several modulating covariates, and each additive
+component is expanded in a periodized wavelet basis. The resulting design is
+an approximation space of products between a linear covariate and a wavelet evaluated at a
+modulator, and the components are estimated by a single 
+block lasso problem in
+which the levels of the coefficients are left unpenalized and the
+wavelet coefficients of each resolution level are grouped in chunks of order
+$\log n$. Three results are
+established. The population Gram matrix of the product design has its
+smallest eigenvalue bounded away from zero under a conditional second moment
+condition on the linear covariates and a bounded joint density for the
+modulators, with no independence between the two groups of covariates; the
+estimator satisfies a nonasymptotic oracle inequality that needs no cone
+condition, because the unpenalized levels are profiled out, and
+that holds for any weights of bounded ratio; and, at a
+resolution level chosen inside an explicit window, the prediction error and
+the componentwise error attain the rate of nonlinear wavelet approximation, with no logarithmic factor when the Besov
+integrability index is at least two, which is minimax optimal, under the same Besov condition that governs
+linear approximation. The last result rests on   a
+bound on the ideal risk over chunks that the Besov condition already implies,
+so that adaptivity costs no additional assumption. A threshold on the
+norms of the fitted components recovers which modulators act on which
+coefficients, and the thresholded estimator keeps the rate of the fit. The
+estimator is a single convex
+program and is fit by standard
+group lasso software.
+In a simulation study the thresholded estimator recovers
+the structure exactly in every replicate from $n = 1000$ and, where the
+components are spatially inhomogeneous, predicts better than penalized
+splines and within 8\% of an estimator that knows the structure; on hourly
+air pollution data it predicts within 3\% of penalized splines in London and
+8\% better in Beijing.
+An implementation in R and the code that reproduces every
+numerical result of the paper are made available with it.
+
+\vspace{9pt}
+\noindent {\it Key words and phrases:}
+Additive coefficient model, Besov space,  group
+lasso, lasso, oracle
+inequality, thresholding, varying coefficient model, wavelets.
+\par
+\end{quotation}\par
+
+\def\thefigure{\arabic{figure}}
+\def\thetable{\arabic{table}}
+
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+% o contador de equacoes do template nao reinicia por secao, o que produzia
+% "(3.6)" logo depois de "(2.5)"; o \numberwithin reinicia.
+\numberwithin{equation}{section}
+
+\fontsize{12}{14pt plus.8pt minus .6pt}\selectfont
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

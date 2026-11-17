@@ -1,0 +1,129 @@
+\section{Introduction}
+\label{sec:intro}
+
+Applied problems often present an effect that is not constant across the
+sample. The return to schooling changes with age and with experience, the
+effect of temperature on electricity demand changes with the hour of the day
+and with humidity, and the effect of a treatment changes with the age and the
+body mass index of the patient. The varying coefficient model of
+\citet{Hastie-Tibshirani-1993} and \citet*{Cai-Fan-Yao-2000} accommodates this
+by letting the coefficient of each covariate be a function of a modulating
+variable; see \citet{Fan-Zhang-2008} for a review. When more than one variable
+modulates the effect, a fully nonparametric coefficient runs into the curse of
+dimensionality, and the standard remedy is to make each coefficient additive
+in the modulators, which is the additive coefficient model of
+\citet{Xue-Yang-2006}, studied further by \citet{Xue-Liang-2010} and
+\citet{Liu-Yang-2010}.
+
+The estimators available for this model are built from polynomial splines and
+from kernels, and are governed by a global smoothness index, so that a
+component with a peak, a jump or a change of regime is either oversmoothed or
+paid for everywhere in the domain. Wavelet bases combined with an $\ell_1$
+penalty \citep{tibshirani1996regression} are the standard answer to this difficulty, because a function whose
+smoothness is inhomogeneous is still economically represented by a few large
+coefficients \citep{Donoho-Johnstone-1994, Donoho-Johnstone-1998,
+Antoniadis-Fan-2001}. They have been used for varying coefficients without an
+additive structure and without penalization \citep*{Zhou-You-2004,
+Montoril-Morettin-Chiann-2018}, and for additive models without a multiplying
+covariate \citep{Sardy-Tseng-2004, Zhang-Wong-2003, Haris-Simon-Shojaie-2018,
+Amato-Antoniadis-DeFeis-Gijbels-2022, Sardy-Ma-2024}; penalized estimation in
+the additive coefficient model itself has been carried out with grouped
+penalties on spline bases \citep{Wei-Huang-Li-2011,
+Antoniadis-Gijbels-LambertLacroix-2014, Ma-Carroll-Liang-Xu-2015}, again under
+global smoothness.
+
+\citet{Klopp-Pensky-2015} study the varying coefficient model in which a
+single index modulates every coefficient. They expand each coefficient
+function in an orthonormal basis, estimate the resulting array by a block
+lasso, and obtain a nonasymptotic oracle inequality, a Besov rate that adapts
+to inhomogeneous smoothness, and a matching minimax lower bound, under the
+assumption that the covariates are independent of the index. The present paper
+carries that  program to the situation an applied problem usually presents,
+in which several variables modulate a coefficient at once. We let each
+coefficient be additive in the modulators, which keeps the estimator free of
+the curse of dimensionality in their number, we allow the covariates to depend
+on the modulators, and we  keep the block lasso but leave the levels of the
+coefficients unpenalized and group the wavelet coefficients in chunks of order
+$\log n$ within a resolution level, with weights whose ratio stays bounded, so
+that the standardized weights of group lasso software are covered.
+Additivity produces cross terms between distinct modulators,
+so the population Gram matrix no longer factorizes as a Kronecker product and
+has to be bounded directly; dependence between the covariates and the
+modulators replaces a marginal second moment by a conditional one; and the
+unpenalized levels leave a term in the risk that full block penalization does not
+incur. Our main result, Theorem~\ref{thm:main}, states that the estimator
+attains the rate of  
+Klopp and Pensky, with no logarithmic factor when the Besov integrability
+index is at least two, 
+% E5g (D57): "where it is minimax optimal", pela cota inferior do Theorem S6.1.
+where it is minimax optimal. It holds under weaker conditions than
+theirs: the number of covariates is fixed, a regime their high dimensional
+condition excludes, and the effective smoothness of the components need only
+exceed $s/(2s+1)$, which is below one half, where theirs must exceed one half.
+Components with effective smoothness one half, such as the inhomogeneous
+functions of Section~\ref{sec:simulation}, are covered here and not there. 
+% E5g (D57): a frase de D50 sobre a cota inferior, trocada (Theorem S6.1 do supp).
+% D58 (pergunta 52(d)): "it" trocado por "the rate".
+The lower bound that makes  the rate optimal is proved here for any number of
+modulators and for covariates that depend on them; Klopp and Pensky have it
+with a single modulator independent of the covariates.
+% E5h (k = 5): o "Section~5" acima passou a \ref{sec:simulation} (D50); o texto
+% impresso nao muda. A Secao 5 diz que as funcoes nao homogeneas tem s' = 1/2.
+
+We call the resulting procedure WAFC, for wavelet additive functional
+coefficients. Its contributions are of   three kinds. The first is the theory of
+the additive product design: a design condition for the Gram matrix of the
+products between a linear covariate and a wavelet of a modulator, which
+carries a cross term between distinct modulators and does not assume
+independence (Proposition~\ref{prop:gram}); an oracle inequality that needs no
+cone condition, because the unpenalized levels are profiled out, and
+that holds for any weights of bounded ratio, including those of the software
+that computes the estimator
+(Theorem~\ref{thm:oracle}); and rates 
+that follow from the Besov assumption alone, through a bound on the
+ideal risk over chunks
+(Theorem~\ref{thm:main}), together with a minimax lower bound, for any number
+of modulators, that makes these rates optimal when $\pi \ge 2$ (Theorem~S6.1 in
+the Supplementary Material). 
+The second is the recovery of the structure of the model, which
+modulators act on which coefficients, by a threshold on the norms of the
+fitted components (Corollary~\ref{cor:threshold}): removing the null blocks
+needs no separation condition, and the thresholded estimator keeps the rate of
+the fit (Corollary~\ref{cor:thrisk}), so that one estimator serves both for
+structure and for prediction. The third is computational: the
+estimator is one convex program  solved by
+standard group lasso software,  the resolution
+level and the penalty are chosen jointly by cross-validation, and the
+threshold by the one standard error rule on the same folds.
+
+
+The rest of the paper is organized as follows. Section~\ref{sec:model}
+introduces the model, its identification, the wavelet approximation space and the estimator.
+Section~\ref{sec:theory} states the assumptions and the theory, opening with
+the main rate and then giving the three results it rests on, then
+the rates, including one with no design condition, and
+closes with the recovery of the block structure by thresholding and
+the risk of the thresholded estimator.
+Section~\ref{sec:computation} describes the computation, the scale of the
+penalty and the tuning rules, the threshold among them.
+% E5h (k = 5): as Secoes 5 e 6 no roteiro; a Secao 7 (Discussion) e a frase de
+% fechamento continuam com a E5b.
+Section~\ref{sec:simulation} compares the method with penalized
+splines and with other competitors in a simulation study, and
+Section~\ref{sec:application} applies it to hourly air pollution data from
+London. Section~\ref{sec:discussion} discusses where the method
+does not win and what is left open. Proofs are collected in the online Supplementary
+Material, which also gives the theory of the coordinatewise lasso,
+offered by the software as an option, the details and further
+results of the simulation study, and a second application, to data from
+Beijing.
+
+Throughout, $\norm{a}_\pi$ is the $\ell_\pi$ norm of a vector,
+$\normn{h}^2 = n^{-1}\sum_{i\le n} h_i^2$ is the empirical norm,
+$\lmin(\cdot)$ and $\lmaxx(\cdot)$ are the extreme eigenvalues of a symmetric
+matrix, $\opnorm{\cdot}$ is the operator norm, and $a_n \asymp b_n$ means that
+$a_n/b_n$ is bounded away from zero and infinity. For a support
+$S$, $\delta_S$ is the vector that agrees with $\delta$ on $S$ and vanishes
+elsewhere.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

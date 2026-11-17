@@ -9,7 +9,14 @@ mesmo índice `k`; a versão `{k+1}` copia os três e atualiza
 A versão `1` não leva marcação de alteração; o preâmbulo já define `colR1`
 e carrega `ulem` para quando `k = 2` existir.
 
-**Versão viva: `k = 6`**, aberta em 2026-10-12 pela E5b como cópia de
+**Versão viva: `k = 7`**, aberta em 2026-11-16 (E8.4) a partir da `k = 6` com a
+rodada `colR1` aceita (inserções mantidas, remoções apagadas; a marcação
+seguinte é `colR2`). `ms_7.tex` e `supp_7.tex` são só o preâmbulo e os
+`\input{k7/...}`; o texto está em `k7/` (um arquivo por seção, 9 do corpo e 11 do
+supp). Gerados por `tools/accept-round.py` (aceita a rodada) e
+`tools/split-sections.py` (reparte em seções). 71 e 111 páginas.
+
+A `k = 6` foi aberta em 2026-10-12 pela E5b como cópia de
 `k = 5`, para os números do estudo de simulação (E4.4), a Seção 7 e a
 pergunta 68; os `\input` de `tables/` e `figures/` que ela muda ganham o
 sufixo `_6` (o primeiro: `tables/app-tuning_6.tex`), para a `k = 5`
@@ -50,5 +57,5 @@ geradas dos arquivos de origem é item do checklist de submissão
 ## Compilar
 
 ```bash
-cd manuscript && latexmk -pdf ms_5.tex && latexmk -pdf supp_5.tex && latexmk -c
+cd manuscript && latexmk -pdf ms_7.tex && latexmk -pdf supp_7.tex && latexmk -c
 ```
